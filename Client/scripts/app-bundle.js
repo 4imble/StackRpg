@@ -65,6 +65,116 @@ define('domain/Monster',["require", "exports", "./Body"], function (require, exp
     exports.default = Monster;
 });
 
+define('domain/Items/Loot',["require", "exports"], function (require, exports) {
+    "use strict";
+    var Loot = (function () {
+        function Loot() {
+        }
+        Object.defineProperty(Loot.prototype, "displayName", {
+            get: function () { },
+            enumerable: true,
+            configurable: true
+        });
+        return Loot;
+    }());
+    exports.Loot = Loot;
+});
+
+define('helpers/Dice',["require", "exports"], function (require, exports) {
+    "use strict";
+    var Dice = (function () {
+        function Dice() {
+        }
+        Dice.d6 = function () {
+            return this.rollSides(6);
+        };
+        Dice.d20 = function () {
+            return this.rollSides(20);
+        };
+        Dice.rollSides = function (sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        };
+        return Dice;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Dice;
+});
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Items/Gold',["require", "exports", "./Loot", "../../helpers/Dice", '../../messages'], function (require, exports, Loot_1, Dice_1, messages_1) {
+    "use strict";
+    var Gold = (function (_super) {
+        __extends(Gold, _super);
+        function Gold() {
+            _super.call(this);
+            this.value = Dice_1.default.d20();
+            this.template = "gold";
+        }
+        Object.defineProperty(Gold.prototype, "displayName", {
+            get: function () {
+                return "Gold Bag (" + this.value + ")";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Gold.prototype.showToolTip = function () { };
+        ;
+        Gold.prototype.take = function () { return new messages_1.GoldTaken(this); };
+        ;
+        Gold.prototype.use = function () { };
+        ;
+        return Gold;
+    }(Loot_1.Loot));
+    exports.Gold = Gold;
+});
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Items/Weapon',["require", "exports", "./Loot", "../../helpers/Dice", '../../messages'], function (require, exports, Loot_1, Dice_1, messages_1) {
+    "use strict";
+    var Weapon = (function (_super) {
+        __extends(Weapon, _super);
+        function Weapon(name) {
+            _super.call(this);
+            this.name = name;
+            this.damage = Dice_1.default.d20();
+            this.template = "weapon";
+        }
+        Object.defineProperty(Weapon.prototype, "displayName", {
+            get: function () {
+                return this.name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Weapon.prototype.showToolTip = function () { };
+        ;
+        Weapon.prototype.take = function () { return new messages_1.ItemTaken(this); };
+        ;
+        Weapon.prototype.use = function () { };
+        ;
+        return Weapon;
+    }(Loot_1.Loot));
+    exports.Weapon = Weapon;
+});
+
+define('domain/AllItems',["require", "exports", './Items/Loot', './Items/Gold', './Items/Weapon'], function (require, exports, Loot_1, Gold_1, Weapon_1) {
+    "use strict";
+    function __export(m) {
+        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    }
+    __export(Loot_1);
+    __export(Gold_1);
+    __export(Weapon_1);
+});
+
 define('messages',["require", "exports"], function (require, exports) {
     "use strict";
     var Heartbeat = (function () {
@@ -428,113 +538,6 @@ Array.prototype.remove = function (itemToRemove) {
 
 define("helpers/Array", [],function(){});
 
-define('helpers/Dice',["require", "exports"], function (require, exports) {
-    "use strict";
-    var Dice = (function () {
-        function Dice() {
-        }
-        Dice.d6 = function () {
-            return this.rollSides(6);
-        };
-        Dice.d20 = function () {
-            return this.rollSides(20);
-        };
-        Dice.rollSides = function (sides) {
-            return Math.floor(Math.random() * sides) + 1;
-        };
-        return Dice;
-    }());
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = Dice;
-});
-
-define('resources/index',["require", "exports"], function (require, exports) {
-    "use strict";
-    function configure(config) {
-    }
-    exports.configure = configure;
-});
-
-define('domain/Items/Loot',["require", "exports"], function (require, exports) {
-    "use strict";
-    var Loot = (function () {
-        function Loot() {
-        }
-        Object.defineProperty(Loot.prototype, "displayName", {
-            get: function () { },
-            enumerable: true,
-            configurable: true
-        });
-        return Loot;
-    }());
-    exports.Loot = Loot;
-});
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-define('domain/Items/Gold',["require", "exports", "./Loot", "../../helpers/Dice", '../../messages'], function (require, exports, Loot_1, Dice_1, messages_1) {
-    "use strict";
-    var Gold = (function (_super) {
-        __extends(Gold, _super);
-        function Gold() {
-            _super.call(this);
-            this.value = Dice_1.default.d20();
-            this.template = "gold";
-        }
-        Object.defineProperty(Gold.prototype, "displayName", {
-            get: function () {
-                return "Gold Bag (" + this.value + ")";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Gold.prototype.showToolTip = function () { };
-        ;
-        Gold.prototype.take = function () { return new messages_1.GoldTaken(this); };
-        ;
-        Gold.prototype.use = function () { };
-        ;
-        return Gold;
-    }(Loot_1.Loot));
-    exports.Gold = Gold;
-});
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-define('domain/Items/Weapon',["require", "exports", "./Loot", "../../helpers/Dice", '../../messages'], function (require, exports, Loot_1, Dice_1, messages_1) {
-    "use strict";
-    var Weapon = (function (_super) {
-        __extends(Weapon, _super);
-        function Weapon(name) {
-            _super.call(this);
-            this.name = name;
-            this.damage = Dice_1.default.d20();
-            this.template = "weapon";
-        }
-        Object.defineProperty(Weapon.prototype, "displayName", {
-            get: function () {
-                return this.name;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Weapon.prototype.showToolTip = function () { };
-        ;
-        Weapon.prototype.take = function () { return new messages_1.ItemTaken(this); };
-        ;
-        Weapon.prototype.use = function () { };
-        ;
-        return Weapon;
-    }(Loot_1.Loot));
-    exports.Weapon = Weapon;
-});
-
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -569,34 +572,11 @@ define('components/loot/loot-stack',["require", "exports", 'aurelia-framework', 
     exports.LootStack = LootStack;
 });
 
-define('domain/Items',["require", "exports", './Items/Loot', './Items/Gold', './Items/Weapon'], function (require, exports, Loot_1, Gold_1, Weapon_1) {
+define('resources/index',["require", "exports"], function (require, exports) {
     "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+    function configure(config) {
     }
-    __export(Loot_1);
-    __export(Gold_1);
-    __export(Weapon_1);
-});
-
-define('domain/Item',["require", "exports", './Items/Loot', './Items/Gold', './Items/Weapon'], function (require, exports, Loot_1, Gold_1, Weapon_1) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-    }
-    __export(Loot_1);
-    __export(Gold_1);
-    __export(Weapon_1);
-});
-
-define('domain/AllItems',["require", "exports", './Items/Loot', './Items/Gold', './Items/Weapon'], function (require, exports, Loot_1, Gold_1, Weapon_1) {
-    "use strict";
-    function __export(m) {
-        for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-    }
-    __export(Loot_1);
-    __export(Gold_1);
-    __export(Weapon_1);
+    exports.configure = configure;
 });
 
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n  <require from=\"./components/monster-bag\"></require>\r\n  <require from=\"./components/battle-stack\"></require>\r\n  <require from=\"./components/loot/loot-stack\"></require>\r\n  <require from=\"./components/main-menu\"></require>\r\n  <require from=\"./components/player-overview\"></require>\r\n  <require from=\"./components/player-inventory\"></require>\r\n  <require from=\"bootstrap4/css/bootstrap.css\"></require>\r\n  <require from=\"./styles/styles.css\"></require>\r\n\r\n  <div id=\"timer\">\r\n    Timer: ${timer}\r\n  </div>\r\n  <div class=\"row\">\r\n    <div class=\"col-sm-2\">\r\n      <main-menu></main-menu>\r\n    </div>\r\n    <div class=\"col-sm-10\">\r\n      <battle-stack></battle-stack>\r\n      <monster-bag></monster-bag>\r\n      <loot-stack></loot-stack>\r\n    </div>\r\n  </div>\r\n\r\n  <player-overview></player-overview>\r\n  <player-inventory></player-inventory>\r\n</template>"; });
@@ -605,9 +585,9 @@ define('text!styles/styles.css', ['module'], function(module) { module.exports =
 define('text!components/main-menu.html', ['module'], function(module) { module.exports = "<template>\r\n    <button click.delegate=\"open('player-overview')\" class=\"btn btn-block\">Player Overview</button>\r\n    <button click.delegate=\"open('player-inventory')\" class=\"btn btn-block\">Inventory</button>\r\n    <button class=\"btn btn-block\">Templates</button>\r\n</template>"; });
 define('text!components/modal-content.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"visibility\" class=\"modal-window\">\r\n    <div>\r\n      <button class=\"btn btn-danger btn-sm close-button\" click.delegate=\"close()\">close</button>\r\n    </div>\r\n    <slot></slot>\r\n  </div>\r\n  <div show.bind=\"visibility\" class=\"modal-window-overlay\" click.delegate=\"close()\"></div>\r\n</template>"; });
 define('text!components/monster-bag.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"clearfix\">\r\n        <div class=\"bagItem\" repeat.for=\"monster of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.useMonster(monster)\">${monster.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!components/player-inventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n    \r\n    <modal-content id.bind=\"'player-inventory'\">\r\n        <h2>\r\n            Inventory\r\n        </h2>\r\n\r\n        <div repeat.for=\"item of stack\" class=\"inventoryItem\">\r\n            ${item.name}\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
+define('text!components/player-inventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-inventory'\">\r\n        <h2>Inventory</h2>\r\n\r\n        <div repeat.for=\"item of stack\" class=\"inventoryItem\">\r\n            ${item.name}\r\n        </div>\r\n        <div if.bind=\"!stack.length\">\r\n            - empty -\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
 define('text!components/player-overview.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-overview'\">\r\n        <h2>\r\n            Player Overview\r\n        </h2>\r\n        <div id=\"player-overview\">\r\n            <span>Name</span> : ${currentPlayer.name}\r\n            <br />\r\n            <span>Gold</span> : ${currentPlayer.gold}\r\n            <br />\r\n            <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}\r\n            <br />\r\n            <span>Strength</span> : ${currentPlayer.strength}\r\n            <br />\r\n            <span>Dexterity</span> : ${currentPlayer.dexterity}\r\n            <br />\r\n            <span>Toughness</span> : ${currentPlayer.toughness}\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
-define('text!components/loot/gold-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    Gold Bag <br/>\r\n    value: ${lootItem.value}\r\n</template>"; });
+define('text!components/loot/gold-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"gold-loot\">\r\n        <img src=\"src/images/gold_stack.png\" width=\"50px\" height=\"50px\" /> \r\n        ${lootItem.value} Gold\r\n    </div>\r\n</template>"; });
 define('text!components/loot/loot-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose \r\n      class=\"lootItem\" \r\n      repeat.for=\"lootItem of stack\" \r\n      view=\"./${lootItem.template}-loot.html\"\r\n      click.delegate=\"$parent.takeItem(lootItem)\">\r\n    </compose>\r\n</template>"; });
 define('text!components/loot/weapon-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div>\r\n        ${lootItem.displayName}<br/> \r\n        Damage: ${lootItem.damage}\r\n    </div>\r\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map
