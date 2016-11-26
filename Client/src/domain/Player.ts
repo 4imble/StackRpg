@@ -1,7 +1,6 @@
-export default class Player
+import Body from "./Body";
+
+export default class Player extends Body
 {
     gold: number = 0;
-
-    constructor(public name: string){
-    }
 }

@@ -1,5 +1,5 @@
 import Loot from "./Loot";
-import Dice from "../helpers/Dice";
+import Dice from "../../helpers/Dice";
 
 export default class Gold extends Loot {
     value: number;

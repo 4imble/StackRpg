@@ -1,8 +1,8 @@
 import {inject, customElement} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import Loot from "../../domain/Loot";
-import Gold from "../../domain/Gold";
-import Weapon from "../../domain/Weapon";
+import Loot from "../../domain/Items/Loot";
+import Gold from "../../domain/Items/Gold";
+import Weapon from "../../domain/Items/Weapon";
 import { MonsterKilled, ItemTaken } from '../../messages';
 
 @inject(EventAggregator)

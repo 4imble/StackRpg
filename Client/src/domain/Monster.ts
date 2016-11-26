@@ -1,5 +1,4 @@
-export default class Monster {
-    constructor(public name: string) {
-        
-    }
+import Body from "./Body";
+
+export default class Monster extends Body {
 }

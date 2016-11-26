@@ -1,11 +1,58 @@
-define('domain/Monster',["require", "exports"], function (require, exports) {
+define('helpers/Attribute',["require", "exports"], function (require, exports) {
     "use strict";
-    var Monster = (function () {
-        function Monster(name) {
+    var Attribute = (function () {
+        function Attribute() {
+        }
+        Attribute.getModifier = function (value) {
+            return Math.floor((value - 10) / 2);
+        };
+        return Attribute;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Attribute;
+});
+
+define('domain/Body',["require", "exports", "../helpers/Attribute"], function (require, exports, Attribute_1) {
+    "use strict";
+    var Body = (function () {
+        function Body(name) {
             this.name = name;
+            this.baseHealth = 10;
+            this.damageTaken = 0;
+            this.level = 1;
+            this.strength = 10;
+            this.toughness = 10;
+            this.dexterity = 10;
+        }
+        Object.defineProperty(Body.prototype, "currentHealth", {
+            get: function () {
+                var toughnessModifier = Attribute_1.default.getModifier(this.toughness);
+                return (this.baseHealth + toughnessModifier) - this.damageTaken;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ;
+        return Body;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Body;
+});
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Monster',["require", "exports", "./Body"], function (require, exports, Body_1) {
+    "use strict";
+    var Monster = (function (_super) {
+        __extends(Monster, _super);
+        function Monster() {
+            _super.apply(this, arguments);
         }
         return Monster;
-    }());
+    }(Body_1.default));
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = Monster;
 });
@@ -304,15 +351,21 @@ define('components/player-inventory',["require", "exports", 'aurelia-framework',
     exports.PlayerInventory = PlayerInventory;
 });
 
-define('domain/Player',["require", "exports"], function (require, exports) {
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Player',["require", "exports", "./Body"], function (require, exports, Body_1) {
     "use strict";
-    var Player = (function () {
-        function Player(name) {
-            this.name = name;
+    var Player = (function (_super) {
+        __extends(Player, _super);
+        function Player() {
+            _super.apply(this, arguments);
             this.gold = 0;
         }
         return Player;
-    }());
+    }(Body_1.default));
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = Player;
 });
@@ -344,21 +397,15 @@ define('components/player-overview',["require", "exports", 'aurelia-framework', 
     exports.PlayerOverview = PlayerOverview;
 });
 
-define('domain/Loot',["require", "exports"], function (require, exports) {
-    "use strict";
-    var Loot = (function () {
-        function Loot() {
-        }
-        Object.defineProperty(Loot.prototype, "displayName", {
-            get: function () { },
-            enumerable: true,
-            configurable: true
-        });
-        return Loot;
-    }());
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = Loot;
-});
+Array.prototype.remove = function (itemToRemove) {
+    var index = this.indexOf(itemToRemove);
+    if (index !== -1) {
+        this.splice(index, 1);
+    }
+    return this;
+};
+
+define("helpers/Array", [],function(){});
 
 define('helpers/Dice',["require", "exports"], function (require, exports) {
     "use strict";
@@ -380,12 +427,35 @@ define('helpers/Dice',["require", "exports"], function (require, exports) {
     exports.default = Dice;
 });
 
+define('resources/index',["require", "exports"], function (require, exports) {
+    "use strict";
+    function configure(config) {
+    }
+    exports.configure = configure;
+});
+
+define('domain/Items/Loot',["require", "exports"], function (require, exports) {
+    "use strict";
+    var Loot = (function () {
+        function Loot() {
+        }
+        Object.defineProperty(Loot.prototype, "displayName", {
+            get: function () { },
+            enumerable: true,
+            configurable: true
+        });
+        return Loot;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Loot;
+});
+
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define('domain/Gold',["require", "exports", "./Loot", "../helpers/Dice"], function (require, exports, Loot_1, Dice_1) {
+define('domain/Items/Gold',["require", "exports", "./Loot", "../../helpers/Dice"], function (require, exports, Loot_1, Dice_1) {
     "use strict";
     var Gold = (function (_super) {
         __extends(Gold, _super);
@@ -418,7 +488,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define('domain/Weapon',["require", "exports", "./Loot", "../helpers/Dice"], function (require, exports, Loot_1, Dice_1) {
+define('domain/Items/Weapon',["require", "exports", "./Loot", "../../helpers/Dice"], function (require, exports, Loot_1, Dice_1) {
     "use strict";
     var Weapon = (function (_super) {
         __extends(Weapon, _super);
@@ -447,23 +517,6 @@ define('domain/Weapon',["require", "exports", "./Loot", "../helpers/Dice"], func
     exports.default = Weapon;
 });
 
-Array.prototype.remove = function (itemToRemove) {
-    var index = this.indexOf(itemToRemove);
-    if (index !== -1) {
-        this.splice(index, 1);
-    }
-    return this;
-};
-
-define("helpers/Array", [],function(){});
-
-define('resources/index',["require", "exports"], function (require, exports) {
-    "use strict";
-    function configure(config) {
-    }
-    exports.configure = configure;
-});
-
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -473,7 +526,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/loot/loot-stack',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', "../../domain/Gold", "../../domain/Weapon", '../../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Gold_1, Weapon_1, messages_1) {
+define('components/loot/loot-stack',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', "../../domain/Items/Gold", "../../domain/Items/Weapon", '../../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Gold_1, Weapon_1, messages_1) {
     "use strict";
     var LootStack = (function () {
         function LootStack(eventAggregator) {
