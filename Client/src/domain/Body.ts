@@ -11,9 +11,13 @@ abstract class Body {
 
     constructor(public name: string) {}
 
-    get currentHealth() {
+    get totalHealth() {
         let toughnessModifier = Attribute.getModifier(this.toughness);
         return (this.baseHealth + toughnessModifier) - this.damageTaken;
+    };
+
+    get currentHealth() {
+        return this.totalHealth - this.damageTaken;
     };
 }
 

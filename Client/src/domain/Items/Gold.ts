@@ -1,7 +1,9 @@
-import Loot from "./Loot";
+import {Loot} from "./Loot";
 import Dice from "../../helpers/Dice";
+import { GoldTaken } from '../../messages';
 
-export default class Gold extends Loot {
+
+export class Gold extends Loot {
     value: number;
 
     constructor() {
@@ -14,7 +16,7 @@ export default class Gold extends Loot {
         return `Gold Bag (${this.value})`;
     }
 
-    showToolTip() { alert(`Showing ${this.displayName}.`) };
-    moveToInventory() { };
+    showToolTip() { };
+    take() { return new GoldTaken(this) };
     use() {};
 }

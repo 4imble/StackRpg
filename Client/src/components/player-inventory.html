@@ -2,8 +2,12 @@
     <require from="./modal-content"></require>
     
     <modal-content id.bind="'player-inventory'">
-        <div>
+        <h2>
             Inventory
+        </h2>
+
+        <div repeat.for="item of stack" class="inventoryItem">
+            ${item.name}
         </div>
     </modal-content>
 </template>

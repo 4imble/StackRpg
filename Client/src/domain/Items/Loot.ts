@@ -1,11 +1,9 @@
-abstract class Loot {
+export abstract class Loot {
     constructor() {}
 
     template: string;
     abstract get displayName();
     abstract showToolTip();
-    abstract moveToInventory();
+    abstract take();
     abstract use();
 }
-
-export default Loot;

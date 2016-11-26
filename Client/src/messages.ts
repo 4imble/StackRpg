@@ -1,5 +1,5 @@
 import Monster from "./domain/monster";
-//import { GoldItem } from "./domain/GoldItem";
+import * as Item from "./domain/AllItems";
 
 export class Heartbeat {
     constructor() { }
@@ -13,8 +13,12 @@ export class MonsterKilled {
     constructor(public monster: Monster) { }
 }
 
+export class GoldTaken {
+    constructor(public goldItem: Item.Gold) { }
+}
+
 export class ItemTaken {
-    //constructor(public goldItem: GoldItem) { }
+    constructor(public item: Item.Loot) { }
 }
 
 export class ShowModalWindow {

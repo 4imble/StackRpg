@@ -1,24 +1,21 @@
 import {inject, customElement} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
-import Loot from "../../domain/Items/Loot";
-import Gold from "../../domain/Items/Gold";
-import Weapon from "../../domain/Items/Weapon";
-import { MonsterKilled, ItemTaken } from '../../messages';
+import * as Item from "../../domain/AllItems";
+import { MonsterKilled, GoldTaken } from '../../messages';
 
 @inject(EventAggregator)
 export class LootStack {
-    stack: Array<Loot> = [];
+    stack: Array<Item.Loot> = [];
     
     constructor(private eventAggregator: EventAggregator) {
         this.eventAggregator.subscribe(MonsterKilled, () => {
-            this.stack.push(new Gold()); 
-            this.stack.push(new Weapon("Thunderfury, Blessed Blade of the Windseeker"));
+            this.stack.push(new Item.Gold()); 
+            this.stack.push(new Item.Weapon("Thunderfury, Blessed Blade of the Windseeker"));
         });
     }
     
-    takeItem(lootItem: Loot){
-        //this.eventAggregator.publish(new ItemTaken(lootItem));
-        lootItem.showToolTip();
+    takeItem(lootItem: Item.Loot){
+        this.eventAggregator.publish(lootItem.take())
         this.stack.remove(lootItem);
     }
 }
