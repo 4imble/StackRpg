@@ -1,0 +1,10 @@
+<template>
+  <div show.bind="visibility" class="modal-window">
+    <div>
+      <button class="btn btn-danger btn-sm close-button" click.delegate="close()">Close</button>
+      <span>${id}</span>
+    </div>
+    <slot></slot>
+  </div>
+  <div show.bind="visibility" class="modal-window-overlay" click.delegate="close()"></div>
+</template>

@@ -1,0 +1,120 @@
+.component {
+    display: block;
+    overflow: hidden;
+}
+
+body {
+  margin: 0;
+}
+
+battle-stack, loot-stack, monster-bag, player-overview, player-inventory
+{
+    .component;
+}
+
+#timer{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.page-host{
+    padding-top: 60px;
+}
+
+.bagItem{
+    padding: 6px;
+    margin-top: 1px;
+    background-color: antiquewhite;
+}
+
+.bagItem:hover{
+    background-color: beige;
+    cursor: pointer;    
+}
+
+.battleStackItem{
+    height: 100px;
+    width: 80px;
+    padding: 6px;
+    margin-top: 1px;
+    margin-left: 1px;
+    background-color: coral;
+    color:whitesmoke;
+    font-weight: 600;
+    float: left;
+
+    &.empty{
+        background-color: #b1b1b1;
+        color: white;
+    }
+}
+
+.battleStackEmptyItem{
+    .battleStackItem;
+    background-color: darkslategray;
+}
+
+.lootItem{
+    width: 140px;
+    padding: 6px;
+    margin-top: 1px;
+    margin-left: 1px;
+    background-color: gray;
+    color:whitesmoke;
+    font-weight: 600;
+    float: left;
+}
+
+.lootItem:hover{
+    background-color: cadetblue;
+    cursor: pointer;    
+}
+
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.clearfix{
+    clear:both;
+}
+
+.modal-window
+{
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: white;
+    position: fixed;
+    z-index: 99999;
+    border-radius: 5px;
+    padding: 22px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%);
+    max-height: 70%;
+
+    .close-button {
+        float: right;
+    }
+}
+
+.modal-window-overlay
+{
+    background-color: black;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+    background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 10000;
+}

@@ -1,0 +1,11 @@
+<template>
+    <require from="./modal-content"></require>
+    
+    <modal-content id.bind="'player-overview'">
+        <div>
+            <span>Name</span> : ${currentPlayer.name}
+            <br />
+            <span>Gold</span> : ${currentPlayer.gold}
+        </div>
+    </modal-content>
+</template>
