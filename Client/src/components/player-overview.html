@@ -1,22 +1,18 @@
 <template>
-    <require from="./modal-content"></require>
-
-    <modal-content id.bind="'player-overview'">
+    <div id="player-overview">
         <h2>
             Player Overview
         </h2>
-        <div id="player-overview">
-            <span>Name</span> : ${currentPlayer.name}
-            <br />
-            <span>Gold</span> : ${currentPlayer.gold}
-            <br />
-            <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}
-            <br />
-            <span>Strength</span> : ${currentPlayer.strength}
-            <br />
-            <span>Dexterity</span> : ${currentPlayer.dexterity}
-            <br />
-            <span>Toughness</span> : ${currentPlayer.toughness}
-        </div>
-    </modal-content>
+        <span>Name</span> : ${currentPlayer.name}
+        <br />
+        <span>Gold</span> : ${currentPlayer.gold}
+        <br />
+        <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}
+        <br />
+        <span>Strength</span> : ${currentPlayer.strength}
+        <br />
+        <span>Dexterity</span> : ${currentPlayer.dexterity}
+        <br />
+        <span>Toughness</span> : ${currentPlayer.toughness}
+    </div>
 </template>

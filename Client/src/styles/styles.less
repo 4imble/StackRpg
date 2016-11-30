@@ -7,14 +7,13 @@ body {
   margin: 0;
 }
 
-battle-stack, loot-stack, monster-bag, player-overview, player-inventory
+battle-stack, loot-stack, monster-bag
 {
     .component;
 }
 
 #player-overview{
-    width: 500px;
-    height: 500px;
+    background-color: lightblue;
 }
 
 #timer{
@@ -71,14 +70,14 @@ battle-stack, loot-stack, monster-bag, player-overview, player-inventory
 }
 
 .lootItem{
-    width: 140px;
+    .component;
     padding: 6px;
     margin-top: 1px;
     margin-left: 1px;
     background-color: gray;
     color:whitesmoke;
     font-weight: 600;
-    float: left;
+    font-size: 14px;
 }
 
 .lootItem:hover{

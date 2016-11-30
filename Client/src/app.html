@@ -1,27 +1,21 @@
 <template>
-  <require from="./components/monster-bag"></require>
-  <require from="./components/battle-stack"></require>
-  <require from="./components/loot/loot-stack"></require>
-  <require from="./components/main-menu"></require>
-  <require from="./components/player-overview"></require>
-  <require from="./components/player-inventory"></require>
-  <require from="bootstrap4/css/bootstrap.css"></require>
-  <require from="./styles/styles.css"></require>
+	<require from="./components/battle-stack"></require>
+	<require from="./components/loot/loot-stack"></require>
+	<require from="./components/main-menu"></require>
+	<require from="./components/player-overview"></require>
+	<require from="./components/player-inventory"></require>
+	<require from="./components/player-templates"></require>
+	<require from="bootstrap4/css/bootstrap.css"></require>
+	<require from="./styles/styles.css"></require>
 
-  <div id="timer">
-    Timer: ${timer}
-  </div>
-  <div class="row">
-    <div class="col-sm-2">
-      <main-menu></main-menu>
-    </div>
-    <div class="col-sm-10">
-      <battle-stack></battle-stack>
-      <monster-bag></monster-bag>
-      <loot-stack></loot-stack>
-    </div>
-  </div>
+	<div id="timer">
+		Timer: ${timer}
+	</div>
+	<main-menu></main-menu>
+	<battle-stack></battle-stack>
+	<player-overview></player-overview>
+	<loot-stack></loot-stack>
 
-  <player-overview></player-overview>
-  <player-inventory></player-inventory>
+	<player-inventory></player-inventory>
+	<player-templates></player-templates>
 </template>
