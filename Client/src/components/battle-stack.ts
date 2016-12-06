@@ -5,7 +5,7 @@ import { MonsterAdded, Heartbeat, MonsterKilled } from '../messages';
 
 @inject(EventAggregator)
 export class BattleStack {
-    stack: Array<Monster> = [new Monster("Grumble"), new Monster("Terrible Ade"), new Monster("Viqas's Bread")];
+    stack: Array<Monster> = [new Monster("Grumble"), new Monster("Terrible Ade"), new Monster("Viqas's Bread"), new Monster("Viqas's Bread")];
 
     constructor(private eventAggregator: EventAggregator) {
         this.eventAggregator.subscribe(MonsterAdded, (msg: MonsterAdded) => {
