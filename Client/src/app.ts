@@ -8,7 +8,8 @@ export class App {
     timer: number = 0;
     showModal: boolean = false;
 
-    constructor(private gameLoop: GameLoop, private eventAggregator: EventAggregator) {
+    constructor(private gameLoop: GameLoop, private eventAggregator: EventAggregator) 
+    {
         this.eventAggregator.subscribe(Heartbeat, () => {
             this.timer ++;
         })

@@ -1,27 +1,26 @@
 import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Monster from '../domain/Monster';
+import TemplateStore from '../domain/Stores/TemplateStore';
 import MonsterTemplate from '../domain/MonsterTemplate';
 import { MonsterAdded, Heartbeat, MonsterKilled } from '../messages';
 
-@inject(EventAggregator)
+@inject(EventAggregator, TemplateStore)
 export class MonsterManager {
     bag: Array<Monster>;
-    templates: Array<MonsterTemplate>;
-    selectedTemplate: MonsterTemplate;
 
-    constructor(private eventAggregator: EventAggregator) {
+    constructor(private eventAggregator: EventAggregator, private templateStore: TemplateStore) {
         this.bag = [new Monster("Grumble"), new Monster("Viqas's Bread")];
-        this.templates = [new MonsterTemplate("Template 1"), new MonsterTemplate("Template 2")];
+        templateStore.templates = [new MonsterTemplate("Template 1"), new MonsterTemplate("Template 2")];
     }
     
     useMonster(monster) 
     {
-        this.selectedTemplate.addMonster(monster);
+        this.templateStore.selectedTemplate.addMonster(monster);
         //this.eventAggregator.publish(new MonsterAdded(monster));
     }
 
     selectTemplate(template) {
-        this.selectedTemplate = template;
+        this.templateStore.selectedTemplate = template;
     }
 }

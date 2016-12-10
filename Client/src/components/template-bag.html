@@ -1,0 +1,10 @@
+<template>
+    <div class="templateItem" repeat.for="template of templateStore.templates">
+        <div class="noselect">
+            ${template.name}
+            <div repeat.for="monster of template.monsters" class="templateItem">
+                <div class="noselect" click.delegate="$parent.$parent.alertMonster(monster)">${monster.name}</div>
+            </div>
+        </div>
+    </div>
+</template>
