@@ -8,11 +8,11 @@ export default class MonsterTemplate
         this.monsters = [];
     };
 
-    addMonster(newMonster){
+    addMonster(newMonster: Monster){
         this.monsters.push(newMonster);
     }
 
-    remove(existingMonster){
+    remove(existingMonster: Monster){
         this.monsters.remove(existingMonster);
     }
 }

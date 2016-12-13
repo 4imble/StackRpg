@@ -1,4 +1,5 @@
 import MonsterTemplate from '../MonsterTemplate';
+import Monster from "../Monster";
 
 export default class TemplateStore
 {
@@ -6,6 +7,10 @@ export default class TemplateStore
     selectedTemplate: MonsterTemplate;
     
     constructor() {
-        this.templates = [];
+        let defaultTemplate = new MonsterTemplate("Test Template");
+        defaultTemplate.addMonster(new Monster("Default Monster1"));
+        defaultTemplate.addMonster(new Monster("Default Monster2"));
+
+        this.templates = [defaultTemplate];
     }
 }

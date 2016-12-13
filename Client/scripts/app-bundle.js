@@ -218,6 +218,13 @@ define('messages',["require", "exports"], function (require, exports) {
         return ShowModalWindow;
     }());
     exports.ShowModalWindow = ShowModalWindow;
+    var TemplateUsed = (function () {
+        function TemplateUsed(template) {
+            this.template = template;
+        }
+        return TemplateUsed;
+    }());
+    exports.TemplateUsed = TemplateUsed;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -443,6 +450,21 @@ define('domain/MonsterTemplate',["require", "exports"], function (require, expor
     exports.default = MonsterTemplate;
 });
 
+define('domain/Stores/TemplateStore',["require", "exports", '../MonsterTemplate', "../Monster"], function (require, exports, MonsterTemplate_1, Monster_1) {
+    "use strict";
+    var TemplateStore = (function () {
+        function TemplateStore() {
+            var defaultTemplate = new MonsterTemplate_1.default("Test Template");
+            defaultTemplate.addMonster(new Monster_1.default("Default Monster1"));
+            defaultTemplate.addMonster(new Monster_1.default("Default Monster2"));
+            this.templates = [defaultTemplate];
+        }
+        return TemplateStore;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = TemplateStore;
+});
+
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -459,7 +481,7 @@ define('components/monster-manager',["require", "exports", 'aurelia-framework', 
             this.eventAggregator = eventAggregator;
             this.templateStore = templateStore;
             this.bag = [new Monster_1.default("Grumble"), new Monster_1.default("Viqas's Bread")];
-            templateStore.templates = [new MonsterTemplate_1.default("Template 1"), new MonsterTemplate_1.default("Template 2")];
+            templateStore.templates.push(new MonsterTemplate_1.default("Template 1"));
         }
         MonsterManager.prototype.useMonster = function (monster) {
             this.templateStore.selectedTemplate.addMonster(monster);
@@ -577,6 +599,34 @@ define('components/player-templates',["require", "exports", 'aurelia-framework',
     exports.PlayerTemplates = PlayerTemplates;
 });
 
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('components/template-bag',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../domain/Stores/TemplateStore', '../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, TemplateStore_1, messages_1) {
+    "use strict";
+    var TemplateBag = (function () {
+        function TemplateBag(eventAggregator, templateStore) {
+            this.eventAggregator = eventAggregator;
+            this.templateStore = templateStore;
+        }
+        TemplateBag.prototype.spawnTemplate = function (template) {
+            this.eventAggregator.publish(new messages_1.TemplateUsed(template));
+        };
+        TemplateBag = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default])
+        ], TemplateBag);
+        return TemplateBag;
+    }());
+    exports.TemplateBag = TemplateBag;
+});
+
 Array.prototype.remove = function (itemToRemove) {
     var index = this.indexOf(itemToRemove);
     if (index !== -1) {
@@ -628,56 +678,17 @@ define('components/loot/loot-stack',["require", "exports", 'aurelia-framework', 
     exports.LootStack = LootStack;
 });
 
-define('domain/Stores/TemplateStore',["require", "exports"], function (require, exports) {
-    "use strict";
-    var TemplateStore = (function () {
-        function TemplateStore() {
-            this.templates = [];
-        }
-        return TemplateStore;
-    }());
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = TemplateStore;
-});
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('components/template-bag',["require", "exports", 'aurelia-framework', '../domain/Stores/TemplateStore'], function (require, exports, aurelia_framework_1, TemplateStore_1) {
-    "use strict";
-    var TemplateBag = (function () {
-        function TemplateBag(templateStore) {
-            this.templateStore = templateStore;
-        }
-        TemplateBag.prototype.alertMonster = function (monster) {
-            alert(monster.name);
-        };
-        TemplateBag = __decorate([
-            aurelia_framework_1.inject(TemplateStore_1.default), 
-            __metadata('design:paramtypes', [TemplateStore_1.default])
-        ], TemplateBag);
-        return TemplateBag;
-    }());
-    exports.TemplateBag = TemplateBag;
-});
-
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./components/battle-stack\"></require>\r\n\t<require from=\"./components/loot/loot-stack\"></require>\r\n\t<require from=\"./components/main-menu\"></require>\r\n\t<require from=\"./components/player-overview\"></require>\r\n\t<require from=\"./components/player-inventory\"></require>\r\n\t<require from=\"./components/player-templates\"></require>\r\n\t<require from=\"./components/template-bag\"></require>\r\n\t<require from=\"bootstrap4/css/bootstrap.css\"></require>\r\n\t<require from=\"./styles/styles.css\"></require>\r\n\r\n\t<div id=\"timer\">\r\n\t\tTimer: ${timer}\r\n\t</div>\r\n\t<main-menu></main-menu>\r\n\t<battle-stack></battle-stack>\r\n\t<player-overview></player-overview>\r\n\t<template-bag></template-bag>\r\n\t<loot-stack></loot-stack>\r\n\r\n\t<player-inventory></player-inventory>\r\n\t<player-templates></player-templates>\r\n</template>"; });
 define('text!components/battle-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <div>\r\n        <div repeat.for=\"monster of stack\" class=\"battleStackItem\">\r\n            ${monster.name}\r\n        </div>\r\n        <div repeat.for=\"i of (5 - stack.length)\" class=\"battleStackItem empty\">\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!styles/styles.css', ['module'], function(module) { module.exports = ".component {\n  display: block;\n  overflow: hidden;\n}\nbody {\n  margin: 0;\n}\nbattle-stack,\nloot-stack,\nmonster-bag {\n  display: block;\n  overflow: hidden;\n}\n#player-overview {\n  background-color: lightblue;\n}\n#timer {\n  position: absolute;\n  bottom: 0;\n  right: 0;\n  padding: 10px;\n  font-size: 20px;\n  font-weight: 700;\n}\n.page-host {\n  padding-top: 60px;\n}\n.bagItem {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: antiquewhite;\n}\n.bagItem:hover {\n  background-color: beige;\n  cursor: pointer;\n}\n.templateItem {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: cadetblue;\n}\n.templateItem:hover {\n  background-color: lightblue;\n  cursor: pointer;\n}\n.battleStackItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.battleStackItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.inventoryItem {\n  background-color: darkslategray;\n  padding: 4px;\n  margin-top: 1px;\n  color: white;\n}\n.lootItem {\n  display: block;\n  overflow: hidden;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: gray;\n  color: whitesmoke;\n  font-weight: 600;\n  font-size: 14px;\n}\n.lootItem:hover {\n  background-color: cadetblue;\n  cursor: pointer;\n}\n.noselect {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.clearfix {\n  clear: both;\n  overflow: none;\n}\n.modal-window {\n  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  background-color: white;\n  position: fixed;\n  z-index: 99999;\n  border-radius: 5px;\n  padding: 22px;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  -webkit-transform: translate(-50%, -50%);\n  max-height: 70%;\n}\n.modal-window .close-button {\n  float: right;\n}\n.modal-window-overlay {\n  background-color: black;\n  -ms-filter: \"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)\";\n  background-color: rgba(0, 0, 0, 0.4);\n  position: fixed;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  z-index: 10000;\n}\n"; });
+define('text!styles/styles.css', ['module'], function(module) { module.exports = ".component {\n  display: block;\n  overflow: hidden;\n}\nbody {\n  margin: 0;\n}\nbattle-stack,\nloot-stack,\nmonster-bag {\n  display: block;\n  overflow: hidden;\n}\n#player-overview {\n  background-color: lightblue;\n}\n#timer {\n  position: absolute;\n  bottom: 0;\n  right: 0;\n  padding: 10px;\n  font-size: 20px;\n  font-weight: 700;\n}\n.page-host {\n  padding-top: 60px;\n}\n.bagItem {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: antiquewhite;\n}\n.bagItem:hover {\n  background-color: beige;\n  cursor: pointer;\n}\n.templateItem {\n  padding: 6px;\n  margin-top: 1px;\n  color: ghostwhite;\n  background-color: saddlebrown;\n}\n.templateMonster {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: coral;\n}\n.battleStackItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.battleStackItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.inventoryItem {\n  background-color: darkslategray;\n  padding: 4px;\n  margin-top: 1px;\n  color: white;\n}\n.lootItem {\n  display: block;\n  overflow: hidden;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: gray;\n  color: whitesmoke;\n  font-weight: 600;\n  font-size: 14px;\n}\n.lootItem:hover {\n  background-color: cadetblue;\n  cursor: pointer;\n}\n.noselect {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.clearfix {\n  clear: both;\n  overflow: none;\n}\n.modal-window {\n  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  background-color: white;\n  position: fixed;\n  z-index: 99999;\n  border-radius: 5px;\n  padding: 22px;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  -webkit-transform: translate(-50%, -50%);\n  max-height: 70%;\n}\n.modal-window .close-button {\n  float: right;\n}\n.modal-window-overlay {\n  background-color: black;\n  -ms-filter: \"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)\";\n  background-color: rgba(0, 0, 0, 0.4);\n  position: fixed;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  z-index: 10000;\n}\n"; });
 define('text!components/main-menu.html', ['module'], function(module) { module.exports = "<template>\r\n    <nav class=\"navbar navbar-light bg-faded\">\r\n        <ul class=\"nav navbar-nav\">\r\n            <li class=\"nav-item\">\r\n                <button click.delegate=\"open('player-inventory')\" class=\"btn btn-block\">Inventory</button>\r\n            </li>\r\n            <li class=\"nav-item\">\r\n                <button click.delegate=\"open('player-templates')\" class=\"btn btn-block\">Templates</button>\r\n            </li>\r\n        </ul>\r\n    </nav>\r\n</template>"; });
 define('text!components/modal-content.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"visibility\" class=\"modal-window\">\r\n    <div>\r\n      <button class=\"btn btn-danger btn-sm close-button\" click.delegate=\"close()\">close</button>\r\n    </div>\r\n    <slot></slot>\r\n  </div>\r\n  <div show.bind=\"visibility\" class=\"modal-window-overlay\" click.delegate=\"close()\"></div>\r\n</template>"; });
-define('text!components/monster-manager.html', ['module'], function(module) { module.exports = "<template>\r\n    <div style=\"width: 407px;\">\r\n        <div if.bind=\"selectedTemplate == null\">No template selected</div>\r\n        <div class=\"clearfix\" if.bind=\"templateStore.selectedTemplate\" with.bind=\"templateStore.selectedTemplate\">\r\n            <div repeat.for=\"monster of monsters\" class=\"battleStackItem\" click.delegate=\"$parent.remove(monster)\">\r\n                <div class=\"noselect\">${monster.name}</div>\r\n            </div>\r\n            <div repeat.for=\"i of (5 - monsters.length)\" class=\"battleStackItem empty\"></div>\r\n        </div>\r\n\r\n        <div class=\"bagItem\" if.bind=\"templateStore.selectedTemplate\" repeat.for=\"monster of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.useMonster(monster)\">${monster.name}</div>\r\n        </div>\r\n\r\n        <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.selectTemplate(template)\">${template.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!components/monster-manager.html', ['module'], function(module) { module.exports = "<template>\r\n    <div style=\"width: 407px;\">\r\n        <div if.bind=\"templateStore.selectedTemplate == null\">No template selected</div>\r\n        <div class=\"clearfix\" if.bind=\"templateStore.selectedTemplate\" with.bind=\"templateStore.selectedTemplate\">\r\n            <div repeat.for=\"monster of monsters\" class=\"battleStackItem\" click.delegate=\"$parent.remove(monster)\">\r\n                <div class=\"noselect\">${monster.name}</div>\r\n            </div>\r\n            <div repeat.for=\"i of (5 - monsters.length)\" class=\"battleStackItem empty\"></div>\r\n        </div>\r\n\r\n        <div class=\"bagItem\" if.bind=\"templateStore.selectedTemplate\" repeat.for=\"monster of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.useMonster(monster)\">${monster.name}</div>\r\n        </div>\r\n\r\n        <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.selectTemplate(template)\">${template.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!components/player-inventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-inventory'\">\r\n        <h2>Inventory</h2>\r\n\r\n        <div repeat.for=\"item of stack\" class=\"inventoryItem\">\r\n            ${item.name}\r\n        </div>\r\n        <div if.bind=\"!stack.length\">\r\n            - empty -\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
 define('text!components/player-overview.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"player-overview\">\r\n        <h2>\r\n            Player Overview\r\n        </h2>\r\n        <span>Name</span> : ${currentPlayer.name}\r\n        <br />\r\n        <span>Gold</span> : ${currentPlayer.gold}\r\n        <br />\r\n        <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}\r\n        <br />\r\n        <span>Strength</span> : ${currentPlayer.strength}\r\n        <br />\r\n        <span>Dexterity</span> : ${currentPlayer.dexterity}\r\n        <br />\r\n        <span>Toughness</span> : ${currentPlayer.toughness}\r\n    </div>\r\n</template>"; });
 define('text!components/player-templates.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./monster-manager\"></require>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-templates'\">\r\n        <h2>Templates</h2>\r\n        <monster-manager></monster-manager>\r\n    </modal-content>\r\n</template>"; });
+define('text!components/template-bag.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n        <div class=\"noselect\">\r\n            ${template.name} <button class=\"btn btn-info btn-sm\">Spawn Template</button>\r\n            <div>\r\n                <span repeat.for=\"monster of template.monsters\" class=\"noselect tag tag-warning\">\r\n                ${monster.name}\r\n            </span>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!components/loot/gold-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"gold-loot\">\r\n        <img src=\"src/images/gold_stack.png\" width=\"30px\" height=\"30px\" /> \r\n        ${lootItem.value} Gold\r\n    </div>\r\n</template>"; });
 define('text!components/loot/loot-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose \r\n      class=\"lootItem\" \r\n      repeat.for=\"lootItem of stack\" \r\n      view=\"./${lootItem.template}-loot.html\"\r\n      click.delegate=\"$parent.takeItem(lootItem)\">\r\n    </compose>\r\n</template>"; });
 define('text!components/loot/weapon-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div>\r\n        ${lootItem.displayName}<br/> \r\n        Damage: ${lootItem.damage}\r\n    </div>\r\n</template>"; });
-define('text!components/template-bag.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n        <div class=\"noselect\">\r\n            ${template.name}\r\n            <div repeat.for=\"monster of template.monsters\" class=\"templateItem\">\r\n                <div class=\"noselect\" click.delegate=\"$parent.$parent.alertMonster(monster)\">${monster.name}</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

@@ -1,6 +1,6 @@
 <template>
     <div style="width: 407px;">
-        <div if.bind="selectedTemplate == null">No template selected</div>
+        <div if.bind="templateStore.selectedTemplate == null">No template selected</div>
         <div class="clearfix" if.bind="templateStore.selectedTemplate" with.bind="templateStore.selectedTemplate">
             <div repeat.for="monster of monsters" class="battleStackItem" click.delegate="$parent.remove(monster)">
                 <div class="noselect">${monster.name}</div>

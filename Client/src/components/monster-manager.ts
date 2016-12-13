@@ -11,7 +11,7 @@ export class MonsterManager {
 
     constructor(private eventAggregator: EventAggregator, private templateStore: TemplateStore) {
         this.bag = [new Monster("Grumble"), new Monster("Viqas's Bread")];
-        templateStore.templates = [new MonsterTemplate("Template 1"), new MonsterTemplate("Template 2")];
+        templateStore.templates.push(new MonsterTemplate("Template 1"));
     }
     
     useMonster(monster) 

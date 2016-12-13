@@ -1,4 +1,5 @@
 import Monster from "./domain/monster";
+import MonsterTemplate from "./domain/MonsterTemplate";
 import * as Item from "./domain/AllItems";
 
 export class Heartbeat {
@@ -23,4 +24,8 @@ export class ItemTaken {
 
 export class ShowModalWindow {
     constructor(public id: string) { }
+}
+
+export class TemplateUsed {
+    constructor(public template: MonsterTemplate) { }
 }
