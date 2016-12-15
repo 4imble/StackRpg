@@ -2,7 +2,7 @@ interface Array<T> {
    remove(itemToRemove: T): Array<T>;
 }
 
-Array.prototype.remove = function (itemToRemove) {
+(<any>Array.prototype).remove = function (itemToRemove) {
     const index = this.indexOf(itemToRemove);
     if (index !== -1) {
         this.splice(index, 1);

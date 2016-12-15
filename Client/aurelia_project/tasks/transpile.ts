@@ -32,7 +32,9 @@ function buildTypeScript() {
   let src = gulp.src(project.transpiler.source)
     .pipe(changedInPlace({firstPass: true}));
 
-  return eventStream.merge(dts, src)
+  let exts = gulp.src("src/helpers/Array.ts")
+
+  return eventStream.merge(dts, src, exts)
     .pipe(plumber({ errorHandler: notify.onError('Error: <%= error.message %>') }))
     .pipe(sourcemaps.init())
     .pipe(ts(typescriptCompiler))
