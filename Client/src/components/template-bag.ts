@@ -2,7 +2,7 @@ import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import TemplateStore from '../domain/Stores/TemplateStore';
 import MonsterTemplate from '../domain/MonsterTemplate';
-import { TemplateUsed } from '../messages';
+import { TemplateSpawned, ShowModalWindow } from '../messages';
 
 @inject(EventAggregator, TemplateStore)
 export class TemplateBag {
@@ -11,6 +11,12 @@ export class TemplateBag {
     }
 
     spawnTemplate(template: MonsterTemplate){
-        this.eventAggregator.publish(new TemplateUsed(template));
+        this.eventAggregator.publish(new TemplateSpawned(template));
+    }
+
+    viewTemplate(template: MonsterTemplate)
+    {
+        this.templateStore.selectedTemplate = template;
+        this.eventAggregator.publish(new ShowModalWindow("player-templates"));
     }
 }

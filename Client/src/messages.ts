@@ -26,6 +26,6 @@ export class ShowModalWindow {
     constructor(public id: string) { }
 }
 
-export class TemplateUsed {
+export class TemplateSpawned {
     constructor(public template: MonsterTemplate) { }
 }

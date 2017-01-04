@@ -1,6 +1,6 @@
 <template>
     <compose 
-      class="lootItem" 
+      class="lootItem noselect" 
       repeat.for="lootItem of stack" 
       view="./${lootItem.template}-loot.html"
       click.delegate="$parent.takeItem(lootItem)">

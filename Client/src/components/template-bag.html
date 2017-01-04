@@ -1,11 +1,15 @@
 <template>
     <div class="templateItem" repeat.for="template of templateStore.templates">
         <div class="noselect">
-            ${template.name} <button class="btn btn-info btn-sm">Spawn Template</button>
+            ${template.name}
+            <div class="template-controls">
+                <button class="btn btn-success btn-sm" click.delegate="$parent.spawnTemplate(template)"><i class="fa fa-level-up"></i> Spawn</button>
+                <button class="btn btn-info btn-sm" click.delegate="$parent.viewTemplate(template)"><i class="fa fa-eye"></i> View</button>
+            </div>
             <div>
                 <span repeat.for="monster of template.monsters" class="noselect tag tag-warning">
-                ${monster.name}
-            </span>
+                    ${monster.name}
+                </span>
             </div>
         </div>
     </div>
