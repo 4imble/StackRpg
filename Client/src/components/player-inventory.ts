@@ -2,14 +2,17 @@ import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { ItemTaken } from '../messages';
 import * as Item from "../domain/AllItems";
+import PlayerStore from "../domain/Stores/PlayerStore";
 
-@inject(EventAggregator)
+@inject(EventAggregator, PlayerStore)
 export class PlayerInventory {
-stack: Array<Item.Loot> = [];
+playerInventory: Array<Item.Loot>;
 
-    constructor(private eventAggregator: EventAggregator) {
+    constructor(private eventAggregator: EventAggregator, private playerStore: PlayerStore) {
+        this.playerInventory = playerStore.inventory;
+
         this.eventAggregator.subscribe(ItemTaken, (msg: ItemTaken) => { 
-            this.stack.push(msg.item);
+            this.playerInventory.push(msg.item);
         });
     }
 }

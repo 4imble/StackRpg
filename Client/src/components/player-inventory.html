@@ -4,10 +4,10 @@
     <modal-content id.bind="'player-inventory'">
         <h2>Inventory</h2>
 
-        <div repeat.for="item of stack" class="inventoryItem">
+        <div repeat.for="item of playerInventory" class="inventoryItem">
             ${item.name}
         </div>
-        <div if.bind="!stack.length">
+        <div if.bind="!playerInventory.length">
             - empty -
         </div>
     </modal-content>
