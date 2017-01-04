@@ -19,6 +19,8 @@ abstract class Body {
     get currentHealth() {
         return this.totalHealth - this.damageTaken;
     };
+
+    abstract takeDamage(damage:number);
 }
 
 export default Body;
