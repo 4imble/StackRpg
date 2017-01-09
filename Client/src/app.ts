@@ -3,6 +3,8 @@ import GameLoop from "./helpers/GameLoop";
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { Heartbeat } from './messages';
 
+declare var AG: EventAggregator;
+
 @inject(GameLoop, EventAggregator)
 export class App {
     timer: number = 0;

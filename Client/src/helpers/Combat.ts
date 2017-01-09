@@ -1,10 +1,10 @@
-import { inject } from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Player from '../Domain/Player';
 import Monster from '../Domain/Monster';
 import { Heartbeat } from '../messages';
 
-@inject(EventAggregator)
+@autoinject
 export default class Combat {
     constructor(private eventAggregator: EventAggregator) { }
 

@@ -15,7 +15,8 @@ define('helpers/Attribute',["require", "exports"], function (require, exports) {
 define('domain/Body',["require", "exports", "../helpers/Attribute"], function (require, exports, Attribute_1) {
     "use strict";
     var Body = (function () {
-        function Body(name) {
+        function Body(eventAggregator, name) {
+            this.eventAggregator = eventAggregator;
             this.name = name;
             this.baseHealth = 10;
             this.damageTaken = 0;
@@ -354,6 +355,29 @@ define('main',["require", "exports", "./environment"], function (require, export
     exports.configure = configure;
 });
 
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Player',["require", "exports", "./Body"], function (require, exports, Body_1) {
+    "use strict";
+    var Player = (function (_super) {
+        __extends(Player, _super);
+        function Player() {
+            var _this = _super.apply(this, arguments) || this;
+            _this.gold = 0;
+            return _this;
+        }
+        Player.prototype.takeDamage = function (damage) {
+            this.damageTaken += damage;
+        };
+        return Player;
+    }(Body_1.default));
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Player;
+});
+
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -363,13 +387,46 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/battle-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Monster", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Monster_1, messages_1) {
+define('factories/BodyFactory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Player", "../domain/Monster"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Player_1, Monster_1) {
+    "use strict";
+    var BodyFactory = (function () {
+        function BodyFactory(eventAggregator) {
+            this.eventAggregator = eventAggregator;
+        }
+        BodyFactory.prototype.buildPlayer = function (name) {
+            return new Player_1.default(this.eventAggregator, name);
+        };
+        BodyFactory.prototype.buildMonster = function (name) {
+            return new Monster_1.default(this.eventAggregator, name);
+        };
+        return BodyFactory;
+    }());
+    BodyFactory = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
+    ], BodyFactory);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = BodyFactory;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('components/battle-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../factories/BodyFactory", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, BodyFactory_1, messages_1) {
     "use strict";
     var BattleStack = (function () {
-        function BattleStack(eventAggregator) {
+        function BattleStack(eventAggregator, bodyFactory) {
             var _this = this;
             this.eventAggregator = eventAggregator;
-            this.stack = [new Monster_1.default("Grumble"), new Monster_1.default("Terrible Ade"), new Monster_1.default("Viqas's Bread"), new Monster_1.default("Viqas's Bread")];
+            this.bodyFactory = bodyFactory;
+            this.stack = [];
+            this.stack.push(bodyFactory.buildMonster("Grumble"), bodyFactory.buildMonster("Viqas' Expensive Bread"));
             this.eventAggregator.subscribe(messages_1.TemplateSpawned, function (msg) {
                 msg.template.monsters.forEach(function (monster) {
                     _this.stack.push(monster);
@@ -385,15 +442,69 @@ define('components/battle-stack',["require", "exports", "aurelia-framework", "au
             var monster = this.stack.shift();
             this.eventAggregator.publish(new messages_1.MonsterKilled(monster));
         };
-        BattleStack.prototype.created = function () {
-        };
+        BattleStack.prototype.created = function () { };
         return BattleStack;
     }());
     BattleStack = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, BodyFactory_1.default])
     ], BattleStack);
     exports.BattleStack = BattleStack;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('domain/Stores/PlayerStore',["require", "exports", "aurelia-framework", "../../factories/BodyFactory"], function (require, exports, aurelia_framework_1, BodyFactory_1) {
+    "use strict";
+    var PlayerStore = (function () {
+        function PlayerStore(bodyFactory) {
+            this.inventory = [];
+            this.currentPlayer = bodyFactory.buildPlayer("Test Factory Player");
+        }
+        return PlayerStore;
+    }());
+    PlayerStore = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [BodyFactory_1.default])
+    ], PlayerStore);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = PlayerStore;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('domain/Stores/TemplateStore',["require", "exports", "aurelia-framework", "../MonsterTemplate", "../../factories/BodyFactory"], function (require, exports, aurelia_framework_1, MonsterTemplate_1, BodyFactory_1) {
+    "use strict";
+    var TemplateStore = (function () {
+        function TemplateStore(bodyFactory) {
+            this.bodyFactory = bodyFactory;
+            var defaultTemplate = new MonsterTemplate_1.default("Test Template");
+            defaultTemplate.addMonster(bodyFactory.buildMonster("Default Monster1"));
+            defaultTemplate.addMonster(bodyFactory.buildMonster("Default Monster2"));
+            this.templates = [defaultTemplate];
+        }
+        return TemplateStore;
+    }());
+    TemplateStore = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [BodyFactory_1.default])
+    ], TemplateStore);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = TemplateStore;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -464,21 +575,6 @@ define('components/modal-content',["require", "exports", "aurelia-framework", ".
     exports.ModalContent = ModalContent;
 });
 
-define('domain/Stores/TemplateStore',["require", "exports", "../MonsterTemplate", "../Monster"], function (require, exports, MonsterTemplate_1, Monster_1) {
-    "use strict";
-    var TemplateStore = (function () {
-        function TemplateStore() {
-            var defaultTemplate = new MonsterTemplate_1.default("Test Template");
-            defaultTemplate.addMonster(new Monster_1.default("Default Monster1"));
-            defaultTemplate.addMonster(new Monster_1.default("Default Monster2"));
-            this.templates = [defaultTemplate];
-        }
-        return TemplateStore;
-    }());
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = TemplateStore;
-});
-
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -488,13 +584,14 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/monster-manager',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Monster", "../domain/Stores/TemplateStore", "../domain/MonsterTemplate"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Monster_1, TemplateStore_1, MonsterTemplate_1) {
+define('components/monster-manager',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/TemplateStore", "../factories/BodyFactory", "../domain/MonsterTemplate"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, TemplateStore_1, BodyFactory_1, MonsterTemplate_1) {
     "use strict";
     var MonsterManager = (function () {
-        function MonsterManager(eventAggregator, templateStore) {
+        function MonsterManager(eventAggregator, templateStore, bodyFactory) {
             this.eventAggregator = eventAggregator;
             this.templateStore = templateStore;
-            this.bag = [new Monster_1.default("Grumble"), new Monster_1.default("Viqas's Bread")];
+            this.bodyFactory = bodyFactory;
+            this.bag = [bodyFactory.buildMonster("Grumble"), bodyFactory.buildMonster("Viqas's Bread")];
             templateStore.templates.push(new MonsterTemplate_1.default("Template 1"));
         }
         MonsterManager.prototype.useMonster = function (monster) {
@@ -506,8 +603,8 @@ define('components/monster-manager',["require", "exports", "aurelia-framework", 
         return MonsterManager;
     }());
     MonsterManager = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default])
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default, BodyFactory_1.default])
     ], MonsterManager);
     exports.MonsterManager = MonsterManager;
 });
@@ -540,42 +637,6 @@ define('components/player-inventory',["require", "exports", "aurelia-framework",
         __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
     ], PlayerInventory);
     exports.PlayerInventory = PlayerInventory;
-});
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-define('domain/Player',["require", "exports", "./Body"], function (require, exports, Body_1) {
-    "use strict";
-    var Player = (function (_super) {
-        __extends(Player, _super);
-        function Player() {
-            var _this = _super.apply(this, arguments) || this;
-            _this.gold = 0;
-            return _this;
-        }
-        Player.prototype.takeDamage = function (damage) {
-            this.damageTaken += damage;
-        };
-        return Player;
-    }(Body_1.default));
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = Player;
-});
-
-define('domain/Stores/PlayerStore',["require", "exports", "../Player"], function (require, exports, Player_1) {
-    "use strict";
-    var PlayerStore = (function () {
-        function PlayerStore() {
-            this.inventory = [];
-            this.currentPlayer = new Player_1.default("Test Player");
-        }
-        return PlayerStore;
-    }());
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = PlayerStore;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -664,6 +725,36 @@ define('components/template-bag',["require", "exports", "aurelia-framework", "au
     exports.TemplateBag = TemplateBag;
 });
 
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
+    "use strict";
+    var Combat = (function () {
+        function Combat(eventAggregator) {
+            this.eventAggregator = eventAggregator;
+        }
+        Combat.prototype.battle = function (player, monster) {
+            var result = this.calculateBattleResult(player, monster);
+        };
+        Combat.prototype.calculateBattleResult = function (player, monster) {
+        };
+        return Combat;
+    }());
+    Combat = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
+    ], Combat);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Combat;
+});
+
 define('resources/index',["require", "exports"], function (require, exports) {
     "use strict";
     function configure(config) {
@@ -703,67 +794,6 @@ define('components/loot/loot-stack',["require", "exports", "aurelia-framework", 
         __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
     ], LootStack);
     exports.LootStack = LootStack;
-});
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('helpers/GameLoop.1',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, messages_1) {
-    "use strict";
-    var GameLoop = (function () {
-        function GameLoop(eventAggregator) {
-            this.eventAggregator = eventAggregator;
-        }
-        GameLoop.prototype.start = function () {
-            var _this = this;
-            setInterval(function () {
-                _this.eventAggregator.publish(new messages_1.Heartbeat());
-            }, 1000);
-        };
-        return GameLoop;
-    }());
-    GameLoop = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], GameLoop);
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = GameLoop;
-});
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
-    "use strict";
-    var Combat = (function () {
-        function Combat(eventAggregator) {
-            this.eventAggregator = eventAggregator;
-        }
-        Combat.prototype.battle = function (player, monster) {
-            var result = this.calculateBattleResult(player, monster);
-        };
-        Combat.prototype.calculateBattleResult = function (player, monster) {
-        };
-        return Combat;
-    }());
-    Combat = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], Combat);
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = Combat;
 });
 
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./components/battle-stack\"></require>\r\n\t<require from=\"./components/loot/loot-stack\"></require>\r\n\t<require from=\"./components/main-menu\"></require>\r\n\t<require from=\"./components/player-overview\"></require>\r\n\t<require from=\"./components/player-inventory\"></require>\r\n\t<require from=\"./components/player-templates\"></require>\r\n\t<require from=\"./components/template-bag\"></require>\r\n\t<require from=\"bootstrap4/css/bootstrap.css\"></require>\r\n\t<require from=\"./styles/styles.css\"></require>\r\n\r\n\t<div id=\"timer\">\r\n\t\tTimer: ${timer}\r\n\t</div>\r\n\t<main-menu></main-menu>\r\n\t<battle-stack></battle-stack>\r\n\t<player-overview></player-overview>\r\n\t<template-bag></template-bag>\r\n\t<loot-stack></loot-stack>\r\n\r\n\t<player-inventory></player-inventory>\r\n\t<player-templates></player-templates>\r\n</template>"; });

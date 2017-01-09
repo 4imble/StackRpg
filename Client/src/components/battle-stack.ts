@@ -1,13 +1,16 @@
-import { inject } from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Monster from '../domain/Monster';
+import BodyFactory from '../factories/BodyFactory';
 import { TemplateSpawned, Heartbeat, MonsterKilled } from '../messages';
 
-@inject(EventAggregator)
+@autoinject
 export class BattleStack {
-    stack: Array<Monster> = [new Monster("Grumble"), new Monster("Terrible Ade"), new Monster("Viqas's Bread"), new Monster("Viqas's Bread")];
+    stack: Array<Monster> = [];
 
-    constructor(private eventAggregator: EventAggregator) {
+    constructor(private eventAggregator: EventAggregator, private bodyFactory: BodyFactory) {
+        this.stack.push(bodyFactory.buildMonster("Grumble"), bodyFactory.buildMonster("Viqas' Expensive Bread"));
+
         this.eventAggregator.subscribe(TemplateSpawned, (msg: TemplateSpawned) => {
             msg.template.monsters.forEach(monster => {
                 this.stack.push(monster);
@@ -26,7 +29,5 @@ export class BattleStack {
         this.eventAggregator.publish(new MonsterKilled(monster));
     }
 
-    created() {
-
-    }
+    created() { }
 }
