@@ -307,7 +307,7 @@ define('app',["require", "exports", "aurelia-framework", "./helpers/GameLoop", "
         return App;
     }());
     App = __decorate([
-        aurelia_framework_1.inject(GameLoop_1.default, aurelia_event_aggregator_1.EventAggregator),
+        aurelia_framework_1.autoinject,
         __metadata("design:paramtypes", [GameLoop_1.default, aurelia_event_aggregator_1.EventAggregator])
     ], App);
     exports.App = App;

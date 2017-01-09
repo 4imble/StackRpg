@@ -1,11 +1,9 @@
-import { inject } from 'aurelia-framework';
+import { autoinject } from 'aurelia-framework';
 import GameLoop from "./helpers/GameLoop";
 import { EventAggregator } from 'aurelia-event-aggregator';
 import { Heartbeat } from './messages';
 
-declare var AG: EventAggregator;
-
-@inject(GameLoop, EventAggregator)
+@autoinject
 export class App {
     timer: number = 0;
     showModal: boolean = false;
