@@ -58,7 +58,7 @@ define('domain/Monster',["require", "exports", "./Body"], function (require, exp
     var Monster = (function (_super) {
         __extends(Monster, _super);
         function Monster() {
-            return _super.apply(this, arguments) || this;
+            _super.apply(this, arguments);
         }
         Monster.prototype.takeDamage = function (damage) {
             this.damageTaken += damage;
@@ -92,11 +92,47 @@ define('domain/MonsterTemplate',["require", "exports"], function (require, expor
 define('domain/Items/Loot',["require", "exports"], function (require, exports) {
     "use strict";
     var Loot = (function () {
-        function Loot() {
+        function Loot(eventAggregator) {
+            this.eventAggregator = eventAggregator;
         }
+        Object.defineProperty(Loot.prototype, "displayName", {
+            get: function () { },
+            enumerable: true,
+            configurable: true
+        });
         return Loot;
     }());
     exports.Loot = Loot;
+});
+
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Items/Gold',["require", "exports", "./Loot", '../../messages'], function (require, exports, Loot_1, messages_1) {
+    "use strict";
+    var Gold = (function (_super) {
+        __extends(Gold, _super);
+        function Gold() {
+            _super.apply(this, arguments);
+        }
+        Object.defineProperty(Gold.prototype, "displayName", {
+            get: function () {
+                return "Gold Bag (" + this.value + ")";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Gold.prototype.showToolTip = function () { };
+        ;
+        Gold.prototype.take = function () { this.eventAggregator.publish(new messages_1.GoldTaken(this)); };
+        ;
+        Gold.prototype.use = function () { };
+        ;
+        return Gold;
+    }(Loot_1.Loot));
+    exports.Gold = Gold;
 });
 
 define('helpers/Dice',["require", "exports"], function (require, exports) {
@@ -124,49 +160,12 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define('domain/Items/Gold',["require", "exports", "./Loot", "../../helpers/Dice", "../../messages"], function (require, exports, Loot_1, Dice_1, messages_1) {
-    "use strict";
-    var Gold = (function (_super) {
-        __extends(Gold, _super);
-        function Gold() {
-            var _this = _super.call(this) || this;
-            _this.value = Dice_1.default.d20();
-            _this.template = "gold";
-            return _this;
-        }
-        Object.defineProperty(Gold.prototype, "displayName", {
-            get: function () {
-                return "Gold Bag (" + this.value + ")";
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Gold.prototype.showToolTip = function () { };
-        ;
-        Gold.prototype.take = function () { return new messages_1.GoldTaken(this); };
-        ;
-        Gold.prototype.use = function () { };
-        ;
-        return Gold;
-    }(Loot_1.Loot));
-    exports.Gold = Gold;
-});
-
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-define('domain/Items/Weapon',["require", "exports", "./Loot", "../../helpers/Dice", "../../messages"], function (require, exports, Loot_1, Dice_1, messages_1) {
+define('domain/Items/Weapon',["require", "exports", "./Loot", '../../messages'], function (require, exports, Loot_1, messages_1) {
     "use strict";
     var Weapon = (function (_super) {
         __extends(Weapon, _super);
-        function Weapon(name) {
-            var _this = _super.call(this) || this;
-            _this.name = name;
-            _this.damage = Dice_1.default.d20();
-            _this.template = "weapon";
-            return _this;
+        function Weapon() {
+            _super.apply(this, arguments);
         }
         Object.defineProperty(Weapon.prototype, "displayName", {
             get: function () {
@@ -177,7 +176,7 @@ define('domain/Items/Weapon',["require", "exports", "./Loot", "../../helpers/Dic
         });
         Weapon.prototype.showToolTip = function () { };
         ;
-        Weapon.prototype.take = function () { return new messages_1.ItemTaken(this); };
+        Weapon.prototype.take = function () { this.eventAggregator.publish(new messages_1.ItemTaken(this)); };
         ;
         Weapon.prototype.use = function () { };
         ;
@@ -186,7 +185,7 @@ define('domain/Items/Weapon',["require", "exports", "./Loot", "../../helpers/Dic
     exports.Weapon = Weapon;
 });
 
-define('domain/AllItems',["require", "exports", "./Items/Loot", "./Items/Gold", "./Items/Weapon"], function (require, exports, Loot_1, Gold_1, Weapon_1) {
+define('domain/AllItems',["require", "exports", './Items/Loot', './Items/Gold', './Items/Weapon'], function (require, exports, Loot_1, Gold_1, Weapon_1) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -257,7 +256,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('helpers/GameLoop',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, messages_1) {
+define('helpers/GameLoop',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, messages_1) {
     "use strict";
     var GameLoop = (function () {
         function GameLoop(eventAggregator) {
@@ -269,12 +268,12 @@ define('helpers/GameLoop',["require", "exports", "aurelia-framework", "aurelia-e
                 _this.eventAggregator.publish(new messages_1.Heartbeat());
             }, 1000);
         };
+        GameLoop = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator])
+        ], GameLoop);
         return GameLoop;
     }());
-    GameLoop = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], GameLoop);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = GameLoop;
 });
@@ -288,7 +287,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('app',["require", "exports", "aurelia-framework", "./helpers/GameLoop", "aurelia-event-aggregator", "./messages"], function (require, exports, aurelia_framework_1, GameLoop_1, aurelia_event_aggregator_1, messages_1) {
+define('app',["require", "exports", 'aurelia-framework', "./helpers/GameLoop", 'aurelia-event-aggregator', './messages'], function (require, exports, aurelia_framework_1, GameLoop_1, aurelia_event_aggregator_1, messages_1) {
     "use strict";
     var App = (function () {
         function App(gameLoop, eventAggregator) {
@@ -304,12 +303,12 @@ define('app',["require", "exports", "aurelia-framework", "./helpers/GameLoop", "
         App.prototype.activate = function (params, routeConfig) {
             this.gameLoop.start();
         };
+        App = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [GameLoop_1.default, aurelia_event_aggregator_1.EventAggregator])
+        ], App);
         return App;
     }());
-    App = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [GameLoop_1.default, aurelia_event_aggregator_1.EventAggregator])
-    ], App);
     exports.App = App;
 });
 
@@ -332,7 +331,7 @@ define('environment',["require", "exports"], function (require, exports) {
     };
 });
 
-define('main',["require", "exports", "./environment"], function (require, exports, environment_1) {
+define('main',["require", "exports", './environment'], function (require, exports, environment_1) {
     "use strict";
     Promise.config({
         longStackTraces: environment_1.default.debug,
@@ -365,9 +364,8 @@ define('domain/Player',["require", "exports", "./Body"], function (require, expo
     var Player = (function (_super) {
         __extends(Player, _super);
         function Player() {
-            var _this = _super.apply(this, arguments) || this;
-            _this.gold = 0;
-            return _this;
+            _super.apply(this, arguments);
+            this.gold = 0;
         }
         Player.prototype.takeDamage = function (damage) {
             this.damageTaken += damage;
@@ -387,7 +385,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('factories/BodyFactory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Player", "../domain/Monster"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Player_1, Monster_1) {
+define('factories/BodyFactory',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../domain/Player', '../domain/Monster'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Player_1, Monster_1) {
     "use strict";
     var BodyFactory = (function () {
         function BodyFactory(eventAggregator) {
@@ -399,12 +397,12 @@ define('factories/BodyFactory',["require", "exports", "aurelia-framework", "aure
         BodyFactory.prototype.buildMonster = function (name) {
             return new Monster_1.default(this.eventAggregator, name);
         };
+        BodyFactory = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator])
+        ], BodyFactory);
         return BodyFactory;
     }());
-    BodyFactory = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], BodyFactory);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = BodyFactory;
 });
@@ -418,7 +416,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/battle-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../factories/BodyFactory", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, BodyFactory_1, messages_1) {
+define('components/battle-stack',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../factories/BodyFactory', '../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, BodyFactory_1, messages_1) {
     "use strict";
     var BattleStack = (function () {
         function BattleStack(eventAggregator, bodyFactory) {
@@ -443,12 +441,12 @@ define('components/battle-stack',["require", "exports", "aurelia-framework", "au
             this.eventAggregator.publish(new messages_1.MonsterKilled(monster));
         };
         BattleStack.prototype.created = function () { };
+        BattleStack = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, BodyFactory_1.default])
+        ], BattleStack);
         return BattleStack;
     }());
-    BattleStack = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, BodyFactory_1.default])
-    ], BattleStack);
     exports.BattleStack = BattleStack;
 });
 
@@ -461,19 +459,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('domain/Stores/PlayerStore',["require", "exports", "aurelia-framework", "../../factories/BodyFactory"], function (require, exports, aurelia_framework_1, BodyFactory_1) {
+define('domain/Stores/PlayerStore',["require", "exports", 'aurelia-framework', "../../factories/BodyFactory"], function (require, exports, aurelia_framework_1, BodyFactory_1) {
     "use strict";
     var PlayerStore = (function () {
         function PlayerStore(bodyFactory) {
             this.inventory = [];
             this.currentPlayer = bodyFactory.buildPlayer("Test Factory Player");
         }
+        PlayerStore = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [BodyFactory_1.default])
+        ], PlayerStore);
         return PlayerStore;
     }());
-    PlayerStore = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [BodyFactory_1.default])
-    ], PlayerStore);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = PlayerStore;
 });
@@ -487,7 +485,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('domain/Stores/TemplateStore',["require", "exports", "aurelia-framework", "../MonsterTemplate", "../../factories/BodyFactory"], function (require, exports, aurelia_framework_1, MonsterTemplate_1, BodyFactory_1) {
+define('domain/Stores/TemplateStore',["require", "exports", 'aurelia-framework', '../MonsterTemplate', '../../factories/BodyFactory'], function (require, exports, aurelia_framework_1, MonsterTemplate_1, BodyFactory_1) {
     "use strict";
     var TemplateStore = (function () {
         function TemplateStore(bodyFactory) {
@@ -497,12 +495,12 @@ define('domain/Stores/TemplateStore',["require", "exports", "aurelia-framework",
             defaultTemplate.addMonster(bodyFactory.buildMonster("Default Monster2"));
             this.templates = [defaultTemplate];
         }
+        TemplateStore = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [BodyFactory_1.default])
+        ], TemplateStore);
         return TemplateStore;
     }());
-    TemplateStore = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [BodyFactory_1.default])
-    ], TemplateStore);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = TemplateStore;
 });
@@ -516,7 +514,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/main-menu',["require", "exports", "aurelia-framework", "../messages", "aurelia-event-aggregator", "../domain/Stores/PlayerStore", "../domain/Stores/TemplateStore"], function (require, exports, aurelia_framework_1, messages_1, aurelia_event_aggregator_1, PlayerStore_1, TemplateStore_1) {
+define('components/main-menu',["require", "exports", 'aurelia-framework', '../messages', 'aurelia-event-aggregator', '../domain/Stores/PlayerStore', '../domain/Stores/TemplateStore'], function (require, exports, aurelia_framework_1, messages_1, aurelia_event_aggregator_1, PlayerStore_1, TemplateStore_1) {
     "use strict";
     var MainMenu = (function () {
         function MainMenu(eventAggregator, playerStore, templateStore) {
@@ -527,12 +525,12 @@ define('components/main-menu',["require", "exports", "aurelia-framework", "../me
         MainMenu.prototype.open = function (id) {
             this.eventAggregator.publish(new messages_1.ShowModalWindow(id));
         };
+        MainMenu = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default, TemplateStore_1.default), 
+            __metadata('design:paramtypes', [Object, PlayerStore_1.default, TemplateStore_1.default])
+        ], MainMenu);
         return MainMenu;
     }());
-    MainMenu = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default, TemplateStore_1.default),
-        __metadata("design:paramtypes", [Object, PlayerStore_1.default, TemplateStore_1.default])
-    ], MainMenu);
     exports.MainMenu = MainMenu;
 });
 
@@ -545,7 +543,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/modal-content',["require", "exports", "aurelia-framework", "../messages", "aurelia-event-aggregator"], function (require, exports, aurelia_framework_1, messages_1, aurelia_event_aggregator_1) {
+define('components/modal-content',["require", "exports", 'aurelia-framework', '../messages', 'aurelia-event-aggregator'], function (require, exports, aurelia_framework_1, messages_1, aurelia_event_aggregator_1) {
     "use strict";
     var ModalContent = (function () {
         function ModalContent(eventAggregator) {
@@ -558,20 +556,20 @@ define('components/modal-content',["require", "exports", "aurelia-framework", ".
         ModalContent.prototype.close = function () {
             this.visibility = false;
         };
+        __decorate([
+            aurelia_framework_1.bindable, 
+            __metadata('design:type', String)
+        ], ModalContent.prototype, "id", void 0);
+        __decorate([
+            aurelia_framework_1.bindable, 
+            __metadata('design:type', Boolean)
+        ], ModalContent.prototype, "visibility", void 0);
+        ModalContent = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator])
+        ], ModalContent);
         return ModalContent;
     }());
-    __decorate([
-        aurelia_framework_1.bindable,
-        __metadata("design:type", String)
-    ], ModalContent.prototype, "id", void 0);
-    __decorate([
-        aurelia_framework_1.bindable,
-        __metadata("design:type", Boolean)
-    ], ModalContent.prototype, "visibility", void 0);
-    ModalContent = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], ModalContent);
     exports.ModalContent = ModalContent;
 });
 
@@ -584,7 +582,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/monster-manager',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/TemplateStore", "../factories/BodyFactory", "../domain/MonsterTemplate"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, TemplateStore_1, BodyFactory_1, MonsterTemplate_1) {
+define('components/monster-manager',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../domain/Stores/TemplateStore', '../factories/BodyFactory', '../domain/MonsterTemplate'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, TemplateStore_1, BodyFactory_1, MonsterTemplate_1) {
     "use strict";
     var MonsterManager = (function () {
         function MonsterManager(eventAggregator, templateStore, bodyFactory) {
@@ -600,12 +598,12 @@ define('components/monster-manager',["require", "exports", "aurelia-framework", 
         MonsterManager.prototype.selectTemplate = function (template) {
             this.templateStore.selectedTemplate = template;
         };
+        MonsterManager = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default, BodyFactory_1.default])
+        ], MonsterManager);
         return MonsterManager;
     }());
-    MonsterManager = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default, BodyFactory_1.default])
-    ], MonsterManager);
     exports.MonsterManager = MonsterManager;
 });
 
@@ -618,7 +616,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/player-inventory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../messages", "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, messages_1, PlayerStore_1) {
+define('components/player-inventory',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../messages', "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, messages_1, PlayerStore_1) {
     "use strict";
     var PlayerInventory = (function () {
         function PlayerInventory(eventAggregator, playerStore) {
@@ -630,12 +628,12 @@ define('components/player-inventory',["require", "exports", "aurelia-framework",
                 _this.playerInventory.push(msg.item);
             });
         }
+        PlayerInventory = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
+        ], PlayerInventory);
         return PlayerInventory;
     }());
-    PlayerInventory = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
-    ], PlayerInventory);
     exports.PlayerInventory = PlayerInventory;
 });
 
@@ -648,7 +646,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/player-overview',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/PlayerStore", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1, messages_1) {
+define('components/player-overview',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../domain/Stores/PlayerStore', '../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1, messages_1) {
     "use strict";
     var PlayerOverview = (function () {
         function PlayerOverview(eventAggregator, playerStore) {
@@ -660,12 +658,12 @@ define('components/player-overview',["require", "exports", "aurelia-framework", 
                 _this.currentPlayer.gold += msg.goldItem.value;
             });
         }
+        PlayerOverview = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
+        ], PlayerOverview);
         return PlayerOverview;
     }());
-    PlayerOverview = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
-    ], PlayerOverview);
     exports.PlayerOverview = PlayerOverview;
 });
 
@@ -678,18 +676,18 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/player-templates',["require", "exports", "aurelia-framework", "aurelia-event-aggregator"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
+define('components/player-templates',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
     "use strict";
     var PlayerTemplates = (function () {
         function PlayerTemplates(eventAggregator) {
             this.eventAggregator = eventAggregator;
         }
+        PlayerTemplates = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator])
+        ], PlayerTemplates);
         return PlayerTemplates;
     }());
-    PlayerTemplates = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], PlayerTemplates);
     exports.PlayerTemplates = PlayerTemplates;
 });
 
@@ -702,7 +700,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/template-bag',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/TemplateStore", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, TemplateStore_1, messages_1) {
+define('components/template-bag',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../domain/Stores/TemplateStore', '../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, TemplateStore_1, messages_1) {
     "use strict";
     var TemplateBag = (function () {
         function TemplateBag(eventAggregator, templateStore) {
@@ -716,12 +714,12 @@ define('components/template-bag',["require", "exports", "aurelia-framework", "au
             this.templateStore.selectedTemplate = template;
             this.eventAggregator.publish(new messages_1.ShowModalWindow("player-templates"));
         };
+        TemplateBag = __decorate([
+            aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default), 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default])
+        ], TemplateBag);
         return TemplateBag;
     }());
-    TemplateBag = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default])
-    ], TemplateBag);
     exports.TemplateBag = TemplateBag;
 });
 
@@ -734,7 +732,45 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
+define('factories/ItemFactory',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', '../domain/AllItems', "../helpers/Dice"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Item, Dice_1) {
+    "use strict";
+    var BodyFactory = (function () {
+        function BodyFactory(eventAggregator) {
+            this.eventAggregator = eventAggregator;
+        }
+        BodyFactory.prototype.buildGold = function () {
+            var newGold = new Item.Gold(this.eventAggregator);
+            newGold.value = Dice_1.default.d20();
+            newGold.template = "gold";
+            return newGold;
+        };
+        BodyFactory.prototype.buildWeapon = function (name) {
+            var newWeapon = new Item.Weapon(this.eventAggregator);
+            newWeapon.name = name;
+            newWeapon.damage = Dice_1.default.d20();
+            newWeapon.template = "weapon";
+            return newWeapon;
+        };
+        BodyFactory = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator])
+        ], BodyFactory);
+        return BodyFactory;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = BodyFactory;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('helpers/Combat',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
     "use strict";
     var Combat = (function () {
         function Combat(eventAggregator) {
@@ -745,12 +781,12 @@ define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-eve
         };
         Combat.prototype.calculateBattleResult = function (player, monster) {
         };
+        Combat = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator])
+        ], Combat);
         return Combat;
     }());
-    Combat = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], Combat);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = Combat;
 });
@@ -771,28 +807,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/loot/loot-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../../domain/AllItems", "../../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Item, messages_1) {
+define('components/loot/loot-stack',["require", "exports", 'aurelia-framework', 'aurelia-event-aggregator', "../../factories/ItemFactory", '../../messages'], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, ItemFactory_1, messages_1) {
     "use strict";
     var LootStack = (function () {
-        function LootStack(eventAggregator) {
+        function LootStack(eventAggregator, itemFactory) {
             var _this = this;
             this.eventAggregator = eventAggregator;
+            this.itemFactory = itemFactory;
             this.stack = [];
             this.eventAggregator.subscribe(messages_1.MonsterKilled, function () {
-                _this.stack.push(new Item.Gold());
-                _this.stack.push(new Item.Weapon("Thunderfury, Blessed Blade of the Windseeker"));
+                _this.stack.push(itemFactory.buildGold());
+                _this.stack.push(itemFactory.buildWeapon("Thunderfury, Blessed Blade of the Windseeker"));
             });
         }
         LootStack.prototype.takeItem = function (lootItem) {
-            this.eventAggregator.publish(lootItem.take());
+            lootItem.take();
             this.stack.remove(lootItem);
         };
+        LootStack = __decorate([
+            aurelia_framework_1.autoinject, 
+            __metadata('design:paramtypes', [aurelia_event_aggregator_1.EventAggregator, ItemFactory_1.default])
+        ], LootStack);
         return LootStack;
     }());
-    LootStack = __decorate([
-        aurelia_framework_1.inject(aurelia_event_aggregator_1.EventAggregator),
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
-    ], LootStack);
     exports.LootStack = LootStack;
 });
 
@@ -805,7 +842,7 @@ define('text!components/monster-manager.html', ['module'], function(module) { mo
 define('text!components/player-inventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-inventory'\">\r\n        <h2>Inventory</h2>\r\n\r\n        <div repeat.for=\"item of playerInventory\" class=\"inventoryItem\">\r\n            ${item.name}\r\n        </div>\r\n        <div if.bind=\"!playerInventory.length\">\r\n            - empty -\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
 define('text!components/player-overview.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"player-overview\">\r\n        <h2>\r\n            Player Overview\r\n        </h2>\r\n        <span>Name</span> : ${currentPlayer.name}\r\n        <br />\r\n        <span>Gold</span> : ${currentPlayer.gold}\r\n        <br />\r\n        <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}\r\n        <br />\r\n        <span>Strength</span> : ${currentPlayer.strength}\r\n        <br />\r\n        <span>Dexterity</span> : ${currentPlayer.dexterity}\r\n        <br />\r\n        <span>Toughness</span> : ${currentPlayer.toughness}\r\n    </div>\r\n</template>"; });
 define('text!components/player-templates.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./monster-manager\"></require>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-templates'\">\r\n        <h2>Templates</h2>\r\n        <monster-manager></monster-manager>\r\n    </modal-content>\r\n</template>"; });
-define('text!components/template-bag.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\n        <div class=\"noselect\">\n            ${template.name}\n            <div class=\"template-controls\">\n                <button class=\"btn btn-success btn-sm\" click.delegate=\"$parent.spawnTemplate(template)\"><i class=\"fa fa-level-up\"></i> Spawn</button>\n                <button class=\"btn btn-info btn-sm\" click.delegate=\"$parent.viewTemplate(template)\"><i class=\"fa fa-eye\"></i> View</button>\n            </div>\n            <div>\n                <span repeat.for=\"monster of template.monsters\" class=\"noselect tag tag-warning\">\n                    ${monster.name}\n                </span>\n            </div>\n        </div>\n    </div>\n</template>"; });
+define('text!components/template-bag.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n        <div class=\"noselect\">\r\n            ${template.name}\r\n            <div class=\"template-controls\">\r\n                <button class=\"btn btn-success btn-sm\" click.delegate=\"$parent.spawnTemplate(template)\"><i class=\"fa fa-level-up\"></i> Spawn</button>\r\n                <button class=\"btn btn-info btn-sm\" click.delegate=\"$parent.viewTemplate(template)\"><i class=\"fa fa-eye\"></i> View</button>\r\n            </div>\r\n            <div>\r\n                <span repeat.for=\"monster of template.monsters\" class=\"noselect tag tag-warning\">\r\n                    ${monster.name}\r\n                </span>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!components/loot/gold-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"gold-loot\">\r\n        <img src=\"src/images/gold_stack.png\" width=\"30px\" height=\"30px\" /> \r\n        ${lootItem.value} Gold\r\n    </div>\r\n</template>"; });
 define('text!components/loot/loot-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose \r\n      class=\"lootItem noselect\" \r\n      repeat.for=\"lootItem of stack\" \r\n      view=\"./${lootItem.template}-loot.html\"\r\n      click.delegate=\"$parent.takeItem(lootItem)\">\r\n    </compose>\r\n</template>"; });
 define('text!components/loot/weapon-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div>\r\n        ${lootItem.displayName}<br/> \r\n        Damage: ${lootItem.damage}\r\n    </div>\r\n</template>"; });

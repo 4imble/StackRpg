@@ -1,5 +1,7 @@
+import { EventAggregator } from 'aurelia-event-aggregator';
+
 export abstract class Loot {
-    constructor() {}
+    constructor(protected eventAggregator: EventAggregator) {}
 
     template: string;
     abstract get displayName();
