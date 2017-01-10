@@ -1,7 +1,10 @@
 <template>
+    <require from="./progress-bar"></require>
+    
     <div>
         <div repeat.for="monster of stack" class="battleStackItem">
-            ${monster.name}
+            <progress-bar percent.bind="monster.currentHealthPercent"></progress-bar>
+                ${monster.name}
         </div>
         <div repeat.for="i of (5 - stack.length)" class="battleStackItem empty">
         </div>

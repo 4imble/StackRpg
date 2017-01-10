@@ -23,6 +23,10 @@ abstract class Body {
         return this.totalHealth - this.damageTaken;
     };
 
+    get currentHealthPercent() {
+        return Math.floor((this.currentHealth * 100) / this.totalHealth);
+    }
+
     get hasDied() {
         return this.killed || this.currentHealth <= 0;
     }
