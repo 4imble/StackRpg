@@ -92,6 +92,28 @@ battle-stack, loot-stack, monster-bag
     background-color: darkslategray;
 }
 
+.monsterTemplateItem{
+    height: 100px;
+    width: 80px;
+    padding: 6px;
+    margin-top: 1px;
+    margin-left: 1px;
+    background-color: coral;
+    color:whitesmoke;
+    font-weight: 600;
+    float: left;
+
+    &.empty{
+        background-color: #b1b1b1;
+        color: white;
+    }
+}
+
+.battleStackEmptyItem{
+    .battleStackItem;
+    background-color: darkslategray;
+}
+
 .inventoryItem {
     background-color: darkslategray;
     padding: 4px;
