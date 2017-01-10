@@ -5,7 +5,7 @@ import Monster from '../domain/Monster';
 import Dice from "../helpers/Dice";
 
 @autoinject
-export default class BodyFactory {
+export default class ItemFactory {
     constructor(private eventAggregator: EventAggregator) { }
 
     buildGold(): Item.Gold {
