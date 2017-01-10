@@ -24,11 +24,12 @@ define('domain/Body',["require", "exports", "../helpers/Attribute"], function (r
             this.strength = 10;
             this.toughness = 10;
             this.dexterity = 10;
+            this.killed = false;
         }
         Object.defineProperty(Body.prototype, "totalHealth", {
             get: function () {
                 var toughnessModifier = Attribute_1.default.getModifier(this.toughness);
-                return (this.baseHealth + toughnessModifier) - this.damageTaken;
+                return this.baseHealth + toughnessModifier;
             },
             enumerable: true,
             configurable: true
@@ -42,6 +43,13 @@ define('domain/Body',["require", "exports", "../helpers/Attribute"], function (r
             configurable: true
         });
         ;
+        Object.defineProperty(Body.prototype, "hasDied", {
+            get: function () {
+                return this.killed || this.currentHealth <= 0;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return Body;
     }());
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -53,7 +61,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-define('domain/Monster',["require", "exports", "./Body"], function (require, exports, Body_1) {
+define('domain/Monster',["require", "exports", "./Body", "../messages"], function (require, exports, Body_1, messages_1) {
     "use strict";
     var Monster = (function (_super) {
         __extends(Monster, _super);
@@ -62,6 +70,9 @@ define('domain/Monster',["require", "exports", "./Body"], function (require, exp
         }
         Monster.prototype.takeDamage = function (damage) {
             this.damageTaken += damage;
+            if (this.hasDied) {
+                this.eventAggregator.publish(new messages_1.MonsterKilled(this));
+            }
         };
         return Monster;
     }(Body_1.default));
@@ -392,19 +403,23 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/battle-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../factories/BodyFactory", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, BodyFactory_1, messages_1) {
+define('components/battle-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../factories/BodyFactory", "../helpers/Combat", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, BodyFactory_1, Combat_1, messages_1) {
     "use strict";
     var BattleStack = (function () {
-        function BattleStack(eventAggregator, bodyFactory) {
+        function BattleStack(eventAggregator, bodyFactory, combat) {
             var _this = this;
             this.eventAggregator = eventAggregator;
             this.bodyFactory = bodyFactory;
+            this.combat = combat;
             this.stack = [];
             this.stack.push(bodyFactory.buildMonster("Grumble"), bodyFactory.buildMonster("Viqas' Expensive Bread"));
             this.eventAggregator.subscribe(messages_1.TemplateSpawned, function (msg) {
                 msg.template.monsters.forEach(function (monster) {
                     _this.stack.push(monster);
                 });
+            });
+            this.eventAggregator.subscribe(messages_1.MonsterKilled, function (msg) {
+                _this.stack.remove(msg.monster);
             });
             this.eventAggregator.subscribe(messages_1.Heartbeat, function () {
                 if (_this.stack.length) {
@@ -413,15 +428,14 @@ define('components/battle-stack',["require", "exports", "aurelia-framework", "au
             });
         }
         BattleStack.prototype.fightMonster = function () {
-            var monster = this.stack.shift();
-            this.eventAggregator.publish(new messages_1.MonsterKilled(monster));
+            this.combat.battle(this.stack);
         };
         BattleStack.prototype.created = function () { };
         return BattleStack;
     }());
     BattleStack = __decorate([
         aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, BodyFactory_1.default])
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, BodyFactory_1.default, Combat_1.default])
     ], BattleStack);
     exports.BattleStack = BattleStack;
 });
@@ -766,25 +780,40 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1) {
+define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1) {
     "use strict";
     var Combat = (function () {
-        function Combat(eventAggregator) {
+        function Combat(eventAggregator, playerStore) {
             this.eventAggregator = eventAggregator;
+            this.playerStore = playerStore;
         }
-        Combat.prototype.battle = function (player, monster) {
-            var result = this.calculateBattleResult(player, monster);
+        Combat.prototype.battle = function (monsters) {
+            if (!monsters.length)
+                return;
+            var player = this.playerStore.currentPlayer;
+            var result = this.calculateBattleResult(player, monsters);
+            player.takeDamage(result.playerDamage);
+            monsters[0].takeDamage(result.monsterDamage);
         };
-        Combat.prototype.calculateBattleResult = function (player, monster) {
+        Combat.prototype.calculateBattleResult = function (player, monsters) {
+            var battleResult = new BattleResult();
+            battleResult.playerDamage = 3;
+            battleResult.monsterDamage = 6;
+            return battleResult;
         };
         return Combat;
     }());
     Combat = __decorate([
         aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
     ], Combat);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = Combat;
+    var BattleResult = (function () {
+        function BattleResult() {
+        }
+        return BattleResult;
+    }());
 });
 
 define('resources/index',["require", "exports"], function (require, exports) {

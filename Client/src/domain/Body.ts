@@ -10,16 +10,22 @@ abstract class Body {
     toughness: number = 10;
     dexterity: number = 10;
 
-    constructor(private eventAggregator: EventAggregator, public name: string) {}
+    killed: boolean = false;
+
+    constructor(protected eventAggregator: EventAggregator, public name: string) {}
 
     get totalHealth() {
         let toughnessModifier = Attribute.getModifier(this.toughness);
-        return (this.baseHealth + toughnessModifier) - this.damageTaken;
+        return this.baseHealth + toughnessModifier;
     };
 
     get currentHealth() {
         return this.totalHealth - this.damageTaken;
     };
+
+    get hasDied() {
+        return this.killed || this.currentHealth <= 0;
+    }
 
     abstract takeDamage(damage:number);
 }
