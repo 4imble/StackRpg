@@ -14,4 +14,8 @@ export default class BodyFactory {
     buildMonster(name: string): Monster {
         return new Monster(this.eventAggregator, name);
     }
+
+    cloneMonster(monster: Monster){
+        return Object.assign(this.buildMonster(monster.name), monster);
+    }
 }

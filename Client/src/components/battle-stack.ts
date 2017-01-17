@@ -14,7 +14,7 @@ export class BattleStack {
 
         this.eventAggregator.subscribe(TemplateSpawned, (msg: TemplateSpawned) => {
             msg.template.monsters.forEach(monster => {
-                this.stack.push(monster);
+                this.stack.push(bodyFactory.cloneMonster(monster));
             });
         });
 

@@ -10,6 +10,6 @@ export default class GameLoop {
     {        
         setInterval(() => {
             this.eventAggregator.publish(new Heartbeat());
-        }, 5000);
+        }, 2000);
     }
 }

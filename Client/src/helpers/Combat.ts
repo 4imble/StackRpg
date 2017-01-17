@@ -3,6 +3,9 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import Player from '../Domain/Player';
 import PlayerStore from '../domain/Stores/PlayerStore';
 import Monster from '../Domain/Monster';
+import Body from '../Domain/Body';
+import Dice from "../helpers/Dice";
+import Attribute from "../helpers/Attribute";
 import { Heartbeat } from '../messages';
 
 @autoinject
@@ -24,15 +27,32 @@ export default class Combat {
     private calculateBattleResult(player: Player, monsters: Array<Monster>)
     {
         let battleResult = new BattleResult();
-        battleResult.playerDamage = 3;
-        battleResult.monsterDamage = 6;
+        
+        monsters.forEach(monster => {
+            battleResult.playerDamage += this.calculateDamage(player, monster);        
+        });
+        
+        battleResult.monsterDamage = this.calculateDamage(monsters[0], player);
 
         return battleResult;
+    }
+
+    private calculateDamage(defender: Body, attacker: Body): number {
+        let defenderDodge = Attribute.getModifier(defender.dexterity) + Dice.d20();
+        if(defenderDodge >= attacker.baseAttack + Dice.d20())
+            {
+                console.log(attacker.name + "Misses");
+                return 0;
+            }
+
+        let attackerDamage = Attribute.getModifier(attacker.strength) + Dice.d6();
+        console.log(attacker.name + "Hits - " + attackerDamage);        
+        return attackerDamage;
     }
 }
 
 class BattleResult
 {
-    playerDamage;
-    monsterDamage;
+    playerDamage = 0;
+    monsterDamage = 0;
 }

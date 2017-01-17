@@ -2,7 +2,6 @@ import Attribute from "../helpers/Attribute";
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 abstract class Body {
-    baseHealth: number = 10;
     damageTaken: number = 0;
     level: number = 1;
 
@@ -13,6 +12,14 @@ abstract class Body {
     killed: boolean = false;
 
     constructor(protected eventAggregator: EventAggregator, public name: string) {}
+
+    get baseHealth() {
+        return 10 * this.level;
+    }
+
+    get baseAttack() {
+        return 1 * this.level;
+    }
 
     get totalHealth() {
         let toughnessModifier = Attribute.getModifier(this.toughness);

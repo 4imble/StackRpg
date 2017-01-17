@@ -18,7 +18,6 @@ define('domain/Body',["require", "exports", "../helpers/Attribute"], function (r
         function Body(eventAggregator, name) {
             this.eventAggregator = eventAggregator;
             this.name = name;
-            this.baseHealth = 10;
             this.damageTaken = 0;
             this.level = 1;
             this.strength = 10;
@@ -26,6 +25,20 @@ define('domain/Body',["require", "exports", "../helpers/Attribute"], function (r
             this.dexterity = 10;
             this.killed = false;
         }
+        Object.defineProperty(Body.prototype, "baseHealth", {
+            get: function () {
+                return 10 * this.level;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Body.prototype, "baseAttack", {
+            get: function () {
+                return 1 * this.level;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Body.prototype, "totalHealth", {
             get: function () {
                 var toughnessModifier = Attribute_1.default.getModifier(this.toughness);
@@ -259,7 +272,7 @@ define('helpers/GameLoop',["require", "exports", "aurelia-framework", "aurelia-e
             var _this = this;
             setInterval(function () {
                 _this.eventAggregator.publish(new messages_1.Heartbeat());
-            }, 5000);
+            }, 2000);
         };
         return GameLoop;
     }());
@@ -391,6 +404,9 @@ define('factories/BodyFactory',["require", "exports", "aurelia-framework", "aure
         BodyFactory.prototype.buildMonster = function (name) {
             return new Monster_1.default(this.eventAggregator, name);
         };
+        BodyFactory.prototype.cloneMonster = function (monster) {
+            return Object.assign(this.buildMonster(monster.name), monster);
+        };
         return BodyFactory;
     }());
     BodyFactory = __decorate([
@@ -427,6 +443,26 @@ define('domain/Stores/PlayerStore',["require", "exports", "aurelia-framework", "
     exports.default = PlayerStore;
 });
 
+define('helpers/Dice',["require", "exports"], function (require, exports) {
+    "use strict";
+    var Dice = (function () {
+        function Dice() {
+        }
+        Dice.d6 = function () {
+            return this.rollSides(6);
+        };
+        Dice.d20 = function () {
+            return this.rollSides(20);
+        };
+        Dice.rollSides = function (sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        };
+        return Dice;
+    }());
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = Dice;
+});
+
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -436,7 +472,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1) {
+define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/PlayerStore", "../helpers/Dice", "../helpers/Attribute"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1, Dice_1, Attribute_1) {
     "use strict";
     var Combat = (function () {
         function Combat(eventAggregator, playerStore) {
@@ -452,10 +488,23 @@ define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-eve
             monsters[0].takeDamage(result.monsterDamage);
         };
         Combat.prototype.calculateBattleResult = function (player, monsters) {
+            var _this = this;
             var battleResult = new BattleResult();
-            battleResult.playerDamage = 3;
-            battleResult.monsterDamage = 6;
+            monsters.forEach(function (monster) {
+                battleResult.playerDamage += _this.calculateDamage(player, monster);
+            });
+            battleResult.monsterDamage = this.calculateDamage(monsters[0], player);
             return battleResult;
+        };
+        Combat.prototype.calculateDamage = function (defender, attacker) {
+            var defenderDodge = Attribute_1.default.getModifier(defender.dexterity) + Dice_1.default.d20();
+            if (defenderDodge >= attacker.baseAttack + Dice_1.default.d20()) {
+                console.log(attacker.name + "Misses");
+                return 0;
+            }
+            var attackerDamage = Attribute_1.default.getModifier(attacker.strength) + Dice_1.default.d6();
+            console.log(attacker.name + "Hits - " + attackerDamage);
+            return attackerDamage;
         };
         return Combat;
     }());
@@ -467,6 +516,8 @@ define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-eve
     exports.default = Combat;
     var BattleResult = (function () {
         function BattleResult() {
+            this.playerDamage = 0;
+            this.monsterDamage = 0;
         }
         return BattleResult;
     }());
@@ -493,7 +544,7 @@ define('components/battle-stack',["require", "exports", "aurelia-framework", "au
             this.stack.push(bodyFactory.buildMonster("Grumble"), bodyFactory.buildMonster("Viqas' Expensive Bread"));
             this.eventAggregator.subscribe(messages_1.TemplateSpawned, function (msg) {
                 msg.template.monsters.forEach(function (monster) {
-                    _this.stack.push(monster);
+                    _this.stack.push(bodyFactory.cloneMonster(monster));
                 });
             });
             this.eventAggregator.subscribe(messages_1.MonsterKilled, function (msg) {
@@ -793,26 +844,6 @@ define('components/template-bag',["require", "exports", "aurelia-framework", "au
         __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, TemplateStore_1.default])
     ], TemplateBag);
     exports.TemplateBag = TemplateBag;
-});
-
-define('helpers/Dice',["require", "exports"], function (require, exports) {
-    "use strict";
-    var Dice = (function () {
-        function Dice() {
-        }
-        Dice.d6 = function () {
-            return this.rollSides(6);
-        };
-        Dice.d20 = function () {
-            return this.rollSides(20);
-        };
-        Dice.rollSides = function (sides) {
-            return Math.floor(Math.random() * sides) + 1;
-        };
-        return Dice;
-    }());
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = Dice;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
