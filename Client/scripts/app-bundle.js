@@ -498,12 +498,14 @@ define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-eve
         };
         Combat.prototype.calculateDamage = function (defender, attacker) {
             var defenderDodge = Attribute_1.default.getModifier(defender.dexterity) + Dice_1.default.d20();
-            if (defenderDodge >= attacker.baseAttack + Dice_1.default.d20()) {
-                console.log(attacker.name + "Misses");
+            var attackerHit = attacker.baseAttack + Dice_1.default.d20();
+            console.log(defenderDodge + " vs " + attackerHit);
+            if (defenderDodge >= attackerHit) {
+                console.log(attacker.name + " Misses");
                 return 0;
             }
             var attackerDamage = Attribute_1.default.getModifier(attacker.strength) + Dice_1.default.d6();
-            console.log(attacker.name + "Hits - " + attackerDamage);
+            console.log(attacker.name + " Hits for " + attackerDamage);
             return attackerDamage;
         };
         return Combat;
