@@ -2,7 +2,7 @@ import { inject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Player from '../domain/Player';
 import PlayerStore from '../domain/Stores/PlayerStore';
-import { GoldTaken } from '../messages';
+import { GoldTaken, Heartbeat } from '../messages';
 
 @inject(EventAggregator, PlayerStore)
 export class PlayerOverview {
@@ -13,6 +13,10 @@ export class PlayerOverview {
 
         this.eventAggregator.subscribe(GoldTaken, (msg: GoldTaken) => {
             this.currentPlayer.gold += msg.goldItem.value;
+        });
+
+        this.eventAggregator.subscribe(Heartbeat, (msg: Heartbeat) => {
+            this.currentPlayer.healDamage(1);
         });
     }
 }

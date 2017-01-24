@@ -1,4 +1,5 @@
 import Attribute from "../helpers/Attribute";
+import Dice from "../helpers/Dice";
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 abstract class Body {
@@ -22,7 +23,7 @@ abstract class Body {
     }
 
     get totalHealth() {
-        let toughnessModifier = Attribute.getModifier(this.toughness);
+        let toughnessModifier = Attribute.getModifier(this.toughness) * this.level;
         return this.baseHealth + toughnessModifier;
     };
 
@@ -36,6 +37,23 @@ abstract class Body {
 
     get hasDied() {
         return this.killed || this.currentHealth <= 0;
+    }
+
+    calculateDodgeRoll(): number {
+        return Attribute.getModifier(this.dexterity) + Dice.d20();
+    }
+
+    calculateAttackRoll(): number {
+        return this.baseAttack + Dice.d20();
+    }
+    
+    calculateDamageRoll(): number {
+        return Math.max(Attribute.getModifier(this.strength) + Dice.d6(), 0);
+    }
+
+    healDamage(heal:number) {
+        if(this.damageTaken > 0)
+            this.damageTaken -= heal;
     }
 
     abstract takeDamage(damage:number);

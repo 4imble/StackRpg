@@ -38,9 +38,9 @@ export default class Combat {
     }
 
     private calculateDamage(defender: Body, attacker: Body): number {
-        let defenderDodge = Attribute.getModifier(defender.dexterity) + Dice.d20();
-        let attackerHit = attacker.baseAttack + Dice.d20();
-        console.log(`${defenderDodge} vs ${attackerHit}`);
+        let defenderDodge = defender.calculateDodgeRoll();
+        let attackerHit = attacker.calculateAttackRoll();
+        console.log(`${defenderDodge} dodge vs ${attackerHit} attack`);
         
         if(defenderDodge >= attackerHit)
             {
@@ -48,7 +48,7 @@ export default class Combat {
                 return 0;
             }
 
-        let attackerDamage = Attribute.getModifier(attacker.strength) + Dice.d6();
+        let attackerDamage = attacker.calculateDamageRoll();
         console.log(`${attacker.name} Hits for ${attackerDamage}`);        
         return attackerDamage;
     }

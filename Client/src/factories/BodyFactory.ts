@@ -8,11 +8,21 @@ export default class BodyFactory {
     constructor(private eventAggregator: EventAggregator) { }
 
     buildPlayer(name: string): Player {
-        return new Player(this.eventAggregator, name);
+        let player = new Player(this.eventAggregator, name);
+        player.strength = 16;
+        player.toughness = 14;
+        player.dexterity = 16;
+
+        return player;
     }
 
     buildMonster(name: string): Monster {
-        return new Monster(this.eventAggregator, name);
+        let monster = new Monster(this.eventAggregator, name);
+        monster.strength = 9;
+        monster.toughness = 10;
+        monster.dexterity = 13;
+
+        return monster;
     }
 
     cloneMonster(monster: Monster){

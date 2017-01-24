@@ -12,7 +12,7 @@ define('helpers/Attribute',["require", "exports"], function (require, exports) {
     exports.default = Attribute;
 });
 
-define('domain/Body',["require", "exports", "../helpers/Attribute"], function (require, exports, Attribute_1) {
+define('domain/Body',["require", "exports", "../helpers/Attribute", "../helpers/Dice"], function (require, exports, Attribute_1, Dice_1) {
     "use strict";
     var Body = (function () {
         function Body(eventAggregator, name) {
@@ -41,7 +41,7 @@ define('domain/Body',["require", "exports", "../helpers/Attribute"], function (r
         });
         Object.defineProperty(Body.prototype, "totalHealth", {
             get: function () {
-                var toughnessModifier = Attribute_1.default.getModifier(this.toughness);
+                var toughnessModifier = Attribute_1.default.getModifier(this.toughness) * this.level;
                 return this.baseHealth + toughnessModifier;
             },
             enumerable: true,
@@ -70,6 +70,19 @@ define('domain/Body',["require", "exports", "../helpers/Attribute"], function (r
             enumerable: true,
             configurable: true
         });
+        Body.prototype.calculateDodgeRoll = function () {
+            return Attribute_1.default.getModifier(this.dexterity) + Dice_1.default.d20();
+        };
+        Body.prototype.calculateAttackRoll = function () {
+            return this.baseAttack + Dice_1.default.d20();
+        };
+        Body.prototype.calculateDamageRoll = function () {
+            return Math.max(Attribute_1.default.getModifier(this.strength) + Dice_1.default.d6(), 0);
+        };
+        Body.prototype.healDamage = function (heal) {
+            if (this.damageTaken > 0)
+                this.damageTaken -= heal;
+        };
         return Body;
     }());
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -399,10 +412,18 @@ define('factories/BodyFactory',["require", "exports", "aurelia-framework", "aure
             this.eventAggregator = eventAggregator;
         }
         BodyFactory.prototype.buildPlayer = function (name) {
-            return new Player_1.default(this.eventAggregator, name);
+            var player = new Player_1.default(this.eventAggregator, name);
+            player.strength = 16;
+            player.toughness = 14;
+            player.dexterity = 16;
+            return player;
         };
         BodyFactory.prototype.buildMonster = function (name) {
-            return new Monster_1.default(this.eventAggregator, name);
+            var monster = new Monster_1.default(this.eventAggregator, name);
+            monster.strength = 9;
+            monster.toughness = 10;
+            monster.dexterity = 13;
+            return monster;
         };
         BodyFactory.prototype.cloneMonster = function (monster) {
             return Object.assign(this.buildMonster(monster.name), monster);
@@ -472,7 +493,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/PlayerStore", "../helpers/Dice", "../helpers/Attribute"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1, Dice_1, Attribute_1) {
+define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, PlayerStore_1) {
     "use strict";
     var Combat = (function () {
         function Combat(eventAggregator, playerStore) {
@@ -497,14 +518,14 @@ define('helpers/Combat',["require", "exports", "aurelia-framework", "aurelia-eve
             return battleResult;
         };
         Combat.prototype.calculateDamage = function (defender, attacker) {
-            var defenderDodge = Attribute_1.default.getModifier(defender.dexterity) + Dice_1.default.d20();
-            var attackerHit = attacker.baseAttack + Dice_1.default.d20();
-            console.log(defenderDodge + " vs " + attackerHit);
+            var defenderDodge = defender.calculateDodgeRoll();
+            var attackerHit = attacker.calculateAttackRoll();
+            console.log(defenderDodge + " dodge vs " + attackerHit + " attack");
             if (defenderDodge >= attackerHit) {
                 console.log(attacker.name + " Misses");
                 return 0;
             }
-            var attackerDamage = Attribute_1.default.getModifier(attacker.strength) + Dice_1.default.d6();
+            var attackerDamage = attacker.calculateDamageRoll();
             console.log(attacker.name + " Hits for " + attackerDamage);
             return attackerDamage;
         };
@@ -752,6 +773,9 @@ define('components/player-overview',["require", "exports", "aurelia-framework", 
             this.eventAggregator.subscribe(messages_1.GoldTaken, function (msg) {
                 _this.currentPlayer.gold += msg.goldItem.value;
             });
+            this.eventAggregator.subscribe(messages_1.Heartbeat, function (msg) {
+                _this.currentPlayer.healDamage(1);
+            });
         }
         return PlayerOverview;
     }());
@@ -929,8 +953,8 @@ define('components/loot/loot-stack',["require", "exports", "aurelia-framework", 
 });
 
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./components/battle-stack\"></require>\r\n\t<require from=\"./components/loot/loot-stack\"></require>\r\n\t<require from=\"./components/main-menu\"></require>\r\n\t<require from=\"./components/player-overview\"></require>\r\n\t<require from=\"./components/player-inventory\"></require>\r\n\t<require from=\"./components/player-templates\"></require>\r\n\t<require from=\"./components/template-bag\"></require>\r\n\t<require from=\"bootstrap4/css/bootstrap.css\"></require>\r\n\t<require from=\"./styles/styles.css\"></require>\r\n\r\n\t<div id=\"timer\">\r\n\t\tTimer: ${timer}\r\n\t</div>\r\n\t<main-menu></main-menu>\r\n\t<battle-stack></battle-stack>\r\n\t<player-overview></player-overview>\r\n\t<template-bag></template-bag>\r\n\t<loot-stack></loot-stack>\r\n\r\n\t<player-inventory></player-inventory>\r\n\t<player-templates></player-templates>\r\n</template>"; });
-define('text!components/battle-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./progress-bar\"></require>\r\n    \r\n    <div>\r\n        <div repeat.for=\"monster of stack\" class=\"battleStackItem\">\r\n            <progress-bar percent.bind=\"monster.currentHealthPercent\"></progress-bar>\r\n                ${monster.name}\r\n        </div>\r\n        <div repeat.for=\"i of (5 - stack.length)\" class=\"battleStackItem empty\">\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!styles/styles.css', ['module'], function(module) { module.exports = ".component {\n  display: block;\n  overflow: hidden;\n}\nbody {\n  margin: 0;\n}\nbattle-stack,\nloot-stack,\nmonster-bag {\n  display: block;\n  overflow: hidden;\n}\n#player-overview {\n  background-color: lightblue;\n}\n#timer {\n  position: fixed;\n  top: 10px;\n  right: 10px;\n  padding: 10px;\n  font-size: 12px;\n  font-weight: 700;\n  background: white;\n  border-radius: 4px;\n  z-index: 10000;\n}\n.page-host {\n  padding-top: 60px;\n}\n.bagItem {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: antiquewhite;\n}\n.bagItem:hover {\n  background-color: beige;\n  cursor: pointer;\n}\n.templateItem {\n  padding: 6px;\n  margin-top: 1px;\n  color: ghostwhite;\n  background-color: saddlebrown;\n}\n.templateMonster {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: coral;\n}\n.progressBarContainer {\n  width: 10px;\n  float: right;\n  height: 100%;\n  background: #c9d250;\n}\n.progressBarContainer .progressBar {\n  width: 10px;\n  height: 100%;\n  transition: height 1s;\n  background: red;\n}\n.battleStackItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.battleStackItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.monsterTemplateItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.monsterTemplateItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.inventoryItem {\n  background-color: darkslategray;\n  padding: 4px;\n  margin-top: 1px;\n  color: white;\n}\n.lootItem {\n  display: block;\n  overflow: hidden;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: gray;\n  color: whitesmoke;\n  font-weight: 600;\n  font-size: 14px;\n}\n.lootItem:hover {\n  background-color: cadetblue;\n  cursor: pointer;\n}\n.noselect {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.clearfix {\n  clear: both;\n  overflow: none;\n}\n.modal-window {\n  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  background-color: white;\n  position: fixed;\n  z-index: 99999;\n  border-radius: 5px;\n  padding: 22px;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  -webkit-transform: translate(-50%, -50%);\n  max-height: 70%;\n}\n.modal-window .close-button {\n  float: right;\n}\n.modal-window-overlay {\n  background-color: black;\n  -ms-filter: \"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)\";\n  background-color: rgba(0, 0, 0, 0.4);\n  position: fixed;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  z-index: 10000;\n}\n.template-controls {\n  float: right;\n}\n"; });
+define('text!components/battle-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./progress-bar\"></require>\r\n    \r\n    <div>\r\n        <div repeat.for=\"monster of stack\" class=\"battleStackItem\">\r\n            <progress-bar percent.bind=\"monster.currentHealthPercent\"></progress-bar>\r\n                ${monster.name}\r\n        </div>\r\n        <div repeat.for=\"i of (5 - stack.length)\" class=\"battleStackItem empty\">\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!components/main-menu.html', ['module'], function(module) { module.exports = "<template>\r\n    <nav class=\"navbar navbar-light bg-faded\">\r\n        <ul class=\"nav navbar-nav\">\r\n            <li class=\"nav-item\">\r\n                <button click.delegate=\"open('player-inventory')\" class=\"btn btn-block\">Inventory (${playerStore.inventory.length})</button>\r\n            </li>\r\n            <li class=\"nav-item\">\r\n                <button click.delegate=\"open('player-templates')\" class=\"btn btn-block\">Templates (${templateStore.templates.length})</button>\r\n            </li>\r\n        </ul>\r\n    </nav>\r\n</template>"; });
 define('text!components/modal-content.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"visibility\" class=\"modal-window\">\r\n    <div>\r\n      <button class=\"btn btn-danger btn-sm close-button\" click.delegate=\"close()\">close</button>\r\n    </div>\r\n    <slot></slot>\r\n  </div>\r\n  <div show.bind=\"visibility\" class=\"modal-window-overlay\" click.delegate=\"close()\"></div>\r\n</template>"; });
 define('text!components/monster-manager.html', ['module'], function(module) { module.exports = "<template>\r\n    <div style=\"width: 407px;\">\r\n        <div if.bind=\"templateStore.selectedTemplate == null\">No template selected</div>\r\n        <div class=\"clearfix\" if.bind=\"templateStore.selectedTemplate\" with.bind=\"templateStore.selectedTemplate\">\r\n            <div repeat.for=\"monster of monsters\" class=\"monsterTemplateItem\" click.delegate=\"$parent.remove(monster)\">\r\n                <div class=\"noselect\">${monster.name}</div>\r\n            </div>\r\n            <div repeat.for=\"i of (5 - monsters.length)\" class=\"monsterTemplateItem empty\"></div>\r\n        </div>\r\n\r\n        <div class=\"bagItem\" if.bind=\"templateStore.selectedTemplate\" repeat.for=\"monster of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.useMonster(monster)\">${monster.name}</div>\r\n        </div>\r\n\r\n        <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.selectTemplate(template)\">${template.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
