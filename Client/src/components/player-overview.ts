@@ -14,9 +14,5 @@ export class PlayerOverview {
         this.eventAggregator.subscribe(GoldTaken, (msg: GoldTaken) => {
             this.currentPlayer.gold += msg.goldItem.value;
         });
-
-        this.eventAggregator.subscribe(Heartbeat, (msg: Heartbeat) => {
-            this.currentPlayer.healDamage(1);
-        });
     }
 }

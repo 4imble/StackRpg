@@ -19,12 +19,19 @@ define('domain/Body',["require", "exports", "../helpers/Attribute", "../helpers/
             this.eventAggregator = eventAggregator;
             this.name = name;
             this.damageTaken = 0;
-            this.level = 1;
+            this.experience = 0;
             this.strength = 10;
             this.toughness = 10;
             this.dexterity = 10;
             this.killed = false;
         }
+        Object.defineProperty(Body.prototype, "level", {
+            get: function () {
+                return Math.floor(Math.sqrt(this.experience / 1000)) + 1;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Body.prototype, "baseHealth", {
             get: function () {
                 return 10 * this.level;
@@ -447,18 +454,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('domain/Stores/PlayerStore',["require", "exports", "aurelia-framework", "../../factories/BodyFactory"], function (require, exports, aurelia_framework_1, BodyFactory_1) {
+define('domain/Stores/PlayerStore',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../../factories/BodyFactory", "../../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, BodyFactory_1, messages_1) {
     "use strict";
     var PlayerStore = (function () {
-        function PlayerStore(bodyFactory) {
+        function PlayerStore(eventAggregator, bodyFactory) {
+            var _this = this;
+            this.eventAggregator = eventAggregator;
             this.inventory = [];
             this.currentPlayer = bodyFactory.buildPlayer("Test Factory Player");
+            this.eventAggregator.subscribe(messages_1.Heartbeat, function (msg) {
+                _this.currentPlayer.healDamage(1);
+            });
+            this.eventAggregator.subscribe(messages_1.MonsterKilled, function (msg) {
+                _this.currentPlayer.experience += 4000;
+            });
         }
         return PlayerStore;
     }());
     PlayerStore = __decorate([
         aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [BodyFactory_1.default])
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, BodyFactory_1.default])
     ], PlayerStore);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = PlayerStore;
@@ -773,9 +788,6 @@ define('components/player-overview',["require", "exports", "aurelia-framework", 
             this.eventAggregator.subscribe(messages_1.GoldTaken, function (msg) {
                 _this.currentPlayer.gold += msg.goldItem.value;
             });
-            this.eventAggregator.subscribe(messages_1.Heartbeat, function (msg) {
-                _this.currentPlayer.healDamage(1);
-            });
         }
         return PlayerOverview;
     }());
@@ -959,7 +971,7 @@ define('text!components/main-menu.html', ['module'], function(module) { module.e
 define('text!components/modal-content.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"visibility\" class=\"modal-window\">\r\n    <div>\r\n      <button class=\"btn btn-danger btn-sm close-button\" click.delegate=\"close()\">close</button>\r\n    </div>\r\n    <slot></slot>\r\n  </div>\r\n  <div show.bind=\"visibility\" class=\"modal-window-overlay\" click.delegate=\"close()\"></div>\r\n</template>"; });
 define('text!components/monster-manager.html', ['module'], function(module) { module.exports = "<template>\r\n    <div style=\"width: 407px;\">\r\n        <div if.bind=\"templateStore.selectedTemplate == null\">No template selected</div>\r\n        <div class=\"clearfix\" if.bind=\"templateStore.selectedTemplate\" with.bind=\"templateStore.selectedTemplate\">\r\n            <div repeat.for=\"monster of monsters\" class=\"monsterTemplateItem\" click.delegate=\"$parent.remove(monster)\">\r\n                <div class=\"noselect\">${monster.name}</div>\r\n            </div>\r\n            <div repeat.for=\"i of (5 - monsters.length)\" class=\"monsterTemplateItem empty\"></div>\r\n        </div>\r\n\r\n        <div class=\"bagItem\" if.bind=\"templateStore.selectedTemplate\" repeat.for=\"monster of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.useMonster(monster)\">${monster.name}</div>\r\n        </div>\r\n\r\n        <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.selectTemplate(template)\">${template.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!components/player-inventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-inventory'\">\r\n        <h2>Inventory</h2>\r\n\r\n        <div repeat.for=\"item of playerInventory\" class=\"inventoryItem\">\r\n            ${item.name}\r\n        </div>\r\n        <div if.bind=\"!playerInventory.length\">\r\n            - empty -\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
-define('text!components/player-overview.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"player-overview\">\r\n        <h2>\r\n            Player Overview\r\n        </h2>\r\n        <span>Name</span> : ${currentPlayer.name}\r\n        <br />\r\n        <span>Gold</span> : ${currentPlayer.gold}\r\n        <br />\r\n        <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}\r\n        <br />\r\n        <span>Strength</span> : ${currentPlayer.strength}\r\n        <br />\r\n        <span>Dexterity</span> : ${currentPlayer.dexterity}\r\n        <br />\r\n        <span>Toughness</span> : ${currentPlayer.toughness}\r\n    </div>\r\n</template>"; });
+define('text!components/player-overview.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"player-overview\">\r\n        <h2>\r\n            Player Overview\r\n        </h2>\r\n        <span>Name</span> : ${currentPlayer.name}\r\n        <br />\r\n        <span>Level</span> : ${currentPlayer.level} <span>Experience </span> : ${currentPlayer.experience}\r\n        <br />\r\n        <span>Gold</span> : ${currentPlayer.gold}\r\n        <br />\r\n        <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}\r\n        <br />\r\n        <span>Strength</span> : ${currentPlayer.strength}\r\n        <br />\r\n        <span>Dexterity</span> : ${currentPlayer.dexterity}\r\n        <br />\r\n        <span>Toughness</span> : ${currentPlayer.toughness}\r\n    </div>\r\n</template>"; });
 define('text!components/player-templates.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./monster-manager\"></require>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-templates'\">\r\n        <h2>Templates</h2>\r\n        <monster-manager></monster-manager>\r\n    </modal-content>\r\n</template>"; });
 define('text!components/progress-bar.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"progressBarContainer\">\r\n        <div class=\"progressBar\" css=\"height: ${height}%;\"></div>\r\n    </div>\r\n</template>"; });
 define('text!components/template-bag.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\n        <div class=\"noselect\">\n            ${template.name}\n            <div class=\"template-controls\">\n                <button class=\"btn btn-success btn-sm\" click.delegate=\"$parent.spawnTemplate(template)\"><i class=\"fa fa-level-up\"></i> Spawn</button>\n                <button class=\"btn btn-info btn-sm\" click.delegate=\"$parent.viewTemplate(template)\"><i class=\"fa fa-eye\"></i> View</button>\n            </div>\n            <div>\n                <span repeat.for=\"monster of template.monsters\" class=\"noselect tag tag-warning\">\n                    ${monster.name}\n                </span>\n            </div>\n        </div>\n    </div>\n</template>"; });

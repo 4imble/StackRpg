@@ -4,7 +4,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 
 abstract class Body {
     damageTaken: number = 0;
-    level: number = 1;
+    experience: number = 0;
 
     strength: number = 10;
     toughness: number = 10;
@@ -14,28 +14,32 @@ abstract class Body {
 
     constructor(protected eventAggregator: EventAggregator, public name: string) {}
 
-    get baseHealth() {
+    get level(): number {
+        return Math.floor(Math.sqrt(this.experience / 1000))+1
+    }
+
+    get baseHealth(): number {
         return 10 * this.level;
     }
 
-    get baseAttack() {
+    get baseAttack(): number {
         return 1 * this.level;
     }
 
-    get totalHealth() {
+    get totalHealth(): number {
         let toughnessModifier = Attribute.getModifier(this.toughness) * this.level;
         return this.baseHealth + toughnessModifier;
     };
 
-    get currentHealth() {
+    get currentHealth(): number {
         return this.totalHealth - this.damageTaken;
     };
 
-    get currentHealthPercent() {
+    get currentHealthPercent(): number {
         return Math.floor((this.currentHealth * 100) / this.totalHealth);
     }
 
-    get hasDied() {
+    get hasDied(): boolean {
         return this.killed || this.currentHealth <= 0;
     }
 
