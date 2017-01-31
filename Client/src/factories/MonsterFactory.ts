@@ -1,19 +1,13 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
-import Player from '../domain/Player';
 import Monster from '../domain/Monster';
 
 @autoinject
-export default class BodyFactory {
+export default class MonsterFactory {
     constructor(private eventAggregator: EventAggregator) { }
 
-    buildPlayer(name: string): Player {
-        let player = new Player(this.eventAggregator, name);
-        player.strength = 16;
-        player.toughness = 14;
-        player.dexterity = 16;
-
-        return player;
+    cloneMonster(monster: Monster){
+        return Object.assign(this.buildMonster(monster.name), monster);
     }
 
     buildMonster(name: string): Monster {
@@ -23,9 +17,5 @@ export default class BodyFactory {
         monster.dexterity = 13;
 
         return monster;
-    }
-
-    cloneMonster(monster: Monster){
-        return Object.assign(this.buildMonster(monster.name), monster);
     }
 }

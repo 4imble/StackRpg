@@ -2,7 +2,7 @@ import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Monster from '../domain/Monster';
 import TemplateStore from '../domain/Stores/TemplateStore';
-import BodyFactory from '../factories/BodyFactory';
+import MonsterFactory from '../factories/MonsterFactory';
 import MonsterTemplate from '../domain/MonsterTemplate';
 import { MonsterAdded, Heartbeat, MonsterKilled } from '../messages';
 
@@ -10,8 +10,8 @@ import { MonsterAdded, Heartbeat, MonsterKilled } from '../messages';
 export class MonsterManager {
     bag: Array<Monster>;
 
-    constructor(private eventAggregator: EventAggregator, private templateStore: TemplateStore, private bodyFactory: BodyFactory) {
-        this.bag = [bodyFactory.buildMonster("Grumble"), bodyFactory.buildMonster("Viqas's Bread")];
+    constructor(private eventAggregator: EventAggregator, private templateStore: TemplateStore, private monsterFactory: MonsterFactory) {
+        this.bag = [monsterFactory.buildMonster("Grumble"), monsterFactory.buildMonster("Viqas's Bread")];
         templateStore.templates.push(new MonsterTemplate("Template 1"));
     }
     
