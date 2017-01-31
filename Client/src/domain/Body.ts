@@ -15,7 +15,10 @@ abstract class Body {
     constructor(protected eventAggregator: EventAggregator, public name: string) {}
 
     get level(): number {
-        return Math.floor(Math.sqrt(this.experience / 1000))+1
+        let power = 2.1;
+        let root = 1 / power;
+        let xpmod = 500;
+        return Math.floor(Math.pow(this.experience / xpmod, root))+1
     }
 
     get baseHealth(): number {

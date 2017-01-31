@@ -4,6 +4,8 @@ import Player from "../Player";
 import * as Item from "../AllItems";
 import BodyFactory from "../../factories/BodyFactory"
 import { Heartbeat, MonsterKilled } from '../../messages';
+import Dice from "../../helpers/Dice";
+
 
 @autoinject
 export default class PlayerStore {
@@ -18,7 +20,7 @@ export default class PlayerStore {
         });
 
         this.eventAggregator.subscribe(MonsterKilled, (msg: MonsterKilled) => {
-            this.currentPlayer.experience += 4000;
+            this.currentPlayer.experience += Dice.rollSides(500);
         });
     }
 }

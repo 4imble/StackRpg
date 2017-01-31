@@ -11358,170 +11358,6 @@ define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-
     return deco(targetOrConfig, key, descriptor);
   }
 });
-define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.EventAggregator = undefined;
-  exports.includeEventsIn = includeEventsIn;
-  exports.configure = configure;
-
-  var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  
-
-  var logger = LogManager.getLogger('event-aggregator');
-
-  var Handler = function () {
-    function Handler(messageType, callback) {
-      
-
-      this.messageType = messageType;
-      this.callback = callback;
-    }
-
-    Handler.prototype.handle = function handle(message) {
-      if (message instanceof this.messageType) {
-        this.callback.call(null, message);
-      }
-    };
-
-    return Handler;
-  }();
-
-  function invokeCallback(callback, data, event) {
-    try {
-      callback(data, event);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  function invokeHandler(handler, data) {
-    try {
-      handler.handle(data);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  var EventAggregator = exports.EventAggregator = function () {
-    function EventAggregator() {
-      
-
-      this.eventLookup = {};
-      this.messageHandlers = [];
-    }
-
-    EventAggregator.prototype.publish = function publish(event, data) {
-      var subscribers = void 0;
-      var i = void 0;
-
-      if (!event) {
-        throw new Error('Event was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        subscribers = this.eventLookup[event];
-        if (subscribers) {
-          subscribers = subscribers.slice();
-          i = subscribers.length;
-
-          while (i--) {
-            invokeCallback(subscribers[i], data, event);
-          }
-        }
-      } else {
-        subscribers = this.messageHandlers.slice();
-        i = subscribers.length;
-
-        while (i--) {
-          invokeHandler(subscribers[i], event);
-        }
-      }
-    };
-
-    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
-      var handler = void 0;
-      var subscribers = void 0;
-
-      if (!event) {
-        throw new Error('Event channel/type was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        handler = callback;
-        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
-      } else {
-        handler = new Handler(event, callback);
-        subscribers = this.messageHandlers;
-      }
-
-      subscribers.push(handler);
-
-      return {
-        dispose: function dispose() {
-          var idx = subscribers.indexOf(handler);
-          if (idx !== -1) {
-            subscribers.splice(idx, 1);
-          }
-        }
-      };
-    };
-
-    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
-      var sub = this.subscribe(event, function (a, b) {
-        sub.dispose();
-        return callback(a, b);
-      });
-
-      return sub;
-    };
-
-    return EventAggregator;
-  }();
-
-  function includeEventsIn(obj) {
-    var ea = new EventAggregator();
-
-    obj.subscribeOnce = function (event, callback) {
-      return ea.subscribeOnce(event, callback);
-    };
-
-    obj.subscribe = function (event, callback) {
-      return ea.subscribe(event, callback);
-    };
-
-    obj.publish = function (event, data) {
-      ea.publish(event, data);
-    };
-
-    return ea;
-  }
-
-  function configure(config) {
-    config.instance(EventAggregator, includeEventsIn(config.aurelia));
-  }
-});
 define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaMetadata, _aureliaPal) {
   'use strict';
 
@@ -13125,194 +12961,6 @@ define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 
 
   run();
 });
-define('aurelia-logging',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getLogger = getLogger;
-  exports.addAppender = addAppender;
-  exports.setLevel = setLevel;
-  exports.getLevel = getLevel;
-
-  
-
-  var logLevel = exports.logLevel = {
-    none: 0,
-    error: 1,
-    warn: 2,
-    info: 3,
-    debug: 4
-  };
-
-  var loggers = {};
-  var appenders = [];
-  var slice = Array.prototype.slice;
-  var loggerConstructionKey = {};
-  var globalDefaultLevel = logLevel.none;
-
-  function log(logger, level, args) {
-    var i = appenders.length;
-    var current = void 0;
-
-    args = slice.call(args);
-    args.unshift(logger);
-
-    while (i--) {
-      current = appenders[i];
-      current[level].apply(current, args);
-    }
-  }
-
-  function debug() {
-    if (this.level < 4) {
-      return;
-    }
-
-    log(this, 'debug', arguments);
-  }
-
-  function info() {
-    if (this.level < 3) {
-      return;
-    }
-
-    log(this, 'info', arguments);
-  }
-
-  function warn() {
-    if (this.level < 2) {
-      return;
-    }
-
-    log(this, 'warn', arguments);
-  }
-
-  function error() {
-    if (this.level < 1) {
-      return;
-    }
-
-    log(this, 'error', arguments);
-  }
-
-  function connectLogger(logger) {
-    logger.debug = debug;
-    logger.info = info;
-    logger.warn = warn;
-    logger.error = error;
-  }
-
-  function createLogger(id) {
-    var logger = new Logger(id, loggerConstructionKey);
-    logger.setLevel(globalDefaultLevel);
-
-    if (appenders.length) {
-      connectLogger(logger);
-    }
-
-    return logger;
-  }
-
-  function getLogger(id) {
-    return loggers[id] || (loggers[id] = createLogger(id));
-  }
-
-  function addAppender(appender) {
-    appenders.push(appender);
-
-    if (appenders.length === 1) {
-      for (var key in loggers) {
-        connectLogger(loggers[key]);
-      }
-    }
-  }
-
-  function setLevel(level) {
-    globalDefaultLevel = level;
-    for (var key in loggers) {
-      loggers[key].setLevel(level);
-    }
-  }
-
-  function getLevel() {
-    return globalDefaultLevel;
-  }
-
-  var Logger = exports.Logger = function () {
-    function Logger(id, key) {
-      
-
-      this.level = logLevel.none;
-
-      if (key !== loggerConstructionKey) {
-        throw new Error('Cannot instantiate "Logger". Use "getLogger" instead.');
-      }
-
-      this.id = id;
-    }
-
-    Logger.prototype.debug = function debug(message) {};
-
-    Logger.prototype.info = function info(message) {};
-
-    Logger.prototype.warn = function warn(message) {};
-
-    Logger.prototype.error = function error(message) {};
-
-    Logger.prototype.setLevel = function setLevel(level) {
-      this.level = level;
-    };
-
-    return Logger;
-  }();
-});
-define('aurelia-history',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  function mi(name) {
-    throw new Error('History must implement ' + name + '().');
-  }
-
-  var History = exports.History = function () {
-    function History() {
-      
-    }
-
-    History.prototype.activate = function activate(options) {
-      mi('activate');
-    };
-
-    History.prototype.deactivate = function deactivate() {
-      mi('deactivate');
-    };
-
-    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
-      mi('getAbsoluteRoot');
-    };
-
-    History.prototype.navigate = function navigate(fragment, options) {
-      mi('navigate');
-    };
-
-    History.prototype.navigateBack = function navigateBack() {
-      mi('navigateBack');
-    };
-
-    History.prototype.setTitle = function setTitle(title) {
-      mi('setTitle');
-    };
-
-    return History;
-  }();
-});
 define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], function (exports, _aureliaPal, _aureliaHistory) {
   'use strict';
 
@@ -13639,289 +13287,193 @@ define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], 
     return protocol + '//' + hostname + (port ? ':' + port : '');
   }
 });
-define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
+define('aurelia-history',['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.Origin = exports.metadata = undefined;
-  exports.decorators = decorators;
-  exports.deprecated = deprecated;
-  exports.mixin = mixin;
-  exports.protocol = protocol;
-
-  var _extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
 
   
 
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  function isObject(val) {
-    return val && (typeof val === 'function' || (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object');
+  function mi(name) {
+    throw new Error('History must implement ' + name + '().');
   }
 
-  var metadata = exports.metadata = {
-    resource: 'aurelia:resource',
-    paramTypes: 'design:paramtypes',
-    propertyType: 'design:type',
-    properties: 'design:properties',
-    get: function get(metadataKey, target, targetKey) {
-      if (!isObject(target)) {
-        return undefined;
-      }
-      var result = metadata.getOwn(metadataKey, target, targetKey);
-      return result === undefined ? metadata.get(metadataKey, Object.getPrototypeOf(target), targetKey) : result;
-    },
-    getOwn: function getOwn(metadataKey, target, targetKey) {
-      if (!isObject(target)) {
-        return undefined;
-      }
-      return Reflect.getOwnMetadata(metadataKey, target, targetKey);
-    },
-    define: function define(metadataKey, metadataValue, target, targetKey) {
-      Reflect.defineMetadata(metadataKey, metadataValue, target, targetKey);
-    },
-    getOrCreateOwn: function getOrCreateOwn(metadataKey, Type, target, targetKey) {
-      var result = metadata.getOwn(metadataKey, target, targetKey);
-
-      if (result === undefined) {
-        result = new Type();
-        Reflect.defineMetadata(metadataKey, result, target, targetKey);
-      }
-
-      return result;
+  var History = exports.History = function () {
+    function History() {
+      
     }
+
+    History.prototype.activate = function activate(options) {
+      mi('activate');
+    };
+
+    History.prototype.deactivate = function deactivate() {
+      mi('deactivate');
+    };
+
+    History.prototype.getAbsoluteRoot = function getAbsoluteRoot() {
+      mi('getAbsoluteRoot');
+    };
+
+    History.prototype.navigate = function navigate(fragment, options) {
+      mi('navigate');
+    };
+
+    History.prototype.navigateBack = function navigateBack() {
+      mi('navigateBack');
+    };
+
+    History.prototype.setTitle = function setTitle(title) {
+      mi('setTitle');
+    };
+
+    return History;
+  }();
+});
+define('aurelia-logging',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getLogger = getLogger;
+  exports.addAppender = addAppender;
+  exports.setLevel = setLevel;
+  exports.getLevel = getLevel;
+
+  
+
+  var logLevel = exports.logLevel = {
+    none: 0,
+    error: 1,
+    warn: 2,
+    info: 3,
+    debug: 4
   };
 
-  var originStorage = new Map();
-  var unknownOrigin = Object.freeze({ moduleId: undefined, moduleMember: undefined });
+  var loggers = {};
+  var appenders = [];
+  var slice = Array.prototype.slice;
+  var loggerConstructionKey = {};
+  var globalDefaultLevel = logLevel.none;
 
-  var Origin = exports.Origin = function () {
-    function Origin(moduleId, moduleMember) {
+  function log(logger, level, args) {
+    var i = appenders.length;
+    var current = void 0;
+
+    args = slice.call(args);
+    args.unshift(logger);
+
+    while (i--) {
+      current = appenders[i];
+      current[level].apply(current, args);
+    }
+  }
+
+  function debug() {
+    if (this.level < 4) {
+      return;
+    }
+
+    log(this, 'debug', arguments);
+  }
+
+  function info() {
+    if (this.level < 3) {
+      return;
+    }
+
+    log(this, 'info', arguments);
+  }
+
+  function warn() {
+    if (this.level < 2) {
+      return;
+    }
+
+    log(this, 'warn', arguments);
+  }
+
+  function error() {
+    if (this.level < 1) {
+      return;
+    }
+
+    log(this, 'error', arguments);
+  }
+
+  function connectLogger(logger) {
+    logger.debug = debug;
+    logger.info = info;
+    logger.warn = warn;
+    logger.error = error;
+  }
+
+  function createLogger(id) {
+    var logger = new Logger(id, loggerConstructionKey);
+    logger.setLevel(globalDefaultLevel);
+
+    if (appenders.length) {
+      connectLogger(logger);
+    }
+
+    return logger;
+  }
+
+  function getLogger(id) {
+    return loggers[id] || (loggers[id] = createLogger(id));
+  }
+
+  function addAppender(appender) {
+    appenders.push(appender);
+
+    if (appenders.length === 1) {
+      for (var key in loggers) {
+        connectLogger(loggers[key]);
+      }
+    }
+  }
+
+  function setLevel(level) {
+    globalDefaultLevel = level;
+    for (var key in loggers) {
+      loggers[key].setLevel(level);
+    }
+  }
+
+  function getLevel() {
+    return globalDefaultLevel;
+  }
+
+  var Logger = exports.Logger = function () {
+    function Logger(id, key) {
       
 
-      this.moduleId = moduleId;
-      this.moduleMember = moduleMember;
-    }
+      this.level = logLevel.none;
 
-    Origin.get = function get(fn) {
-      var origin = originStorage.get(fn);
-
-      if (origin === undefined) {
-        _aureliaPal.PLATFORM.eachModule(function (key, value) {
-          if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-            for (var name in value) {
-              var exp = value[name];
-              if (exp === fn) {
-                originStorage.set(fn, origin = new Origin(key, name));
-                return true;
-              }
-            }
-          }
-
-          if (value === fn) {
-            originStorage.set(fn, origin = new Origin(key, 'default'));
-            return true;
-          }
-
-          return false;
-        });
+      if (key !== loggerConstructionKey) {
+        throw new Error('Cannot instantiate "Logger". Use "getLogger" instead.');
       }
 
-      return origin || unknownOrigin;
+      this.id = id;
+    }
+
+    Logger.prototype.debug = function debug(message) {};
+
+    Logger.prototype.info = function info(message) {};
+
+    Logger.prototype.warn = function warn(message) {};
+
+    Logger.prototype.error = function error(message) {};
+
+    Logger.prototype.setLevel = function setLevel(level) {
+      this.level = level;
     };
 
-    Origin.set = function set(fn, origin) {
-      originStorage.set(fn, origin);
-    };
-
-    return Origin;
+    return Logger;
   }();
-
-  function decorators() {
-    for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
-      rest[_key] = arguments[_key];
-    }
-
-    var applicator = function applicator(target, key, descriptor) {
-      var i = rest.length;
-
-      if (key) {
-        descriptor = descriptor || {
-          value: target[key],
-          writable: true,
-          configurable: true,
-          enumerable: true
-        };
-
-        while (i--) {
-          descriptor = rest[i](target, key, descriptor) || descriptor;
-        }
-
-        Object.defineProperty(target, key, descriptor);
-      } else {
-        while (i--) {
-          target = rest[i](target) || target;
-        }
-      }
-
-      return target;
-    };
-
-    applicator.on = applicator;
-    return applicator;
-  }
-
-  function deprecated(optionsOrTarget, maybeKey, maybeDescriptor) {
-    function decorator(target, key, descriptor) {
-      var methodSignature = target.constructor.name + '#' + key;
-      var options = maybeKey ? {} : optionsOrTarget || {};
-      var message = 'DEPRECATION - ' + methodSignature;
-
-      if (typeof descriptor.value !== 'function') {
-        throw new SyntaxError('Only methods can be marked as deprecated.');
-      }
-
-      if (options.message) {
-        message += ' - ' + options.message;
-      }
-
-      return _extends({}, descriptor, {
-        value: function deprecationWrapper() {
-          if (options.error) {
-            throw new Error(message);
-          } else {
-            console.warn(message);
-          }
-
-          return descriptor.value.apply(this, arguments);
-        }
-      });
-    }
-
-    return maybeKey ? decorator(optionsOrTarget, maybeKey, maybeDescriptor) : decorator;
-  }
-
-  function mixin(behavior) {
-    var instanceKeys = Object.keys(behavior);
-
-    function _mixin(possible) {
-      var decorator = function decorator(target) {
-        var resolvedTarget = typeof target === 'function' ? target.prototype : target;
-
-        var i = instanceKeys.length;
-        while (i--) {
-          var property = instanceKeys[i];
-          Object.defineProperty(resolvedTarget, property, {
-            value: behavior[property],
-            writable: true
-          });
-        }
-      };
-
-      return possible ? decorator(possible) : decorator;
-    }
-
-    return _mixin;
-  }
-
-  function alwaysValid() {
-    return true;
-  }
-  function noCompose() {}
-
-  function ensureProtocolOptions(options) {
-    if (options === undefined) {
-      options = {};
-    } else if (typeof options === 'function') {
-      options = {
-        validate: options
-      };
-    }
-
-    if (!options.validate) {
-      options.validate = alwaysValid;
-    }
-
-    if (!options.compose) {
-      options.compose = noCompose;
-    }
-
-    return options;
-  }
-
-  function createProtocolValidator(validate) {
-    return function (target) {
-      var result = validate(target);
-      return result === true;
-    };
-  }
-
-  function createProtocolAsserter(name, validate) {
-    return function (target) {
-      var result = validate(target);
-      if (result !== true) {
-        throw new Error(result || name + ' was not correctly implemented.');
-      }
-    };
-  }
-
-  function protocol(name, options) {
-    options = ensureProtocolOptions(options);
-
-    var result = function result(target) {
-      var resolvedTarget = typeof target === 'function' ? target.prototype : target;
-
-      options.compose(resolvedTarget);
-      result.assert(resolvedTarget);
-
-      Object.defineProperty(resolvedTarget, 'protocol:' + name, {
-        enumerable: false,
-        configurable: false,
-        writable: false,
-        value: true
-      });
-    };
-
-    result.validate = createProtocolValidator(options.validate);
-    result.assert = createProtocolAsserter(name, options.validate);
-
-    return result;
-  }
-
-  protocol.create = function (name, options) {
-    options = ensureProtocolOptions(options);
-    var hidden = 'protocol:' + name;
-    var result = function result(target) {
-      var decorator = protocol(name, options);
-      return target ? decorator(target) : decorator;
-    };
-
-    result.decorates = function (obj) {
-      return obj[hidden] === true;
-    };
-    result.validate = createProtocolValidator(options.validate);
-    result.assert = createProtocolAsserter(name, options.validate);
-
-    return result;
-  };
 });
 define('aurelia-pal',['exports'], function (exports) {
   'use strict';
@@ -14498,63 +14050,814 @@ define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'au
     };
   }
 });
-define('aurelia-logging-console',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
   'use strict';
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ConsoleAppender = undefined;
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
 
-  
+  (function (Object, GOPS) {
+    'use strict';
 
-  var ConsoleAppender = exports.ConsoleAppender = function () {
-    function ConsoleAppender() {
-      
+    if (GOPS in Object) return;
+
+    var setDescriptor,
+        G = _aureliaPal.PLATFORM.global,
+        id = 0,
+        random = '' + Math.random(),
+        prefix = '__\x01symbol:',
+        prefixLength = prefix.length,
+        internalSymbol = '__\x01symbol@@' + random,
+        DP = 'defineProperty',
+        DPies = 'defineProperties',
+        GOPN = 'getOwnPropertyNames',
+        GOPD = 'getOwnPropertyDescriptor',
+        PIE = 'propertyIsEnumerable',
+        gOPN = Object[GOPN],
+        gOPD = Object[GOPD],
+        create = Object.create,
+        keys = Object.keys,
+        defineProperty = Object[DP],
+        $defineProperties = Object[DPies],
+        descriptor = gOPD(Object, GOPN),
+        ObjectProto = Object.prototype,
+        hOP = ObjectProto.hasOwnProperty,
+        pIE = ObjectProto[PIE],
+        toString = ObjectProto.toString,
+        indexOf = Array.prototype.indexOf || function (v) {
+      for (var i = this.length; i-- && this[i] !== v;) {}
+      return i;
+    },
+        addInternalIfNeeded = function addInternalIfNeeded(o, uid, enumerable) {
+      if (!hOP.call(o, internalSymbol)) {
+        defineProperty(o, internalSymbol, {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: {}
+        });
+      }
+      o[internalSymbol]['@@' + uid] = enumerable;
+    },
+        createWithSymbols = function createWithSymbols(proto, descriptors) {
+      var self = create(proto);
+      gOPN(descriptors).forEach(function (key) {
+        if (propertyIsEnumerable.call(descriptors, key)) {
+          $defineProperty(self, key, descriptors[key]);
+        }
+      });
+      return self;
+    },
+        copyAsNonEnumerable = function copyAsNonEnumerable(descriptor) {
+      var newDescriptor = create(descriptor);
+      newDescriptor.enumerable = false;
+      return newDescriptor;
+    },
+        get = function get() {},
+        onlyNonSymbols = function onlyNonSymbols(name) {
+      return name != internalSymbol && !hOP.call(source, name);
+    },
+        onlySymbols = function onlySymbols(name) {
+      return name != internalSymbol && hOP.call(source, name);
+    },
+        propertyIsEnumerable = function propertyIsEnumerable(key) {
+      var uid = '' + key;
+      return onlySymbols(uid) ? hOP.call(this, uid) && this[internalSymbol]['@@' + uid] : pIE.call(this, key);
+    },
+        setAndGetSymbol = function setAndGetSymbol(uid) {
+      var descriptor = {
+        enumerable: false,
+        configurable: true,
+        get: get,
+        set: function set(value) {
+          setDescriptor(this, uid, {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: value
+          });
+          addInternalIfNeeded(this, uid, true);
+        }
+      };
+      defineProperty(ObjectProto, uid, descriptor);
+      return source[uid] = defineProperty(Object(uid), 'constructor', sourceConstructor);
+    },
+        _Symbol = function _Symbol2(description) {
+      if (this && this !== G) {
+        throw new TypeError('Symbol is not a constructor');
+      }
+      return setAndGetSymbol(prefix.concat(description || '', random, ++id));
+    },
+        source = create(null),
+        sourceConstructor = { value: _Symbol },
+        sourceMap = function sourceMap(uid) {
+      return source[uid];
+    },
+        $defineProperty = function defineProp(o, key, descriptor) {
+      var uid = '' + key;
+      if (onlySymbols(uid)) {
+        setDescriptor(o, uid, descriptor.enumerable ? copyAsNonEnumerable(descriptor) : descriptor);
+        addInternalIfNeeded(o, uid, !!descriptor.enumerable);
+      } else {
+        defineProperty(o, key, descriptor);
+      }
+      return o;
+    },
+        $getOwnPropertySymbols = function getOwnPropertySymbols(o) {
+      var cof = toString.call(o);
+      o = cof === '[object String]' ? o.split('') : Object(o);
+      return gOPN(o).filter(onlySymbols).map(sourceMap);
+    };
+
+    descriptor.value = $defineProperty;
+    defineProperty(Object, DP, descriptor);
+
+    descriptor.value = $getOwnPropertySymbols;
+    defineProperty(Object, GOPS, descriptor);
+
+    descriptor.value = function getOwnPropertyNames(o) {
+      return gOPN(o).filter(onlyNonSymbols);
+    };
+    defineProperty(Object, GOPN, descriptor);
+
+    descriptor.value = function defineProperties(o, descriptors) {
+      var symbols = $getOwnPropertySymbols(descriptors);
+      if (symbols.length) {
+        keys(descriptors).concat(symbols).forEach(function (uid) {
+          if (propertyIsEnumerable.call(descriptors, uid)) {
+            $defineProperty(o, uid, descriptors[uid]);
+          }
+        });
+      } else {
+        $defineProperties(o, descriptors);
+      }
+      return o;
+    };
+    defineProperty(Object, DPies, descriptor);
+
+    descriptor.value = propertyIsEnumerable;
+    defineProperty(ObjectProto, PIE, descriptor);
+
+    descriptor.value = _Symbol;
+    defineProperty(G, 'Symbol', descriptor);
+
+    descriptor.value = function (key) {
+      var uid = prefix.concat(prefix, key, random);
+      return uid in ObjectProto ? source[uid] : setAndGetSymbol(uid);
+    };
+    defineProperty(_Symbol, 'for', descriptor);
+
+    descriptor.value = function (symbol) {
+      return hOP.call(source, symbol) ? symbol.slice(prefixLength * 2, -random.length) : void 0;
+    };
+    defineProperty(_Symbol, 'keyFor', descriptor);
+
+    descriptor.value = function getOwnPropertyDescriptor(o, key) {
+      var descriptor = gOPD(o, key);
+      if (descriptor && onlySymbols(key)) {
+        descriptor.enumerable = propertyIsEnumerable.call(o, key);
+      }
+      return descriptor;
+    };
+    defineProperty(Object, GOPD, descriptor);
+
+    descriptor.value = function (proto, descriptors) {
+      return arguments.length === 1 ? create(proto) : createWithSymbols(proto, descriptors);
+    };
+    defineProperty(Object, 'create', descriptor);
+
+    descriptor.value = function () {
+      var str = toString.call(this);
+      return str === '[object String]' && onlySymbols(this) ? '[object Symbol]' : str;
+    };
+    defineProperty(ObjectProto, 'toString', descriptor);
+
+    try {
+      setDescriptor = create(defineProperty({}, prefix, {
+        get: function get() {
+          return defineProperty(this, prefix, { value: false })[prefix];
+        }
+      }))[prefix] || defineProperty;
+    } catch (o_O) {
+      setDescriptor = function setDescriptor(o, key, descriptor) {
+        var protoDescriptor = gOPD(ObjectProto, key);
+        delete ObjectProto[key];
+        defineProperty(o, key, descriptor);
+        defineProperty(ObjectProto, key, protoDescriptor);
+      };
+    }
+  })(Object, 'getOwnPropertySymbols');
+
+  (function (O, S) {
+    var dP = O.defineProperty,
+        ObjectProto = O.prototype,
+        toString = ObjectProto.toString,
+        toStringTag = 'toStringTag',
+        descriptor;
+    ['iterator', 'match', 'replace', 'search', 'split', 'hasInstance', 'isConcatSpreadable', 'unscopables', 'species', 'toPrimitive', toStringTag].forEach(function (name) {
+      if (!(name in Symbol)) {
+        dP(Symbol, name, { value: Symbol(name) });
+        switch (name) {
+          case toStringTag:
+            descriptor = O.getOwnPropertyDescriptor(ObjectProto, 'toString');
+            descriptor.value = function () {
+              var str = toString.call(this),
+                  tst = typeof this === 'undefined' || this === null ? undefined : this[Symbol.toStringTag];
+              return typeof tst === 'undefined' ? str : '[object ' + tst + ']';
+            };
+            dP(ObjectProto, 'toString', descriptor);
+            break;
+        }
+      }
+    });
+  })(Object, Symbol);
+
+  (function (Si, AP, SP) {
+
+    function returnThis() {
+      return this;
     }
 
-    ConsoleAppender.prototype.debug = function debug(logger) {
-      var _console;
-
-      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        rest[_key - 1] = arguments[_key];
-      }
-
-      (_console = console).debug.apply(_console, ['DEBUG [' + logger.id + ']'].concat(rest));
+    if (!AP[Si]) AP[Si] = function () {
+      var i = 0,
+          self = this,
+          iterator = {
+        next: function next() {
+          var done = self.length <= i;
+          return done ? { done: done } : { done: done, value: self[i++] };
+        }
+      };
+      iterator[Si] = returnThis;
+      return iterator;
     };
 
-    ConsoleAppender.prototype.info = function info(logger) {
-      var _console2;
+    if (!SP[Si]) SP[Si] = function () {
+      var fromCodePoint = String.fromCodePoint,
+          self = this,
+          i = 0,
+          length = self.length,
+          iterator = {
+        next: function next() {
+          var done = length <= i,
+              c = done ? '' : fromCodePoint(self.codePointAt(i));
+          i += c.length;
+          return done ? { done: done } : { done: done, value: c };
+        }
+      };
+      iterator[Si] = returnThis;
+      return iterator;
+    };
+  })(Symbol.iterator, Array.prototype, String.prototype);
 
-      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        rest[_key2 - 1] = arguments[_key2];
+  Number.isNaN = Number.isNaN || function (value) {
+    return value !== value;
+  };
+
+  Number.isFinite = Number.isFinite || function (value) {
+    return typeof value === "number" && isFinite(value);
+  };
+  if (!String.prototype.endsWith || function () {
+    try {
+      return !"ab".endsWith("a", 1);
+    } catch (e) {
+      return true;
+    }
+  }()) {
+    String.prototype.endsWith = function (searchString, position) {
+      var subjectString = this.toString();
+      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+        position = subjectString.length;
       }
+      position -= searchString.length;
+      var lastIndex = subjectString.indexOf(searchString, position);
+      return lastIndex !== -1 && lastIndex === position;
+    };
+  }
 
-      (_console2 = console).info.apply(_console2, ['INFO [' + logger.id + ']'].concat(rest));
+  if (!String.prototype.startsWith || function () {
+    try {
+      return !"ab".startsWith("b", 1);
+    } catch (e) {
+      return true;
+    }
+  }()) {
+    String.prototype.startsWith = function (searchString, position) {
+      position = position || 0;
+      return this.substr(position, searchString.length) === searchString;
+    };
+  }
+
+  if (!Array.from) {
+    Array.from = function () {
+      var toInteger = function toInteger(it) {
+        return isNaN(it = +it) ? 0 : (it > 0 ? Math.floor : Math.ceil)(it);
+      };
+      var toLength = function toLength(it) {
+        return it > 0 ? Math.min(toInteger(it), 0x1fffffffffffff) : 0;
+      };
+      var iterCall = function iterCall(iter, fn, val, index) {
+        try {
+          return fn(val, index);
+        } catch (E) {
+          if (typeof iter.return == 'function') iter.return();
+          throw E;
+        }
+      };
+
+      return function from(arrayLike) {
+        var O = Object(arrayLike),
+            C = typeof this == 'function' ? this : Array,
+            aLen = arguments.length,
+            mapfn = aLen > 1 ? arguments[1] : undefined,
+            mapping = mapfn !== undefined,
+            index = 0,
+            iterFn = O[Symbol.iterator],
+            length,
+            result,
+            step,
+            iterator;
+        if (mapping) mapfn = mapfn.bind(aLen > 2 ? arguments[2] : undefined);
+        if (iterFn != undefined && !Array.isArray(arrayLike)) {
+          for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+            result[index] = mapping ? iterCall(iterator, mapfn, step.value, index) : step.value;
+          }
+        } else {
+          length = toLength(O.length);
+          for (result = new C(length); length > index; index++) {
+            result[index] = mapping ? mapfn(O[index], index) : O[index];
+          }
+        }
+        result.length = index;
+        return result;
+      };
+    }();
+  }
+
+  if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: function value(predicate) {
+        if (this === null) {
+          throw new TypeError('Array.prototype.find called on null or undefined');
+        }
+        if (typeof predicate !== 'function') {
+          throw new TypeError('predicate must be a function');
+        }
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisArg = arguments[1];
+        var value;
+
+        for (var i = 0; i < length; i++) {
+          value = list[i];
+          if (predicate.call(thisArg, value, i, list)) {
+            return value;
+          }
+        }
+        return undefined;
+      }
+    });
+  }
+
+  if (!Array.prototype.findIndex) {
+    Object.defineProperty(Array.prototype, 'findIndex', {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: function value(predicate) {
+        if (this === null) {
+          throw new TypeError('Array.prototype.findIndex called on null or undefined');
+        }
+        if (typeof predicate !== 'function') {
+          throw new TypeError('predicate must be a function');
+        }
+        var list = Object(this);
+        var length = list.length >>> 0;
+        var thisArg = arguments[1];
+        var value;
+
+        for (var i = 0; i < length; i++) {
+          value = list[i];
+          if (predicate.call(thisArg, value, i, list)) {
+            return i;
+          }
+        }
+        return -1;
+      }
+    });
+  }
+
+  if (!Array.prototype.includes) {
+    Object.defineProperty(Array.prototype, 'includes', {
+      configurable: true,
+      writable: true,
+      enumerable: false,
+      value: function value(searchElement) {
+        var O = Object(this);
+        var len = parseInt(O.length) || 0;
+        if (len === 0) {
+          return false;
+        }
+        var n = parseInt(arguments[1]) || 0;
+        var k;
+        if (n >= 0) {
+          k = n;
+        } else {
+          k = len + n;
+          if (k < 0) {
+            k = 0;
+          }
+        }
+        var currentElement;
+        while (k < len) {
+          currentElement = O[k];
+          if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
+            return true;
+          }
+          k++;
+        }
+        return false;
+      }
+    });
+  }
+
+  (function () {
+    var needsFix = false;
+
+    try {
+      var s = Object.keys('a');
+      needsFix = s.length !== 1 || s[0] !== '0';
+    } catch (e) {
+      needsFix = true;
+    }
+
+    if (needsFix) {
+      Object.keys = function () {
+        var hasOwnProperty = Object.prototype.hasOwnProperty,
+            hasDontEnumBug = !{ toString: null }.propertyIsEnumerable('toString'),
+            dontEnums = ['toString', 'toLocaleString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'constructor'],
+            dontEnumsLength = dontEnums.length;
+
+        return function (obj) {
+          if (obj === undefined || obj === null) {
+            throw TypeError('Cannot convert undefined or null to object');
+          }
+
+          obj = Object(obj);
+
+          var result = [],
+              prop,
+              i;
+
+          for (prop in obj) {
+            if (hasOwnProperty.call(obj, prop)) {
+              result.push(prop);
+            }
+          }
+
+          if (hasDontEnumBug) {
+            for (i = 0; i < dontEnumsLength; i++) {
+              if (hasOwnProperty.call(obj, dontEnums[i])) {
+                result.push(dontEnums[i]);
+              }
+            }
+          }
+
+          return result;
+        };
+      }();
+    }
+  })();
+
+  (function (O) {
+    if ('assign' in O) {
+      return;
+    }
+
+    O.defineProperty(O, 'assign', {
+      configurable: true,
+      writable: true,
+      value: function () {
+        var gOPS = O.getOwnPropertySymbols,
+            pIE = O.propertyIsEnumerable,
+            filterOS = gOPS ? function (self) {
+          return gOPS(self).filter(pIE, self);
+        } : function () {
+          return Array.prototype;
+        };
+
+        return function assign(where) {
+          if (gOPS && !(where instanceof O)) {
+            console.warn('problematic Symbols', where);
+          }
+
+          function set(keyOrSymbol) {
+            where[keyOrSymbol] = arg[keyOrSymbol];
+          }
+
+          for (var i = 1, ii = arguments.length; i < ii; ++i) {
+            var arg = arguments[i];
+
+            if (arg === null || arg === undefined) {
+              continue;
+            }
+
+            O.keys(arg).concat(filterOS(arg)).forEach(set);
+          }
+
+          return where;
+        };
+      }()
+    });
+  })(Object);
+
+  (function (global) {
+    var i;
+
+    var defineProperty = Object.defineProperty,
+        is = function is(a, b) {
+      return a === b || a !== a && b !== b;
     };
 
-    ConsoleAppender.prototype.warn = function warn(logger) {
-      var _console3;
+    if (typeof WeakMap == 'undefined') {
+      global.WeakMap = createCollection({
+        'delete': sharedDelete,
 
-      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-        rest[_key3 - 1] = arguments[_key3];
+        clear: sharedClear,
+
+        get: sharedGet,
+
+        has: mapHas,
+
+        set: sharedSet
+      }, true);
+    }
+
+    if (typeof Map == 'undefined' || typeof new Map().values !== 'function' || !new Map().values().next) {
+      var _createCollection;
+
+      global.Map = createCollection((_createCollection = {
+        'delete': sharedDelete,
+
+        has: mapHas,
+
+        get: sharedGet,
+
+        set: sharedSet,
+
+        keys: sharedKeys,
+
+        values: sharedValues,
+
+        entries: mapEntries,
+
+        forEach: sharedForEach,
+
+        clear: sharedClear
+      }, _createCollection[Symbol.iterator] = mapEntries, _createCollection));
+    }
+
+    if (typeof Set == 'undefined' || typeof new Set().values !== 'function' || !new Set().values().next) {
+      var _createCollection2;
+
+      global.Set = createCollection((_createCollection2 = {
+        has: setHas,
+
+        add: sharedAdd,
+
+        'delete': sharedDelete,
+
+        clear: sharedClear,
+
+        keys: sharedValues,
+        values: sharedValues,
+
+        entries: setEntries,
+
+        forEach: sharedForEach
+      }, _createCollection2[Symbol.iterator] = sharedValues, _createCollection2));
+    }
+
+    if (typeof WeakSet == 'undefined') {
+      global.WeakSet = createCollection({
+        'delete': sharedDelete,
+
+        add: sharedAdd,
+
+        clear: sharedClear,
+
+        has: setHas
+      }, true);
+    }
+
+    function createCollection(proto, objectOnly) {
+      function Collection(a) {
+        if (!this || this.constructor !== Collection) return new Collection(a);
+        this._keys = [];
+        this._values = [];
+        this._itp = [];
+        this.objectOnly = objectOnly;
+
+        if (a) init.call(this, a);
       }
 
-      (_console3 = console).warn.apply(_console3, ['WARN [' + logger.id + ']'].concat(rest));
-    };
-
-    ConsoleAppender.prototype.error = function error(logger) {
-      var _console4;
-
-      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        rest[_key4 - 1] = arguments[_key4];
+      if (!objectOnly) {
+        defineProperty(proto, 'size', {
+          get: sharedSize
+        });
       }
 
-      (_console4 = console).error.apply(_console4, ['ERROR [' + logger.id + ']'].concat(rest));
+      proto.constructor = Collection;
+      Collection.prototype = proto;
+
+      return Collection;
+    }
+
+    function init(a) {
+      var i;
+
+      if (this.add) a.forEach(this.add, this);else a.forEach(function (a) {
+          this.set(a[0], a[1]);
+        }, this);
+    }
+
+    function sharedDelete(key) {
+      if (this.has(key)) {
+        this._keys.splice(i, 1);
+        this._values.splice(i, 1);
+
+        this._itp.forEach(function (p) {
+          if (i < p[0]) p[0]--;
+        });
+      }
+
+      return -1 < i;
     };
 
-    return ConsoleAppender;
-  }();
+    function sharedGet(key) {
+      return this.has(key) ? this._values[i] : undefined;
+    }
+
+    function has(list, key) {
+      if (this.objectOnly && key !== Object(key)) throw new TypeError("Invalid value used as weak collection key");
+
+      if (key != key || key === 0) for (i = list.length; i-- && !is(list[i], key);) {} else i = list.indexOf(key);
+      return -1 < i;
+    }
+
+    function setHas(value) {
+      return has.call(this, this._values, value);
+    }
+
+    function mapHas(value) {
+      return has.call(this, this._keys, value);
+    }
+
+    function sharedSet(key, value) {
+      this.has(key) ? this._values[i] = value : this._values[this._keys.push(key) - 1] = value;
+      return this;
+    }
+
+    function sharedAdd(value) {
+      if (!this.has(value)) this._values.push(value);
+      return this;
+    }
+
+    function sharedClear() {
+      (this._keys || 0).length = this._values.length = 0;
+    }
+
+    function sharedKeys() {
+      return sharedIterator(this._itp, this._keys);
+    }
+
+    function sharedValues() {
+      return sharedIterator(this._itp, this._values);
+    }
+
+    function mapEntries() {
+      return sharedIterator(this._itp, this._keys, this._values);
+    }
+
+    function setEntries() {
+      return sharedIterator(this._itp, this._values, this._values);
+    }
+
+    function sharedIterator(itp, array, array2) {
+      var _ref;
+
+      var p = [0],
+          done = false;
+      itp.push(p);
+      return _ref = {}, _ref[Symbol.iterator] = function () {
+        return this;
+      }, _ref.next = function next() {
+        var v,
+            k = p[0];
+        if (!done && k < array.length) {
+          v = array2 ? [array[k], array2[k]] : array[k];
+          p[0]++;
+        } else {
+          done = true;
+          itp.splice(itp.indexOf(p), 1);
+        }
+        return { done: done, value: v };
+      }, _ref;
+    }
+
+    function sharedSize() {
+      return this._values.length;
+    }
+
+    function sharedForEach(callback, context) {
+      var it = this.entries();
+      for (;;) {
+        var r = it.next();
+        if (r.done) break;
+        callback.call(context, r.value[1], r.value[0], this);
+      }
+    }
+  })(_aureliaPal.PLATFORM.global);
+
+  var emptyMetadata = Object.freeze({});
+  var metadataContainerKey = '__metadata__';
+  var bind = Function.prototype.bind;
+
+  if (typeof _aureliaPal.PLATFORM.global.Reflect === 'undefined') {
+    _aureliaPal.PLATFORM.global.Reflect = {};
+  }
+
+  if (typeof Reflect.getOwnMetadata !== 'function') {
+    Reflect.getOwnMetadata = function (metadataKey, target, targetKey) {
+      if (target.hasOwnProperty(metadataContainerKey)) {
+        return (target[metadataContainerKey][targetKey] || emptyMetadata)[metadataKey];
+      }
+    };
+  }
+
+  if (typeof Reflect.defineMetadata !== 'function') {
+    Reflect.defineMetadata = function (metadataKey, metadataValue, target, targetKey) {
+      var metadataContainer = target.hasOwnProperty(metadataContainerKey) ? target[metadataContainerKey] : target[metadataContainerKey] = {};
+      var targetContainer = metadataContainer[targetKey] || (metadataContainer[targetKey] = {});
+      targetContainer[metadataKey] = metadataValue;
+    };
+  }
+
+  if (typeof Reflect.metadata !== 'function') {
+    Reflect.metadata = function (metadataKey, metadataValue) {
+      return function (target, targetKey) {
+        Reflect.defineMetadata(metadataKey, metadataValue, target, targetKey);
+      };
+    };
+  }
+
+  if (typeof Reflect.defineProperty !== 'function') {
+    Reflect.defineProperty = function (target, propertyKey, descriptor) {
+      if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object' ? target === null : typeof target !== 'function') {
+        throw new TypeError('Reflect.defineProperty called on non-object');
+      }
+      try {
+        Object.defineProperty(target, propertyKey, descriptor);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+  }
+
+  if (typeof Reflect.construct !== 'function') {
+    Reflect.construct = function (Target, args) {
+      if (args) {
+        switch (args.length) {
+          case 0:
+            return new Target();
+          case 1:
+            return new Target(args[0]);
+          case 2:
+            return new Target(args[0], args[1]);
+          case 3:
+            return new Target(args[0], args[1], args[2]);
+          case 4:
+            return new Target(args[0], args[1], args[2], args[3]);
+        }
+      }
+
+      var a = [null];
+      a.push.apply(a, args);
+      return new (bind.apply(Target, a))();
+    };
+  }
+
+  if (typeof Reflect.ownKeys !== 'function') {
+    Reflect.ownKeys = function (o) {
+      return Object.getOwnPropertyNames(o).concat(Object.getOwnPropertySymbols(o));
+    };
+  }
 });
 define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
@@ -15067,6 +15370,64 @@ define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aur
     });
   }
 });
+define('aurelia-logging-console',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ConsoleAppender = undefined;
+
+  
+
+  var ConsoleAppender = exports.ConsoleAppender = function () {
+    function ConsoleAppender() {
+      
+    }
+
+    ConsoleAppender.prototype.debug = function debug(logger) {
+      var _console;
+
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
+
+      (_console = console).debug.apply(_console, ['DEBUG [' + logger.id + ']'].concat(rest));
+    };
+
+    ConsoleAppender.prototype.info = function info(logger) {
+      var _console2;
+
+      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        rest[_key2 - 1] = arguments[_key2];
+      }
+
+      (_console2 = console).info.apply(_console2, ['INFO [' + logger.id + ']'].concat(rest));
+    };
+
+    ConsoleAppender.prototype.warn = function warn(logger) {
+      var _console3;
+
+      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        rest[_key3 - 1] = arguments[_key3];
+      }
+
+      (_console3 = console).warn.apply(_console3, ['WARN [' + logger.id + ']'].concat(rest));
+    };
+
+    ConsoleAppender.prototype.error = function error(logger) {
+      var _console4;
+
+      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        rest[_key4 - 1] = arguments[_key4];
+      }
+
+      (_console4 = console).error.apply(_console4, ['ERROR [' + logger.id + ']'].concat(rest));
+    };
+
+    return ConsoleAppender;
+  }();
+});
 define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
 
@@ -15214,5320 +15575,6 @@ define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aure
 
     return TaskQueue;
   }();
-});
-define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
-
-  
-
-  var State = exports.State = function () {
-    function State(charSpec) {
-      
-
-      this.charSpec = charSpec;
-      this.nextStates = [];
-    }
-
-    State.prototype.get = function get(charSpec) {
-      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var child = _ref;
-
-        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
-
-        if (isEqual) {
-          return child;
-        }
-      }
-
-      return undefined;
-    };
-
-    State.prototype.put = function put(charSpec) {
-      var state = this.get(charSpec);
-
-      if (state) {
-        return state;
-      }
-
-      state = new State(charSpec);
-
-      this.nextStates.push(state);
-
-      if (charSpec.repeat) {
-        state.nextStates.push(state);
-      }
-
-      return state;
-    };
-
-    State.prototype.match = function match(ch) {
-      var nextStates = this.nextStates;
-      var results = [];
-
-      for (var i = 0, l = nextStates.length; i < l; i++) {
-        var child = nextStates[i];
-        var charSpec = child.charSpec;
-
-        if (charSpec.validChars !== undefined) {
-          if (charSpec.validChars.indexOf(ch) !== -1) {
-            results.push(child);
-          }
-        } else if (charSpec.invalidChars !== undefined) {
-          if (charSpec.invalidChars.indexOf(ch) === -1) {
-            results.push(child);
-          }
-        }
-      }
-
-      return results;
-    };
-
-    return State;
-  }();
-
-  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
-
-  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
-
-  var StaticSegment = exports.StaticSegment = function () {
-    function StaticSegment(string, caseSensitive) {
-      
-
-      this.string = string;
-      this.caseSensitive = caseSensitive;
-    }
-
-    StaticSegment.prototype.eachChar = function eachChar(callback) {
-      var s = this.string;
-      for (var i = 0, ii = s.length; i < ii; ++i) {
-        var ch = s[i];
-        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
-      }
-    };
-
-    StaticSegment.prototype.regex = function regex() {
-      return this.string.replace(escapeRegex, '\\$1');
-    };
-
-    StaticSegment.prototype.generate = function generate() {
-      return this.string;
-    };
-
-    return StaticSegment;
-  }();
-
-  var DynamicSegment = exports.DynamicSegment = function () {
-    function DynamicSegment(name, optional) {
-      
-
-      this.name = name;
-      this.optional = optional;
-    }
-
-    DynamicSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '/', repeat: true });
-    };
-
-    DynamicSegment.prototype.regex = function regex() {
-      return this.optional ? '([^/]+)?' : '([^/]+)';
-    };
-
-    DynamicSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return DynamicSegment;
-  }();
-
-  var StarSegment = exports.StarSegment = function () {
-    function StarSegment(name) {
-      
-
-      this.name = name;
-    }
-
-    StarSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '', repeat: true });
-    };
-
-    StarSegment.prototype.regex = function regex() {
-      return '(.+)';
-    };
-
-    StarSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return StarSegment;
-  }();
-
-  var EpsilonSegment = exports.EpsilonSegment = function () {
-    function EpsilonSegment() {
-      
-    }
-
-    EpsilonSegment.prototype.eachChar = function eachChar() {};
-
-    EpsilonSegment.prototype.regex = function regex() {
-      return '';
-    };
-
-    EpsilonSegment.prototype.generate = function generate() {
-      return '';
-    };
-
-    return EpsilonSegment;
-  }();
-
-  var RouteRecognizer = exports.RouteRecognizer = function () {
-    function RouteRecognizer() {
-      
-
-      this.rootState = new State();
-      this.names = {};
-    }
-
-    RouteRecognizer.prototype.add = function add(route) {
-      var _this = this;
-
-      if (Array.isArray(route)) {
-        route.forEach(function (r) {
-          return _this.add(r);
-        });
-        return undefined;
-      }
-
-      var currentState = this.rootState;
-      var regex = '^';
-      var types = { statics: 0, dynamics: 0, stars: 0 };
-      var names = [];
-      var routeName = route.handler.name;
-      var isEmpty = true;
-      var isAllOptional = true;
-      var segments = parse(route.path, names, types, route.caseSensitive);
-
-      for (var i = 0, ii = segments.length; i < ii; i++) {
-        var segment = segments[i];
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        isEmpty = false;
-        isAllOptional = isAllOptional && segment.optional;
-
-        currentState = addSegment(currentState, segment);
-        regex += segment.optional ? '/?' : '/';
-        regex += segment.regex();
-      }
-
-      if (isAllOptional) {
-        if (isEmpty) {
-          currentState = currentState.put({ validChars: '/' });
-          regex += '/';
-        } else {
-          var finalState = this.rootState.put({ validChars: '/' });
-          currentState.epsilon = [finalState];
-          currentState = finalState;
-        }
-      }
-
-      var handlers = [{ handler: route.handler, names: names }];
-
-      if (routeName) {
-        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
-        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
-          this.names[routeNames[_i2]] = {
-            segments: segments,
-            handlers: handlers
-          };
-        }
-      }
-
-      currentState.handlers = handlers;
-      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
-      currentState.types = types;
-
-      return currentState;
-    };
-
-    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      return [].concat(route.handlers);
-    };
-
-    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
-      return !!this.names[name];
-    };
-
-    RouteRecognizer.prototype.generate = function generate(name, params) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      var handler = route.handlers[0].handler;
-      if (handler.generationUsesHref) {
-        return handler.href;
-      }
-
-      var routeParams = Object.assign({}, params);
-      var segments = route.segments;
-      var consumed = {};
-      var output = '';
-
-      for (var i = 0, l = segments.length; i < l; i++) {
-        var segment = segments[i];
-
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        var segmentValue = segment.generate(routeParams, consumed);
-        if (segmentValue === null || segmentValue === undefined) {
-          if (!segment.optional) {
-            throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
-          }
-        } else {
-          output += '/';
-          output += segmentValue;
-        }
-      }
-
-      if (output.charAt(0) !== '/') {
-        output = '/' + output;
-      }
-
-      for (var param in consumed) {
-        delete routeParams[param];
-      }
-
-      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
-      output += queryString ? '?' + queryString : '';
-
-      return output;
-    };
-
-    RouteRecognizer.prototype.recognize = function recognize(path) {
-      var states = [this.rootState];
-      var queryParams = {};
-      var isSlashDropped = false;
-      var normalizedPath = path;
-
-      var queryStart = normalizedPath.indexOf('?');
-      if (queryStart !== -1) {
-        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
-        normalizedPath = normalizedPath.substr(0, queryStart);
-        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
-      }
-
-      normalizedPath = decodeURI(normalizedPath);
-
-      if (normalizedPath.charAt(0) !== '/') {
-        normalizedPath = '/' + normalizedPath;
-      }
-
-      var pathLen = normalizedPath.length;
-      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
-        normalizedPath = normalizedPath.substr(0, pathLen - 1);
-        isSlashDropped = true;
-      }
-
-      for (var i = 0, l = normalizedPath.length; i < l; i++) {
-        states = recognizeChar(states, normalizedPath.charAt(i));
-        if (!states.length) {
-          break;
-        }
-      }
-
-      var solutions = [];
-      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
-        if (states[_i3].handlers) {
-          solutions.push(states[_i3]);
-        }
-      }
-
-      states = sortSolutions(solutions);
-
-      var state = solutions[0];
-      if (state && state.handlers) {
-        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
-          normalizedPath = normalizedPath + '/';
-        }
-
-        return findHandler(state, normalizedPath, queryParams);
-      }
-
-      return undefined;
-    };
-
-    return RouteRecognizer;
-  }();
-
-  var RecognizeResults = function RecognizeResults(queryParams) {
-    
-
-    this.splice = Array.prototype.splice;
-    this.slice = Array.prototype.slice;
-    this.push = Array.prototype.push;
-    this.length = 0;
-    this.queryParams = queryParams || {};
-  };
-
-  function parse(route, names, types, caseSensitive) {
-    var normalizedRoute = route;
-    if (route.charAt(0) === '/') {
-      normalizedRoute = route.substr(1);
-    }
-
-    var results = [];
-
-    var splitRoute = normalizedRoute.split('/');
-    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
-      var segment = splitRoute[i];
-
-      var match = segment.match(/^:([^?]+)(\?)?$/);
-      if (match) {
-        var _match = match;
-        var _name = _match[1];
-        var optional = _match[2];
-
-        if (_name.indexOf('=') !== -1) {
-          throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
-        }
-        results.push(new DynamicSegment(_name, !!optional));
-        names.push(_name);
-        types.dynamics++;
-        continue;
-      }
-
-      match = segment.match(/^\*(.+)$/);
-      if (match) {
-        results.push(new StarSegment(match[1]));
-        names.push(match[1]);
-        types.stars++;
-      } else if (segment === '') {
-        results.push(new EpsilonSegment());
-      } else {
-        results.push(new StaticSegment(segment, caseSensitive));
-        types.statics++;
-      }
-    }
-
-    return results;
-  }
-
-  function sortSolutions(states) {
-    return states.sort(function (a, b) {
-      if (a.types.stars !== b.types.stars) {
-        return a.types.stars - b.types.stars;
-      }
-
-      if (a.types.stars) {
-        if (a.types.statics !== b.types.statics) {
-          return b.types.statics - a.types.statics;
-        }
-        if (a.types.dynamics !== b.types.dynamics) {
-          return b.types.dynamics - a.types.dynamics;
-        }
-      }
-
-      if (a.types.dynamics !== b.types.dynamics) {
-        return a.types.dynamics - b.types.dynamics;
-      }
-
-      if (a.types.statics !== b.types.statics) {
-        return b.types.statics - a.types.statics;
-      }
-
-      return 0;
-    });
-  }
-
-  function recognizeChar(states, ch) {
-    var nextStates = [];
-
-    for (var i = 0, l = states.length; i < l; i++) {
-      var state = states[i];
-      nextStates.push.apply(nextStates, state.match(ch));
-    }
-
-    var skippableStates = nextStates.filter(function (s) {
-      return s.epsilon;
-    });
-
-    var _loop = function _loop() {
-      var newStates = [];
-      skippableStates.forEach(function (s) {
-        nextStates.push.apply(nextStates, s.epsilon);
-        newStates.push.apply(newStates, s.epsilon);
-      });
-      skippableStates = newStates.filter(function (s) {
-        return s.epsilon;
-      });
-    };
-
-    while (skippableStates.length > 0) {
-      _loop();
-    }
-
-    return nextStates;
-  }
-
-  function findHandler(state, path, queryParams) {
-    var handlers = state.handlers;
-    var regex = state.regex;
-    var captures = path.match(regex);
-    var currentCapture = 1;
-    var result = new RecognizeResults(queryParams);
-
-    for (var i = 0, l = handlers.length; i < l; i++) {
-      var _handler = handlers[i];
-      var _names = _handler.names;
-      var _params = {};
-
-      for (var j = 0, m = _names.length; j < m; j++) {
-        _params[_names[j]] = captures[currentCapture++];
-      }
-
-      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
-    }
-
-    return result;
-  }
-
-  function addSegment(currentState, segment) {
-    var state = currentState.put({ validChars: '/' });
-    segment.eachChar(function (ch) {
-      state = state.put(ch);
-    });
-
-    if (segment.optional) {
-      currentState.epsilon = currentState.epsilon || [];
-      currentState.epsilon.push(state);
-    }
-
-    return state;
-  }
-});
-define('aurelia-templating',['exports', 'aurelia-logging', 'aurelia-metadata', 'aurelia-pal', 'aurelia-path', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-task-queue'], function (exports, _aureliaLogging, _aureliaMetadata, _aureliaPal, _aureliaPath, _aureliaLoader, _aureliaDependencyInjection, _aureliaBinding, _aureliaTaskQueue) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.TemplatingEngine = exports.ElementConfigResource = exports.CompositionEngine = exports.HtmlBehaviorResource = exports.BindableProperty = exports.BehaviorPropertyObserver = exports.Controller = exports.ViewEngine = exports.ModuleAnalyzer = exports.ResourceDescription = exports.ResourceModule = exports.ViewCompiler = exports.ViewFactory = exports.BoundViewFactory = exports.ViewSlot = exports.View = exports.ViewResources = exports.ShadowDOM = exports.ShadowSlot = exports.PassThroughSlot = exports.SlotCustomAttribute = exports.BindingLanguage = exports.ViewLocator = exports.InlineViewStrategy = exports.TemplateRegistryViewStrategy = exports.NoViewStrategy = exports.ConventionalViewStrategy = exports.RelativeViewStrategy = exports.viewStrategy = exports.TargetInstruction = exports.BehaviorInstruction = exports.ViewCompileInstruction = exports.ResourceLoadContext = exports.ElementEvents = exports.ViewEngineHooksResource = exports.CompositionTransaction = exports.CompositionTransactionOwnershipToken = exports.CompositionTransactionNotifier = exports.Animator = exports.animationEvent = undefined;
-  exports._hyphenate = _hyphenate;
-  exports._isAllWhitespace = _isAllWhitespace;
-  exports.viewEngineHooks = viewEngineHooks;
-  exports.children = children;
-  exports.child = child;
-  exports.resource = resource;
-  exports.behavior = behavior;
-  exports.customElement = customElement;
-  exports.customAttribute = customAttribute;
-  exports.templateController = templateController;
-  exports.bindable = bindable;
-  exports.dynamicOptions = dynamicOptions;
-  exports.useShadowDOM = useShadowDOM;
-  exports.processAttributes = processAttributes;
-  exports.processContent = processContent;
-  exports.containerless = containerless;
-  exports.useViewStrategy = useViewStrategy;
-  exports.useView = useView;
-  exports.inlineView = inlineView;
-  exports.noView = noView;
-  exports.elementConfig = elementConfig;
-  exports.viewResources = viewResources;
-
-  var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  var _class4, _temp, _dec, _class5, _dec2, _class6, _dec3, _class7, _dec4, _class8, _dec5, _class9, _class10, _temp2, _dec6, _class11, _class12, _temp3, _class15, _dec7, _class17, _dec8, _class18, _class19, _temp4, _dec9, _class21, _dec10, _class22, _dec11, _class23;
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  
-
-  var animationEvent = exports.animationEvent = {
-    enterBegin: 'animation:enter:begin',
-    enterActive: 'animation:enter:active',
-    enterDone: 'animation:enter:done',
-    enterTimeout: 'animation:enter:timeout',
-
-    leaveBegin: 'animation:leave:begin',
-    leaveActive: 'animation:leave:active',
-    leaveDone: 'animation:leave:done',
-    leaveTimeout: 'animation:leave:timeout',
-
-    staggerNext: 'animation:stagger:next',
-
-    removeClassBegin: 'animation:remove-class:begin',
-    removeClassActive: 'animation:remove-class:active',
-    removeClassDone: 'animation:remove-class:done',
-    removeClassTimeout: 'animation:remove-class:timeout',
-
-    addClassBegin: 'animation:add-class:begin',
-    addClassActive: 'animation:add-class:active',
-    addClassDone: 'animation:add-class:done',
-    addClassTimeout: 'animation:add-class:timeout',
-
-    animateBegin: 'animation:animate:begin',
-    animateActive: 'animation:animate:active',
-    animateDone: 'animation:animate:done',
-    animateTimeout: 'animation:animate:timeout',
-
-    sequenceBegin: 'animation:sequence:begin',
-    sequenceDone: 'animation:sequence:done'
-  };
-
-  var Animator = exports.Animator = function () {
-    function Animator() {
-      
-    }
-
-    Animator.prototype.enter = function enter(element) {
-      return Promise.resolve(false);
-    };
-
-    Animator.prototype.leave = function leave(element) {
-      return Promise.resolve(false);
-    };
-
-    Animator.prototype.removeClass = function removeClass(element, className) {
-      element.classList.remove(className);
-      return Promise.resolve(false);
-    };
-
-    Animator.prototype.addClass = function addClass(element, className) {
-      element.classList.add(className);
-      return Promise.resolve(false);
-    };
-
-    Animator.prototype.animate = function animate(element, className) {
-      return Promise.resolve(false);
-    };
-
-    Animator.prototype.runSequence = function runSequence(animations) {};
-
-    Animator.prototype.registerEffect = function registerEffect(effectName, properties) {};
-
-    Animator.prototype.unregisterEffect = function unregisterEffect(effectName) {};
-
-    return Animator;
-  }();
-
-  var CompositionTransactionNotifier = exports.CompositionTransactionNotifier = function () {
-    function CompositionTransactionNotifier(owner) {
-      
-
-      this.owner = owner;
-      this.owner._compositionCount++;
-    }
-
-    CompositionTransactionNotifier.prototype.done = function done() {
-      this.owner._compositionCount--;
-      this.owner._tryCompleteTransaction();
-    };
-
-    return CompositionTransactionNotifier;
-  }();
-
-  var CompositionTransactionOwnershipToken = exports.CompositionTransactionOwnershipToken = function () {
-    function CompositionTransactionOwnershipToken(owner) {
-      
-
-      this.owner = owner;
-      this.owner._ownershipToken = this;
-      this.thenable = this._createThenable();
-    }
-
-    CompositionTransactionOwnershipToken.prototype.waitForCompositionComplete = function waitForCompositionComplete() {
-      this.owner._tryCompleteTransaction();
-      return this.thenable;
-    };
-
-    CompositionTransactionOwnershipToken.prototype.resolve = function resolve() {
-      this._resolveCallback();
-    };
-
-    CompositionTransactionOwnershipToken.prototype._createThenable = function _createThenable() {
-      var _this = this;
-
-      return new Promise(function (resolve, reject) {
-        _this._resolveCallback = resolve;
-      });
-    };
-
-    return CompositionTransactionOwnershipToken;
-  }();
-
-  var CompositionTransaction = exports.CompositionTransaction = function () {
-    function CompositionTransaction() {
-      
-
-      this._ownershipToken = null;
-      this._compositionCount = 0;
-    }
-
-    CompositionTransaction.prototype.tryCapture = function tryCapture() {
-      return this._ownershipToken === null ? new CompositionTransactionOwnershipToken(this) : null;
-    };
-
-    CompositionTransaction.prototype.enlist = function enlist() {
-      return new CompositionTransactionNotifier(this);
-    };
-
-    CompositionTransaction.prototype._tryCompleteTransaction = function _tryCompleteTransaction() {
-      if (this._compositionCount <= 0) {
-        this._compositionCount = 0;
-
-        if (this._ownershipToken !== null) {
-          var token = this._ownershipToken;
-          this._ownershipToken = null;
-          token.resolve();
-        }
-      }
-    };
-
-    return CompositionTransaction;
-  }();
-
-  var capitalMatcher = /([A-Z])/g;
-
-  function addHyphenAndLower(char) {
-    return '-' + char.toLowerCase();
-  }
-
-  function _hyphenate(name) {
-    return (name.charAt(0).toLowerCase() + name.slice(1)).replace(capitalMatcher, addHyphenAndLower);
-  }
-
-  function _isAllWhitespace(node) {
-    return !(node.auInterpolationTarget || /[^\t\n\r ]/.test(node.textContent));
-  }
-
-  var ViewEngineHooksResource = exports.ViewEngineHooksResource = function () {
-    function ViewEngineHooksResource() {
-      
-    }
-
-    ViewEngineHooksResource.prototype.initialize = function initialize(container, target) {
-      this.instance = container.get(target);
-    };
-
-    ViewEngineHooksResource.prototype.register = function register(registry, name) {
-      registry.registerViewEngineHooks(this.instance);
-    };
-
-    ViewEngineHooksResource.prototype.load = function load(container, target) {};
-
-    ViewEngineHooksResource.convention = function convention(name) {
-      if (name.endsWith('ViewEngineHooks')) {
-        return new ViewEngineHooksResource();
-      }
-    };
-
-    return ViewEngineHooksResource;
-  }();
-
-  function viewEngineHooks(target) {
-    var deco = function deco(t) {
-      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, new ViewEngineHooksResource(), t);
-    };
-
-    return target ? deco(target) : deco;
-  }
-
-  var ElementEvents = exports.ElementEvents = function () {
-    function ElementEvents(element) {
-      
-
-      this.element = element;
-      this.subscriptions = {};
-    }
-
-    ElementEvents.prototype._enqueueHandler = function _enqueueHandler(handler) {
-      this.subscriptions[handler.eventName] = this.subscriptions[handler.eventName] || [];
-      this.subscriptions[handler.eventName].push(handler);
-    };
-
-    ElementEvents.prototype._dequeueHandler = function _dequeueHandler(handler) {
-      var index = void 0;
-      var subscriptions = this.subscriptions[handler.eventName];
-      if (subscriptions) {
-        index = subscriptions.indexOf(handler);
-        if (index > -1) {
-          subscriptions.splice(index, 1);
-        }
-      }
-      return handler;
-    };
-
-    ElementEvents.prototype.publish = function publish(eventName) {
-      var detail = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var bubbles = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
-      var cancelable = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
-
-      var event = _aureliaPal.DOM.createCustomEvent(eventName, { cancelable: cancelable, bubbles: bubbles, detail: detail });
-      this.element.dispatchEvent(event);
-    };
-
-    ElementEvents.prototype.subscribe = function subscribe(eventName, handler) {
-      var _this2 = this;
-
-      var bubbles = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
-
-      if (handler && typeof handler === 'function') {
-        handler.eventName = eventName;
-        handler.handler = handler;
-        handler.bubbles = bubbles;
-        handler.dispose = function () {
-          _this2.element.removeEventListener(eventName, handler, bubbles);
-          _this2._dequeueHandler(handler);
-        };
-        this.element.addEventListener(eventName, handler, bubbles);
-        this._enqueueHandler(handler);
-        return handler;
-      }
-
-      return undefined;
-    };
-
-    ElementEvents.prototype.subscribeOnce = function subscribeOnce(eventName, handler) {
-      var _this3 = this;
-
-      var bubbles = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
-
-      if (handler && typeof handler === 'function') {
-        var _ret = function () {
-          var _handler = function _handler(event) {
-            handler(event);
-            _handler.dispose();
-          };
-          return {
-            v: _this3.subscribe(eventName, _handler, bubbles)
-          };
-        }();
-
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-      }
-
-      return undefined;
-    };
-
-    ElementEvents.prototype.dispose = function dispose(eventName) {
-      if (eventName && typeof eventName === 'string') {
-        var subscriptions = this.subscriptions[eventName];
-        if (subscriptions) {
-          while (subscriptions.length) {
-            var subscription = subscriptions.pop();
-            if (subscription) {
-              subscription.dispose();
-            }
-          }
-        }
-      } else {
-        this.disposeAll();
-      }
-    };
-
-    ElementEvents.prototype.disposeAll = function disposeAll() {
-      for (var key in this.subscriptions) {
-        this.dispose(key);
-      }
-    };
-
-    return ElementEvents;
-  }();
-
-  var ResourceLoadContext = exports.ResourceLoadContext = function () {
-    function ResourceLoadContext() {
-      
-
-      this.dependencies = {};
-    }
-
-    ResourceLoadContext.prototype.addDependency = function addDependency(url) {
-      this.dependencies[url] = true;
-    };
-
-    ResourceLoadContext.prototype.hasDependency = function hasDependency(url) {
-      return url in this.dependencies;
-    };
-
-    return ResourceLoadContext;
-  }();
-
-  var ViewCompileInstruction = exports.ViewCompileInstruction = function ViewCompileInstruction() {
-    var targetShadowDOM = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
-    var compileSurrogate = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
-
-    
-
-    this.targetShadowDOM = targetShadowDOM;
-    this.compileSurrogate = compileSurrogate;
-    this.associatedModuleId = null;
-  };
-
-  ViewCompileInstruction.normal = new ViewCompileInstruction();
-
-  var BehaviorInstruction = exports.BehaviorInstruction = function () {
-    BehaviorInstruction.enhance = function enhance() {
-      var instruction = new BehaviorInstruction();
-      instruction.enhance = true;
-      return instruction;
-    };
-
-    BehaviorInstruction.unitTest = function unitTest(type, attributes) {
-      var instruction = new BehaviorInstruction();
-      instruction.type = type;
-      instruction.attributes = attributes || {};
-      return instruction;
-    };
-
-    BehaviorInstruction.element = function element(node, type) {
-      var instruction = new BehaviorInstruction();
-      instruction.type = type;
-      instruction.attributes = {};
-      instruction.anchorIsContainer = !(node.hasAttribute('containerless') || type.containerless);
-      instruction.initiatedByBehavior = true;
-      return instruction;
-    };
-
-    BehaviorInstruction.attribute = function attribute(attrName, type) {
-      var instruction = new BehaviorInstruction();
-      instruction.attrName = attrName;
-      instruction.type = type || null;
-      instruction.attributes = {};
-      return instruction;
-    };
-
-    BehaviorInstruction.dynamic = function dynamic(host, viewModel, viewFactory) {
-      var instruction = new BehaviorInstruction();
-      instruction.host = host;
-      instruction.viewModel = viewModel;
-      instruction.viewFactory = viewFactory;
-      instruction.inheritBindingContext = true;
-      return instruction;
-    };
-
-    function BehaviorInstruction() {
-      
-
-      this.initiatedByBehavior = false;
-      this.enhance = false;
-      this.partReplacements = null;
-      this.viewFactory = null;
-      this.originalAttrName = null;
-      this.skipContentProcessing = false;
-      this.contentFactory = null;
-      this.viewModel = null;
-      this.anchorIsContainer = false;
-      this.host = null;
-      this.attributes = null;
-      this.type = null;
-      this.attrName = null;
-      this.inheritBindingContext = false;
-    }
-
-    return BehaviorInstruction;
-  }();
-
-  BehaviorInstruction.normal = new BehaviorInstruction();
-
-  var TargetInstruction = exports.TargetInstruction = (_temp = _class4 = function () {
-    TargetInstruction.shadowSlot = function shadowSlot(parentInjectorId) {
-      var instruction = new TargetInstruction();
-      instruction.parentInjectorId = parentInjectorId;
-      instruction.shadowSlot = true;
-      return instruction;
-    };
-
-    TargetInstruction.contentExpression = function contentExpression(expression) {
-      var instruction = new TargetInstruction();
-      instruction.contentExpression = expression;
-      return instruction;
-    };
-
-    TargetInstruction.lifting = function lifting(parentInjectorId, liftingInstruction) {
-      var instruction = new TargetInstruction();
-      instruction.parentInjectorId = parentInjectorId;
-      instruction.expressions = TargetInstruction.noExpressions;
-      instruction.behaviorInstructions = [liftingInstruction];
-      instruction.viewFactory = liftingInstruction.viewFactory;
-      instruction.providers = [liftingInstruction.type.target];
-      instruction.lifting = true;
-      return instruction;
-    };
-
-    TargetInstruction.normal = function normal(injectorId, parentInjectorId, providers, behaviorInstructions, expressions, elementInstruction) {
-      var instruction = new TargetInstruction();
-      instruction.injectorId = injectorId;
-      instruction.parentInjectorId = parentInjectorId;
-      instruction.providers = providers;
-      instruction.behaviorInstructions = behaviorInstructions;
-      instruction.expressions = expressions;
-      instruction.anchorIsContainer = elementInstruction ? elementInstruction.anchorIsContainer : true;
-      instruction.elementInstruction = elementInstruction;
-      return instruction;
-    };
-
-    TargetInstruction.surrogate = function surrogate(providers, behaviorInstructions, expressions, values) {
-      var instruction = new TargetInstruction();
-      instruction.expressions = expressions;
-      instruction.behaviorInstructions = behaviorInstructions;
-      instruction.providers = providers;
-      instruction.values = values;
-      return instruction;
-    };
-
-    function TargetInstruction() {
-      
-
-      this.injectorId = null;
-      this.parentInjectorId = null;
-
-      this.shadowSlot = false;
-      this.slotName = null;
-      this.slotFallbackFactory = null;
-
-      this.contentExpression = null;
-
-      this.expressions = null;
-      this.behaviorInstructions = null;
-      this.providers = null;
-
-      this.viewFactory = null;
-
-      this.anchorIsContainer = false;
-      this.elementInstruction = null;
-      this.lifting = false;
-
-      this.values = null;
-    }
-
-    return TargetInstruction;
-  }(), _class4.noExpressions = Object.freeze([]), _temp);
-  var viewStrategy = exports.viewStrategy = _aureliaMetadata.protocol.create('aurelia:view-strategy', {
-    validate: function validate(target) {
-      if (!(typeof target.loadViewFactory === 'function')) {
-        return 'View strategies must implement: loadViewFactory(viewEngine: ViewEngine, compileInstruction: ViewCompileInstruction, loadContext?: ResourceLoadContext): Promise<ViewFactory>';
-      }
-
-      return true;
-    },
-    compose: function compose(target) {
-      if (!(typeof target.makeRelativeTo === 'function')) {
-        target.makeRelativeTo = _aureliaPal.PLATFORM.noop;
-      }
-    }
-  });
-
-  var RelativeViewStrategy = exports.RelativeViewStrategy = (_dec = viewStrategy(), _dec(_class5 = function () {
-    function RelativeViewStrategy(path) {
-      
-
-      this.path = path;
-      this.absolutePath = null;
-    }
-
-    RelativeViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
-      if (this.absolutePath === null && this.moduleId) {
-        this.absolutePath = (0, _aureliaPath.relativeToFile)(this.path, this.moduleId);
-      }
-
-      compileInstruction.associatedModuleId = this.moduleId;
-      return viewEngine.loadViewFactory(this.absolutePath || this.path, compileInstruction, loadContext, target);
-    };
-
-    RelativeViewStrategy.prototype.makeRelativeTo = function makeRelativeTo(file) {
-      if (this.absolutePath === null) {
-        this.absolutePath = (0, _aureliaPath.relativeToFile)(this.path, file);
-      }
-    };
-
-    return RelativeViewStrategy;
-  }()) || _class5);
-  var ConventionalViewStrategy = exports.ConventionalViewStrategy = (_dec2 = viewStrategy(), _dec2(_class6 = function () {
-    function ConventionalViewStrategy(viewLocator, origin) {
-      
-
-      this.moduleId = origin.moduleId;
-      this.viewUrl = viewLocator.convertOriginToViewUrl(origin);
-    }
-
-    ConventionalViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
-      compileInstruction.associatedModuleId = this.moduleId;
-      return viewEngine.loadViewFactory(this.viewUrl, compileInstruction, loadContext, target);
-    };
-
-    return ConventionalViewStrategy;
-  }()) || _class6);
-  var NoViewStrategy = exports.NoViewStrategy = (_dec3 = viewStrategy(), _dec3(_class7 = function () {
-    function NoViewStrategy(dependencies, dependencyBaseUrl) {
-      
-
-      this.dependencies = dependencies || null;
-      this.dependencyBaseUrl = dependencyBaseUrl || '';
-    }
-
-    NoViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
-      var entry = this.entry;
-      var dependencies = this.dependencies;
-
-      if (entry && entry.factoryIsReady) {
-        return Promise.resolve(null);
-      }
-
-      this.entry = entry = new _aureliaLoader.TemplateRegistryEntry(this.moduleId || this.dependencyBaseUrl);
-
-      entry.dependencies = [];
-      entry.templateIsLoaded = true;
-
-      if (dependencies !== null) {
-        for (var i = 0, ii = dependencies.length; i < ii; ++i) {
-          var current = dependencies[i];
-
-          if (typeof current === 'string' || typeof current === 'function') {
-            entry.addDependency(current);
-          } else {
-            entry.addDependency(current.from, current.as);
-          }
-        }
-      }
-
-      compileInstruction.associatedModuleId = this.moduleId;
-
-      return viewEngine.loadViewFactory(entry, compileInstruction, loadContext, target);
-    };
-
-    return NoViewStrategy;
-  }()) || _class7);
-  var TemplateRegistryViewStrategy = exports.TemplateRegistryViewStrategy = (_dec4 = viewStrategy(), _dec4(_class8 = function () {
-    function TemplateRegistryViewStrategy(moduleId, entry) {
-      
-
-      this.moduleId = moduleId;
-      this.entry = entry;
-    }
-
-    TemplateRegistryViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
-      var entry = this.entry;
-
-      if (entry.factoryIsReady) {
-        return Promise.resolve(entry.factory);
-      }
-
-      compileInstruction.associatedModuleId = this.moduleId;
-      return viewEngine.loadViewFactory(entry, compileInstruction, loadContext, target);
-    };
-
-    return TemplateRegistryViewStrategy;
-  }()) || _class8);
-  var InlineViewStrategy = exports.InlineViewStrategy = (_dec5 = viewStrategy(), _dec5(_class9 = function () {
-    function InlineViewStrategy(markup, dependencies, dependencyBaseUrl) {
-      
-
-      this.markup = markup;
-      this.dependencies = dependencies || null;
-      this.dependencyBaseUrl = dependencyBaseUrl || '';
-    }
-
-    InlineViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
-      var entry = this.entry;
-      var dependencies = this.dependencies;
-
-      if (entry && entry.factoryIsReady) {
-        return Promise.resolve(entry.factory);
-      }
-
-      this.entry = entry = new _aureliaLoader.TemplateRegistryEntry(this.moduleId || this.dependencyBaseUrl);
-      entry.template = _aureliaPal.DOM.createTemplateFromMarkup(this.markup);
-
-      if (dependencies !== null) {
-        for (var i = 0, ii = dependencies.length; i < ii; ++i) {
-          var current = dependencies[i];
-
-          if (typeof current === 'string' || typeof current === 'function') {
-            entry.addDependency(current);
-          } else {
-            entry.addDependency(current.from, current.as);
-          }
-        }
-      }
-
-      compileInstruction.associatedModuleId = this.moduleId;
-      return viewEngine.loadViewFactory(entry, compileInstruction, loadContext, target);
-    };
-
-    return InlineViewStrategy;
-  }()) || _class9);
-  var ViewLocator = exports.ViewLocator = (_temp2 = _class10 = function () {
-    function ViewLocator() {
-      
-    }
-
-    ViewLocator.prototype.getViewStrategy = function getViewStrategy(value) {
-      if (!value) {
-        return null;
-      }
-
-      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && 'getViewStrategy' in value) {
-        var _origin = _aureliaMetadata.Origin.get(value.constructor);
-
-        value = value.getViewStrategy();
-
-        if (typeof value === 'string') {
-          value = new RelativeViewStrategy(value);
-        }
-
-        viewStrategy.assert(value);
-
-        if (_origin.moduleId) {
-          value.makeRelativeTo(_origin.moduleId);
-        }
-
-        return value;
-      }
-
-      if (typeof value === 'string') {
-        value = new RelativeViewStrategy(value);
-      }
-
-      if (viewStrategy.validate(value)) {
-        return value;
-      }
-
-      if (typeof value !== 'function') {
-        value = value.constructor;
-      }
-
-      var origin = _aureliaMetadata.Origin.get(value);
-      var strategy = _aureliaMetadata.metadata.get(ViewLocator.viewStrategyMetadataKey, value);
-
-      if (!strategy) {
-        if (!origin.moduleId) {
-          throw new Error('Cannot determine default view strategy for object.', value);
-        }
-
-        strategy = this.createFallbackViewStrategy(origin);
-      } else if (origin.moduleId) {
-        strategy.moduleId = origin.moduleId;
-      }
-
-      return strategy;
-    };
-
-    ViewLocator.prototype.createFallbackViewStrategy = function createFallbackViewStrategy(origin) {
-      return new ConventionalViewStrategy(this, origin);
-    };
-
-    ViewLocator.prototype.convertOriginToViewUrl = function convertOriginToViewUrl(origin) {
-      var moduleId = origin.moduleId;
-      var id = moduleId.endsWith('.js') || moduleId.endsWith('.ts') ? moduleId.substring(0, moduleId.length - 3) : moduleId;
-      return id + '.html';
-    };
-
-    return ViewLocator;
-  }(), _class10.viewStrategyMetadataKey = 'aurelia:view-strategy', _temp2);
-
-
-  function mi(name) {
-    throw new Error('BindingLanguage must implement ' + name + '().');
-  }
-
-  var BindingLanguage = exports.BindingLanguage = function () {
-    function BindingLanguage() {
-      
-    }
-
-    BindingLanguage.prototype.inspectAttribute = function inspectAttribute(resources, elementName, attrName, attrValue) {
-      mi('inspectAttribute');
-    };
-
-    BindingLanguage.prototype.createAttributeInstruction = function createAttributeInstruction(resources, element, info, existingInstruction) {
-      mi('createAttributeInstruction');
-    };
-
-    BindingLanguage.prototype.inspectTextContent = function inspectTextContent(resources, value) {
-      mi('inspectTextContent');
-    };
-
-    return BindingLanguage;
-  }();
-
-  var noNodes = Object.freeze([]);
-
-  var SlotCustomAttribute = exports.SlotCustomAttribute = (_dec6 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element), _dec6(_class11 = function () {
-    function SlotCustomAttribute(element) {
-      
-
-      this.element = element;
-      this.element.auSlotAttribute = this;
-    }
-
-    SlotCustomAttribute.prototype.valueChanged = function valueChanged(newValue, oldValue) {};
-
-    return SlotCustomAttribute;
-  }()) || _class11);
-
-  var PassThroughSlot = exports.PassThroughSlot = function () {
-    function PassThroughSlot(anchor, name, destinationName, fallbackFactory) {
-      
-
-      this.anchor = anchor;
-      this.anchor.viewSlot = this;
-      this.name = name;
-      this.destinationName = destinationName;
-      this.fallbackFactory = fallbackFactory;
-      this.destinationSlot = null;
-      this.projections = 0;
-      this.contentView = null;
-
-      var attr = new SlotCustomAttribute(this.anchor);
-      attr.value = this.destinationName;
-    }
-
-    PassThroughSlot.prototype.renderFallbackContent = function renderFallbackContent(view, nodes, projectionSource, index) {
-      if (this.contentView === null) {
-        this.contentView = this.fallbackFactory.create(this.ownerView.container);
-        this.contentView.bind(this.ownerView.bindingContext, this.ownerView.overrideContext);
-
-        var slots = Object.create(null);
-        slots[this.destinationSlot.name] = this.destinationSlot;
-
-        ShadowDOM.distributeView(this.contentView, slots, projectionSource, index, this.destinationSlot.name);
-      }
-    };
-
-    PassThroughSlot.prototype.passThroughTo = function passThroughTo(destinationSlot) {
-      this.destinationSlot = destinationSlot;
-    };
-
-    PassThroughSlot.prototype.addNode = function addNode(view, node, projectionSource, index) {
-      if (this.contentView !== null) {
-        this.contentView.removeNodes();
-        this.contentView.detached();
-        this.contentView.unbind();
-        this.contentView = null;
-      }
-
-      if (node.viewSlot instanceof PassThroughSlot) {
-        node.viewSlot.passThroughTo(this);
-        return;
-      }
-
-      this.projections++;
-      this.destinationSlot.addNode(view, node, projectionSource, index);
-    };
-
-    PassThroughSlot.prototype.removeView = function removeView(view, projectionSource) {
-      this.projections--;
-      this.destinationSlot.removeView(view, projectionSource);
-
-      if (this.needsFallbackRendering) {
-        this.renderFallbackContent(null, noNodes, projectionSource);
-      }
-    };
-
-    PassThroughSlot.prototype.removeAll = function removeAll(projectionSource) {
-      this.projections = 0;
-      this.destinationSlot.removeAll(projectionSource);
-
-      if (this.needsFallbackRendering) {
-        this.renderFallbackContent(null, noNodes, projectionSource);
-      }
-    };
-
-    PassThroughSlot.prototype.projectFrom = function projectFrom(view, projectionSource) {
-      this.destinationSlot.projectFrom(view, projectionSource);
-    };
-
-    PassThroughSlot.prototype.created = function created(ownerView) {
-      this.ownerView = ownerView;
-    };
-
-    PassThroughSlot.prototype.bind = function bind(view) {
-      if (this.contentView) {
-        this.contentView.bind(view.bindingContext, view.overrideContext);
-      }
-    };
-
-    PassThroughSlot.prototype.attached = function attached() {
-      if (this.contentView) {
-        this.contentView.attached();
-      }
-    };
-
-    PassThroughSlot.prototype.detached = function detached() {
-      if (this.contentView) {
-        this.contentView.detached();
-      }
-    };
-
-    PassThroughSlot.prototype.unbind = function unbind() {
-      if (this.contentView) {
-        this.contentView.unbind();
-      }
-    };
-
-    _createClass(PassThroughSlot, [{
-      key: 'needsFallbackRendering',
-      get: function get() {
-        return this.fallbackFactory && this.projections === 0;
-      }
-    }]);
-
-    return PassThroughSlot;
-  }();
-
-  var ShadowSlot = exports.ShadowSlot = function () {
-    function ShadowSlot(anchor, name, fallbackFactory) {
-      
-
-      this.anchor = anchor;
-      this.anchor.isContentProjectionSource = true;
-      this.anchor.viewSlot = this;
-      this.name = name;
-      this.fallbackFactory = fallbackFactory;
-      this.contentView = null;
-      this.projections = 0;
-      this.children = [];
-      this.projectFromAnchors = null;
-      this.destinationSlots = null;
-    }
-
-    ShadowSlot.prototype.addNode = function addNode(view, node, projectionSource, index, destination) {
-      if (this.contentView !== null) {
-        this.contentView.removeNodes();
-        this.contentView.detached();
-        this.contentView.unbind();
-        this.contentView = null;
-      }
-
-      if (node.viewSlot instanceof PassThroughSlot) {
-        node.viewSlot.passThroughTo(this);
-        return;
-      }
-
-      if (this.destinationSlots !== null) {
-        ShadowDOM.distributeNodes(view, [node], this.destinationSlots, this, index);
-      } else {
-        node.auOwnerView = view;
-        node.auProjectionSource = projectionSource;
-        node.auAssignedSlot = this;
-
-        var anchor = this._findAnchor(view, node, projectionSource, index);
-        var parent = anchor.parentNode;
-
-        parent.insertBefore(node, anchor);
-        this.children.push(node);
-        this.projections++;
-      }
-    };
-
-    ShadowSlot.prototype.removeView = function removeView(view, projectionSource) {
-      if (this.destinationSlots !== null) {
-        ShadowDOM.undistributeView(view, this.destinationSlots, this);
-      } else if (this.contentView && this.contentView.hasSlots) {
-        ShadowDOM.undistributeView(view, this.contentView.slots, projectionSource);
-      } else {
-        var found = this.children.find(function (x) {
-          return x.auSlotProjectFrom === projectionSource;
-        });
-        if (found) {
-          var _children = found.auProjectionChildren;
-
-          for (var i = 0, ii = _children.length; i < ii; ++i) {
-            var _child = _children[i];
-
-            if (_child.auOwnerView === view) {
-              _children.splice(i, 1);
-              view.fragment.appendChild(_child);
-              i--;ii--;
-              this.projections--;
-            }
-          }
-
-          if (this.needsFallbackRendering) {
-            this.renderFallbackContent(view, noNodes, projectionSource);
-          }
-        }
-      }
-    };
-
-    ShadowSlot.prototype.removeAll = function removeAll(projectionSource) {
-      if (this.destinationSlots !== null) {
-        ShadowDOM.undistributeAll(this.destinationSlots, this);
-      } else if (this.contentView && this.contentView.hasSlots) {
-        ShadowDOM.undistributeAll(this.contentView.slots, projectionSource);
-      } else {
-        var found = this.children.find(function (x) {
-          return x.auSlotProjectFrom === projectionSource;
-        });
-
-        if (found) {
-          var _children2 = found.auProjectionChildren;
-          for (var i = 0, ii = _children2.length; i < ii; ++i) {
-            var _child2 = _children2[i];
-            _child2.auOwnerView.fragment.appendChild(_child2);
-            this.projections--;
-          }
-
-          found.auProjectionChildren = [];
-
-          if (this.needsFallbackRendering) {
-            this.renderFallbackContent(null, noNodes, projectionSource);
-          }
-        }
-      }
-    };
-
-    ShadowSlot.prototype._findAnchor = function _findAnchor(view, node, projectionSource, index) {
-      if (projectionSource) {
-        var found = this.children.find(function (x) {
-          return x.auSlotProjectFrom === projectionSource;
-        });
-        if (found) {
-          if (index !== undefined) {
-            var _children3 = found.auProjectionChildren;
-            var viewIndex = -1;
-            var lastView = void 0;
-
-            for (var i = 0, ii = _children3.length; i < ii; ++i) {
-              var current = _children3[i];
-
-              if (current.auOwnerView !== lastView) {
-                viewIndex++;
-                lastView = current.auOwnerView;
-
-                if (viewIndex >= index && lastView !== view) {
-                  _children3.splice(i, 0, node);
-                  return current;
-                }
-              }
-            }
-          }
-
-          found.auProjectionChildren.push(node);
-          return found;
-        }
-      }
-
-      return this.anchor;
-    };
-
-    ShadowSlot.prototype.projectTo = function projectTo(slots) {
-      this.destinationSlots = slots;
-    };
-
-    ShadowSlot.prototype.projectFrom = function projectFrom(view, projectionSource) {
-      var anchor = _aureliaPal.DOM.createComment('anchor');
-      var parent = this.anchor.parentNode;
-      anchor.auSlotProjectFrom = projectionSource;
-      anchor.auOwnerView = view;
-      anchor.auProjectionChildren = [];
-      parent.insertBefore(anchor, this.anchor);
-      this.children.push(anchor);
-
-      if (this.projectFromAnchors === null) {
-        this.projectFromAnchors = [];
-      }
-
-      this.projectFromAnchors.push(anchor);
-    };
-
-    ShadowSlot.prototype.renderFallbackContent = function renderFallbackContent(view, nodes, projectionSource, index) {
-      if (this.contentView === null) {
-        this.contentView = this.fallbackFactory.create(this.ownerView.container);
-        this.contentView.bind(this.ownerView.bindingContext, this.ownerView.overrideContext);
-        this.contentView.insertNodesBefore(this.anchor);
-      }
-
-      if (this.contentView.hasSlots) {
-        var slots = this.contentView.slots;
-        var projectFromAnchors = this.projectFromAnchors;
-
-        if (projectFromAnchors !== null) {
-          for (var slotName in slots) {
-            var slot = slots[slotName];
-
-            for (var i = 0, ii = projectFromAnchors.length; i < ii; ++i) {
-              var anchor = projectFromAnchors[i];
-              slot.projectFrom(anchor.auOwnerView, anchor.auSlotProjectFrom);
-            }
-          }
-        }
-
-        this.fallbackSlots = slots;
-        ShadowDOM.distributeNodes(view, nodes, slots, projectionSource, index);
-      }
-    };
-
-    ShadowSlot.prototype.created = function created(ownerView) {
-      this.ownerView = ownerView;
-    };
-
-    ShadowSlot.prototype.bind = function bind(view) {
-      if (this.contentView) {
-        this.contentView.bind(view.bindingContext, view.overrideContext);
-      }
-    };
-
-    ShadowSlot.prototype.attached = function attached() {
-      if (this.contentView) {
-        this.contentView.attached();
-      }
-    };
-
-    ShadowSlot.prototype.detached = function detached() {
-      if (this.contentView) {
-        this.contentView.detached();
-      }
-    };
-
-    ShadowSlot.prototype.unbind = function unbind() {
-      if (this.contentView) {
-        this.contentView.unbind();
-      }
-    };
-
-    _createClass(ShadowSlot, [{
-      key: 'needsFallbackRendering',
-      get: function get() {
-        return this.fallbackFactory && this.projections === 0;
-      }
-    }]);
-
-    return ShadowSlot;
-  }();
-
-  var ShadowDOM = exports.ShadowDOM = (_temp3 = _class12 = function () {
-    function ShadowDOM() {
-      
-    }
-
-    ShadowDOM.getSlotName = function getSlotName(node) {
-      if (node.auSlotAttribute === undefined) {
-        return ShadowDOM.defaultSlotKey;
-      }
-
-      return node.auSlotAttribute.value;
-    };
-
-    ShadowDOM.distributeView = function distributeView(view, slots, projectionSource, index, destinationOverride) {
-      var nodes = void 0;
-
-      if (view === null) {
-        nodes = noNodes;
-      } else {
-        var childNodes = view.fragment.childNodes;
-        var ii = childNodes.length;
-        nodes = new Array(ii);
-
-        for (var i = 0; i < ii; ++i) {
-          nodes[i] = childNodes[i];
-        }
-      }
-
-      ShadowDOM.distributeNodes(view, nodes, slots, projectionSource, index, destinationOverride);
-    };
-
-    ShadowDOM.undistributeView = function undistributeView(view, slots, projectionSource) {
-      for (var slotName in slots) {
-        slots[slotName].removeView(view, projectionSource);
-      }
-    };
-
-    ShadowDOM.undistributeAll = function undistributeAll(slots, projectionSource) {
-      for (var slotName in slots) {
-        slots[slotName].removeAll(projectionSource);
-      }
-    };
-
-    ShadowDOM.distributeNodes = function distributeNodes(view, nodes, slots, projectionSource, index, destinationOverride) {
-      for (var i = 0, ii = nodes.length; i < ii; ++i) {
-        var currentNode = nodes[i];
-        var nodeType = currentNode.nodeType;
-
-        if (currentNode.isContentProjectionSource) {
-          currentNode.viewSlot.projectTo(slots);
-
-          for (var slotName in slots) {
-            slots[slotName].projectFrom(view, currentNode.viewSlot);
-          }
-
-          nodes.splice(i, 1);
-          ii--;i--;
-        } else if (nodeType === 1 || nodeType === 3 || currentNode.viewSlot instanceof PassThroughSlot) {
-          if (nodeType === 3 && _isAllWhitespace(currentNode)) {
-            nodes.splice(i, 1);
-            ii--;i--;
-          } else {
-            var found = slots[destinationOverride || ShadowDOM.getSlotName(currentNode)];
-
-            if (found) {
-              found.addNode(view, currentNode, projectionSource, index);
-              nodes.splice(i, 1);
-              ii--;i--;
-            }
-          }
-        } else {
-          nodes.splice(i, 1);
-          ii--;i--;
-        }
-      }
-
-      for (var _slotName in slots) {
-        var slot = slots[_slotName];
-
-        if (slot.needsFallbackRendering) {
-          slot.renderFallbackContent(view, nodes, projectionSource, index);
-        }
-      }
-    };
-
-    return ShadowDOM;
-  }(), _class12.defaultSlotKey = '__au-default-slot-key__', _temp3);
-
-
-  function register(lookup, name, resource, type) {
-    if (!name) {
-      return;
-    }
-
-    var existing = lookup[name];
-    if (existing) {
-      if (existing !== resource) {
-        throw new Error('Attempted to register ' + type + ' when one with the same name already exists. Name: ' + name + '.');
-      }
-
-      return;
-    }
-
-    lookup[name] = resource;
-  }
-
-  var ViewResources = exports.ViewResources = function () {
-    function ViewResources(parent, viewUrl) {
-      
-
-      this.bindingLanguage = null;
-
-      this.parent = parent || null;
-      this.hasParent = this.parent !== null;
-      this.viewUrl = viewUrl || '';
-      this.lookupFunctions = {
-        valueConverters: this.getValueConverter.bind(this),
-        bindingBehaviors: this.getBindingBehavior.bind(this)
-      };
-      this.attributes = Object.create(null);
-      this.elements = Object.create(null);
-      this.valueConverters = Object.create(null);
-      this.bindingBehaviors = Object.create(null);
-      this.attributeMap = Object.create(null);
-      this.values = Object.create(null);
-      this.beforeCompile = this.afterCompile = this.beforeCreate = this.afterCreate = this.beforeBind = this.beforeUnbind = false;
-    }
-
-    ViewResources.prototype._tryAddHook = function _tryAddHook(obj, name) {
-      if (typeof obj[name] === 'function') {
-        var func = obj[name].bind(obj);
-        var counter = 1;
-        var callbackName = void 0;
-
-        while (this[callbackName = name + counter.toString()] !== undefined) {
-          counter++;
-        }
-
-        this[name] = true;
-        this[callbackName] = func;
-      }
-    };
-
-    ViewResources.prototype._invokeHook = function _invokeHook(name, one, two, three, four) {
-      if (this.hasParent) {
-        this.parent._invokeHook(name, one, two, three, four);
-      }
-
-      if (this[name]) {
-        this[name + '1'](one, two, three, four);
-
-        var callbackName = name + '2';
-        if (this[callbackName]) {
-          this[callbackName](one, two, three, four);
-
-          callbackName = name + '3';
-          if (this[callbackName]) {
-            this[callbackName](one, two, three, four);
-
-            var counter = 4;
-
-            while (this[callbackName = name + counter.toString()] !== undefined) {
-              this[callbackName](one, two, three, four);
-              counter++;
-            }
-          }
-        }
-      }
-    };
-
-    ViewResources.prototype.registerViewEngineHooks = function registerViewEngineHooks(hooks) {
-      this._tryAddHook(hooks, 'beforeCompile');
-      this._tryAddHook(hooks, 'afterCompile');
-      this._tryAddHook(hooks, 'beforeCreate');
-      this._tryAddHook(hooks, 'afterCreate');
-      this._tryAddHook(hooks, 'beforeBind');
-      this._tryAddHook(hooks, 'beforeUnbind');
-    };
-
-    ViewResources.prototype.getBindingLanguage = function getBindingLanguage(bindingLanguageFallback) {
-      return this.bindingLanguage || (this.bindingLanguage = bindingLanguageFallback);
-    };
-
-    ViewResources.prototype.patchInParent = function patchInParent(newParent) {
-      var originalParent = this.parent;
-
-      this.parent = newParent || null;
-      this.hasParent = this.parent !== null;
-
-      if (newParent.parent === null) {
-        newParent.parent = originalParent;
-        newParent.hasParent = originalParent !== null;
-      }
-    };
-
-    ViewResources.prototype.relativeToView = function relativeToView(path) {
-      return (0, _aureliaPath.relativeToFile)(path, this.viewUrl);
-    };
-
-    ViewResources.prototype.registerElement = function registerElement(tagName, behavior) {
-      register(this.elements, tagName, behavior, 'an Element');
-    };
-
-    ViewResources.prototype.getElement = function getElement(tagName) {
-      return this.elements[tagName] || (this.hasParent ? this.parent.getElement(tagName) : null);
-    };
-
-    ViewResources.prototype.mapAttribute = function mapAttribute(attribute) {
-      return this.attributeMap[attribute] || (this.hasParent ? this.parent.mapAttribute(attribute) : null);
-    };
-
-    ViewResources.prototype.registerAttribute = function registerAttribute(attribute, behavior, knownAttribute) {
-      this.attributeMap[attribute] = knownAttribute;
-      register(this.attributes, attribute, behavior, 'an Attribute');
-    };
-
-    ViewResources.prototype.getAttribute = function getAttribute(attribute) {
-      return this.attributes[attribute] || (this.hasParent ? this.parent.getAttribute(attribute) : null);
-    };
-
-    ViewResources.prototype.registerValueConverter = function registerValueConverter(name, valueConverter) {
-      register(this.valueConverters, name, valueConverter, 'a ValueConverter');
-    };
-
-    ViewResources.prototype.getValueConverter = function getValueConverter(name) {
-      return this.valueConverters[name] || (this.hasParent ? this.parent.getValueConverter(name) : null);
-    };
-
-    ViewResources.prototype.registerBindingBehavior = function registerBindingBehavior(name, bindingBehavior) {
-      register(this.bindingBehaviors, name, bindingBehavior, 'a BindingBehavior');
-    };
-
-    ViewResources.prototype.getBindingBehavior = function getBindingBehavior(name) {
-      return this.bindingBehaviors[name] || (this.hasParent ? this.parent.getBindingBehavior(name) : null);
-    };
-
-    ViewResources.prototype.registerValue = function registerValue(name, value) {
-      register(this.values, name, value, 'a value');
-    };
-
-    ViewResources.prototype.getValue = function getValue(name) {
-      return this.values[name] || (this.hasParent ? this.parent.getValue(name) : null);
-    };
-
-    return ViewResources;
-  }();
-
-  var View = exports.View = function () {
-    function View(container, viewFactory, fragment, controllers, bindings, children, slots) {
-      
-
-      this.container = container;
-      this.viewFactory = viewFactory;
-      this.resources = viewFactory.resources;
-      this.fragment = fragment;
-      this.firstChild = fragment.firstChild;
-      this.lastChild = fragment.lastChild;
-      this.controllers = controllers;
-      this.bindings = bindings;
-      this.children = children;
-      this.slots = slots;
-      this.hasSlots = false;
-      this.fromCache = false;
-      this.isBound = false;
-      this.isAttached = false;
-      this.bindingContext = null;
-      this.overrideContext = null;
-      this.controller = null;
-      this.viewModelScope = null;
-      this.animatableElement = undefined;
-      this._isUserControlled = false;
-      this.contentView = null;
-
-      for (var key in slots) {
-        this.hasSlots = true;
-        break;
-      }
-    }
-
-    View.prototype.returnToCache = function returnToCache() {
-      this.viewFactory.returnViewToCache(this);
-    };
-
-    View.prototype.created = function created() {
-      var i = void 0;
-      var ii = void 0;
-      var controllers = this.controllers;
-
-      for (i = 0, ii = controllers.length; i < ii; ++i) {
-        controllers[i].created(this);
-      }
-    };
-
-    View.prototype.bind = function bind(bindingContext, overrideContext, _systemUpdate) {
-      var controllers = void 0;
-      var bindings = void 0;
-      var children = void 0;
-      var i = void 0;
-      var ii = void 0;
-
-      if (_systemUpdate && this._isUserControlled) {
-        return;
-      }
-
-      if (this.isBound) {
-        if (this.bindingContext === bindingContext) {
-          return;
-        }
-
-        this.unbind();
-      }
-
-      this.isBound = true;
-      this.bindingContext = bindingContext;
-      this.overrideContext = overrideContext || (0, _aureliaBinding.createOverrideContext)(bindingContext);
-
-      this.resources._invokeHook('beforeBind', this);
-
-      bindings = this.bindings;
-      for (i = 0, ii = bindings.length; i < ii; ++i) {
-        bindings[i].bind(this);
-      }
-
-      if (this.viewModelScope !== null) {
-        bindingContext.bind(this.viewModelScope.bindingContext, this.viewModelScope.overrideContext);
-        this.viewModelScope = null;
-      }
-
-      controllers = this.controllers;
-      for (i = 0, ii = controllers.length; i < ii; ++i) {
-        controllers[i].bind(this);
-      }
-
-      children = this.children;
-      for (i = 0, ii = children.length; i < ii; ++i) {
-        children[i].bind(bindingContext, overrideContext, true);
-      }
-
-      if (this.hasSlots) {
-        ShadowDOM.distributeView(this.contentView, this.slots);
-      }
-    };
-
-    View.prototype.addBinding = function addBinding(binding) {
-      this.bindings.push(binding);
-
-      if (this.isBound) {
-        binding.bind(this);
-      }
-    };
-
-    View.prototype.unbind = function unbind() {
-      var controllers = void 0;
-      var bindings = void 0;
-      var children = void 0;
-      var i = void 0;
-      var ii = void 0;
-
-      if (this.isBound) {
-        this.isBound = false;
-        this.resources._invokeHook('beforeUnbind', this);
-
-        if (this.controller !== null) {
-          this.controller.unbind();
-        }
-
-        bindings = this.bindings;
-        for (i = 0, ii = bindings.length; i < ii; ++i) {
-          bindings[i].unbind();
-        }
-
-        controllers = this.controllers;
-        for (i = 0, ii = controllers.length; i < ii; ++i) {
-          controllers[i].unbind();
-        }
-
-        children = this.children;
-        for (i = 0, ii = children.length; i < ii; ++i) {
-          children[i].unbind();
-        }
-
-        this.bindingContext = null;
-        this.overrideContext = null;
-      }
-    };
-
-    View.prototype.insertNodesBefore = function insertNodesBefore(refNode) {
-      refNode.parentNode.insertBefore(this.fragment, refNode);
-    };
-
-    View.prototype.appendNodesTo = function appendNodesTo(parent) {
-      parent.appendChild(this.fragment);
-    };
-
-    View.prototype.removeNodes = function removeNodes() {
-      var fragment = this.fragment;
-      var current = this.firstChild;
-      var end = this.lastChild;
-      var next = void 0;
-
-      while (current) {
-        next = current.nextSibling;
-        fragment.appendChild(current);
-
-        if (current === end) {
-          break;
-        }
-
-        current = next;
-      }
-    };
-
-    View.prototype.attached = function attached() {
-      var controllers = void 0;
-      var children = void 0;
-      var i = void 0;
-      var ii = void 0;
-
-      if (this.isAttached) {
-        return;
-      }
-
-      this.isAttached = true;
-
-      if (this.controller !== null) {
-        this.controller.attached();
-      }
-
-      controllers = this.controllers;
-      for (i = 0, ii = controllers.length; i < ii; ++i) {
-        controllers[i].attached();
-      }
-
-      children = this.children;
-      for (i = 0, ii = children.length; i < ii; ++i) {
-        children[i].attached();
-      }
-    };
-
-    View.prototype.detached = function detached() {
-      var controllers = void 0;
-      var children = void 0;
-      var i = void 0;
-      var ii = void 0;
-
-      if (this.isAttached) {
-        this.isAttached = false;
-
-        if (this.controller !== null) {
-          this.controller.detached();
-        }
-
-        controllers = this.controllers;
-        for (i = 0, ii = controllers.length; i < ii; ++i) {
-          controllers[i].detached();
-        }
-
-        children = this.children;
-        for (i = 0, ii = children.length; i < ii; ++i) {
-          children[i].detached();
-        }
-      }
-    };
-
-    return View;
-  }();
-
-  function getAnimatableElement(view) {
-    if (view.animatableElement !== undefined) {
-      return view.animatableElement;
-    }
-
-    var current = view.firstChild;
-
-    while (current && current.nodeType !== 1) {
-      current = current.nextSibling;
-    }
-
-    if (current && current.nodeType === 1) {
-      return view.animatableElement = current.classList.contains('au-animate') ? current : null;
-    }
-
-    return view.animatableElement = null;
-  }
-
-  var ViewSlot = exports.ViewSlot = function () {
-    function ViewSlot(anchor, anchorIsContainer) {
-      var animator = arguments.length <= 2 || arguments[2] === undefined ? Animator.instance : arguments[2];
-
-      
-
-      this.anchor = anchor;
-      this.anchorIsContainer = anchorIsContainer;
-      this.bindingContext = null;
-      this.overrideContext = null;
-      this.animator = animator;
-      this.children = [];
-      this.isBound = false;
-      this.isAttached = false;
-      this.contentSelectors = null;
-      anchor.viewSlot = this;
-      anchor.isContentProjectionSource = false;
-    }
-
-    ViewSlot.prototype.animateView = function animateView(view) {
-      var direction = arguments.length <= 1 || arguments[1] === undefined ? 'enter' : arguments[1];
-
-      var animatableElement = getAnimatableElement(view);
-
-      if (animatableElement !== null) {
-        switch (direction) {
-          case 'enter':
-            return this.animator.enter(animatableElement);
-          case 'leave':
-            return this.animator.leave(animatableElement);
-          default:
-            throw new Error('Invalid animation direction: ' + direction);
-        }
-      }
-    };
-
-    ViewSlot.prototype.transformChildNodesIntoView = function transformChildNodesIntoView() {
-      var parent = this.anchor;
-
-      this.children.push({
-        fragment: parent,
-        firstChild: parent.firstChild,
-        lastChild: parent.lastChild,
-        returnToCache: function returnToCache() {},
-        removeNodes: function removeNodes() {
-          var last = void 0;
-
-          while (last = parent.lastChild) {
-            parent.removeChild(last);
-          }
-        },
-        created: function created() {},
-        bind: function bind() {},
-        unbind: function unbind() {},
-        attached: function attached() {},
-        detached: function detached() {}
-      });
-    };
-
-    ViewSlot.prototype.bind = function bind(bindingContext, overrideContext) {
-      var i = void 0;
-      var ii = void 0;
-      var children = void 0;
-
-      if (this.isBound) {
-        if (this.bindingContext === bindingContext) {
-          return;
-        }
-
-        this.unbind();
-      }
-
-      this.isBound = true;
-      this.bindingContext = bindingContext = bindingContext || this.bindingContext;
-      this.overrideContext = overrideContext = overrideContext || this.overrideContext;
-
-      children = this.children;
-      for (i = 0, ii = children.length; i < ii; ++i) {
-        children[i].bind(bindingContext, overrideContext, true);
-      }
-    };
-
-    ViewSlot.prototype.unbind = function unbind() {
-      if (this.isBound) {
-        var i = void 0;
-        var ii = void 0;
-        var _children4 = this.children;
-
-        this.isBound = false;
-        this.bindingContext = null;
-        this.overrideContext = null;
-
-        for (i = 0, ii = _children4.length; i < ii; ++i) {
-          _children4[i].unbind();
-        }
-      }
-    };
-
-    ViewSlot.prototype.add = function add(view) {
-      if (this.anchorIsContainer) {
-        view.appendNodesTo(this.anchor);
-      } else {
-        view.insertNodesBefore(this.anchor);
-      }
-
-      this.children.push(view);
-
-      if (this.isAttached) {
-        view.attached();
-        return this.animateView(view, 'enter');
-      }
-    };
-
-    ViewSlot.prototype.insert = function insert(index, view) {
-      var children = this.children;
-      var length = children.length;
-
-      if (index === 0 && length === 0 || index >= length) {
-        return this.add(view);
-      }
-
-      view.insertNodesBefore(children[index].firstChild);
-      children.splice(index, 0, view);
-
-      if (this.isAttached) {
-        view.attached();
-        return this.animateView(view, 'enter');
-      }
-    };
-
-    ViewSlot.prototype.move = function move(sourceIndex, targetIndex) {
-      if (sourceIndex === targetIndex) {
-        return;
-      }
-
-      var children = this.children;
-      var view = children[sourceIndex];
-
-      view.removeNodes();
-      view.insertNodesBefore(children[targetIndex].firstChild);
-      children.splice(sourceIndex, 1);
-      children.splice(targetIndex, 0, view);
-    };
-
-    ViewSlot.prototype.remove = function remove(view, returnToCache, skipAnimation) {
-      return this.removeAt(this.children.indexOf(view), returnToCache, skipAnimation);
-    };
-
-    ViewSlot.prototype.removeMany = function removeMany(viewsToRemove, returnToCache, skipAnimation) {
-      var _this4 = this;
-
-      var children = this.children;
-      var ii = viewsToRemove.length;
-      var i = void 0;
-      var rmPromises = [];
-
-      viewsToRemove.forEach(function (child) {
-        if (skipAnimation) {
-          child.removeNodes();
-          return;
-        }
-
-        var animation = _this4.animateView(child, 'leave');
-        if (animation) {
-          rmPromises.push(animation.then(function () {
-            return child.removeNodes();
-          }));
-        } else {
-          child.removeNodes();
-        }
-      });
-
-      var removeAction = function removeAction() {
-        if (_this4.isAttached) {
-          for (i = 0; i < ii; ++i) {
-            viewsToRemove[i].detached();
-          }
-        }
-
-        if (returnToCache) {
-          for (i = 0; i < ii; ++i) {
-            viewsToRemove[i].returnToCache();
-          }
-        }
-
-        for (i = 0; i < ii; ++i) {
-          var index = children.indexOf(viewsToRemove[i]);
-          if (index >= 0) {
-            children.splice(index, 1);
-          }
-        }
-      };
-
-      if (rmPromises.length > 0) {
-        return Promise.all(rmPromises).then(function () {
-          return removeAction();
-        });
-      }
-
-      return removeAction();
-    };
-
-    ViewSlot.prototype.removeAt = function removeAt(index, returnToCache, skipAnimation) {
-      var _this5 = this;
-
-      var view = this.children[index];
-
-      var removeAction = function removeAction() {
-        index = _this5.children.indexOf(view);
-        view.removeNodes();
-        _this5.children.splice(index, 1);
-
-        if (_this5.isAttached) {
-          view.detached();
-        }
-
-        if (returnToCache) {
-          view.returnToCache();
-        }
-
-        return view;
-      };
-
-      if (!skipAnimation) {
-        var animation = this.animateView(view, 'leave');
-        if (animation) {
-          return animation.then(function () {
-            return removeAction();
-          });
-        }
-      }
-
-      return removeAction();
-    };
-
-    ViewSlot.prototype.removeAll = function removeAll(returnToCache, skipAnimation) {
-      var _this6 = this;
-
-      var children = this.children;
-      var ii = children.length;
-      var i = void 0;
-      var rmPromises = [];
-
-      children.forEach(function (child) {
-        if (skipAnimation) {
-          child.removeNodes();
-          return;
-        }
-
-        var animation = _this6.animateView(child, 'leave');
-        if (animation) {
-          rmPromises.push(animation.then(function () {
-            return child.removeNodes();
-          }));
-        } else {
-          child.removeNodes();
-        }
-      });
-
-      var removeAction = function removeAction() {
-        if (_this6.isAttached) {
-          for (i = 0; i < ii; ++i) {
-            children[i].detached();
-          }
-        }
-
-        if (returnToCache) {
-          for (i = 0; i < ii; ++i) {
-            children[i].returnToCache();
-          }
-        }
-
-        _this6.children = [];
-      };
-
-      if (rmPromises.length > 0) {
-        return Promise.all(rmPromises).then(function () {
-          return removeAction();
-        });
-      }
-
-      return removeAction();
-    };
-
-    ViewSlot.prototype.attached = function attached() {
-      var i = void 0;
-      var ii = void 0;
-      var children = void 0;
-      var child = void 0;
-
-      if (this.isAttached) {
-        return;
-      }
-
-      this.isAttached = true;
-
-      children = this.children;
-      for (i = 0, ii = children.length; i < ii; ++i) {
-        child = children[i];
-        child.attached();
-        this.animateView(child, 'enter');
-      }
-    };
-
-    ViewSlot.prototype.detached = function detached() {
-      var i = void 0;
-      var ii = void 0;
-      var children = void 0;
-
-      if (this.isAttached) {
-        this.isAttached = false;
-        children = this.children;
-        for (i = 0, ii = children.length; i < ii; ++i) {
-          children[i].detached();
-        }
-      }
-    };
-
-    ViewSlot.prototype.projectTo = function projectTo(slots) {
-      var _this7 = this;
-
-      this.projectToSlots = slots;
-      this.add = this._projectionAdd;
-      this.insert = this._projectionInsert;
-      this.move = this._projectionMove;
-      this.remove = this._projectionRemove;
-      this.removeAt = this._projectionRemoveAt;
-      this.removeMany = this._projectionRemoveMany;
-      this.removeAll = this._projectionRemoveAll;
-      this.children.forEach(function (view) {
-        return ShadowDOM.distributeView(view, slots, _this7);
-      });
-    };
-
-    ViewSlot.prototype._projectionAdd = function _projectionAdd(view) {
-      ShadowDOM.distributeView(view, this.projectToSlots, this);
-
-      this.children.push(view);
-
-      if (this.isAttached) {
-        view.attached();
-      }
-    };
-
-    ViewSlot.prototype._projectionInsert = function _projectionInsert(index, view) {
-      if (index === 0 && !this.children.length || index >= this.children.length) {
-        this.add(view);
-      } else {
-        ShadowDOM.distributeView(view, this.projectToSlots, this, index);
-
-        this.children.splice(index, 0, view);
-
-        if (this.isAttached) {
-          view.attached();
-        }
-      }
-    };
-
-    ViewSlot.prototype._projectionMove = function _projectionMove(sourceIndex, targetIndex) {
-      if (sourceIndex === targetIndex) {
-        return;
-      }
-
-      var children = this.children;
-      var view = children[sourceIndex];
-
-      ShadowDOM.undistributeView(view, this.projectToSlots, this);
-      ShadowDOM.distributeView(view, this.projectToSlots, this, targetIndex);
-
-      children.splice(sourceIndex, 1);
-      children.splice(targetIndex, 0, view);
-    };
-
-    ViewSlot.prototype._projectionRemove = function _projectionRemove(view, returnToCache) {
-      ShadowDOM.undistributeView(view, this.projectToSlots, this);
-      this.children.splice(this.children.indexOf(view), 1);
-
-      if (this.isAttached) {
-        view.detached();
-      }
-    };
-
-    ViewSlot.prototype._projectionRemoveAt = function _projectionRemoveAt(index, returnToCache) {
-      var view = this.children[index];
-
-      ShadowDOM.undistributeView(view, this.projectToSlots, this);
-      this.children.splice(index, 1);
-
-      if (this.isAttached) {
-        view.detached();
-      }
-    };
-
-    ViewSlot.prototype._projectionRemoveMany = function _projectionRemoveMany(viewsToRemove, returnToCache) {
-      var _this8 = this;
-
-      viewsToRemove.forEach(function (view) {
-        return _this8.remove(view, returnToCache);
-      });
-    };
-
-    ViewSlot.prototype._projectionRemoveAll = function _projectionRemoveAll(returnToCache) {
-      ShadowDOM.undistributeAll(this.projectToSlots, this);
-
-      var children = this.children;
-
-      if (this.isAttached) {
-        for (var i = 0, ii = children.length; i < ii; ++i) {
-          children[i].detached();
-        }
-      }
-
-      this.children = [];
-    };
-
-    return ViewSlot;
-  }();
-
-  var ProviderResolver = (0, _aureliaDependencyInjection.resolver)(_class15 = function () {
-    function ProviderResolver() {
-      
-    }
-
-    ProviderResolver.prototype.get = function get(container, key) {
-      var id = key.__providerId__;
-      return id in container ? container[id] : container[id] = container.invoke(key);
-    };
-
-    return ProviderResolver;
-  }()) || _class15;
-
-  var providerResolverInstance = new ProviderResolver();
-
-  function elementContainerGet(key) {
-    if (key === _aureliaPal.DOM.Element) {
-      return this.element;
-    }
-
-    if (key === BoundViewFactory) {
-      if (this.boundViewFactory) {
-        return this.boundViewFactory;
-      }
-
-      var factory = this.instruction.viewFactory;
-      var _partReplacements = this.partReplacements;
-
-      if (_partReplacements) {
-        factory = _partReplacements[factory.part] || factory;
-      }
-
-      this.boundViewFactory = new BoundViewFactory(this, factory, _partReplacements);
-      return this.boundViewFactory;
-    }
-
-    if (key === ViewSlot) {
-      if (this.viewSlot === undefined) {
-        this.viewSlot = new ViewSlot(this.element, this.instruction.anchorIsContainer);
-        this.element.isContentProjectionSource = this.instruction.lifting;
-        this.children.push(this.viewSlot);
-      }
-
-      return this.viewSlot;
-    }
-
-    if (key === ElementEvents) {
-      return this.elementEvents || (this.elementEvents = new ElementEvents(this.element));
-    }
-
-    if (key === CompositionTransaction) {
-      return this.compositionTransaction || (this.compositionTransaction = this.parent.get(key));
-    }
-
-    if (key === ViewResources) {
-      return this.viewResources;
-    }
-
-    if (key === TargetInstruction) {
-      return this.instruction;
-    }
-
-    return this.superGet(key);
-  }
-
-  function createElementContainer(parent, element, instruction, children, partReplacements, resources) {
-    var container = parent.createChild();
-    var providers = void 0;
-    var i = void 0;
-
-    container.element = element;
-    container.instruction = instruction;
-    container.children = children;
-    container.viewResources = resources;
-    container.partReplacements = partReplacements;
-
-    providers = instruction.providers;
-    i = providers.length;
-
-    while (i--) {
-      container._resolvers.set(providers[i], providerResolverInstance);
-    }
-
-    container.superGet = container.get;
-    container.get = elementContainerGet;
-
-    return container;
-  }
-
-  function makeElementIntoAnchor(element, elementInstruction) {
-    var anchor = _aureliaPal.DOM.createComment('anchor');
-
-    if (elementInstruction) {
-      var firstChild = element.firstChild;
-
-      if (firstChild && firstChild.tagName === 'AU-CONTENT') {
-        anchor.contentElement = firstChild;
-      }
-
-      anchor.hasAttribute = function (name) {
-        return element.hasAttribute(name);
-      };
-      anchor.getAttribute = function (name) {
-        return element.getAttribute(name);
-      };
-      anchor.setAttribute = function (name, value) {
-        element.setAttribute(name, value);
-      };
-    }
-
-    _aureliaPal.DOM.replaceNode(anchor, element);
-
-    return anchor;
-  }
-
-  function applyInstructions(containers, element, instruction, controllers, bindings, children, shadowSlots, partReplacements, resources) {
-    var behaviorInstructions = instruction.behaviorInstructions;
-    var expressions = instruction.expressions;
-    var elementContainer = void 0;
-    var i = void 0;
-    var ii = void 0;
-    var current = void 0;
-    var instance = void 0;
-
-    if (instruction.contentExpression) {
-      bindings.push(instruction.contentExpression.createBinding(element.nextSibling));
-      element.nextSibling.auInterpolationTarget = true;
-      element.parentNode.removeChild(element);
-      return;
-    }
-
-    if (instruction.shadowSlot) {
-      var commentAnchor = _aureliaPal.DOM.createComment('slot');
-      var slot = void 0;
-
-      if (instruction.slotDestination) {
-        slot = new PassThroughSlot(commentAnchor, instruction.slotName, instruction.slotDestination, instruction.slotFallbackFactory);
-      } else {
-        slot = new ShadowSlot(commentAnchor, instruction.slotName, instruction.slotFallbackFactory);
-      }
-
-      _aureliaPal.DOM.replaceNode(commentAnchor, element);
-      shadowSlots[instruction.slotName] = slot;
-      controllers.push(slot);
-      return;
-    }
-
-    if (behaviorInstructions.length) {
-      if (!instruction.anchorIsContainer) {
-        element = makeElementIntoAnchor(element, instruction.elementInstruction);
-      }
-
-      containers[instruction.injectorId] = elementContainer = createElementContainer(containers[instruction.parentInjectorId], element, instruction, children, partReplacements, resources);
-
-      for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
-        current = behaviorInstructions[i];
-        instance = current.type.create(elementContainer, current, element, bindings);
-        controllers.push(instance);
-      }
-    }
-
-    for (i = 0, ii = expressions.length; i < ii; ++i) {
-      bindings.push(expressions[i].createBinding(element));
-    }
-  }
-
-  function styleStringToObject(style, target) {
-    var attributes = style.split(';');
-    var firstIndexOfColon = void 0;
-    var i = void 0;
-    var current = void 0;
-    var key = void 0;
-    var value = void 0;
-
-    target = target || {};
-
-    for (i = 0; i < attributes.length; i++) {
-      current = attributes[i];
-      firstIndexOfColon = current.indexOf(':');
-      key = current.substring(0, firstIndexOfColon).trim();
-      value = current.substring(firstIndexOfColon + 1).trim();
-      target[key] = value;
-    }
-
-    return target;
-  }
-
-  function styleObjectToString(obj) {
-    var result = '';
-
-    for (var key in obj) {
-      result += key + ':' + obj[key] + ';';
-    }
-
-    return result;
-  }
-
-  function applySurrogateInstruction(container, element, instruction, controllers, bindings, children) {
-    var behaviorInstructions = instruction.behaviorInstructions;
-    var expressions = instruction.expressions;
-    var providers = instruction.providers;
-    var values = instruction.values;
-    var i = void 0;
-    var ii = void 0;
-    var current = void 0;
-    var instance = void 0;
-    var currentAttributeValue = void 0;
-
-    i = providers.length;
-    while (i--) {
-      container._resolvers.set(providers[i], providerResolverInstance);
-    }
-
-    for (var key in values) {
-      currentAttributeValue = element.getAttribute(key);
-
-      if (currentAttributeValue) {
-        if (key === 'class') {
-          element.setAttribute('class', currentAttributeValue + ' ' + values[key]);
-        } else if (key === 'style') {
-          var styleObject = styleStringToObject(values[key]);
-          styleStringToObject(currentAttributeValue, styleObject);
-          element.setAttribute('style', styleObjectToString(styleObject));
-        }
-      } else {
-          element.setAttribute(key, values[key]);
-        }
-    }
-
-    if (behaviorInstructions.length) {
-      for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
-        current = behaviorInstructions[i];
-        instance = current.type.create(container, current, element, bindings);
-
-        if (instance.contentView) {
-          children.push(instance.contentView);
-        }
-
-        controllers.push(instance);
-      }
-    }
-
-    for (i = 0, ii = expressions.length; i < ii; ++i) {
-      bindings.push(expressions[i].createBinding(element));
-    }
-  }
-
-  var BoundViewFactory = exports.BoundViewFactory = function () {
-    function BoundViewFactory(parentContainer, viewFactory, partReplacements) {
-      
-
-      this.parentContainer = parentContainer;
-      this.viewFactory = viewFactory;
-      this.factoryCreateInstruction = { partReplacements: partReplacements };
-    }
-
-    BoundViewFactory.prototype.create = function create() {
-      var view = this.viewFactory.create(this.parentContainer.createChild(), this.factoryCreateInstruction);
-      view._isUserControlled = true;
-      return view;
-    };
-
-    BoundViewFactory.prototype.setCacheSize = function setCacheSize(size, doNotOverrideIfAlreadySet) {
-      this.viewFactory.setCacheSize(size, doNotOverrideIfAlreadySet);
-    };
-
-    BoundViewFactory.prototype.getCachedView = function getCachedView() {
-      return this.viewFactory.getCachedView();
-    };
-
-    BoundViewFactory.prototype.returnViewToCache = function returnViewToCache(view) {
-      this.viewFactory.returnViewToCache(view);
-    };
-
-    _createClass(BoundViewFactory, [{
-      key: 'isCaching',
-      get: function get() {
-        return this.viewFactory.isCaching;
-      }
-    }]);
-
-    return BoundViewFactory;
-  }();
-
-  var ViewFactory = exports.ViewFactory = function () {
-    function ViewFactory(template, instructions, resources) {
-      
-
-      this.isCaching = false;
-
-      this.template = template;
-      this.instructions = instructions;
-      this.resources = resources;
-      this.cacheSize = -1;
-      this.cache = null;
-    }
-
-    ViewFactory.prototype.setCacheSize = function setCacheSize(size, doNotOverrideIfAlreadySet) {
-      if (size) {
-        if (size === '*') {
-          size = Number.MAX_VALUE;
-        } else if (typeof size === 'string') {
-          size = parseInt(size, 10);
-        }
-      }
-
-      if (this.cacheSize === -1 || !doNotOverrideIfAlreadySet) {
-        this.cacheSize = size;
-      }
-
-      if (this.cacheSize > 0) {
-        this.cache = [];
-      } else {
-        this.cache = null;
-      }
-
-      this.isCaching = this.cacheSize > 0;
-    };
-
-    ViewFactory.prototype.getCachedView = function getCachedView() {
-      return this.cache !== null ? this.cache.pop() || null : null;
-    };
-
-    ViewFactory.prototype.returnViewToCache = function returnViewToCache(view) {
-      if (view.isAttached) {
-        view.detached();
-      }
-
-      if (view.isBound) {
-        view.unbind();
-      }
-
-      if (this.cache !== null && this.cache.length < this.cacheSize) {
-        view.fromCache = true;
-        this.cache.push(view);
-      }
-    };
-
-    ViewFactory.prototype.create = function create(container, createInstruction, element) {
-      createInstruction = createInstruction || BehaviorInstruction.normal;
-
-      var cachedView = this.getCachedView();
-      if (cachedView !== null) {
-        return cachedView;
-      }
-
-      var fragment = createInstruction.enhance ? this.template : this.template.cloneNode(true);
-      var instructables = fragment.querySelectorAll('.au-target');
-      var instructions = this.instructions;
-      var resources = this.resources;
-      var controllers = [];
-      var bindings = [];
-      var children = [];
-      var shadowSlots = Object.create(null);
-      var containers = { root: container };
-      var partReplacements = createInstruction.partReplacements;
-      var i = void 0;
-      var ii = void 0;
-      var view = void 0;
-      var instructable = void 0;
-      var instruction = void 0;
-
-      this.resources._invokeHook('beforeCreate', this, container, fragment, createInstruction);
-
-      if (element && this.surrogateInstruction !== null) {
-        applySurrogateInstruction(container, element, this.surrogateInstruction, controllers, bindings, children);
-      }
-
-      if (createInstruction.enhance && fragment.hasAttribute('au-target-id')) {
-        instructable = fragment;
-        instruction = instructions[instructable.getAttribute('au-target-id')];
-        applyInstructions(containers, instructable, instruction, controllers, bindings, children, shadowSlots, partReplacements, resources);
-      }
-
-      for (i = 0, ii = instructables.length; i < ii; ++i) {
-        instructable = instructables[i];
-        instruction = instructions[instructable.getAttribute('au-target-id')];
-        applyInstructions(containers, instructable, instruction, controllers, bindings, children, shadowSlots, partReplacements, resources);
-      }
-
-      view = new View(container, this, fragment, controllers, bindings, children, shadowSlots);
-
-      if (!createInstruction.initiatedByBehavior) {
-        view.created();
-      }
-
-      this.resources._invokeHook('afterCreate', view);
-
-      return view;
-    };
-
-    return ViewFactory;
-  }();
-
-  var nextInjectorId = 0;
-  function getNextInjectorId() {
-    return ++nextInjectorId;
-  }
-
-  function configureProperties(instruction, resources) {
-    var type = instruction.type;
-    var attrName = instruction.attrName;
-    var attributes = instruction.attributes;
-    var property = void 0;
-    var key = void 0;
-    var value = void 0;
-
-    var knownAttribute = resources.mapAttribute(attrName);
-    if (knownAttribute && attrName in attributes && knownAttribute !== attrName) {
-      attributes[knownAttribute] = attributes[attrName];
-      delete attributes[attrName];
-    }
-
-    for (key in attributes) {
-      value = attributes[key];
-
-      if (value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-        property = type.attributes[key];
-
-        if (property !== undefined) {
-          value.targetProperty = property.name;
-        } else {
-          value.targetProperty = key;
-        }
-      }
-    }
-  }
-
-  var lastAUTargetID = 0;
-  function getNextAUTargetID() {
-    return (++lastAUTargetID).toString();
-  }
-
-  function makeIntoInstructionTarget(element) {
-    var value = element.getAttribute('class');
-    var auTargetID = getNextAUTargetID();
-
-    element.setAttribute('class', value ? value + ' au-target' : 'au-target');
-    element.setAttribute('au-target-id', auTargetID);
-
-    return auTargetID;
-  }
-
-  function makeShadowSlot(compiler, resources, node, instructions, parentInjectorId) {
-    var auShadowSlot = _aureliaPal.DOM.createElement('au-shadow-slot');
-    _aureliaPal.DOM.replaceNode(auShadowSlot, node);
-
-    var auTargetID = makeIntoInstructionTarget(auShadowSlot);
-    var instruction = TargetInstruction.shadowSlot(parentInjectorId);
-
-    instruction.slotName = node.getAttribute('name') || ShadowDOM.defaultSlotKey;
-    instruction.slotDestination = node.getAttribute('slot');
-
-    if (node.innerHTML.trim()) {
-      var fragment = _aureliaPal.DOM.createDocumentFragment();
-      var _child3 = void 0;
-
-      while (_child3 = node.firstChild) {
-        fragment.appendChild(_child3);
-      }
-
-      instruction.slotFallbackFactory = compiler.compile(fragment, resources);
-    }
-
-    instructions[auTargetID] = instruction;
-
-    return auShadowSlot;
-  }
-
-  var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjection.inject)(BindingLanguage, ViewResources), _dec7(_class17 = function () {
-    function ViewCompiler(bindingLanguage, resources) {
-      
-
-      this.bindingLanguage = bindingLanguage;
-      this.resources = resources;
-    }
-
-    ViewCompiler.prototype.compile = function compile(source, resources, compileInstruction) {
-      resources = resources || this.resources;
-      compileInstruction = compileInstruction || ViewCompileInstruction.normal;
-      source = typeof source === 'string' ? _aureliaPal.DOM.createTemplateFromMarkup(source) : source;
-
-      var content = void 0;
-      var part = void 0;
-      var cacheSize = void 0;
-
-      if (source.content) {
-        part = source.getAttribute('part');
-        cacheSize = source.getAttribute('view-cache');
-        content = _aureliaPal.DOM.adoptNode(source.content);
-      } else {
-        content = source;
-      }
-
-      compileInstruction.targetShadowDOM = compileInstruction.targetShadowDOM && _aureliaPal.FEATURE.shadowDOM;
-      resources._invokeHook('beforeCompile', content, resources, compileInstruction);
-
-      var instructions = {};
-      this._compileNode(content, resources, instructions, source, 'root', !compileInstruction.targetShadowDOM);
-
-      var firstChild = content.firstChild;
-      if (firstChild && firstChild.nodeType === 1) {
-        var targetId = firstChild.getAttribute('au-target-id');
-        if (targetId) {
-          var ins = instructions[targetId];
-
-          if (ins.shadowSlot || ins.lifting || ins.elementInstruction && !ins.elementInstruction.anchorIsContainer) {
-            content.insertBefore(_aureliaPal.DOM.createComment('view'), firstChild);
-          }
-        }
-      }
-
-      var factory = new ViewFactory(content, instructions, resources);
-
-      factory.surrogateInstruction = compileInstruction.compileSurrogate ? this._compileSurrogate(source, resources) : null;
-      factory.part = part;
-
-      if (cacheSize) {
-        factory.setCacheSize(cacheSize);
-      }
-
-      resources._invokeHook('afterCompile', factory);
-
-      return factory;
-    };
-
-    ViewCompiler.prototype._compileNode = function _compileNode(node, resources, instructions, parentNode, parentInjectorId, targetLightDOM) {
-      switch (node.nodeType) {
-        case 1:
-          return this._compileElement(node, resources, instructions, parentNode, parentInjectorId, targetLightDOM);
-        case 3:
-          var expression = resources.getBindingLanguage(this.bindingLanguage).inspectTextContent(resources, node.wholeText);
-          if (expression) {
-            var marker = _aureliaPal.DOM.createElement('au-marker');
-            var auTargetID = makeIntoInstructionTarget(marker);
-            (node.parentNode || parentNode).insertBefore(marker, node);
-            node.textContent = ' ';
-            instructions[auTargetID] = TargetInstruction.contentExpression(expression);
-
-            while (node.nextSibling && node.nextSibling.nodeType === 3) {
-              (node.parentNode || parentNode).removeChild(node.nextSibling);
-            }
-          } else {
-            while (node.nextSibling && node.nextSibling.nodeType === 3) {
-              node = node.nextSibling;
-            }
-          }
-          return node.nextSibling;
-        case 11:
-          var currentChild = node.firstChild;
-          while (currentChild) {
-            currentChild = this._compileNode(currentChild, resources, instructions, node, parentInjectorId, targetLightDOM);
-          }
-          break;
-        default:
-          break;
-      }
-
-      return node.nextSibling;
-    };
-
-    ViewCompiler.prototype._compileSurrogate = function _compileSurrogate(node, resources) {
-      var tagName = node.tagName.toLowerCase();
-      var attributes = node.attributes;
-      var bindingLanguage = resources.getBindingLanguage(this.bindingLanguage);
-      var knownAttribute = void 0;
-      var property = void 0;
-      var instruction = void 0;
-      var i = void 0;
-      var ii = void 0;
-      var attr = void 0;
-      var attrName = void 0;
-      var attrValue = void 0;
-      var info = void 0;
-      var type = void 0;
-      var expressions = [];
-      var expression = void 0;
-      var behaviorInstructions = [];
-      var values = {};
-      var hasValues = false;
-      var providers = [];
-
-      for (i = 0, ii = attributes.length; i < ii; ++i) {
-        attr = attributes[i];
-        attrName = attr.name;
-        attrValue = attr.value;
-
-        info = bindingLanguage.inspectAttribute(resources, tagName, attrName, attrValue);
-        type = resources.getAttribute(info.attrName);
-
-        if (type) {
-          knownAttribute = resources.mapAttribute(info.attrName);
-          if (knownAttribute) {
-            property = type.attributes[knownAttribute];
-
-            if (property) {
-              info.defaultBindingMode = property.defaultBindingMode;
-
-              if (!info.command && !info.expression) {
-                info.command = property.hasOptions ? 'options' : null;
-              }
-            }
-          }
-        }
-
-        instruction = bindingLanguage.createAttributeInstruction(resources, node, info, undefined, type);
-
-        if (instruction) {
-          if (instruction.alteredAttr) {
-            type = resources.getAttribute(instruction.attrName);
-          }
-
-          if (instruction.discrete) {
-            expressions.push(instruction);
-          } else {
-            if (type) {
-              instruction.type = type;
-              configureProperties(instruction, resources);
-
-              if (type.liftsContent) {
-                throw new Error('You cannot place a template controller on a surrogate element.');
-              } else {
-                behaviorInstructions.push(instruction);
-              }
-            } else {
-              expressions.push(instruction.attributes[instruction.attrName]);
-            }
-          }
-        } else {
-          if (type) {
-            instruction = BehaviorInstruction.attribute(attrName, type);
-            instruction.attributes[resources.mapAttribute(attrName)] = attrValue;
-
-            if (type.liftsContent) {
-              throw new Error('You cannot place a template controller on a surrogate element.');
-            } else {
-              behaviorInstructions.push(instruction);
-            }
-          } else if (attrName !== 'id' && attrName !== 'part' && attrName !== 'replace-part') {
-            hasValues = true;
-            values[attrName] = attrValue;
-          }
-        }
-      }
-
-      if (expressions.length || behaviorInstructions.length || hasValues) {
-        for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
-          instruction = behaviorInstructions[i];
-          instruction.type.compile(this, resources, node, instruction);
-          providers.push(instruction.type.target);
-        }
-
-        for (i = 0, ii = expressions.length; i < ii; ++i) {
-          expression = expressions[i];
-          if (expression.attrToRemove !== undefined) {
-            node.removeAttribute(expression.attrToRemove);
-          }
-        }
-
-        return TargetInstruction.surrogate(providers, behaviorInstructions, expressions, values);
-      }
-
-      return null;
-    };
-
-    ViewCompiler.prototype._compileElement = function _compileElement(node, resources, instructions, parentNode, parentInjectorId, targetLightDOM) {
-      var tagName = node.tagName.toLowerCase();
-      var attributes = node.attributes;
-      var expressions = [];
-      var expression = void 0;
-      var behaviorInstructions = [];
-      var providers = [];
-      var bindingLanguage = resources.getBindingLanguage(this.bindingLanguage);
-      var liftingInstruction = void 0;
-      var viewFactory = void 0;
-      var type = void 0;
-      var elementInstruction = void 0;
-      var elementProperty = void 0;
-      var i = void 0;
-      var ii = void 0;
-      var attr = void 0;
-      var attrName = void 0;
-      var attrValue = void 0;
-      var instruction = void 0;
-      var info = void 0;
-      var property = void 0;
-      var knownAttribute = void 0;
-      var auTargetID = void 0;
-      var injectorId = void 0;
-
-      if (tagName === 'slot') {
-        if (targetLightDOM) {
-          node = makeShadowSlot(this, resources, node, instructions, parentInjectorId);
-        }
-        return node.nextSibling;
-      } else if (tagName === 'template') {
-        viewFactory = this.compile(node, resources);
-        viewFactory.part = node.getAttribute('part');
-      } else {
-        type = resources.getElement(node.getAttribute('as-element') || tagName);
-        if (type) {
-          elementInstruction = BehaviorInstruction.element(node, type);
-          type.processAttributes(this, resources, node, attributes, elementInstruction);
-          behaviorInstructions.push(elementInstruction);
-        }
-      }
-
-      for (i = 0, ii = attributes.length; i < ii; ++i) {
-        attr = attributes[i];
-        attrName = attr.name;
-        attrValue = attr.value;
-        info = bindingLanguage.inspectAttribute(resources, tagName, attrName, attrValue);
-
-        if (targetLightDOM && info.attrName === 'slot') {
-          info.attrName = attrName = 'au-slot';
-        }
-
-        type = resources.getAttribute(info.attrName);
-        elementProperty = null;
-
-        if (type) {
-          knownAttribute = resources.mapAttribute(info.attrName);
-          if (knownAttribute) {
-            property = type.attributes[knownAttribute];
-
-            if (property) {
-              info.defaultBindingMode = property.defaultBindingMode;
-
-              if (!info.command && !info.expression) {
-                info.command = property.hasOptions ? 'options' : null;
-              }
-            }
-          }
-        } else if (elementInstruction) {
-            elementProperty = elementInstruction.type.attributes[info.attrName];
-            if (elementProperty) {
-              info.defaultBindingMode = elementProperty.defaultBindingMode;
-            }
-          }
-
-        if (elementProperty) {
-          instruction = bindingLanguage.createAttributeInstruction(resources, node, info, elementInstruction);
-        } else {
-          instruction = bindingLanguage.createAttributeInstruction(resources, node, info, undefined, type);
-        }
-
-        if (instruction) {
-          if (instruction.alteredAttr) {
-            type = resources.getAttribute(instruction.attrName);
-          }
-
-          if (instruction.discrete) {
-            expressions.push(instruction);
-          } else {
-            if (type) {
-              instruction.type = type;
-              configureProperties(instruction, resources);
-
-              if (type.liftsContent) {
-                instruction.originalAttrName = attrName;
-                liftingInstruction = instruction;
-                break;
-              } else {
-                behaviorInstructions.push(instruction);
-              }
-            } else if (elementProperty) {
-              elementInstruction.attributes[info.attrName].targetProperty = elementProperty.name;
-            } else {
-              expressions.push(instruction.attributes[instruction.attrName]);
-            }
-          }
-        } else {
-          if (type) {
-            instruction = BehaviorInstruction.attribute(attrName, type);
-            instruction.attributes[resources.mapAttribute(attrName)] = attrValue;
-
-            if (type.liftsContent) {
-              instruction.originalAttrName = attrName;
-              liftingInstruction = instruction;
-              break;
-            } else {
-              behaviorInstructions.push(instruction);
-            }
-          } else if (elementProperty) {
-            elementInstruction.attributes[attrName] = attrValue;
-          }
-        }
-      }
-
-      if (liftingInstruction) {
-        liftingInstruction.viewFactory = viewFactory;
-        node = liftingInstruction.type.compile(this, resources, node, liftingInstruction, parentNode);
-        auTargetID = makeIntoInstructionTarget(node);
-        instructions[auTargetID] = TargetInstruction.lifting(parentInjectorId, liftingInstruction);
-      } else {
-        if (expressions.length || behaviorInstructions.length) {
-          injectorId = behaviorInstructions.length ? getNextInjectorId() : false;
-
-          for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
-            instruction = behaviorInstructions[i];
-            instruction.type.compile(this, resources, node, instruction, parentNode);
-            providers.push(instruction.type.target);
-          }
-
-          for (i = 0, ii = expressions.length; i < ii; ++i) {
-            expression = expressions[i];
-            if (expression.attrToRemove !== undefined) {
-              node.removeAttribute(expression.attrToRemove);
-            }
-          }
-
-          auTargetID = makeIntoInstructionTarget(node);
-          instructions[auTargetID] = TargetInstruction.normal(injectorId, parentInjectorId, providers, behaviorInstructions, expressions, elementInstruction);
-        }
-
-        if (elementInstruction && elementInstruction.skipContentProcessing) {
-          return node.nextSibling;
-        }
-
-        var currentChild = node.firstChild;
-        while (currentChild) {
-          currentChild = this._compileNode(currentChild, resources, instructions, node, injectorId || parentInjectorId, targetLightDOM);
-        }
-      }
-
-      return node.nextSibling;
-    };
-
-    return ViewCompiler;
-  }()) || _class17);
-
-  var ResourceModule = exports.ResourceModule = function () {
-    function ResourceModule(moduleId) {
-      
-
-      this.id = moduleId;
-      this.moduleInstance = null;
-      this.mainResource = null;
-      this.resources = null;
-      this.viewStrategy = null;
-      this.isInitialized = false;
-      this.onLoaded = null;
-      this.loadContext = null;
-    }
-
-    ResourceModule.prototype.initialize = function initialize(container) {
-      var current = this.mainResource;
-      var resources = this.resources;
-      var vs = this.viewStrategy;
-
-      if (this.isInitialized) {
-        return;
-      }
-
-      this.isInitialized = true;
-
-      if (current !== undefined) {
-        current.metadata.viewStrategy = vs;
-        current.initialize(container);
-      }
-
-      for (var i = 0, ii = resources.length; i < ii; ++i) {
-        current = resources[i];
-        current.metadata.viewStrategy = vs;
-        current.initialize(container);
-      }
-    };
-
-    ResourceModule.prototype.register = function register(registry, name) {
-      var main = this.mainResource;
-      var resources = this.resources;
-
-      if (main !== undefined) {
-        main.register(registry, name);
-        name = null;
-      }
-
-      for (var i = 0, ii = resources.length; i < ii; ++i) {
-        resources[i].register(registry, name);
-        name = null;
-      }
-    };
-
-    ResourceModule.prototype.load = function load(container, loadContext) {
-      if (this.onLoaded !== null) {
-        return this.loadContext === loadContext ? Promise.resolve() : this.onLoaded;
-      }
-
-      var main = this.mainResource;
-      var resources = this.resources;
-      var loads = void 0;
-
-      if (main !== undefined) {
-        loads = new Array(resources.length + 1);
-        loads[0] = main.load(container, loadContext);
-        for (var i = 0, ii = resources.length; i < ii; ++i) {
-          loads[i + 1] = resources[i].load(container, loadContext);
-        }
-      } else {
-        loads = new Array(resources.length);
-        for (var _i = 0, _ii = resources.length; _i < _ii; ++_i) {
-          loads[_i] = resources[_i].load(container, loadContext);
-        }
-      }
-
-      this.loadContext = loadContext;
-      this.onLoaded = Promise.all(loads);
-      return this.onLoaded;
-    };
-
-    return ResourceModule;
-  }();
-
-  var ResourceDescription = exports.ResourceDescription = function () {
-    function ResourceDescription(key, exportedValue, resourceTypeMeta) {
-      
-
-      if (!resourceTypeMeta) {
-        resourceTypeMeta = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.resource, exportedValue);
-
-        if (!resourceTypeMeta) {
-          resourceTypeMeta = new HtmlBehaviorResource();
-          resourceTypeMeta.elementName = _hyphenate(key);
-          _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, resourceTypeMeta, exportedValue);
-        }
-      }
-
-      if (resourceTypeMeta instanceof HtmlBehaviorResource) {
-        if (resourceTypeMeta.elementName === undefined) {
-          resourceTypeMeta.elementName = _hyphenate(key);
-        } else if (resourceTypeMeta.attributeName === undefined) {
-          resourceTypeMeta.attributeName = _hyphenate(key);
-        } else if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
-          HtmlBehaviorResource.convention(key, resourceTypeMeta);
-        }
-      } else if (!resourceTypeMeta.name) {
-        resourceTypeMeta.name = _hyphenate(key);
-      }
-
-      this.metadata = resourceTypeMeta;
-      this.value = exportedValue;
-    }
-
-    ResourceDescription.prototype.initialize = function initialize(container) {
-      this.metadata.initialize(container, this.value);
-    };
-
-    ResourceDescription.prototype.register = function register(registry, name) {
-      this.metadata.register(registry, name);
-    };
-
-    ResourceDescription.prototype.load = function load(container, loadContext) {
-      return this.metadata.load(container, this.value, loadContext);
-    };
-
-    return ResourceDescription;
-  }();
-
-  var ModuleAnalyzer = exports.ModuleAnalyzer = function () {
-    function ModuleAnalyzer() {
-      
-
-      this.cache = Object.create(null);
-    }
-
-    ModuleAnalyzer.prototype.getAnalysis = function getAnalysis(moduleId) {
-      return this.cache[moduleId];
-    };
-
-    ModuleAnalyzer.prototype.analyze = function analyze(moduleId, moduleInstance, mainResourceKey) {
-      var mainResource = void 0;
-      var fallbackValue = void 0;
-      var fallbackKey = void 0;
-      var resourceTypeMeta = void 0;
-      var key = void 0;
-      var exportedValue = void 0;
-      var resources = [];
-      var conventional = void 0;
-      var vs = void 0;
-      var resourceModule = void 0;
-
-      resourceModule = this.cache[moduleId];
-      if (resourceModule) {
-        return resourceModule;
-      }
-
-      resourceModule = new ResourceModule(moduleId);
-      this.cache[moduleId] = resourceModule;
-
-      if (typeof moduleInstance === 'function') {
-        moduleInstance = { 'default': moduleInstance };
-      }
-
-      if (mainResourceKey) {
-        mainResource = new ResourceDescription(mainResourceKey, moduleInstance[mainResourceKey]);
-      }
-
-      for (key in moduleInstance) {
-        exportedValue = moduleInstance[key];
-
-        if (key === mainResourceKey || typeof exportedValue !== 'function') {
-          continue;
-        }
-
-        resourceTypeMeta = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.resource, exportedValue);
-
-        if (resourceTypeMeta) {
-          if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
-            HtmlBehaviorResource.convention(key, resourceTypeMeta);
-          }
-
-          if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
-            resourceTypeMeta.elementName = _hyphenate(key);
-          }
-
-          if (!mainResource && resourceTypeMeta instanceof HtmlBehaviorResource && resourceTypeMeta.elementName !== null) {
-            mainResource = new ResourceDescription(key, exportedValue, resourceTypeMeta);
-          } else {
-            resources.push(new ResourceDescription(key, exportedValue, resourceTypeMeta));
-          }
-        } else if (viewStrategy.decorates(exportedValue)) {
-          vs = exportedValue;
-        } else if (exportedValue instanceof _aureliaLoader.TemplateRegistryEntry) {
-          vs = new TemplateRegistryViewStrategy(moduleId, exportedValue);
-        } else {
-          if (conventional = HtmlBehaviorResource.convention(key)) {
-            if (conventional.elementName !== null && !mainResource) {
-              mainResource = new ResourceDescription(key, exportedValue, conventional);
-            } else {
-              resources.push(new ResourceDescription(key, exportedValue, conventional));
-            }
-
-            _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, conventional, exportedValue);
-          } else if (conventional = _aureliaBinding.ValueConverterResource.convention(key) || _aureliaBinding.BindingBehaviorResource.convention(key) || ViewEngineHooksResource.convention(key)) {
-            resources.push(new ResourceDescription(key, exportedValue, conventional));
-            _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, conventional, exportedValue);
-          } else if (!fallbackValue) {
-            fallbackValue = exportedValue;
-            fallbackKey = key;
-          }
-        }
-      }
-
-      if (!mainResource && fallbackValue) {
-        mainResource = new ResourceDescription(fallbackKey, fallbackValue);
-      }
-
-      resourceModule.moduleInstance = moduleInstance;
-      resourceModule.mainResource = mainResource;
-      resourceModule.resources = resources;
-      resourceModule.viewStrategy = vs;
-
-      return resourceModule;
-    };
-
-    return ModuleAnalyzer;
-  }();
-
-  var logger = LogManager.getLogger('templating');
-
-  function ensureRegistryEntry(loader, urlOrRegistryEntry) {
-    if (urlOrRegistryEntry instanceof _aureliaLoader.TemplateRegistryEntry) {
-      return Promise.resolve(urlOrRegistryEntry);
-    }
-
-    return loader.loadTemplate(urlOrRegistryEntry);
-  }
-
-  var ProxyViewFactory = function () {
-    function ProxyViewFactory(promise) {
-      var _this9 = this;
-
-      
-
-      promise.then(function (x) {
-        return _this9.viewFactory = x;
-      });
-    }
-
-    ProxyViewFactory.prototype.create = function create(container, bindingContext, createInstruction, element) {
-      return this.viewFactory.create(container, bindingContext, createInstruction, element);
-    };
-
-    ProxyViewFactory.prototype.setCacheSize = function setCacheSize(size, doNotOverrideIfAlreadySet) {
-      this.viewFactory.setCacheSize(size, doNotOverrideIfAlreadySet);
-    };
-
-    ProxyViewFactory.prototype.getCachedView = function getCachedView() {
-      return this.viewFactory.getCachedView();
-    };
-
-    ProxyViewFactory.prototype.returnViewToCache = function returnViewToCache(view) {
-      this.viewFactory.returnViewToCache(view);
-    };
-
-    _createClass(ProxyViewFactory, [{
-      key: 'isCaching',
-      get: function get() {
-        return this.viewFactory.isCaching;
-      }
-    }]);
-
-    return ProxyViewFactory;
-  }();
-
-  var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.inject)(_aureliaLoader.Loader, _aureliaDependencyInjection.Container, ViewCompiler, ModuleAnalyzer, ViewResources), _dec8(_class18 = (_temp4 = _class19 = function () {
-    function ViewEngine(loader, container, viewCompiler, moduleAnalyzer, appResources) {
-      
-
-      this.loader = loader;
-      this.container = container;
-      this.viewCompiler = viewCompiler;
-      this.moduleAnalyzer = moduleAnalyzer;
-      this.appResources = appResources;
-      this._pluginMap = {};
-
-      var auSlotBehavior = new HtmlBehaviorResource();
-      auSlotBehavior.attributeName = 'au-slot';
-      auSlotBehavior.initialize(container, SlotCustomAttribute);
-      auSlotBehavior.register(appResources);
-    }
-
-    ViewEngine.prototype.addResourcePlugin = function addResourcePlugin(extension, implementation) {
-      var name = extension.replace('.', '') + '-resource-plugin';
-      this._pluginMap[extension] = name;
-      this.loader.addPlugin(name, implementation);
-    };
-
-    ViewEngine.prototype.loadViewFactory = function loadViewFactory(urlOrRegistryEntry, compileInstruction, loadContext, target) {
-      var _this10 = this;
-
-      loadContext = loadContext || new ResourceLoadContext();
-
-      return ensureRegistryEntry(this.loader, urlOrRegistryEntry).then(function (registryEntry) {
-        if (registryEntry.onReady) {
-          if (!loadContext.hasDependency(urlOrRegistryEntry)) {
-            loadContext.addDependency(urlOrRegistryEntry);
-            return registryEntry.onReady;
-          }
-
-          if (registryEntry.template === null) {
-            return registryEntry.onReady;
-          }
-
-          return Promise.resolve(new ProxyViewFactory(registryEntry.onReady));
-        }
-
-        loadContext.addDependency(urlOrRegistryEntry);
-
-        registryEntry.onReady = _this10.loadTemplateResources(registryEntry, compileInstruction, loadContext, target).then(function (resources) {
-          registryEntry.resources = resources;
-
-          if (registryEntry.template === null) {
-            return registryEntry.factory = null;
-          }
-
-          var viewFactory = _this10.viewCompiler.compile(registryEntry.template, resources, compileInstruction);
-          return registryEntry.factory = viewFactory;
-        });
-
-        return registryEntry.onReady;
-      });
-    };
-
-    ViewEngine.prototype.loadTemplateResources = function loadTemplateResources(registryEntry, compileInstruction, loadContext, target) {
-      var resources = new ViewResources(this.appResources, registryEntry.address);
-      var dependencies = registryEntry.dependencies;
-      var importIds = void 0;
-      var names = void 0;
-
-      compileInstruction = compileInstruction || ViewCompileInstruction.normal;
-
-      if (dependencies.length === 0 && !compileInstruction.associatedModuleId) {
-        return Promise.resolve(resources);
-      }
-
-      importIds = dependencies.map(function (x) {
-        return x.src;
-      });
-      names = dependencies.map(function (x) {
-        return x.name;
-      });
-      logger.debug('importing resources for ' + registryEntry.address, importIds);
-
-      if (target) {
-        var viewModelRequires = _aureliaMetadata.metadata.get(ViewEngine.viewModelRequireMetadataKey, target);
-        if (viewModelRequires) {
-          var templateImportCount = importIds.length;
-          for (var i = 0, ii = viewModelRequires.length; i < ii; ++i) {
-            var req = viewModelRequires[i];
-            var importId = typeof req === 'function' ? _aureliaMetadata.Origin.get(req).moduleId : (0, _aureliaPath.relativeToFile)(req.src || req, registryEntry.address);
-
-            if (importIds.indexOf(importId) === -1) {
-              importIds.push(importId);
-              names.push(req.as);
-            }
-          }
-          logger.debug('importing ViewModel resources for ' + compileInstruction.associatedModuleId, importIds.slice(templateImportCount));
-        }
-      }
-
-      return this.importViewResources(importIds, names, resources, compileInstruction, loadContext);
-    };
-
-    ViewEngine.prototype.importViewModelResource = function importViewModelResource(moduleImport, moduleMember) {
-      var _this11 = this;
-
-      return this.loader.loadModule(moduleImport).then(function (viewModelModule) {
-        var normalizedId = _aureliaMetadata.Origin.get(viewModelModule).moduleId;
-        var resourceModule = _this11.moduleAnalyzer.analyze(normalizedId, viewModelModule, moduleMember);
-
-        if (!resourceModule.mainResource) {
-          throw new Error('No view model found in module "' + moduleImport + '".');
-        }
-
-        resourceModule.initialize(_this11.container);
-
-        return resourceModule.mainResource;
-      });
-    };
-
-    ViewEngine.prototype.importViewResources = function importViewResources(moduleIds, names, resources, compileInstruction, loadContext) {
-      var _this12 = this;
-
-      loadContext = loadContext || new ResourceLoadContext();
-      compileInstruction = compileInstruction || ViewCompileInstruction.normal;
-
-      moduleIds = moduleIds.map(function (x) {
-        return _this12._applyLoaderPlugin(x);
-      });
-
-      return this.loader.loadAllModules(moduleIds).then(function (imports) {
-        var i = void 0;
-        var ii = void 0;
-        var analysis = void 0;
-        var normalizedId = void 0;
-        var current = void 0;
-        var associatedModule = void 0;
-        var container = _this12.container;
-        var moduleAnalyzer = _this12.moduleAnalyzer;
-        var allAnalysis = new Array(imports.length);
-
-        for (i = 0, ii = imports.length; i < ii; ++i) {
-          current = imports[i];
-          normalizedId = _aureliaMetadata.Origin.get(current).moduleId;
-
-          analysis = moduleAnalyzer.analyze(normalizedId, current);
-          analysis.initialize(container);
-          analysis.register(resources, names[i]);
-
-          allAnalysis[i] = analysis;
-        }
-
-        if (compileInstruction.associatedModuleId) {
-          associatedModule = moduleAnalyzer.getAnalysis(compileInstruction.associatedModuleId);
-
-          if (associatedModule) {
-            associatedModule.register(resources);
-          }
-        }
-
-        for (i = 0, ii = allAnalysis.length; i < ii; ++i) {
-          allAnalysis[i] = allAnalysis[i].load(container, loadContext);
-        }
-
-        return Promise.all(allAnalysis).then(function () {
-          return resources;
-        });
-      });
-    };
-
-    ViewEngine.prototype._applyLoaderPlugin = function _applyLoaderPlugin(id) {
-      var index = id.lastIndexOf('.');
-      if (index !== -1) {
-        var ext = id.substring(index);
-        var pluginName = this._pluginMap[ext];
-
-        if (pluginName === undefined) {
-          return id;
-        }
-
-        return this.loader.applyPluginToUrl(id, pluginName);
-      }
-
-      return id;
-    };
-
-    return ViewEngine;
-  }(), _class19.viewModelRequireMetadataKey = 'aurelia:view-model-require', _temp4)) || _class18);
-
-  var Controller = exports.Controller = function () {
-    function Controller(behavior, instruction, viewModel, container) {
-      
-
-      this.behavior = behavior;
-      this.instruction = instruction;
-      this.viewModel = viewModel;
-      this.isAttached = false;
-      this.view = null;
-      this.isBound = false;
-      this.scope = null;
-      this.container = container;
-      this.elementEvents = container.elementEvents || null;
-
-      var observerLookup = behavior.observerLocator.getOrCreateObserversLookup(viewModel);
-      var handlesBind = behavior.handlesBind;
-      var attributes = instruction.attributes;
-      var boundProperties = this.boundProperties = [];
-      var properties = behavior.properties;
-      var i = void 0;
-      var ii = void 0;
-
-      behavior._ensurePropertiesDefined(viewModel, observerLookup);
-
-      for (i = 0, ii = properties.length; i < ii; ++i) {
-        properties[i]._initialize(viewModel, observerLookup, attributes, handlesBind, boundProperties);
-      }
-    }
-
-    Controller.prototype.created = function created(owningView) {
-      if (this.behavior.handlesCreated) {
-        this.viewModel.created(owningView, this.view);
-      }
-    };
-
-    Controller.prototype.automate = function automate(overrideContext, owningView) {
-      this.view.bindingContext = this.viewModel;
-      this.view.overrideContext = overrideContext || (0, _aureliaBinding.createOverrideContext)(this.viewModel);
-      this.view._isUserControlled = true;
-
-      if (this.behavior.handlesCreated) {
-        this.viewModel.created(owningView || null, this.view);
-      }
-
-      this.bind(this.view);
-    };
-
-    Controller.prototype.bind = function bind(scope) {
-      var skipSelfSubscriber = this.behavior.handlesBind;
-      var boundProperties = this.boundProperties;
-      var i = void 0;
-      var ii = void 0;
-      var x = void 0;
-      var observer = void 0;
-      var selfSubscriber = void 0;
-
-      if (this.isBound) {
-        if (this.scope === scope) {
-          return;
-        }
-
-        this.unbind();
-      }
-
-      this.isBound = true;
-      this.scope = scope;
-
-      for (i = 0, ii = boundProperties.length; i < ii; ++i) {
-        x = boundProperties[i];
-        observer = x.observer;
-        selfSubscriber = observer.selfSubscriber;
-        observer.publishing = false;
-
-        if (skipSelfSubscriber) {
-          observer.selfSubscriber = null;
-        }
-
-        x.binding.bind(scope);
-        observer.call();
-
-        observer.publishing = true;
-        observer.selfSubscriber = selfSubscriber;
-      }
-
-      var overrideContext = void 0;
-      if (this.view !== null) {
-        if (skipSelfSubscriber) {
-          this.view.viewModelScope = scope;
-        }
-
-        if (this.viewModel === scope.overrideContext.bindingContext) {
-          overrideContext = scope.overrideContext;
-        } else if (this.instruction.inheritBindingContext) {
-            overrideContext = (0, _aureliaBinding.createOverrideContext)(this.viewModel, scope.overrideContext);
-          } else {
-              overrideContext = (0, _aureliaBinding.createOverrideContext)(this.viewModel);
-              overrideContext.__parentOverrideContext = scope.overrideContext;
-            }
-
-        this.view.bind(this.viewModel, overrideContext);
-      } else if (skipSelfSubscriber) {
-        overrideContext = scope.overrideContext;
-
-        if (scope.overrideContext.__parentOverrideContext !== undefined && this.viewModel.viewFactory && this.viewModel.viewFactory.factoryCreateInstruction.partReplacements) {
-          overrideContext = Object.assign({}, scope.overrideContext);
-          overrideContext.parentOverrideContext = scope.overrideContext.__parentOverrideContext;
-        }
-        this.viewModel.bind(scope.bindingContext, overrideContext);
-      }
-    };
-
-    Controller.prototype.unbind = function unbind() {
-      if (this.isBound) {
-        var boundProperties = this.boundProperties;
-        var i = void 0;
-        var ii = void 0;
-
-        this.isBound = false;
-        this.scope = null;
-
-        if (this.view !== null) {
-          this.view.unbind();
-        }
-
-        if (this.behavior.handlesUnbind) {
-          this.viewModel.unbind();
-        }
-
-        if (this.elementEvents !== null) {
-          this.elementEvents.disposeAll();
-        }
-
-        for (i = 0, ii = boundProperties.length; i < ii; ++i) {
-          boundProperties[i].binding.unbind();
-        }
-      }
-    };
-
-    Controller.prototype.attached = function attached() {
-      if (this.isAttached) {
-        return;
-      }
-
-      this.isAttached = true;
-
-      if (this.behavior.handlesAttached) {
-        this.viewModel.attached();
-      }
-
-      if (this.view !== null) {
-        this.view.attached();
-      }
-    };
-
-    Controller.prototype.detached = function detached() {
-      if (this.isAttached) {
-        this.isAttached = false;
-
-        if (this.view !== null) {
-          this.view.detached();
-        }
-
-        if (this.behavior.handlesDetached) {
-          this.viewModel.detached();
-        }
-      }
-    };
-
-    return Controller;
-  }();
-
-  var BehaviorPropertyObserver = exports.BehaviorPropertyObserver = (_dec9 = (0, _aureliaBinding.subscriberCollection)(), _dec9(_class21 = function () {
-    function BehaviorPropertyObserver(taskQueue, obj, propertyName, selfSubscriber, initialValue) {
-      
-
-      this.taskQueue = taskQueue;
-      this.obj = obj;
-      this.propertyName = propertyName;
-      this.notqueued = true;
-      this.publishing = false;
-      this.selfSubscriber = selfSubscriber;
-      this.currentValue = this.oldValue = initialValue;
-    }
-
-    BehaviorPropertyObserver.prototype.getValue = function getValue() {
-      return this.currentValue;
-    };
-
-    BehaviorPropertyObserver.prototype.setValue = function setValue(newValue) {
-      var oldValue = this.currentValue;
-
-      if (oldValue !== newValue) {
-        this.oldValue = oldValue;
-        this.currentValue = newValue;
-
-        if (this.publishing && this.notqueued) {
-          if (this.taskQueue.flushing) {
-            this.call();
-          } else {
-            this.notqueued = false;
-            this.taskQueue.queueMicroTask(this);
-          }
-        }
-      }
-    };
-
-    BehaviorPropertyObserver.prototype.call = function call() {
-      var oldValue = this.oldValue;
-      var newValue = this.currentValue;
-
-      this.notqueued = true;
-
-      if (newValue === oldValue) {
-        return;
-      }
-
-      if (this.selfSubscriber) {
-        this.selfSubscriber(newValue, oldValue);
-      }
-
-      this.callSubscribers(newValue, oldValue);
-      this.oldValue = newValue;
-    };
-
-    BehaviorPropertyObserver.prototype.subscribe = function subscribe(context, callable) {
-      this.addSubscriber(context, callable);
-    };
-
-    BehaviorPropertyObserver.prototype.unsubscribe = function unsubscribe(context, callable) {
-      this.removeSubscriber(context, callable);
-    };
-
-    return BehaviorPropertyObserver;
-  }()) || _class21);
-
-
-  function getObserver(behavior, instance, name) {
-    var lookup = instance.__observers__;
-
-    if (lookup === undefined) {
-      if (!behavior.isInitialized) {
-        behavior.initialize(_aureliaDependencyInjection.Container.instance || new _aureliaDependencyInjection.Container(), instance.constructor);
-      }
-
-      lookup = behavior.observerLocator.getOrCreateObserversLookup(instance);
-      behavior._ensurePropertiesDefined(instance, lookup);
-    }
-
-    return lookup[name];
-  }
-
-  var BindableProperty = exports.BindableProperty = function () {
-    function BindableProperty(nameOrConfig) {
-      
-
-      if (typeof nameOrConfig === 'string') {
-        this.name = nameOrConfig;
-      } else {
-        Object.assign(this, nameOrConfig);
-      }
-
-      this.attribute = this.attribute || _hyphenate(this.name);
-      if (this.defaultBindingMode === null || this.defaultBindingMode === undefined) {
-        this.defaultBindingMode = _aureliaBinding.bindingMode.oneWay;
-      }
-      this.changeHandler = this.changeHandler || null;
-      this.owner = null;
-      this.descriptor = null;
-    }
-
-    BindableProperty.prototype.registerWith = function registerWith(target, behavior, descriptor) {
-      behavior.properties.push(this);
-      behavior.attributes[this.attribute] = this;
-      this.owner = behavior;
-
-      if (descriptor) {
-        this.descriptor = descriptor;
-        return this._configureDescriptor(behavior, descriptor);
-      }
-
-      return undefined;
-    };
-
-    BindableProperty.prototype._configureDescriptor = function _configureDescriptor(behavior, descriptor) {
-      var name = this.name;
-
-      descriptor.configurable = true;
-      descriptor.enumerable = true;
-
-      if ('initializer' in descriptor) {
-        this.defaultValue = descriptor.initializer;
-        delete descriptor.initializer;
-        delete descriptor.writable;
-      }
-
-      if ('value' in descriptor) {
-        this.defaultValue = descriptor.value;
-        delete descriptor.value;
-        delete descriptor.writable;
-      }
-
-      descriptor.get = function () {
-        return getObserver(behavior, this, name).getValue();
-      };
-
-      descriptor.set = function (value) {
-        getObserver(behavior, this, name).setValue(value);
-      };
-
-      descriptor.get.getObserver = function (obj) {
-        return getObserver(behavior, obj, name);
-      };
-
-      return descriptor;
-    };
-
-    BindableProperty.prototype.defineOn = function defineOn(target, behavior) {
-      var name = this.name;
-      var handlerName = void 0;
-
-      if (this.changeHandler === null) {
-        handlerName = name + 'Changed';
-        if (handlerName in target.prototype) {
-          this.changeHandler = handlerName;
-        }
-      }
-
-      if (this.descriptor === null) {
-        Object.defineProperty(target.prototype, name, this._configureDescriptor(behavior, {}));
-      }
-    };
-
-    BindableProperty.prototype.createObserver = function createObserver(viewModel) {
-      var selfSubscriber = null;
-      var defaultValue = this.defaultValue;
-      var changeHandlerName = this.changeHandler;
-      var name = this.name;
-      var initialValue = void 0;
-
-      if (this.hasOptions) {
-        return undefined;
-      }
-
-      if (changeHandlerName in viewModel) {
-        if ('propertyChanged' in viewModel) {
-          selfSubscriber = function selfSubscriber(newValue, oldValue) {
-            viewModel[changeHandlerName](newValue, oldValue);
-            viewModel.propertyChanged(name, newValue, oldValue);
-          };
-        } else {
-          selfSubscriber = function selfSubscriber(newValue, oldValue) {
-            return viewModel[changeHandlerName](newValue, oldValue);
-          };
-        }
-      } else if ('propertyChanged' in viewModel) {
-        selfSubscriber = function selfSubscriber(newValue, oldValue) {
-          return viewModel.propertyChanged(name, newValue, oldValue);
-        };
-      } else if (changeHandlerName !== null) {
-        throw new Error('Change handler ' + changeHandlerName + ' was specified but not declared on the class.');
-      }
-
-      if (defaultValue !== undefined) {
-        initialValue = typeof defaultValue === 'function' ? defaultValue.call(viewModel) : defaultValue;
-      }
-
-      return new BehaviorPropertyObserver(this.owner.taskQueue, viewModel, this.name, selfSubscriber, initialValue);
-    };
-
-    BindableProperty.prototype._initialize = function _initialize(viewModel, observerLookup, attributes, behaviorHandlesBind, boundProperties) {
-      var selfSubscriber = void 0;
-      var observer = void 0;
-      var attribute = void 0;
-      var defaultValue = this.defaultValue;
-
-      if (this.isDynamic) {
-        for (var key in attributes) {
-          this._createDynamicProperty(viewModel, observerLookup, behaviorHandlesBind, key, attributes[key], boundProperties);
-        }
-      } else if (!this.hasOptions) {
-        observer = observerLookup[this.name];
-
-        if (attributes !== null) {
-          selfSubscriber = observer.selfSubscriber;
-          attribute = attributes[this.attribute];
-
-          if (behaviorHandlesBind) {
-            observer.selfSubscriber = null;
-          }
-
-          if (typeof attribute === 'string') {
-            viewModel[this.name] = attribute;
-            observer.call();
-          } else if (attribute) {
-            boundProperties.push({ observer: observer, binding: attribute.createBinding(viewModel) });
-          } else if (defaultValue !== undefined) {
-            observer.call();
-          }
-
-          observer.selfSubscriber = selfSubscriber;
-        }
-
-        observer.publishing = true;
-      }
-    };
-
-    BindableProperty.prototype._createDynamicProperty = function _createDynamicProperty(viewModel, observerLookup, behaviorHandlesBind, name, attribute, boundProperties) {
-      var changeHandlerName = name + 'Changed';
-      var selfSubscriber = null;
-      var observer = void 0;
-      var info = void 0;
-
-      if (changeHandlerName in viewModel) {
-        if ('propertyChanged' in viewModel) {
-          selfSubscriber = function selfSubscriber(newValue, oldValue) {
-            viewModel[changeHandlerName](newValue, oldValue);
-            viewModel.propertyChanged(name, newValue, oldValue);
-          };
-        } else {
-          selfSubscriber = function selfSubscriber(newValue, oldValue) {
-            return viewModel[changeHandlerName](newValue, oldValue);
-          };
-        }
-      } else if ('propertyChanged' in viewModel) {
-        selfSubscriber = function selfSubscriber(newValue, oldValue) {
-          return viewModel.propertyChanged(name, newValue, oldValue);
-        };
-      }
-
-      observer = observerLookup[name] = new BehaviorPropertyObserver(this.owner.taskQueue, viewModel, name, selfSubscriber);
-
-      Object.defineProperty(viewModel, name, {
-        configurable: true,
-        enumerable: true,
-        get: observer.getValue.bind(observer),
-        set: observer.setValue.bind(observer)
-      });
-
-      if (behaviorHandlesBind) {
-        observer.selfSubscriber = null;
-      }
-
-      if (typeof attribute === 'string') {
-        viewModel[name] = attribute;
-        observer.call();
-      } else if (attribute) {
-        info = { observer: observer, binding: attribute.createBinding(viewModel) };
-        boundProperties.push(info);
-      }
-
-      observer.publishing = true;
-      observer.selfSubscriber = selfSubscriber;
-    };
-
-    return BindableProperty;
-  }();
-
-  var lastProviderId = 0;
-
-  function nextProviderId() {
-    return ++lastProviderId;
-  }
-
-  function doProcessContent() {
-    return true;
-  }
-  function doProcessAttributes() {}
-
-  var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
-    function HtmlBehaviorResource() {
-      
-
-      this.elementName = null;
-      this.attributeName = null;
-      this.attributeDefaultBindingMode = undefined;
-      this.liftsContent = false;
-      this.targetShadowDOM = false;
-      this.shadowDOMOptions = null;
-      this.processAttributes = doProcessAttributes;
-      this.processContent = doProcessContent;
-      this.usesShadowDOM = false;
-      this.childBindings = null;
-      this.hasDynamicOptions = false;
-      this.containerless = false;
-      this.properties = [];
-      this.attributes = {};
-      this.isInitialized = false;
-    }
-
-    HtmlBehaviorResource.convention = function convention(name, existing) {
-      var behavior = void 0;
-
-      if (name.endsWith('CustomAttribute')) {
-        behavior = existing || new HtmlBehaviorResource();
-        behavior.attributeName = _hyphenate(name.substring(0, name.length - 15));
-      }
-
-      if (name.endsWith('CustomElement')) {
-        behavior = existing || new HtmlBehaviorResource();
-        behavior.elementName = _hyphenate(name.substring(0, name.length - 13));
-      }
-
-      return behavior;
-    };
-
-    HtmlBehaviorResource.prototype.addChildBinding = function addChildBinding(behavior) {
-      if (this.childBindings === null) {
-        this.childBindings = [];
-      }
-
-      this.childBindings.push(behavior);
-    };
-
-    HtmlBehaviorResource.prototype.initialize = function initialize(container, target) {
-      var proto = target.prototype;
-      var properties = this.properties;
-      var attributeName = this.attributeName;
-      var attributeDefaultBindingMode = this.attributeDefaultBindingMode;
-      var i = void 0;
-      var ii = void 0;
-      var current = void 0;
-
-      if (this.isInitialized) {
-        return;
-      }
-
-      this.isInitialized = true;
-      target.__providerId__ = nextProviderId();
-
-      this.observerLocator = container.get(_aureliaBinding.ObserverLocator);
-      this.taskQueue = container.get(_aureliaTaskQueue.TaskQueue);
-
-      this.target = target;
-      this.usesShadowDOM = this.targetShadowDOM && _aureliaPal.FEATURE.shadowDOM;
-      this.handlesCreated = 'created' in proto;
-      this.handlesBind = 'bind' in proto;
-      this.handlesUnbind = 'unbind' in proto;
-      this.handlesAttached = 'attached' in proto;
-      this.handlesDetached = 'detached' in proto;
-      this.htmlName = this.elementName || this.attributeName;
-
-      if (attributeName !== null) {
-        if (properties.length === 0) {
-          new BindableProperty({
-            name: 'value',
-            changeHandler: 'valueChanged' in proto ? 'valueChanged' : null,
-            attribute: attributeName,
-            defaultBindingMode: attributeDefaultBindingMode
-          }).registerWith(target, this);
-        }
-
-        current = properties[0];
-
-        if (properties.length === 1 && current.name === 'value') {
-          current.isDynamic = current.hasOptions = this.hasDynamicOptions;
-          current.defineOn(target, this);
-        } else {
-          for (i = 0, ii = properties.length; i < ii; ++i) {
-            properties[i].defineOn(target, this);
-          }
-
-          current = new BindableProperty({
-            name: 'value',
-            changeHandler: 'valueChanged' in proto ? 'valueChanged' : null,
-            attribute: attributeName,
-            defaultBindingMode: attributeDefaultBindingMode
-          });
-
-          current.hasOptions = true;
-          current.registerWith(target, this);
-        }
-      } else {
-        for (i = 0, ii = properties.length; i < ii; ++i) {
-          properties[i].defineOn(target, this);
-        }
-      }
-    };
-
-    HtmlBehaviorResource.prototype.register = function register(registry, name) {
-      if (this.attributeName !== null) {
-        registry.registerAttribute(name || this.attributeName, this, this.attributeName);
-      }
-
-      if (this.elementName !== null) {
-        registry.registerElement(name || this.elementName, this);
-      }
-    };
-
-    HtmlBehaviorResource.prototype.load = function load(container, target, loadContext, viewStrategy, transientView) {
-      var _this13 = this;
-
-      var options = void 0;
-
-      if (this.elementName !== null) {
-        viewStrategy = container.get(ViewLocator).getViewStrategy(viewStrategy || this.viewStrategy || target);
-        options = new ViewCompileInstruction(this.targetShadowDOM, true);
-
-        if (!viewStrategy.moduleId) {
-          viewStrategy.moduleId = _aureliaMetadata.Origin.get(target).moduleId;
-        }
-
-        return viewStrategy.loadViewFactory(container.get(ViewEngine), options, loadContext, target).then(function (viewFactory) {
-          if (!transientView || !_this13.viewFactory) {
-            _this13.viewFactory = viewFactory;
-          }
-
-          return viewFactory;
-        });
-      }
-
-      return Promise.resolve(this);
-    };
-
-    HtmlBehaviorResource.prototype.compile = function compile(compiler, resources, node, instruction, parentNode) {
-      if (this.liftsContent) {
-        if (!instruction.viewFactory) {
-          var template = _aureliaPal.DOM.createElement('template');
-          var fragment = _aureliaPal.DOM.createDocumentFragment();
-          var cacheSize = node.getAttribute('view-cache');
-          var part = node.getAttribute('part');
-
-          node.removeAttribute(instruction.originalAttrName);
-          _aureliaPal.DOM.replaceNode(template, node, parentNode);
-          fragment.appendChild(node);
-          instruction.viewFactory = compiler.compile(fragment, resources);
-
-          if (part) {
-            instruction.viewFactory.part = part;
-            node.removeAttribute('part');
-          }
-
-          if (cacheSize) {
-            instruction.viewFactory.setCacheSize(cacheSize);
-            node.removeAttribute('view-cache');
-          }
-
-          node = template;
-        }
-      } else if (this.elementName !== null) {
-        var _partReplacements2 = {};
-
-        if (this.processContent(compiler, resources, node, instruction) && node.hasChildNodes()) {
-          var currentChild = node.firstChild;
-          var contentElement = this.usesShadowDOM ? null : _aureliaPal.DOM.createElement('au-content');
-          var nextSibling = void 0;
-          var toReplace = void 0;
-
-          while (currentChild) {
-            nextSibling = currentChild.nextSibling;
-
-            if (currentChild.tagName === 'TEMPLATE' && (toReplace = currentChild.getAttribute('replace-part'))) {
-              _partReplacements2[toReplace] = compiler.compile(currentChild, resources);
-              _aureliaPal.DOM.removeNode(currentChild, parentNode);
-              instruction.partReplacements = _partReplacements2;
-            } else if (contentElement !== null) {
-              if (currentChild.nodeType === 3 && _isAllWhitespace(currentChild)) {
-                _aureliaPal.DOM.removeNode(currentChild, parentNode);
-              } else {
-                contentElement.appendChild(currentChild);
-              }
-            }
-
-            currentChild = nextSibling;
-          }
-
-          if (contentElement !== null && contentElement.hasChildNodes()) {
-            node.appendChild(contentElement);
-          }
-
-          instruction.skipContentProcessing = false;
-        } else {
-          instruction.skipContentProcessing = true;
-        }
-      }
-
-      return node;
-    };
-
-    HtmlBehaviorResource.prototype.create = function create(container, instruction, element, bindings) {
-      var viewHost = void 0;
-      var au = null;
-
-      instruction = instruction || BehaviorInstruction.normal;
-      element = element || null;
-      bindings = bindings || null;
-
-      if (this.elementName !== null && element) {
-        if (this.usesShadowDOM) {
-          viewHost = element.attachShadow(this.shadowDOMOptions);
-          container.registerInstance(_aureliaPal.DOM.boundary, viewHost);
-        } else {
-          viewHost = element;
-          if (this.targetShadowDOM) {
-            container.registerInstance(_aureliaPal.DOM.boundary, viewHost);
-          }
-        }
-      }
-
-      if (element !== null) {
-        element.au = au = element.au || {};
-      }
-
-      var viewModel = instruction.viewModel || container.get(this.target);
-      var controller = new Controller(this, instruction, viewModel, container);
-      var childBindings = this.childBindings;
-      var viewFactory = void 0;
-
-      if (this.liftsContent) {
-        au.controller = controller;
-      } else if (this.elementName !== null) {
-        viewFactory = instruction.viewFactory || this.viewFactory;
-        container.viewModel = viewModel;
-
-        if (viewFactory) {
-          controller.view = viewFactory.create(container, instruction, element);
-        }
-
-        if (element !== null) {
-          au.controller = controller;
-
-          if (controller.view) {
-            if (!this.usesShadowDOM && (element.childNodes.length === 1 || element.contentElement)) {
-              var contentElement = element.childNodes[0] || element.contentElement;
-              controller.view.contentView = { fragment: contentElement };
-              contentElement.parentNode && _aureliaPal.DOM.removeNode(contentElement);
-            }
-
-            if (instruction.anchorIsContainer) {
-              if (childBindings !== null) {
-                for (var i = 0, ii = childBindings.length; i < ii; ++i) {
-                  controller.view.addBinding(childBindings[i].create(element, viewModel, controller));
-                }
-              }
-
-              controller.view.appendNodesTo(viewHost);
-            } else {
-              controller.view.insertNodesBefore(viewHost);
-            }
-          } else if (childBindings !== null) {
-            for (var _i2 = 0, _ii2 = childBindings.length; _i2 < _ii2; ++_i2) {
-              bindings.push(childBindings[_i2].create(element, viewModel, controller));
-            }
-          }
-        } else if (controller.view) {
-          controller.view.controller = controller;
-
-          if (childBindings !== null) {
-            for (var _i3 = 0, _ii3 = childBindings.length; _i3 < _ii3; ++_i3) {
-              controller.view.addBinding(childBindings[_i3].create(instruction.host, viewModel, controller));
-            }
-          }
-        } else if (childBindings !== null) {
-          for (var _i4 = 0, _ii4 = childBindings.length; _i4 < _ii4; ++_i4) {
-            bindings.push(childBindings[_i4].create(instruction.host, viewModel, controller));
-          }
-        }
-      } else if (childBindings !== null) {
-        for (var _i5 = 0, _ii5 = childBindings.length; _i5 < _ii5; ++_i5) {
-          bindings.push(childBindings[_i5].create(element, viewModel, controller));
-        }
-      }
-
-      if (au !== null) {
-        au[this.htmlName] = controller;
-      }
-
-      if (instruction.initiatedByBehavior && viewFactory) {
-        controller.view.created();
-      }
-
-      return controller;
-    };
-
-    HtmlBehaviorResource.prototype._ensurePropertiesDefined = function _ensurePropertiesDefined(instance, lookup) {
-      var properties = void 0;
-      var i = void 0;
-      var ii = void 0;
-      var observer = void 0;
-
-      if ('__propertiesDefined__' in lookup) {
-        return;
-      }
-
-      lookup.__propertiesDefined__ = true;
-      properties = this.properties;
-
-      for (i = 0, ii = properties.length; i < ii; ++i) {
-        observer = properties[i].createObserver(instance);
-
-        if (observer !== undefined) {
-          lookup[observer.propertyName] = observer;
-        }
-      }
-    };
-
-    return HtmlBehaviorResource;
-  }();
-
-  function createChildObserverDecorator(selectorOrConfig, all) {
-    return function (target, key, descriptor) {
-      var actualTarget = typeof key === 'string' ? target.constructor : target;
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, actualTarget);
-
-      if (typeof selectorOrConfig === 'string') {
-        selectorOrConfig = {
-          selector: selectorOrConfig,
-          name: key
-        };
-      }
-
-      if (descriptor) {
-        descriptor.writable = true;
-      }
-
-      selectorOrConfig.all = all;
-      r.addChildBinding(new ChildObserver(selectorOrConfig));
-    };
-  }
-
-  function children(selectorOrConfig) {
-    return createChildObserverDecorator(selectorOrConfig, true);
-  }
-
-  function child(selectorOrConfig) {
-    return createChildObserverDecorator(selectorOrConfig, false);
-  }
-
-  var ChildObserver = function () {
-    function ChildObserver(config) {
-      
-
-      this.name = config.name;
-      this.changeHandler = config.changeHandler || this.name + 'Changed';
-      this.selector = config.selector;
-      this.all = config.all;
-    }
-
-    ChildObserver.prototype.create = function create(viewHost, viewModel, controller) {
-      return new ChildObserverBinder(this.selector, viewHost, this.name, viewModel, controller, this.changeHandler, this.all);
-    };
-
-    return ChildObserver;
-  }();
-
-  var noMutations = [];
-
-  function trackMutation(groupedMutations, binder, record) {
-    var mutations = groupedMutations.get(binder);
-
-    if (!mutations) {
-      mutations = [];
-      groupedMutations.set(binder, mutations);
-    }
-
-    mutations.push(record);
-  }
-
-  function onChildChange(mutations, observer) {
-    var binders = observer.binders;
-    var bindersLength = binders.length;
-    var groupedMutations = new Map();
-
-    for (var i = 0, ii = mutations.length; i < ii; ++i) {
-      var record = mutations[i];
-      var added = record.addedNodes;
-      var removed = record.removedNodes;
-
-      for (var j = 0, jj = removed.length; j < jj; ++j) {
-        var node = removed[j];
-        if (node.nodeType === 1) {
-          for (var k = 0; k < bindersLength; ++k) {
-            var binder = binders[k];
-            if (binder.onRemove(node)) {
-              trackMutation(groupedMutations, binder, record);
-            }
-          }
-        }
-      }
-
-      for (var _j = 0, _jj = added.length; _j < _jj; ++_j) {
-        var _node = added[_j];
-        if (_node.nodeType === 1) {
-          for (var _k = 0; _k < bindersLength; ++_k) {
-            var _binder = binders[_k];
-            if (_binder.onAdd(_node)) {
-              trackMutation(groupedMutations, _binder, record);
-            }
-          }
-        }
-      }
-    }
-
-    groupedMutations.forEach(function (value, key) {
-      if (key.changeHandler !== null) {
-        key.viewModel[key.changeHandler](value);
-      }
-    });
-  }
-
-  var ChildObserverBinder = function () {
-    function ChildObserverBinder(selector, viewHost, property, viewModel, controller, changeHandler, all) {
-      
-
-      this.selector = selector;
-      this.viewHost = viewHost;
-      this.property = property;
-      this.viewModel = viewModel;
-      this.controller = controller;
-      this.changeHandler = changeHandler in viewModel ? changeHandler : null;
-      this.usesShadowDOM = controller.behavior.usesShadowDOM;
-      this.all = all;
-
-      if (!this.usesShadowDOM && controller.view && controller.view.contentView) {
-        this.contentView = controller.view.contentView;
-      } else {
-        this.contentView = null;
-      }
-    }
-
-    ChildObserverBinder.prototype.matches = function matches(element) {
-      if (element.matches(this.selector)) {
-        if (this.contentView === null) {
-          return true;
-        }
-
-        var contentView = this.contentView;
-        var assignedSlot = element.auAssignedSlot;
-
-        if (assignedSlot && assignedSlot.projectFromAnchors) {
-          var anchors = assignedSlot.projectFromAnchors;
-
-          for (var i = 0, ii = anchors.length; i < ii; ++i) {
-            if (anchors[i].auOwnerView === contentView) {
-              return true;
-            }
-          }
-
-          return false;
-        }
-
-        return element.auOwnerView === contentView;
-      }
-
-      return false;
-    };
-
-    ChildObserverBinder.prototype.bind = function bind(source) {
-      var viewHost = this.viewHost;
-      var viewModel = this.viewModel;
-      var observer = viewHost.__childObserver__;
-
-      if (!observer) {
-        observer = viewHost.__childObserver__ = _aureliaPal.DOM.createMutationObserver(onChildChange);
-
-        var options = {
-          childList: true,
-          subtree: !this.usesShadowDOM
-        };
-
-        observer.observe(viewHost, options);
-        observer.binders = [];
-      }
-
-      observer.binders.push(this);
-
-      if (this.usesShadowDOM) {
-        var current = viewHost.firstElementChild;
-
-        if (this.all) {
-          var items = viewModel[this.property];
-          if (!items) {
-            items = viewModel[this.property] = [];
-          } else {
-            items.length = 0;
-          }
-
-          while (current) {
-            if (this.matches(current)) {
-              items.push(current.au && current.au.controller ? current.au.controller.viewModel : current);
-            }
-
-            current = current.nextElementSibling;
-          }
-
-          if (this.changeHandler !== null) {
-            this.viewModel[this.changeHandler](noMutations);
-          }
-        } else {
-          while (current) {
-            if (this.matches(current)) {
-              var value = current.au && current.au.controller ? current.au.controller.viewModel : current;
-              this.viewModel[this.property] = value;
-
-              if (this.changeHandler !== null) {
-                this.viewModel[this.changeHandler](value);
-              }
-
-              break;
-            }
-
-            current = current.nextElementSibling;
-          }
-        }
-      }
-    };
-
-    ChildObserverBinder.prototype.onRemove = function onRemove(element) {
-      if (this.matches(element)) {
-        var value = element.au && element.au.controller ? element.au.controller.viewModel : element;
-
-        if (this.all) {
-          var items = this.viewModel[this.property] || (this.viewModel[this.property] = []);
-          var index = items.indexOf(value);
-
-          if (index !== -1) {
-            items.splice(index, 1);
-          }
-
-          return true;
-        }
-
-        return false;
-      }
-
-      return false;
-    };
-
-    ChildObserverBinder.prototype.onAdd = function onAdd(element) {
-      if (this.matches(element)) {
-        var value = element.au && element.au.controller ? element.au.controller.viewModel : element;
-
-        if (this.all) {
-          var items = this.viewModel[this.property] || (this.viewModel[this.property] = []);
-          var index = 0;
-          var prev = element.previousElementSibling;
-
-          while (prev) {
-            if (this.matches(prev)) {
-              index++;
-            }
-
-            prev = prev.previousElementSibling;
-          }
-
-          items.splice(index, 0, value);
-          return true;
-        }
-
-        this.viewModel[this.property] = value;
-
-        if (this.changeHandler !== null) {
-          this.viewModel[this.changeHandler](value);
-        }
-      }
-
-      return false;
-    };
-
-    ChildObserverBinder.prototype.unbind = function unbind() {
-      if (this.viewHost.__childObserver__) {
-        this.viewHost.__childObserver__.disconnect();
-        this.viewHost.__childObserver__ = null;
-      }
-    };
-
-    return ChildObserverBinder;
-  }();
-
-  function tryActivateViewModel(context) {
-    if (context.skipActivation || typeof context.viewModel.activate !== 'function') {
-      return Promise.resolve();
-    }
-
-    return context.viewModel.activate(context.model) || Promise.resolve();
-  }
-
-  var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDependencyInjection.inject)(ViewEngine, ViewLocator), _dec10(_class22 = function () {
-    function CompositionEngine(viewEngine, viewLocator) {
-      
-
-      this.viewEngine = viewEngine;
-      this.viewLocator = viewLocator;
-    }
-
-    CompositionEngine.prototype._createControllerAndSwap = function _createControllerAndSwap(context) {
-      function swap(controller) {
-        return Promise.resolve(context.viewSlot.removeAll(true)).then(function () {
-          if (context.currentController) {
-            context.currentController.unbind();
-          }
-
-          context.viewSlot.add(controller.view);
-
-          if (context.compositionTransactionNotifier) {
-            context.compositionTransactionNotifier.done();
-          }
-
-          return controller;
-        });
-      }
-
-      return this.createController(context).then(function (controller) {
-        controller.automate(context.overrideContext, context.owningView);
-
-        if (context.compositionTransactionOwnershipToken) {
-          return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
-            return swap(controller);
-          });
-        }
-
-        return swap(controller);
-      });
-    };
-
-    CompositionEngine.prototype.createController = function createController(context) {
-      var _this14 = this;
-
-      var childContainer = void 0;
-      var viewModel = void 0;
-      var viewModelResource = void 0;
-      var m = void 0;
-
-      return this.ensureViewModel(context).then(tryActivateViewModel).then(function () {
-        childContainer = context.childContainer;
-        viewModel = context.viewModel;
-        viewModelResource = context.viewModelResource;
-        m = viewModelResource.metadata;
-
-        var viewStrategy = _this14.viewLocator.getViewStrategy(context.view || viewModel);
-
-        if (context.viewResources) {
-          viewStrategy.makeRelativeTo(context.viewResources.viewUrl);
-        }
-
-        return m.load(childContainer, viewModelResource.value, null, viewStrategy, true);
-      }).then(function (viewFactory) {
-        return m.create(childContainer, BehaviorInstruction.dynamic(context.host, viewModel, viewFactory));
-      });
-    };
-
-    CompositionEngine.prototype.ensureViewModel = function ensureViewModel(context) {
-      var childContainer = context.childContainer = context.childContainer || context.container.createChild();
-
-      if (typeof context.viewModel === 'string') {
-        context.viewModel = context.viewResources ? context.viewResources.relativeToView(context.viewModel) : context.viewModel;
-
-        return this.viewEngine.importViewModelResource(context.viewModel).then(function (viewModelResource) {
-          childContainer.autoRegister(viewModelResource.value);
-
-          if (context.host) {
-            childContainer.registerInstance(_aureliaPal.DOM.Element, context.host);
-          }
-
-          context.viewModel = childContainer.viewModel = childContainer.get(viewModelResource.value);
-          context.viewModelResource = viewModelResource;
-          return context;
-        });
-      }
-
-      var m = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, context.viewModel.constructor);
-      m.elementName = m.elementName || 'dynamic-element';
-      m.initialize(context.container || childContainer, context.viewModel.constructor);
-      context.viewModelResource = { metadata: m, value: context.viewModel.constructor };
-      childContainer.viewModel = context.viewModel;
-      return Promise.resolve(context);
-    };
-
-    CompositionEngine.prototype.compose = function compose(context) {
-      context.childContainer = context.childContainer || context.container.createChild();
-      context.view = this.viewLocator.getViewStrategy(context.view);
-
-      var transaction = context.childContainer.get(CompositionTransaction);
-      var compositionTransactionOwnershipToken = transaction.tryCapture();
-
-      if (compositionTransactionOwnershipToken) {
-        context.compositionTransactionOwnershipToken = compositionTransactionOwnershipToken;
-      } else {
-        context.compositionTransactionNotifier = transaction.enlist();
-      }
-
-      if (context.viewModel) {
-        return this._createControllerAndSwap(context);
-      } else if (context.view) {
-        if (context.viewResources) {
-          context.view.makeRelativeTo(context.viewResources.viewUrl);
-        }
-
-        return context.view.loadViewFactory(this.viewEngine, new ViewCompileInstruction()).then(function (viewFactory) {
-          var result = viewFactory.create(context.childContainer);
-          result.bind(context.bindingContext, context.overrideContext);
-
-          var work = function work() {
-            return Promise.resolve(context.viewSlot.removeAll(true)).then(function () {
-              context.viewSlot.add(result);
-
-              if (context.compositionTransactionNotifier) {
-                context.compositionTransactionNotifier.done();
-              }
-
-              return result;
-            });
-          };
-
-          if (context.compositionTransactionOwnershipToken) {
-            return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(work);
-          }
-
-          return work();
-        });
-      } else if (context.viewSlot) {
-        context.viewSlot.removeAll();
-
-        if (context.compositionTransactionNotifier) {
-          context.compositionTransactionNotifier.done();
-        }
-
-        return Promise.resolve(null);
-      }
-
-      return Promise.resolve(null);
-    };
-
-    return CompositionEngine;
-  }()) || _class22);
-
-  var ElementConfigResource = exports.ElementConfigResource = function () {
-    function ElementConfigResource() {
-      
-    }
-
-    ElementConfigResource.prototype.initialize = function initialize(container, target) {};
-
-    ElementConfigResource.prototype.register = function register(registry, name) {};
-
-    ElementConfigResource.prototype.load = function load(container, target) {
-      var config = new target();
-      var eventManager = container.get(_aureliaBinding.EventManager);
-      eventManager.registerElementConfig(config);
-    };
-
-    return ElementConfigResource;
-  }();
-
-  function validateBehaviorName(name, type) {
-    if (/[A-Z]/.test(name)) {
-      var newName = _hyphenate(name);
-      LogManager.getLogger('templating').warn('\'' + name + '\' is not a valid ' + type + ' name and has been converted to \'' + newName + '\'. Upper-case letters are not allowed because the DOM is not case-sensitive.');
-      return newName;
-    }
-    return name;
-  }
-
-  function resource(instance) {
-    return function (target) {
-      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, instance, target);
-    };
-  }
-
-  function behavior(override) {
-    return function (target) {
-      if (override instanceof HtmlBehaviorResource) {
-        _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, override, target);
-      } else {
-        var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, target);
-        Object.assign(r, override);
-      }
-    };
-  }
-
-  function customElement(name) {
-    return function (target) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, target);
-      r.elementName = validateBehaviorName(name, 'custom element');
-    };
-  }
-
-  function customAttribute(name, defaultBindingMode) {
-    return function (target) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, target);
-      r.attributeName = validateBehaviorName(name, 'custom attribute');
-      r.attributeDefaultBindingMode = defaultBindingMode;
-    };
-  }
-
-  function templateController(target) {
-    var deco = function deco(t) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
-      r.liftsContent = true;
-    };
-
-    return target ? deco(target) : deco;
-  }
-
-  function bindable(nameOrConfigOrTarget, key, descriptor) {
-    var deco = function deco(target, key2, descriptor2) {
-      var actualTarget = key2 ? target.constructor : target;
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, actualTarget);
-      var prop = void 0;
-
-      if (key2) {
-        nameOrConfigOrTarget = nameOrConfigOrTarget || {};
-        nameOrConfigOrTarget.name = key2;
-      }
-
-      prop = new BindableProperty(nameOrConfigOrTarget);
-      return prop.registerWith(actualTarget, r, descriptor2);
-    };
-
-    if (!nameOrConfigOrTarget) {
-      return deco;
-    }
-
-    if (key) {
-      var _target = nameOrConfigOrTarget;
-      nameOrConfigOrTarget = null;
-      return deco(_target, key, descriptor);
-    }
-
-    return deco;
-  }
-
-  function dynamicOptions(target) {
-    var deco = function deco(t) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
-      r.hasDynamicOptions = true;
-    };
-
-    return target ? deco(target) : deco;
-  }
-
-  var defaultShadowDOMOptions = { mode: 'open' };
-  function useShadowDOM(targetOrOptions) {
-    var options = typeof targetOrOptions === 'function' || !targetOrOptions ? defaultShadowDOMOptions : targetOrOptions;
-
-    var deco = function deco(t) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
-      r.targetShadowDOM = true;
-      r.shadowDOMOptions = options;
-    };
-
-    return typeof targetOrOptions === 'function' ? deco(targetOrOptions) : deco;
-  }
-
-  function processAttributes(processor) {
-    return function (t) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
-      r.processAttributes = function (compiler, resources, node, attributes, elementInstruction) {
-        try {
-          processor(compiler, resources, node, attributes, elementInstruction);
-        } catch (error) {
-          LogManager.getLogger('templating').error(error);
-        }
-      };
-    };
-  }
-
-  function doNotProcessContent() {
-    return false;
-  }
-
-  function processContent(processor) {
-    return function (t) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
-      r.processContent = processor ? function (compiler, resources, node, instruction) {
-        try {
-          return processor(compiler, resources, node, instruction);
-        } catch (error) {
-          LogManager.getLogger('templating').error(error);
-          return false;
-        }
-      } : doNotProcessContent;
-    };
-  }
-
-  function containerless(target) {
-    var deco = function deco(t) {
-      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
-      r.containerless = true;
-    };
-
-    return target ? deco(target) : deco;
-  }
-
-  function useViewStrategy(strategy) {
-    return function (target) {
-      _aureliaMetadata.metadata.define(ViewLocator.viewStrategyMetadataKey, strategy, target);
-    };
-  }
-
-  function useView(path) {
-    return useViewStrategy(new RelativeViewStrategy(path));
-  }
-
-  function inlineView(markup, dependencies, dependencyBaseUrl) {
-    return useViewStrategy(new InlineViewStrategy(markup, dependencies, dependencyBaseUrl));
-  }
-
-  function noView(targetOrDependencies, dependencyBaseUrl) {
-    var target = void 0;
-    var dependencies = void 0;
-    if (typeof targetOrDependencies === 'function') {
-      target = targetOrDependencies;
-    } else {
-      dependencies = targetOrDependencies;
-      target = undefined;
-    }
-
-    var deco = function deco(t) {
-      _aureliaMetadata.metadata.define(ViewLocator.viewStrategyMetadataKey, new NoViewStrategy(dependencies, dependencyBaseUrl), t);
-    };
-
-    return target ? deco(target) : deco;
-  }
-
-  function elementConfig(target) {
-    var deco = function deco(t) {
-      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, new ElementConfigResource(), t);
-    };
-
-    return target ? deco(target) : deco;
-  }
-
-  function viewResources() {
-    for (var _len = arguments.length, resources = Array(_len), _key = 0; _key < _len; _key++) {
-      resources[_key] = arguments[_key];
-    }
-
-    return function (target) {
-      _aureliaMetadata.metadata.define(ViewEngine.viewModelRequireMetadataKey, resources, target);
-    };
-  }
-
-  var TemplatingEngine = exports.TemplatingEngine = (_dec11 = (0, _aureliaDependencyInjection.inject)(_aureliaDependencyInjection.Container, ModuleAnalyzer, ViewCompiler, CompositionEngine), _dec11(_class23 = function () {
-    function TemplatingEngine(container, moduleAnalyzer, viewCompiler, compositionEngine) {
-      
-
-      this._container = container;
-      this._moduleAnalyzer = moduleAnalyzer;
-      this._viewCompiler = viewCompiler;
-      this._compositionEngine = compositionEngine;
-      container.registerInstance(Animator, Animator.instance = new Animator());
-    }
-
-    TemplatingEngine.prototype.configureAnimator = function configureAnimator(animator) {
-      this._container.unregister(Animator);
-      this._container.registerInstance(Animator, Animator.instance = animator);
-    };
-
-    TemplatingEngine.prototype.compose = function compose(context) {
-      return this._compositionEngine.compose(context);
-    };
-
-    TemplatingEngine.prototype.enhance = function enhance(instruction) {
-      if (instruction instanceof _aureliaPal.DOM.Element) {
-        instruction = { element: instruction };
-      }
-
-      var compilerInstructions = {};
-      var resources = instruction.resources || this._container.get(ViewResources);
-
-      this._viewCompiler._compileNode(instruction.element, resources, compilerInstructions, instruction.element.parentNode, 'root', true);
-
-      var factory = new ViewFactory(instruction.element, compilerInstructions, resources);
-      var container = instruction.container || this._container.createChild();
-      var view = factory.create(container, BehaviorInstruction.enhance());
-
-      view.bind(instruction.bindingContext || {}, instruction.overrideContext);
-
-      return view;
-    };
-
-    return TemplatingEngine;
-  }()) || _class23);
 });
 define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _aureliaLogging, _aureliaRouteRecognizer, _aureliaDependencyInjection, _aureliaHistory, _aureliaEventAggregator) {
   'use strict';
@@ -36082,6 +31129,306 @@ define('aurelia-templating-router/route-href',['exports', 'aurelia-templating', 
     return RouteHref;
   }()) || _class) || _class) || _class) || _class) || _class);
 });
+/*!
+ * Bootstrap v4.0.0-alpha.5 (https://getbootstrap.com)
+ * Copyright 2011-2016 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ */
+if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires jQuery");+function(a){var b=a.fn.jquery.split(" ")[0].split(".");if(b[0]<2&&b[1]<9||1==b[0]&&9==b[1]&&b[2]<1||b[0]>=4)throw new Error("Bootstrap's JavaScript requires at least jQuery v1.9.1 but less than v4.0.0")}(jQuery),+function(){function a(a,b){if(!a)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!b||"object"!=typeof b&&"function"!=typeof b?a:b}function b(a,b){if("function"!=typeof b&&null!==b)throw new TypeError("Super expression must either be null or a function, not "+typeof b);a.prototype=Object.create(b&&b.prototype,{constructor:{value:a,enumerable:!1,writable:!0,configurable:!0}}),b&&(Object.setPrototypeOf?Object.setPrototypeOf(a,b):a.__proto__=b)}function c(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var d="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(a){return typeof a}:function(a){return a&&"function"==typeof Symbol&&a.constructor===Symbol&&a!==Symbol.prototype?"symbol":typeof a},e=function(){function a(a,b){for(var c=0;c<b.length;c++){var d=b[c];d.enumerable=d.enumerable||!1,d.configurable=!0,"value"in d&&(d.writable=!0),Object.defineProperty(a,d.key,d)}}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}(),f=function(a){function b(a){return{}.toString.call(a).match(/\s([a-zA-Z]+)/)[1].toLowerCase()}function c(a){return(a[0]||a).nodeType}function d(){return{bindType:h.end,delegateType:h.end,handle:function(b){if(a(b.target).is(this))return b.handleObj.handler.apply(this,arguments)}}}function e(){if(window.QUnit)return!1;var a=document.createElement("bootstrap");for(var b in j)if(void 0!==a.style[b])return{end:j[b]};return!1}function f(b){var c=this,d=!1;return a(this).one(k.TRANSITION_END,function(){d=!0}),setTimeout(function(){d||k.triggerTransitionEnd(c)},b),this}function g(){h=e(),a.fn.emulateTransitionEnd=f,k.supportsTransitionEnd()&&(a.event.special[k.TRANSITION_END]=d())}var h=!1,i=1e6,j={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"},k={TRANSITION_END:"bsTransitionEnd",getUID:function(a){do a+=~~(Math.random()*i);while(document.getElementById(a));return a},getSelectorFromElement:function(a){var b=a.getAttribute("data-target");return b||(b=a.getAttribute("href")||"",b=/^#[a-z]/i.test(b)?b:null),b},reflow:function(a){new Function("bs","return bs")(a.offsetHeight)},triggerTransitionEnd:function(b){a(b).trigger(h.end)},supportsTransitionEnd:function(){return Boolean(h)},typeCheckConfig:function(a,d,e){for(var f in e)if(e.hasOwnProperty(f)){var g=e[f],h=d[f],i=void 0;if(i=h&&c(h)?"element":b(h),!new RegExp(g).test(i))throw new Error(a.toUpperCase()+": "+('Option "'+f+'" provided type "'+i+'" ')+('but expected type "'+g+'".'))}}};return g(),k}(jQuery),g=(function(a){var b="alert",d="4.0.0-alpha.5",g="bs.alert",h="."+g,i=".data-api",j=a.fn[b],k=150,l={DISMISS:'[data-dismiss="alert"]'},m={CLOSE:"close"+h,CLOSED:"closed"+h,CLICK_DATA_API:"click"+h+i},n={ALERT:"alert",FADE:"fade",IN:"in"},o=function(){function b(a){c(this,b),this._element=a}return b.prototype.close=function(a){a=a||this._element;var b=this._getRootElement(a),c=this._triggerCloseEvent(b);c.isDefaultPrevented()||this._removeElement(b)},b.prototype.dispose=function(){a.removeData(this._element,g),this._element=null},b.prototype._getRootElement=function(b){var c=f.getSelectorFromElement(b),d=!1;return c&&(d=a(c)[0]),d||(d=a(b).closest("."+n.ALERT)[0]),d},b.prototype._triggerCloseEvent=function(b){var c=a.Event(m.CLOSE);return a(b).trigger(c),c},b.prototype._removeElement=function(b){return a(b).removeClass(n.IN),f.supportsTransitionEnd()&&a(b).hasClass(n.FADE)?void a(b).one(f.TRANSITION_END,a.proxy(this._destroyElement,this,b)).emulateTransitionEnd(k):void this._destroyElement(b)},b.prototype._destroyElement=function(b){a(b).detach().trigger(m.CLOSED).remove()},b._jQueryInterface=function(c){return this.each(function(){var d=a(this),e=d.data(g);e||(e=new b(this),d.data(g,e)),"close"===c&&e[c](this)})},b._handleDismiss=function(a){return function(b){b&&b.preventDefault(),a.close(this)}},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(m.CLICK_DATA_API,l.DISMISS,o._handleDismiss(new o)),a.fn[b]=o._jQueryInterface,a.fn[b].Constructor=o,a.fn[b].noConflict=function(){return a.fn[b]=j,o._jQueryInterface},o}(jQuery),function(a){var b="button",d="4.0.0-alpha.5",f="bs.button",g="."+f,h=".data-api",i=a.fn[b],j={ACTIVE:"active",BUTTON:"btn",FOCUS:"focus"},k={DATA_TOGGLE_CARROT:'[data-toggle^="button"]',DATA_TOGGLE:'[data-toggle="buttons"]',INPUT:"input",ACTIVE:".active",BUTTON:".btn"},l={CLICK_DATA_API:"click"+g+h,FOCUS_BLUR_DATA_API:"focus"+g+h+" "+("blur"+g+h)},m=function(){function b(a){c(this,b),this._element=a}return b.prototype.toggle=function(){var b=!0,c=a(this._element).closest(k.DATA_TOGGLE)[0];if(c){var d=a(this._element).find(k.INPUT)[0];if(d){if("radio"===d.type)if(d.checked&&a(this._element).hasClass(j.ACTIVE))b=!1;else{var e=a(c).find(k.ACTIVE)[0];e&&a(e).removeClass(j.ACTIVE)}b&&(d.checked=!a(this._element).hasClass(j.ACTIVE),a(this._element).trigger("change")),d.focus()}}else this._element.setAttribute("aria-pressed",!a(this._element).hasClass(j.ACTIVE));b&&a(this._element).toggleClass(j.ACTIVE)},b.prototype.dispose=function(){a.removeData(this._element,f),this._element=null},b._jQueryInterface=function(c){return this.each(function(){var d=a(this).data(f);d||(d=new b(this),a(this).data(f,d)),"toggle"===c&&d[c]()})},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(l.CLICK_DATA_API,k.DATA_TOGGLE_CARROT,function(b){b.preventDefault();var c=b.target;a(c).hasClass(j.BUTTON)||(c=a(c).closest(k.BUTTON)),m._jQueryInterface.call(a(c),"toggle")}).on(l.FOCUS_BLUR_DATA_API,k.DATA_TOGGLE_CARROT,function(b){var c=a(b.target).closest(k.BUTTON)[0];a(c).toggleClass(j.FOCUS,/^focus(in)?$/.test(b.type))}),a.fn[b]=m._jQueryInterface,a.fn[b].Constructor=m,a.fn[b].noConflict=function(){return a.fn[b]=i,m._jQueryInterface},m}(jQuery),function(a){var b="carousel",g="4.0.0-alpha.5",h="bs.carousel",i="."+h,j=".data-api",k=a.fn[b],l=600,m=37,n=39,o={interval:5e3,keyboard:!0,slide:!1,pause:"hover",wrap:!0},p={interval:"(number|boolean)",keyboard:"boolean",slide:"(boolean|string)",pause:"(string|boolean)",wrap:"boolean"},q={NEXT:"next",PREVIOUS:"prev"},r={SLIDE:"slide"+i,SLID:"slid"+i,KEYDOWN:"keydown"+i,MOUSEENTER:"mouseenter"+i,MOUSELEAVE:"mouseleave"+i,LOAD_DATA_API:"load"+i+j,CLICK_DATA_API:"click"+i+j},s={CAROUSEL:"carousel",ACTIVE:"active",SLIDE:"slide",RIGHT:"right",LEFT:"left",ITEM:"carousel-item"},t={ACTIVE:".active",ACTIVE_ITEM:".active.carousel-item",ITEM:".carousel-item",NEXT_PREV:".next, .prev",INDICATORS:".carousel-indicators",DATA_SLIDE:"[data-slide], [data-slide-to]",DATA_RIDE:'[data-ride="carousel"]'},u=function(){function j(b,d){c(this,j),this._items=null,this._interval=null,this._activeElement=null,this._isPaused=!1,this._isSliding=!1,this._config=this._getConfig(d),this._element=a(b)[0],this._indicatorsElement=a(this._element).find(t.INDICATORS)[0],this._addEventListeners()}return j.prototype.next=function(){this._isSliding||this._slide(q.NEXT)},j.prototype.nextWhenVisible=function(){document.hidden||this.next()},j.prototype.prev=function(){this._isSliding||this._slide(q.PREVIOUS)},j.prototype.pause=function(b){b||(this._isPaused=!0),a(this._element).find(t.NEXT_PREV)[0]&&f.supportsTransitionEnd()&&(f.triggerTransitionEnd(this._element),this.cycle(!0)),clearInterval(this._interval),this._interval=null},j.prototype.cycle=function(b){b||(this._isPaused=!1),this._interval&&(clearInterval(this._interval),this._interval=null),this._config.interval&&!this._isPaused&&(this._interval=setInterval(a.proxy(document.visibilityState?this.nextWhenVisible:this.next,this),this._config.interval))},j.prototype.to=function(b){var c=this;this._activeElement=a(this._element).find(t.ACTIVE_ITEM)[0];var d=this._getItemIndex(this._activeElement);if(!(b>this._items.length-1||b<0)){if(this._isSliding)return void a(this._element).one(r.SLID,function(){return c.to(b)});if(d===b)return this.pause(),void this.cycle();var e=b>d?q.NEXT:q.PREVIOUS;this._slide(e,this._items[b])}},j.prototype.dispose=function(){a(this._element).off(i),a.removeData(this._element,h),this._items=null,this._config=null,this._element=null,this._interval=null,this._isPaused=null,this._isSliding=null,this._activeElement=null,this._indicatorsElement=null},j.prototype._getConfig=function(c){return c=a.extend({},o,c),f.typeCheckConfig(b,c,p),c},j.prototype._addEventListeners=function(){this._config.keyboard&&a(this._element).on(r.KEYDOWN,a.proxy(this._keydown,this)),"hover"!==this._config.pause||"ontouchstart"in document.documentElement||a(this._element).on(r.MOUSEENTER,a.proxy(this.pause,this)).on(r.MOUSELEAVE,a.proxy(this.cycle,this))},j.prototype._keydown=function(a){if(a.preventDefault(),!/input|textarea/i.test(a.target.tagName))switch(a.which){case m:this.prev();break;case n:this.next();break;default:return}},j.prototype._getItemIndex=function(b){return this._items=a.makeArray(a(b).parent().find(t.ITEM)),this._items.indexOf(b)},j.prototype._getItemByDirection=function(a,b){var c=a===q.NEXT,d=a===q.PREVIOUS,e=this._getItemIndex(b),f=this._items.length-1,g=d&&0===e||c&&e===f;if(g&&!this._config.wrap)return b;var h=a===q.PREVIOUS?-1:1,i=(e+h)%this._items.length;return i===-1?this._items[this._items.length-1]:this._items[i]},j.prototype._triggerSlideEvent=function(b,c){var d=a.Event(r.SLIDE,{relatedTarget:b,direction:c});return a(this._element).trigger(d),d},j.prototype._setActiveIndicatorElement=function(b){if(this._indicatorsElement){a(this._indicatorsElement).find(t.ACTIVE).removeClass(s.ACTIVE);var c=this._indicatorsElement.children[this._getItemIndex(b)];c&&a(c).addClass(s.ACTIVE)}},j.prototype._slide=function(b,c){var d=this,e=a(this._element).find(t.ACTIVE_ITEM)[0],g=c||e&&this._getItemByDirection(b,e),h=Boolean(this._interval),i=b===q.NEXT?s.LEFT:s.RIGHT;if(g&&a(g).hasClass(s.ACTIVE))return void(this._isSliding=!1);var j=this._triggerSlideEvent(g,i);if(!j.isDefaultPrevented()&&e&&g){this._isSliding=!0,h&&this.pause(),this._setActiveIndicatorElement(g);var k=a.Event(r.SLID,{relatedTarget:g,direction:i});f.supportsTransitionEnd()&&a(this._element).hasClass(s.SLIDE)?(a(g).addClass(b),f.reflow(g),a(e).addClass(i),a(g).addClass(i),a(e).one(f.TRANSITION_END,function(){a(g).removeClass(i).removeClass(b),a(g).addClass(s.ACTIVE),a(e).removeClass(s.ACTIVE).removeClass(b).removeClass(i),d._isSliding=!1,setTimeout(function(){return a(d._element).trigger(k)},0)}).emulateTransitionEnd(l)):(a(e).removeClass(s.ACTIVE),a(g).addClass(s.ACTIVE),this._isSliding=!1,a(this._element).trigger(k)),h&&this.cycle()}},j._jQueryInterface=function(b){return this.each(function(){var c=a(this).data(h),e=a.extend({},o,a(this).data());"object"===("undefined"==typeof b?"undefined":d(b))&&a.extend(e,b);var f="string"==typeof b?b:e.slide;if(c||(c=new j(this,e),a(this).data(h,c)),"number"==typeof b)c.to(b);else if("string"==typeof f){if(void 0===c[f])throw new Error('No method named "'+f+'"');c[f]()}else e.interval&&(c.pause(),c.cycle())})},j._dataApiClickHandler=function(b){var c=f.getSelectorFromElement(this);if(c){var d=a(c)[0];if(d&&a(d).hasClass(s.CAROUSEL)){var e=a.extend({},a(d).data(),a(this).data()),g=this.getAttribute("data-slide-to");g&&(e.interval=!1),j._jQueryInterface.call(a(d),e),g&&a(d).data(h).to(g),b.preventDefault()}}},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return o}}]),j}();return a(document).on(r.CLICK_DATA_API,t.DATA_SLIDE,u._dataApiClickHandler),a(window).on(r.LOAD_DATA_API,function(){a(t.DATA_RIDE).each(function(){var b=a(this);u._jQueryInterface.call(b,b.data())})}),a.fn[b]=u._jQueryInterface,a.fn[b].Constructor=u,a.fn[b].noConflict=function(){return a.fn[b]=k,u._jQueryInterface},u}(jQuery),function(a){var b="collapse",g="4.0.0-alpha.5",h="bs.collapse",i="."+h,j=".data-api",k=a.fn[b],l=600,m={toggle:!0,parent:""},n={toggle:"boolean",parent:"string"},o={SHOW:"show"+i,SHOWN:"shown"+i,HIDE:"hide"+i,HIDDEN:"hidden"+i,CLICK_DATA_API:"click"+i+j},p={IN:"in",COLLAPSE:"collapse",COLLAPSING:"collapsing",COLLAPSED:"collapsed"},q={WIDTH:"width",HEIGHT:"height"},r={ACTIVES:".card > .in, .card > .collapsing",DATA_TOGGLE:'[data-toggle="collapse"]'},s=function(){function i(b,d){c(this,i),this._isTransitioning=!1,this._element=b,this._config=this._getConfig(d),this._triggerArray=a.makeArray(a('[data-toggle="collapse"][href="#'+b.id+'"],'+('[data-toggle="collapse"][data-target="#'+b.id+'"]'))),this._parent=this._config.parent?this._getParent():null,this._config.parent||this._addAriaAndCollapsedClass(this._element,this._triggerArray),this._config.toggle&&this.toggle()}return i.prototype.toggle=function(){a(this._element).hasClass(p.IN)?this.hide():this.show()},i.prototype.show=function(){var b=this;if(!this._isTransitioning&&!a(this._element).hasClass(p.IN)){var c=void 0,d=void 0;if(this._parent&&(c=a.makeArray(a(r.ACTIVES)),c.length||(c=null)),!(c&&(d=a(c).data(h),d&&d._isTransitioning))){var e=a.Event(o.SHOW);if(a(this._element).trigger(e),!e.isDefaultPrevented()){c&&(i._jQueryInterface.call(a(c),"hide"),d||a(c).data(h,null));var g=this._getDimension();a(this._element).removeClass(p.COLLAPSE).addClass(p.COLLAPSING),this._element.style[g]=0,this._element.setAttribute("aria-expanded",!0),this._triggerArray.length&&a(this._triggerArray).removeClass(p.COLLAPSED).attr("aria-expanded",!0),this.setTransitioning(!0);var j=function(){a(b._element).removeClass(p.COLLAPSING).addClass(p.COLLAPSE).addClass(p.IN),b._element.style[g]="",b.setTransitioning(!1),a(b._element).trigger(o.SHOWN)};if(!f.supportsTransitionEnd())return void j();var k=g[0].toUpperCase()+g.slice(1),m="scroll"+k;a(this._element).one(f.TRANSITION_END,j).emulateTransitionEnd(l),this._element.style[g]=this._element[m]+"px"}}}},i.prototype.hide=function(){var b=this;if(!this._isTransitioning&&a(this._element).hasClass(p.IN)){var c=a.Event(o.HIDE);if(a(this._element).trigger(c),!c.isDefaultPrevented()){var d=this._getDimension(),e=d===q.WIDTH?"offsetWidth":"offsetHeight";this._element.style[d]=this._element[e]+"px",f.reflow(this._element),a(this._element).addClass(p.COLLAPSING).removeClass(p.COLLAPSE).removeClass(p.IN),this._element.setAttribute("aria-expanded",!1),this._triggerArray.length&&a(this._triggerArray).addClass(p.COLLAPSED).attr("aria-expanded",!1),this.setTransitioning(!0);var g=function(){b.setTransitioning(!1),a(b._element).removeClass(p.COLLAPSING).addClass(p.COLLAPSE).trigger(o.HIDDEN)};return this._element.style[d]="",f.supportsTransitionEnd()?void a(this._element).one(f.TRANSITION_END,g).emulateTransitionEnd(l):void g()}}},i.prototype.setTransitioning=function(a){this._isTransitioning=a},i.prototype.dispose=function(){a.removeData(this._element,h),this._config=null,this._parent=null,this._element=null,this._triggerArray=null,this._isTransitioning=null},i.prototype._getConfig=function(c){return c=a.extend({},m,c),c.toggle=Boolean(c.toggle),f.typeCheckConfig(b,c,n),c},i.prototype._getDimension=function(){var b=a(this._element).hasClass(q.WIDTH);return b?q.WIDTH:q.HEIGHT},i.prototype._getParent=function(){var b=this,c=a(this._config.parent)[0],d='[data-toggle="collapse"][data-parent="'+this._config.parent+'"]';return a(c).find(d).each(function(a,c){b._addAriaAndCollapsedClass(i._getTargetFromElement(c),[c])}),c},i.prototype._addAriaAndCollapsedClass=function(b,c){if(b){var d=a(b).hasClass(p.IN);b.setAttribute("aria-expanded",d),c.length&&a(c).toggleClass(p.COLLAPSED,!d).attr("aria-expanded",d)}},i._getTargetFromElement=function(b){var c=f.getSelectorFromElement(b);return c?a(c)[0]:null},i._jQueryInterface=function(b){return this.each(function(){var c=a(this),e=c.data(h),f=a.extend({},m,c.data(),"object"===("undefined"==typeof b?"undefined":d(b))&&b);if(!e&&f.toggle&&/show|hide/.test(b)&&(f.toggle=!1),e||(e=new i(this,f),c.data(h,e)),"string"==typeof b){if(void 0===e[b])throw new Error('No method named "'+b+'"');e[b]()}})},e(i,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return m}}]),i}();return a(document).on(o.CLICK_DATA_API,r.DATA_TOGGLE,function(b){b.preventDefault();var c=s._getTargetFromElement(this),d=a(c).data(h),e=d?"toggle":a(this).data();s._jQueryInterface.call(a(c),e)}),a.fn[b]=s._jQueryInterface,a.fn[b].Constructor=s,a.fn[b].noConflict=function(){return a.fn[b]=k,s._jQueryInterface},s}(jQuery),function(a){var b="dropdown",d="4.0.0-alpha.5",g="bs.dropdown",h="."+g,i=".data-api",j=a.fn[b],k=27,l=38,m=40,n=3,o={HIDE:"hide"+h,HIDDEN:"hidden"+h,SHOW:"show"+h,SHOWN:"shown"+h,CLICK:"click"+h,CLICK_DATA_API:"click"+h+i,KEYDOWN_DATA_API:"keydown"+h+i},p={BACKDROP:"dropdown-backdrop",DISABLED:"disabled",OPEN:"open"},q={BACKDROP:".dropdown-backdrop",DATA_TOGGLE:'[data-toggle="dropdown"]',FORM_CHILD:".dropdown form",ROLE_MENU:'[role="menu"]',ROLE_LISTBOX:'[role="listbox"]',NAVBAR_NAV:".navbar-nav",VISIBLE_ITEMS:'[role="menu"] li:not(.disabled) a, [role="listbox"] li:not(.disabled) a'},r=function(){function b(a){c(this,b),this._element=a,this._addEventListeners()}return b.prototype.toggle=function(){if(this.disabled||a(this).hasClass(p.DISABLED))return!1;var c=b._getParentFromElement(this),d=a(c).hasClass(p.OPEN);if(b._clearMenus(),d)return!1;if("ontouchstart"in document.documentElement&&!a(c).closest(q.NAVBAR_NAV).length){var e=document.createElement("div");e.className=p.BACKDROP,a(e).insertBefore(this),a(e).on("click",b._clearMenus)}var f={relatedTarget:this},g=a.Event(o.SHOW,f);return a(c).trigger(g),!g.isDefaultPrevented()&&(this.focus(),this.setAttribute("aria-expanded","true"),a(c).toggleClass(p.OPEN),a(c).trigger(a.Event(o.SHOWN,f)),!1)},b.prototype.dispose=function(){a.removeData(this._element,g),a(this._element).off(h),this._element=null},b.prototype._addEventListeners=function(){a(this._element).on(o.CLICK,this.toggle)},b._jQueryInterface=function(c){return this.each(function(){var d=a(this).data(g);if(d||a(this).data(g,d=new b(this)),"string"==typeof c){if(void 0===d[c])throw new Error('No method named "'+c+'"');d[c].call(this)}})},b._clearMenus=function(c){if(!c||c.which!==n){var d=a(q.BACKDROP)[0];d&&d.parentNode.removeChild(d);for(var e=a.makeArray(a(q.DATA_TOGGLE)),f=0;f<e.length;f++){var g=b._getParentFromElement(e[f]),h={relatedTarget:e[f]};if(a(g).hasClass(p.OPEN)&&!(c&&"click"===c.type&&/input|textarea/i.test(c.target.tagName)&&a.contains(g,c.target))){var i=a.Event(o.HIDE,h);a(g).trigger(i),i.isDefaultPrevented()||(e[f].setAttribute("aria-expanded","false"),a(g).removeClass(p.OPEN).trigger(a.Event(o.HIDDEN,h)))}}}},b._getParentFromElement=function(b){var c=void 0,d=f.getSelectorFromElement(b);return d&&(c=a(d)[0]),c||b.parentNode},b._dataApiKeydownHandler=function(c){if(/(38|40|27|32)/.test(c.which)&&!/input|textarea/i.test(c.target.tagName)&&(c.preventDefault(),c.stopPropagation(),!this.disabled&&!a(this).hasClass(p.DISABLED))){var d=b._getParentFromElement(this),e=a(d).hasClass(p.OPEN);if(!e&&c.which!==k||e&&c.which===k){if(c.which===k){var f=a(d).find(q.DATA_TOGGLE)[0];a(f).trigger("focus")}return void a(this).trigger("click")}var g=a.makeArray(a(q.VISIBLE_ITEMS));if(g=g.filter(function(a){return a.offsetWidth||a.offsetHeight}),g.length){var h=g.indexOf(c.target);c.which===l&&h>0&&h--,c.which===m&&h<g.length-1&&h++,h<0&&(h=0),g[h].focus()}}},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(o.KEYDOWN_DATA_API,q.DATA_TOGGLE,r._dataApiKeydownHandler).on(o.KEYDOWN_DATA_API,q.ROLE_MENU,r._dataApiKeydownHandler).on(o.KEYDOWN_DATA_API,q.ROLE_LISTBOX,r._dataApiKeydownHandler).on(o.CLICK_DATA_API,r._clearMenus).on(o.CLICK_DATA_API,q.DATA_TOGGLE,r.prototype.toggle).on(o.CLICK_DATA_API,q.FORM_CHILD,function(a){a.stopPropagation()}),a.fn[b]=r._jQueryInterface,a.fn[b].Constructor=r,a.fn[b].noConflict=function(){return a.fn[b]=j,r._jQueryInterface},r}(jQuery),function(a){var b="modal",g="4.0.0-alpha.5",h="bs.modal",i="."+h,j=".data-api",k=a.fn[b],l=300,m=150,n=27,o={backdrop:!0,keyboard:!0,focus:!0,show:!0},p={backdrop:"(boolean|string)",keyboard:"boolean",focus:"boolean",show:"boolean"},q={HIDE:"hide"+i,HIDDEN:"hidden"+i,SHOW:"show"+i,SHOWN:"shown"+i,FOCUSIN:"focusin"+i,RESIZE:"resize"+i,CLICK_DISMISS:"click.dismiss"+i,KEYDOWN_DISMISS:"keydown.dismiss"+i,MOUSEUP_DISMISS:"mouseup.dismiss"+i,MOUSEDOWN_DISMISS:"mousedown.dismiss"+i,CLICK_DATA_API:"click"+i+j},r={SCROLLBAR_MEASURER:"modal-scrollbar-measure",BACKDROP:"modal-backdrop",OPEN:"modal-open",FADE:"fade",IN:"in"},s={DIALOG:".modal-dialog",DATA_TOGGLE:'[data-toggle="modal"]',DATA_DISMISS:'[data-dismiss="modal"]',FIXED_CONTENT:".navbar-fixed-top, .navbar-fixed-bottom, .is-fixed"},t=function(){function j(b,d){c(this,j),this._config=this._getConfig(d),this._element=b,this._dialog=a(b).find(s.DIALOG)[0],this._backdrop=null,this._isShown=!1,this._isBodyOverflowing=!1,this._ignoreBackdropClick=!1,this._originalBodyPadding=0,this._scrollbarWidth=0}return j.prototype.toggle=function(a){return this._isShown?this.hide():this.show(a)},j.prototype.show=function(b){var c=this,d=a.Event(q.SHOW,{relatedTarget:b});a(this._element).trigger(d),this._isShown||d.isDefaultPrevented()||(this._isShown=!0,this._checkScrollbar(),this._setScrollbar(),a(document.body).addClass(r.OPEN),this._setEscapeEvent(),this._setResizeEvent(),a(this._element).on(q.CLICK_DISMISS,s.DATA_DISMISS,a.proxy(this.hide,this)),a(this._dialog).on(q.MOUSEDOWN_DISMISS,function(){a(c._element).one(q.MOUSEUP_DISMISS,function(b){a(b.target).is(c._element)&&(c._ignoreBackdropClick=!0)})}),this._showBackdrop(a.proxy(this._showElement,this,b)))},j.prototype.hide=function(b){b&&b.preventDefault();var c=a.Event(q.HIDE);a(this._element).trigger(c),this._isShown&&!c.isDefaultPrevented()&&(this._isShown=!1,this._setEscapeEvent(),this._setResizeEvent(),a(document).off(q.FOCUSIN),a(this._element).removeClass(r.IN),a(this._element).off(q.CLICK_DISMISS),a(this._dialog).off(q.MOUSEDOWN_DISMISS),f.supportsTransitionEnd()&&a(this._element).hasClass(r.FADE)?a(this._element).one(f.TRANSITION_END,a.proxy(this._hideModal,this)).emulateTransitionEnd(l):this._hideModal())},j.prototype.dispose=function(){a.removeData(this._element,h),a(window).off(i),a(document).off(i),a(this._element).off(i),a(this._backdrop).off(i),this._config=null,this._element=null,this._dialog=null,this._backdrop=null,this._isShown=null,this._isBodyOverflowing=null,this._ignoreBackdropClick=null,this._originalBodyPadding=null,this._scrollbarWidth=null},j.prototype._getConfig=function(c){return c=a.extend({},o,c),f.typeCheckConfig(b,c,p),c},j.prototype._showElement=function(b){var c=this,d=f.supportsTransitionEnd()&&a(this._element).hasClass(r.FADE);this._element.parentNode&&this._element.parentNode.nodeType===Node.ELEMENT_NODE||document.body.appendChild(this._element),this._element.style.display="block",this._element.removeAttribute("aria-hidden"),this._element.scrollTop=0,d&&f.reflow(this._element),a(this._element).addClass(r.IN),this._config.focus&&this._enforceFocus();var e=a.Event(q.SHOWN,{relatedTarget:b}),g=function(){c._config.focus&&c._element.focus(),a(c._element).trigger(e)};d?a(this._dialog).one(f.TRANSITION_END,g).emulateTransitionEnd(l):g()},j.prototype._enforceFocus=function(){var b=this;a(document).off(q.FOCUSIN).on(q.FOCUSIN,function(c){document===c.target||b._element===c.target||a(b._element).has(c.target).length||b._element.focus()})},j.prototype._setEscapeEvent=function(){var b=this;this._isShown&&this._config.keyboard?a(this._element).on(q.KEYDOWN_DISMISS,function(a){a.which===n&&b.hide()}):this._isShown||a(this._element).off(q.KEYDOWN_DISMISS)},j.prototype._setResizeEvent=function(){this._isShown?a(window).on(q.RESIZE,a.proxy(this._handleUpdate,this)):a(window).off(q.RESIZE)},j.prototype._hideModal=function(){var b=this;this._element.style.display="none",this._element.setAttribute("aria-hidden","true"),this._showBackdrop(function(){a(document.body).removeClass(r.OPEN),b._resetAdjustments(),b._resetScrollbar(),a(b._element).trigger(q.HIDDEN)})},j.prototype._removeBackdrop=function(){this._backdrop&&(a(this._backdrop).remove(),this._backdrop=null)},j.prototype._showBackdrop=function(b){var c=this,d=a(this._element).hasClass(r.FADE)?r.FADE:"";if(this._isShown&&this._config.backdrop){var e=f.supportsTransitionEnd()&&d;if(this._backdrop=document.createElement("div"),this._backdrop.className=r.BACKDROP,d&&a(this._backdrop).addClass(d),a(this._backdrop).appendTo(document.body),a(this._element).on(q.CLICK_DISMISS,function(a){return c._ignoreBackdropClick?void(c._ignoreBackdropClick=!1):void(a.target===a.currentTarget&&("static"===c._config.backdrop?c._element.focus():c.hide()))}),e&&f.reflow(this._backdrop),a(this._backdrop).addClass(r.IN),!b)return;if(!e)return void b();a(this._backdrop).one(f.TRANSITION_END,b).emulateTransitionEnd(m)}else if(!this._isShown&&this._backdrop){a(this._backdrop).removeClass(r.IN);var g=function(){c._removeBackdrop(),b&&b()};f.supportsTransitionEnd()&&a(this._element).hasClass(r.FADE)?a(this._backdrop).one(f.TRANSITION_END,g).emulateTransitionEnd(m):g()}else b&&b()},j.prototype._handleUpdate=function(){this._adjustDialog()},j.prototype._adjustDialog=function(){var a=this._element.scrollHeight>document.documentElement.clientHeight;!this._isBodyOverflowing&&a&&(this._element.style.paddingLeft=this._scrollbarWidth+"px"),this._isBodyOverflowing&&!a&&(this._element.style.paddingRight=this._scrollbarWidth+"px")},j.prototype._resetAdjustments=function(){this._element.style.paddingLeft="",this._element.style.paddingRight=""},j.prototype._checkScrollbar=function(){this._isBodyOverflowing=document.body.clientWidth<window.innerWidth,this._scrollbarWidth=this._getScrollbarWidth()},j.prototype._setScrollbar=function(){var b=parseInt(a(s.FIXED_CONTENT).css("padding-right")||0,10);this._originalBodyPadding=document.body.style.paddingRight||"",this._isBodyOverflowing&&(document.body.style.paddingRight=b+this._scrollbarWidth+"px")},j.prototype._resetScrollbar=function(){document.body.style.paddingRight=this._originalBodyPadding},j.prototype._getScrollbarWidth=function(){var a=document.createElement("div");a.className=r.SCROLLBAR_MEASURER,document.body.appendChild(a);var b=a.offsetWidth-a.clientWidth;return document.body.removeChild(a),b},j._jQueryInterface=function(b,c){return this.each(function(){var e=a(this).data(h),f=a.extend({},j.Default,a(this).data(),"object"===("undefined"==typeof b?"undefined":d(b))&&b);if(e||(e=new j(this,f),a(this).data(h,e)),"string"==typeof b){if(void 0===e[b])throw new Error('No method named "'+b+'"');e[b](c)}else f.show&&e.show(c)})},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return o}}]),j}();return a(document).on(q.CLICK_DATA_API,s.DATA_TOGGLE,function(b){var c=this,d=void 0,e=f.getSelectorFromElement(this);e&&(d=a(e)[0]);var g=a(d).data(h)?"toggle":a.extend({},a(d).data(),a(this).data());"A"===this.tagName&&b.preventDefault();var i=a(d).one(q.SHOW,function(b){b.isDefaultPrevented()||i.one(q.HIDDEN,function(){a(c).is(":visible")&&c.focus()})});t._jQueryInterface.call(a(d),g,this)}),a.fn[b]=t._jQueryInterface,a.fn[b].Constructor=t,a.fn[b].noConflict=function(){return a.fn[b]=k,t._jQueryInterface},t}(jQuery),function(a){var b="scrollspy",g="4.0.0-alpha.5",h="bs.scrollspy",i="."+h,j=".data-api",k=a.fn[b],l={offset:10,method:"auto",target:""},m={offset:"number",method:"string",target:"(string|element)"},n={ACTIVATE:"activate"+i,SCROLL:"scroll"+i,LOAD_DATA_API:"load"+i+j},o={DROPDOWN_ITEM:"dropdown-item",DROPDOWN_MENU:"dropdown-menu",NAV_LINK:"nav-link",NAV:"nav",ACTIVE:"active"},p={DATA_SPY:'[data-spy="scroll"]',ACTIVE:".active",LIST_ITEM:".list-item",LI:"li",LI_DROPDOWN:"li.dropdown",NAV_LINKS:".nav-link",DROPDOWN:".dropdown",DROPDOWN_ITEMS:".dropdown-item",DROPDOWN_TOGGLE:".dropdown-toggle"},q={OFFSET:"offset",POSITION:"position"},r=function(){function j(b,d){c(this,j),this._element=b,this._scrollElement="BODY"===b.tagName?window:b,this._config=this._getConfig(d),this._selector=this._config.target+" "+p.NAV_LINKS+","+(this._config.target+" "+p.DROPDOWN_ITEMS),this._offsets=[],this._targets=[],this._activeTarget=null,this._scrollHeight=0,a(this._scrollElement).on(n.SCROLL,a.proxy(this._process,this)),this.refresh(),this._process()}return j.prototype.refresh=function(){var b=this,c=this._scrollElement!==this._scrollElement.window?q.POSITION:q.OFFSET,d="auto"===this._config.method?c:this._config.method,e=d===q.POSITION?this._getScrollTop():0;this._offsets=[],this._targets=[],this._scrollHeight=this._getScrollHeight();var g=a.makeArray(a(this._selector));g.map(function(b){var c=void 0,g=f.getSelectorFromElement(b);return g&&(c=a(g)[0]),c&&(c.offsetWidth||c.offsetHeight)?[a(c)[d]().top+e,g]:null}).filter(function(a){return a}).sort(function(a,b){return a[0]-b[0]}).forEach(function(a){b._offsets.push(a[0]),b._targets.push(a[1])})},j.prototype.dispose=function(){a.removeData(this._element,h),a(this._scrollElement).off(i),this._element=null,this._scrollElement=null,this._config=null,this._selector=null,this._offsets=null,this._targets=null,this._activeTarget=null,this._scrollHeight=null},j.prototype._getConfig=function(c){if(c=a.extend({},l,c),"string"!=typeof c.target){var d=a(c.target).attr("id");d||(d=f.getUID(b),a(c.target).attr("id",d)),c.target="#"+d}return f.typeCheckConfig(b,c,m),c},j.prototype._getScrollTop=function(){return this._scrollElement===window?this._scrollElement.scrollY:this._scrollElement.scrollTop},j.prototype._getScrollHeight=function(){return this._scrollElement.scrollHeight||Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)},j.prototype._process=function(){var a=this._getScrollTop()+this._config.offset,b=this._getScrollHeight(),c=this._config.offset+b-this._scrollElement.offsetHeight;if(this._scrollHeight!==b&&this.refresh(),a>=c){var d=this._targets[this._targets.length-1];this._activeTarget!==d&&this._activate(d)}if(this._activeTarget&&a<this._offsets[0])return this._activeTarget=null,void this._clear();for(var e=this._offsets.length;e--;){var f=this._activeTarget!==this._targets[e]&&a>=this._offsets[e]&&(void 0===this._offsets[e+1]||a<this._offsets[e+1]);f&&this._activate(this._targets[e])}},j.prototype._activate=function(b){this._activeTarget=b,this._clear();var c=this._selector.split(",");c=c.map(function(a){return a+'[data-target="'+b+'"],'+(a+'[href="'+b+'"]')});var d=a(c.join(","));d.hasClass(o.DROPDOWN_ITEM)?(d.closest(p.DROPDOWN).find(p.DROPDOWN_TOGGLE).addClass(o.ACTIVE),d.addClass(o.ACTIVE)):d.parents(p.LI).find(p.NAV_LINKS).addClass(o.ACTIVE),a(this._scrollElement).trigger(n.ACTIVATE,{relatedTarget:b})},j.prototype._clear=function(){a(this._selector).filter(p.ACTIVE).removeClass(o.ACTIVE)},j._jQueryInterface=function(b){return this.each(function(){var c=a(this).data(h),e="object"===("undefined"==typeof b?"undefined":d(b))&&b||null;if(c||(c=new j(this,e),a(this).data(h,c)),"string"==typeof b){if(void 0===c[b])throw new Error('No method named "'+b+'"');c[b]()}})},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return l}}]),j}();return a(window).on(n.LOAD_DATA_API,function(){for(var b=a.makeArray(a(p.DATA_SPY)),c=b.length;c--;){var d=a(b[c]);r._jQueryInterface.call(d,d.data())}}),a.fn[b]=r._jQueryInterface,a.fn[b].Constructor=r,a.fn[b].noConflict=function(){return a.fn[b]=k,r._jQueryInterface},r}(jQuery),function(a){var b="tab",d="4.0.0-alpha.5",g="bs.tab",h="."+g,i=".data-api",j=a.fn[b],k=150,l={HIDE:"hide"+h,HIDDEN:"hidden"+h,SHOW:"show"+h,SHOWN:"shown"+h,CLICK_DATA_API:"click"+h+i},m={DROPDOWN_MENU:"dropdown-menu",ACTIVE:"active",FADE:"fade",IN:"in"},n={A:"a",LI:"li",DROPDOWN:".dropdown",UL:"ul:not(.dropdown-menu)",FADE_CHILD:"> .nav-item .fade, > .fade",ACTIVE:".active",ACTIVE_CHILD:"> .nav-item > .active, > .active",DATA_TOGGLE:'[data-toggle="tab"], [data-toggle="pill"]',
+DROPDOWN_TOGGLE:".dropdown-toggle",DROPDOWN_ACTIVE_CHILD:"> .dropdown-menu .active"},o=function(){function b(a){c(this,b),this._element=a}return b.prototype.show=function(){var b=this;if(!this._element.parentNode||this._element.parentNode.nodeType!==Node.ELEMENT_NODE||!a(this._element).hasClass(m.ACTIVE)){var c=void 0,d=void 0,e=a(this._element).closest(n.UL)[0],g=f.getSelectorFromElement(this._element);e&&(d=a.makeArray(a(e).find(n.ACTIVE)),d=d[d.length-1]);var h=a.Event(l.HIDE,{relatedTarget:this._element}),i=a.Event(l.SHOW,{relatedTarget:d});if(d&&a(d).trigger(h),a(this._element).trigger(i),!i.isDefaultPrevented()&&!h.isDefaultPrevented()){g&&(c=a(g)[0]),this._activate(this._element,e);var j=function(){var c=a.Event(l.HIDDEN,{relatedTarget:b._element}),e=a.Event(l.SHOWN,{relatedTarget:d});a(d).trigger(c),a(b._element).trigger(e)};c?this._activate(c,c.parentNode,j):j()}}},b.prototype.dispose=function(){a.removeClass(this._element,g),this._element=null},b.prototype._activate=function(b,c,d){var e=a(c).find(n.ACTIVE_CHILD)[0],g=d&&f.supportsTransitionEnd()&&(e&&a(e).hasClass(m.FADE)||Boolean(a(c).find(n.FADE_CHILD)[0])),h=a.proxy(this._transitionComplete,this,b,e,g,d);e&&g?a(e).one(f.TRANSITION_END,h).emulateTransitionEnd(k):h(),e&&a(e).removeClass(m.IN)},b.prototype._transitionComplete=function(b,c,d,e){if(c){a(c).removeClass(m.ACTIVE);var g=a(c).find(n.DROPDOWN_ACTIVE_CHILD)[0];g&&a(g).removeClass(m.ACTIVE),c.setAttribute("aria-expanded",!1)}if(a(b).addClass(m.ACTIVE),b.setAttribute("aria-expanded",!0),d?(f.reflow(b),a(b).addClass(m.IN)):a(b).removeClass(m.FADE),b.parentNode&&a(b.parentNode).hasClass(m.DROPDOWN_MENU)){var h=a(b).closest(n.DROPDOWN)[0];h&&a(h).find(n.DROPDOWN_TOGGLE).addClass(m.ACTIVE),b.setAttribute("aria-expanded",!0)}e&&e()},b._jQueryInterface=function(c){return this.each(function(){var d=a(this),e=d.data(g);if(e||(e=e=new b(this),d.data(g,e)),"string"==typeof c){if(void 0===e[c])throw new Error('No method named "'+c+'"');e[c]()}})},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(l.CLICK_DATA_API,n.DATA_TOGGLE,function(b){b.preventDefault(),o._jQueryInterface.call(a(this),"show")}),a.fn[b]=o._jQueryInterface,a.fn[b].Constructor=o,a.fn[b].noConflict=function(){return a.fn[b]=j,o._jQueryInterface},o}(jQuery),function(a){if(void 0===window.Tether)throw new Error("Bootstrap tooltips require Tether (http://tether.io/)");var b="tooltip",g="4.0.0-alpha.5",h="bs.tooltip",i="."+h,j=a.fn[b],k=150,l="bs-tether",m={animation:!0,template:'<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,selector:!1,placement:"top",offset:"0 0",constraints:[]},n={animation:"boolean",template:"string",title:"(string|element|function)",trigger:"string",delay:"(number|object)",html:"boolean",selector:"(string|boolean)",placement:"(string|function)",offset:"string",constraints:"array"},o={TOP:"bottom center",RIGHT:"middle left",BOTTOM:"top center",LEFT:"middle right"},p={IN:"in",OUT:"out"},q={HIDE:"hide"+i,HIDDEN:"hidden"+i,SHOW:"show"+i,SHOWN:"shown"+i,INSERTED:"inserted"+i,CLICK:"click"+i,FOCUSIN:"focusin"+i,FOCUSOUT:"focusout"+i,MOUSEENTER:"mouseenter"+i,MOUSELEAVE:"mouseleave"+i},r={FADE:"fade",IN:"in"},s={TOOLTIP:".tooltip",TOOLTIP_INNER:".tooltip-inner"},t={element:!1,enabled:!1},u={HOVER:"hover",FOCUS:"focus",CLICK:"click",MANUAL:"manual"},v=function(){function j(a,b){c(this,j),this._isEnabled=!0,this._timeout=0,this._hoverState="",this._activeTrigger={},this._tether=null,this.element=a,this.config=this._getConfig(b),this.tip=null,this._setListeners()}return j.prototype.enable=function(){this._isEnabled=!0},j.prototype.disable=function(){this._isEnabled=!1},j.prototype.toggleEnabled=function(){this._isEnabled=!this._isEnabled},j.prototype.toggle=function(b){if(b){var c=this.constructor.DATA_KEY,d=a(b.currentTarget).data(c);d||(d=new this.constructor(b.currentTarget,this._getDelegateConfig()),a(b.currentTarget).data(c,d)),d._activeTrigger.click=!d._activeTrigger.click,d._isWithActiveTrigger()?d._enter(null,d):d._leave(null,d)}else{if(a(this.getTipElement()).hasClass(r.IN))return void this._leave(null,this);this._enter(null,this)}},j.prototype.dispose=function(){clearTimeout(this._timeout),this.cleanupTether(),a.removeData(this.element,this.constructor.DATA_KEY),a(this.element).off(this.constructor.EVENT_KEY),this.tip&&a(this.tip).remove(),this._isEnabled=null,this._timeout=null,this._hoverState=null,this._activeTrigger=null,this._tether=null,this.element=null,this.config=null,this.tip=null},j.prototype.show=function(){var b=this,c=a.Event(this.constructor.Event.SHOW);if(this.isWithContent()&&this._isEnabled){a(this.element).trigger(c);var d=a.contains(this.element.ownerDocument.documentElement,this.element);if(c.isDefaultPrevented()||!d)return;var e=this.getTipElement(),g=f.getUID(this.constructor.NAME);e.setAttribute("id",g),this.element.setAttribute("aria-describedby",g),this.setContent(),this.config.animation&&a(e).addClass(r.FADE);var h="function"==typeof this.config.placement?this.config.placement.call(this,e,this.element):this.config.placement,i=this._getAttachment(h);a(e).data(this.constructor.DATA_KEY,this).appendTo(document.body),a(this.element).trigger(this.constructor.Event.INSERTED),this._tether=new Tether({attachment:i,element:e,target:this.element,classes:t,classPrefix:l,offset:this.config.offset,constraints:this.config.constraints,addTargetClasses:!1}),f.reflow(e),this._tether.position(),a(e).addClass(r.IN);var k=function(){var c=b._hoverState;b._hoverState=null,a(b.element).trigger(b.constructor.Event.SHOWN),c===p.OUT&&b._leave(null,b)};if(f.supportsTransitionEnd()&&a(this.tip).hasClass(r.FADE))return void a(this.tip).one(f.TRANSITION_END,k).emulateTransitionEnd(j._TRANSITION_DURATION);k()}},j.prototype.hide=function(b){var c=this,d=this.getTipElement(),e=a.Event(this.constructor.Event.HIDE),g=function(){c._hoverState!==p.IN&&d.parentNode&&d.parentNode.removeChild(d),c.element.removeAttribute("aria-describedby"),a(c.element).trigger(c.constructor.Event.HIDDEN),c.cleanupTether(),b&&b()};a(this.element).trigger(e),e.isDefaultPrevented()||(a(d).removeClass(r.IN),f.supportsTransitionEnd()&&a(this.tip).hasClass(r.FADE)?a(d).one(f.TRANSITION_END,g).emulateTransitionEnd(k):g(),this._hoverState="")},j.prototype.isWithContent=function(){return Boolean(this.getTitle())},j.prototype.getTipElement=function(){return this.tip=this.tip||a(this.config.template)[0]},j.prototype.setContent=function(){var b=a(this.getTipElement());this.setElementContent(b.find(s.TOOLTIP_INNER),this.getTitle()),b.removeClass(r.FADE).removeClass(r.IN),this.cleanupTether()},j.prototype.setElementContent=function(b,c){var e=this.config.html;"object"===("undefined"==typeof c?"undefined":d(c))&&(c.nodeType||c.jquery)?e?a(c).parent().is(b)||b.empty().append(c):b.text(a(c).text()):b[e?"html":"text"](c)},j.prototype.getTitle=function(){var a=this.element.getAttribute("data-original-title");return a||(a="function"==typeof this.config.title?this.config.title.call(this.element):this.config.title),a},j.prototype.cleanupTether=function(){this._tether&&this._tether.destroy()},j.prototype._getAttachment=function(a){return o[a.toUpperCase()]},j.prototype._setListeners=function(){var b=this,c=this.config.trigger.split(" ");c.forEach(function(c){if("click"===c)a(b.element).on(b.constructor.Event.CLICK,b.config.selector,a.proxy(b.toggle,b));else if(c!==u.MANUAL){var d=c===u.HOVER?b.constructor.Event.MOUSEENTER:b.constructor.Event.FOCUSIN,e=c===u.HOVER?b.constructor.Event.MOUSELEAVE:b.constructor.Event.FOCUSOUT;a(b.element).on(d,b.config.selector,a.proxy(b._enter,b)).on(e,b.config.selector,a.proxy(b._leave,b))}}),this.config.selector?this.config=a.extend({},this.config,{trigger:"manual",selector:""}):this._fixTitle()},j.prototype._fixTitle=function(){var a=d(this.element.getAttribute("data-original-title"));(this.element.getAttribute("title")||"string"!==a)&&(this.element.setAttribute("data-original-title",this.element.getAttribute("title")||""),this.element.setAttribute("title",""))},j.prototype._enter=function(b,c){var d=this.constructor.DATA_KEY;return c=c||a(b.currentTarget).data(d),c||(c=new this.constructor(b.currentTarget,this._getDelegateConfig()),a(b.currentTarget).data(d,c)),b&&(c._activeTrigger["focusin"===b.type?u.FOCUS:u.HOVER]=!0),a(c.getTipElement()).hasClass(r.IN)||c._hoverState===p.IN?void(c._hoverState=p.IN):(clearTimeout(c._timeout),c._hoverState=p.IN,c.config.delay&&c.config.delay.show?void(c._timeout=setTimeout(function(){c._hoverState===p.IN&&c.show()},c.config.delay.show)):void c.show())},j.prototype._leave=function(b,c){var d=this.constructor.DATA_KEY;if(c=c||a(b.currentTarget).data(d),c||(c=new this.constructor(b.currentTarget,this._getDelegateConfig()),a(b.currentTarget).data(d,c)),b&&(c._activeTrigger["focusout"===b.type?u.FOCUS:u.HOVER]=!1),!c._isWithActiveTrigger())return clearTimeout(c._timeout),c._hoverState=p.OUT,c.config.delay&&c.config.delay.hide?void(c._timeout=setTimeout(function(){c._hoverState===p.OUT&&c.hide()},c.config.delay.hide)):void c.hide()},j.prototype._isWithActiveTrigger=function(){for(var a in this._activeTrigger)if(this._activeTrigger[a])return!0;return!1},j.prototype._getConfig=function(c){return c=a.extend({},this.constructor.Default,a(this.element).data(),c),c.delay&&"number"==typeof c.delay&&(c.delay={show:c.delay,hide:c.delay}),f.typeCheckConfig(b,c,this.constructor.DefaultType),c},j.prototype._getDelegateConfig=function(){var a={};if(this.config)for(var b in this.config)this.constructor.Default[b]!==this.config[b]&&(a[b]=this.config[b]);return a},j._jQueryInterface=function(b){return this.each(function(){var c=a(this).data(h),e="object"===("undefined"==typeof b?"undefined":d(b))?b:null;if((c||!/dispose|hide/.test(b))&&(c||(c=new j(this,e),a(this).data(h,c)),"string"==typeof b)){if(void 0===c[b])throw new Error('No method named "'+b+'"');c[b]()}})},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return m}},{key:"NAME",get:function(){return b}},{key:"DATA_KEY",get:function(){return h}},{key:"Event",get:function(){return q}},{key:"EVENT_KEY",get:function(){return i}},{key:"DefaultType",get:function(){return n}}]),j}();return a.fn[b]=v._jQueryInterface,a.fn[b].Constructor=v,a.fn[b].noConflict=function(){return a.fn[b]=j,v._jQueryInterface},v}(jQuery));(function(f){var h="popover",i="4.0.0-alpha.5",j="bs.popover",k="."+j,l=f.fn[h],m=f.extend({},g.Default,{placement:"right",trigger:"click",content:"",template:'<div class="popover" role="tooltip"><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),n=f.extend({},g.DefaultType,{content:"(string|element|function)"}),o={FADE:"fade",IN:"in"},p={TITLE:".popover-title",CONTENT:".popover-content"},q={HIDE:"hide"+k,HIDDEN:"hidden"+k,SHOW:"show"+k,SHOWN:"shown"+k,INSERTED:"inserted"+k,CLICK:"click"+k,FOCUSIN:"focusin"+k,FOCUSOUT:"focusout"+k,MOUSEENTER:"mouseenter"+k,MOUSELEAVE:"mouseleave"+k},r=function(g){function l(){return c(this,l),a(this,g.apply(this,arguments))}return b(l,g),l.prototype.isWithContent=function(){return this.getTitle()||this._getContent()},l.prototype.getTipElement=function(){return this.tip=this.tip||f(this.config.template)[0]},l.prototype.setContent=function(){var a=f(this.getTipElement());this.setElementContent(a.find(p.TITLE),this.getTitle()),this.setElementContent(a.find(p.CONTENT),this._getContent()),a.removeClass(o.FADE).removeClass(o.IN),this.cleanupTether()},l.prototype._getContent=function(){return this.element.getAttribute("data-content")||("function"==typeof this.config.content?this.config.content.call(this.element):this.config.content)},l._jQueryInterface=function(a){return this.each(function(){var b=f(this).data(j),c="object"===("undefined"==typeof a?"undefined":d(a))?a:null;if((b||!/destroy|hide/.test(a))&&(b||(b=new l(this,c),f(this).data(j,b)),"string"==typeof a)){if(void 0===b[a])throw new Error('No method named "'+a+'"');b[a]()}})},e(l,null,[{key:"VERSION",get:function(){return i}},{key:"Default",get:function(){return m}},{key:"NAME",get:function(){return h}},{key:"DATA_KEY",get:function(){return j}},{key:"Event",get:function(){return q}},{key:"EVENT_KEY",get:function(){return k}},{key:"DefaultType",get:function(){return n}}]),l}(g);return f.fn[h]=r._jQueryInterface,f.fn[h].Constructor=r,f.fn[h].noConflict=function(){return f.fn[h]=l,r._jQueryInterface},r})(jQuery)}();
+define("bootstrap4/js/bootstrap.min", ["jquery"], (function (global) {
+  return function () {
+    var ret, fn;
+    return ret || global.$;
+  };
+}(this)));
+;define('bootstrap4', ['bootstrap4/js/bootstrap.min'], function (main) { return main; });
+
+define('text!bootstrap4/css/bootstrap.css', ['module'], function(module) { module.exports = "/*!\n * Bootstrap v4.0.0-alpha.5 (https://getbootstrap.com)\n * Copyright 2011-2016 The Bootstrap Authors\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\n/*! normalize.css v4.2.0 | MIT License | github.com/necolas/normalize.css */\nhtml {\n  font-family: sans-serif;\n  line-height: 1.15;\n  -ms-text-size-adjust: 100%;\n  -webkit-text-size-adjust: 100%;\n}\n\nbody {\n  margin: 0;\n}\n\narticle,\naside,\ndetails,\nfigcaption,\nfigure,\nfooter,\nheader,\nmain,\nmenu,\nnav,\nsection,\nsummary {\n  display: block;\n}\n\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n}\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\nprogress {\n  vertical-align: baseline;\n}\n\ntemplate,\n[hidden] {\n  display: none;\n}\n\na {\n  background-color: transparent;\n  -webkit-text-decoration-skip: objects;\n}\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\nabbr[title] {\n  border-bottom: none;\n  text-decoration: underline;\n  text-decoration: underline dotted;\n}\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\ndfn {\n  font-style: italic;\n}\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\nsmall {\n  font-size: 80%;\n}\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\nimg {\n  border-style: none;\n}\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\n\nfigure {\n  margin: 1em 40px;\n}\n\nhr {\n  -webkit-box-sizing: content-box;\n          box-sizing: content-box;\n  height: 0;\n  overflow: visible;\n}\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font: inherit;\n  margin: 0;\n}\n\noptgroup {\n  font-weight: bold;\n}\n\nbutton,\ninput {\n  overflow: visible;\n}\n\nbutton,\nselect {\n  text-transform: none;\n}\n\nbutton,\nhtml [type=\"button\"],\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button;\n}\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\nlegend {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  display: table;\n  max-width: 100%;\n  padding: 0;\n  white-space: normal;\n}\n\ntextarea {\n  overflow: auto;\n}\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  padding: 0;\n}\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n[type=\"search\"] {\n  -webkit-appearance: textfield;\n  outline-offset: -2px;\n}\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n::-webkit-input-placeholder {\n  color: inherit;\n  opacity: 0.54;\n}\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button;\n  font: inherit;\n}\n\n@media print {\n  *,\n  *::before,\n  *::after,\n  *::first-letter,\n  p::first-line,\n  div::first-line,\n  blockquote::first-line,\n  li::first-line {\n    text-shadow: none !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n  abbr[title]::after {\n    content: \" (\" attr(title) \")\";\n  }\n  pre {\n    white-space: pre-wrap !important;\n  }\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n  thead {\n    display: table-header-group;\n  }\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n  .navbar {\n    display: none;\n  }\n  .btn > .caret,\n  .dropup > .btn > .caret {\n    border-top-color: #000 !important;\n  }\n  .tag {\n    border: 1px solid #000;\n  }\n  .table {\n    border-collapse: collapse !important;\n  }\n  .table td,\n  .table th {\n    background-color: #fff !important;\n  }\n  .table-bordered th,\n  .table-bordered td {\n    border: 1px solid #ddd !important;\n  }\n}\n\nhtml {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n\n*,\n*::before,\n*::after {\n  -webkit-box-sizing: inherit;\n          box-sizing: inherit;\n}\n\n@-ms-viewport {\n  width: device-width;\n}\n\nhtml {\n  font-size: 16px;\n  -ms-overflow-style: scrollbar;\n  -webkit-tap-highlight-color: transparent;\n}\n\nbody {\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-size: 1rem;\n  line-height: 1.5;\n  color: #373a3c;\n  background-color: #fff;\n}\n\n[tabindex=\"-1\"]:focus {\n  outline: none !important;\n}\n\nh1, h2, h3, h4, h5, h6 {\n  margin-top: 0;\n  margin-bottom: .5rem;\n}\n\np {\n  margin-top: 0;\n  margin-bottom: 1rem;\n}\n\nabbr[title],\nabbr[data-original-title] {\n  cursor: help;\n  border-bottom: 1px dotted #818a91;\n}\n\naddress {\n  margin-bottom: 1rem;\n  font-style: normal;\n  line-height: inherit;\n}\n\nol,\nul,\ndl {\n  margin-top: 0;\n  margin-bottom: 1rem;\n}\n\nol ol,\nul ul,\nol ul,\nul ol {\n  margin-bottom: 0;\n}\n\ndt {\n  font-weight: bold;\n}\n\ndd {\n  margin-bottom: .5rem;\n  margin-left: 0;\n}\n\nblockquote {\n  margin: 0 0 1rem;\n}\n\na {\n  color: #0275d8;\n  text-decoration: none;\n}\n\na:focus, a:hover {\n  color: #014c8c;\n  text-decoration: underline;\n}\n\na:focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n\na:not([href]):not([tabindex]) {\n  color: inherit;\n  text-decoration: none;\n}\n\na:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {\n  color: inherit;\n  text-decoration: none;\n}\n\na:not([href]):not([tabindex]):focus {\n  outline: none;\n}\n\npre {\n  margin-top: 0;\n  margin-bottom: 1rem;\n  overflow: auto;\n}\n\nfigure {\n  margin: 0 0 1rem;\n}\n\nimg {\n  vertical-align: middle;\n}\n\n[role=\"button\"] {\n  cursor: pointer;\n}\n\na,\narea,\nbutton,\n[role=\"button\"],\ninput,\nlabel,\nselect,\nsummary,\ntextarea {\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n}\n\ntable {\n  border-collapse: collapse;\n  background-color: transparent;\n}\n\ncaption {\n  padding-top: 0.75rem;\n  padding-bottom: 0.75rem;\n  color: #818a91;\n  text-align: left;\n  caption-side: bottom;\n}\n\nth {\n  text-align: left;\n}\n\nlabel {\n  display: inline-block;\n  margin-bottom: .5rem;\n}\n\nbutton:focus {\n  outline: 1px dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n}\n\ninput,\nbutton,\nselect,\ntextarea {\n  line-height: inherit;\n}\n\ninput[type=\"radio\"]:disabled,\ninput[type=\"checkbox\"]:disabled {\n  cursor: not-allowed;\n}\n\ninput[type=\"date\"],\ninput[type=\"time\"],\ninput[type=\"datetime-local\"],\ninput[type=\"month\"] {\n  -webkit-appearance: listbox;\n}\n\ntextarea {\n  resize: vertical;\n}\n\nfieldset {\n  min-width: 0;\n  padding: 0;\n  margin: 0;\n  border: 0;\n}\n\nlegend {\n  display: block;\n  width: 100%;\n  padding: 0;\n  margin-bottom: .5rem;\n  font-size: 1.5rem;\n  line-height: inherit;\n}\n\ninput[type=\"search\"] {\n  -webkit-appearance: none;\n}\n\noutput {\n  display: inline-block;\n}\n\n[hidden] {\n  display: none !important;\n}\n\nh1, h2, h3, h4, h5, h6,\n.h1, .h2, .h3, .h4, .h5, .h6 {\n  margin-bottom: 0.5rem;\n  font-family: inherit;\n  font-weight: 500;\n  line-height: 1.1;\n  color: inherit;\n}\n\nh1, .h1 {\n  font-size: 2.5rem;\n}\n\nh2, .h2 {\n  font-size: 2rem;\n}\n\nh3, .h3 {\n  font-size: 1.75rem;\n}\n\nh4, .h4 {\n  font-size: 1.5rem;\n}\n\nh5, .h5 {\n  font-size: 1.25rem;\n}\n\nh6, .h6 {\n  font-size: 1rem;\n}\n\n.lead {\n  font-size: 1.25rem;\n  font-weight: 300;\n}\n\n.display-1 {\n  font-size: 6rem;\n  font-weight: 300;\n}\n\n.display-2 {\n  font-size: 5.5rem;\n  font-weight: 300;\n}\n\n.display-3 {\n  font-size: 4.5rem;\n  font-weight: 300;\n}\n\n.display-4 {\n  font-size: 3.5rem;\n  font-weight: 300;\n}\n\nhr {\n  margin-top: 1rem;\n  margin-bottom: 1rem;\n  border: 0;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n}\n\nsmall,\n.small {\n  font-size: 80%;\n  font-weight: normal;\n}\n\nmark,\n.mark {\n  padding: 0.2em;\n  background-color: #fcf8e3;\n}\n\n.list-unstyled {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-inline {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-inline-item {\n  display: inline-block;\n}\n\n.list-inline-item:not(:last-child) {\n  margin-right: 5px;\n}\n\n.initialism {\n  font-size: 90%;\n  text-transform: uppercase;\n}\n\n.blockquote {\n  padding: 0.5rem 1rem;\n  margin-bottom: 1rem;\n  font-size: 1.25rem;\n  border-left: 0.25rem solid #eceeef;\n}\n\n.blockquote-footer {\n  display: block;\n  font-size: 80%;\n  color: #818a91;\n}\n\n.blockquote-footer::before {\n  content: \"\\2014 \\00A0\";\n}\n\n.blockquote-reverse {\n  padding-right: 1rem;\n  padding-left: 0;\n  text-align: right;\n  border-right: 0.25rem solid #eceeef;\n  border-left: 0;\n}\n\n.blockquote-reverse .blockquote-footer::before {\n  content: \"\";\n}\n\n.blockquote-reverse .blockquote-footer::after {\n  content: \"\\00A0 \\2014\";\n}\n\ndl.row > dd + dt {\n  clear: left;\n}\n\n.img-fluid, .carousel-inner > .carousel-item > img,\n.carousel-inner > .carousel-item > a > img {\n  max-width: 100%;\n  height: auto;\n}\n\n.img-thumbnail {\n  padding: 0.25rem;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 0.25rem;\n  -webkit-transition: all .2s ease-in-out;\n  -o-transition: all .2s ease-in-out;\n  transition: all .2s ease-in-out;\n  max-width: 100%;\n  height: auto;\n}\n\n.figure {\n  display: inline-block;\n}\n\n.figure-img {\n  margin-bottom: 0.5rem;\n  line-height: 1;\n}\n\n.figure-caption {\n  font-size: 90%;\n  color: #818a91;\n}\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n}\n\ncode {\n  padding: 0.2rem 0.4rem;\n  font-size: 90%;\n  color: #bd4147;\n  background-color: #f7f7f9;\n  border-radius: 0.25rem;\n}\n\nkbd {\n  padding: 0.2rem 0.4rem;\n  font-size: 90%;\n  color: #fff;\n  background-color: #333;\n  border-radius: 0.2rem;\n}\n\nkbd kbd {\n  padding: 0;\n  font-size: 100%;\n  font-weight: bold;\n}\n\npre {\n  display: block;\n  margin-top: 0;\n  margin-bottom: 1rem;\n  font-size: 90%;\n  color: #373a3c;\n}\n\npre code {\n  padding: 0;\n  font-size: inherit;\n  color: inherit;\n  background-color: transparent;\n  border-radius: 0;\n}\n\n.pre-scrollable {\n  max-height: 340px;\n  overflow-y: scroll;\n}\n\n.container {\n  margin-left: auto;\n  margin-right: auto;\n  padding-left: 15px;\n  padding-right: 15px;\n}\n\n.container::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (min-width: 576px) {\n  .container {\n    width: 540px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 768px) {\n  .container {\n    width: 720px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 992px) {\n  .container {\n    width: 960px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 1200px) {\n  .container {\n    width: 1140px;\n    max-width: 100%;\n  }\n}\n\n.container-fluid {\n  margin-left: auto;\n  margin-right: auto;\n  padding-left: 15px;\n  padding-right: 15px;\n}\n\n.container-fluid::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.row {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n\n.row::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (min-width: 576px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n.col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n  position: relative;\n  min-height: 1px;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n\n@media (min-width: 576px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n.col-xs-1 {\n  float: left;\n  width: 8.333333%;\n}\n\n.col-xs-2 {\n  float: left;\n  width: 16.666667%;\n}\n\n.col-xs-3 {\n  float: left;\n  width: 25%;\n}\n\n.col-xs-4 {\n  float: left;\n  width: 33.333333%;\n}\n\n.col-xs-5 {\n  float: left;\n  width: 41.666667%;\n}\n\n.col-xs-6 {\n  float: left;\n  width: 50%;\n}\n\n.col-xs-7 {\n  float: left;\n  width: 58.333333%;\n}\n\n.col-xs-8 {\n  float: left;\n  width: 66.666667%;\n}\n\n.col-xs-9 {\n  float: left;\n  width: 75%;\n}\n\n.col-xs-10 {\n  float: left;\n  width: 83.333333%;\n}\n\n.col-xs-11 {\n  float: left;\n  width: 91.666667%;\n}\n\n.col-xs-12 {\n  float: left;\n  width: 100%;\n}\n\n.pull-xs-0 {\n  right: auto;\n}\n\n.pull-xs-1 {\n  right: 8.333333%;\n}\n\n.pull-xs-2 {\n  right: 16.666667%;\n}\n\n.pull-xs-3 {\n  right: 25%;\n}\n\n.pull-xs-4 {\n  right: 33.333333%;\n}\n\n.pull-xs-5 {\n  right: 41.666667%;\n}\n\n.pull-xs-6 {\n  right: 50%;\n}\n\n.pull-xs-7 {\n  right: 58.333333%;\n}\n\n.pull-xs-8 {\n  right: 66.666667%;\n}\n\n.pull-xs-9 {\n  right: 75%;\n}\n\n.pull-xs-10 {\n  right: 83.333333%;\n}\n\n.pull-xs-11 {\n  right: 91.666667%;\n}\n\n.pull-xs-12 {\n  right: 100%;\n}\n\n.push-xs-0 {\n  left: auto;\n}\n\n.push-xs-1 {\n  left: 8.333333%;\n}\n\n.push-xs-2 {\n  left: 16.666667%;\n}\n\n.push-xs-3 {\n  left: 25%;\n}\n\n.push-xs-4 {\n  left: 33.333333%;\n}\n\n.push-xs-5 {\n  left: 41.666667%;\n}\n\n.push-xs-6 {\n  left: 50%;\n}\n\n.push-xs-7 {\n  left: 58.333333%;\n}\n\n.push-xs-8 {\n  left: 66.666667%;\n}\n\n.push-xs-9 {\n  left: 75%;\n}\n\n.push-xs-10 {\n  left: 83.333333%;\n}\n\n.push-xs-11 {\n  left: 91.666667%;\n}\n\n.push-xs-12 {\n  left: 100%;\n}\n\n.offset-xs-1 {\n  margin-left: 8.333333%;\n}\n\n.offset-xs-2 {\n  margin-left: 16.666667%;\n}\n\n.offset-xs-3 {\n  margin-left: 25%;\n}\n\n.offset-xs-4 {\n  margin-left: 33.333333%;\n}\n\n.offset-xs-5 {\n  margin-left: 41.666667%;\n}\n\n.offset-xs-6 {\n  margin-left: 50%;\n}\n\n.offset-xs-7 {\n  margin-left: 58.333333%;\n}\n\n.offset-xs-8 {\n  margin-left: 66.666667%;\n}\n\n.offset-xs-9 {\n  margin-left: 75%;\n}\n\n.offset-xs-10 {\n  margin-left: 83.333333%;\n}\n\n.offset-xs-11 {\n  margin-left: 91.666667%;\n}\n\n@media (min-width: 576px) {\n  .col-sm-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-sm-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-sm-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-sm-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-sm-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-sm-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-sm-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-sm-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-sm-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-sm-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-sm-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-sm-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-sm-0 {\n    right: auto;\n  }\n  .pull-sm-1 {\n    right: 8.333333%;\n  }\n  .pull-sm-2 {\n    right: 16.666667%;\n  }\n  .pull-sm-3 {\n    right: 25%;\n  }\n  .pull-sm-4 {\n    right: 33.333333%;\n  }\n  .pull-sm-5 {\n    right: 41.666667%;\n  }\n  .pull-sm-6 {\n    right: 50%;\n  }\n  .pull-sm-7 {\n    right: 58.333333%;\n  }\n  .pull-sm-8 {\n    right: 66.666667%;\n  }\n  .pull-sm-9 {\n    right: 75%;\n  }\n  .pull-sm-10 {\n    right: 83.333333%;\n  }\n  .pull-sm-11 {\n    right: 91.666667%;\n  }\n  .pull-sm-12 {\n    right: 100%;\n  }\n  .push-sm-0 {\n    left: auto;\n  }\n  .push-sm-1 {\n    left: 8.333333%;\n  }\n  .push-sm-2 {\n    left: 16.666667%;\n  }\n  .push-sm-3 {\n    left: 25%;\n  }\n  .push-sm-4 {\n    left: 33.333333%;\n  }\n  .push-sm-5 {\n    left: 41.666667%;\n  }\n  .push-sm-6 {\n    left: 50%;\n  }\n  .push-sm-7 {\n    left: 58.333333%;\n  }\n  .push-sm-8 {\n    left: 66.666667%;\n  }\n  .push-sm-9 {\n    left: 75%;\n  }\n  .push-sm-10 {\n    left: 83.333333%;\n  }\n  .push-sm-11 {\n    left: 91.666667%;\n  }\n  .push-sm-12 {\n    left: 100%;\n  }\n  .offset-sm-0 {\n    margin-left: 0%;\n  }\n  .offset-sm-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-sm-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-sm-3 {\n    margin-left: 25%;\n  }\n  .offset-sm-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-sm-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-sm-6 {\n    margin-left: 50%;\n  }\n  .offset-sm-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-sm-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-sm-9 {\n    margin-left: 75%;\n  }\n  .offset-sm-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-sm-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 768px) {\n  .col-md-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-md-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-md-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-md-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-md-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-md-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-md-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-md-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-md-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-md-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-md-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-md-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-md-0 {\n    right: auto;\n  }\n  .pull-md-1 {\n    right: 8.333333%;\n  }\n  .pull-md-2 {\n    right: 16.666667%;\n  }\n  .pull-md-3 {\n    right: 25%;\n  }\n  .pull-md-4 {\n    right: 33.333333%;\n  }\n  .pull-md-5 {\n    right: 41.666667%;\n  }\n  .pull-md-6 {\n    right: 50%;\n  }\n  .pull-md-7 {\n    right: 58.333333%;\n  }\n  .pull-md-8 {\n    right: 66.666667%;\n  }\n  .pull-md-9 {\n    right: 75%;\n  }\n  .pull-md-10 {\n    right: 83.333333%;\n  }\n  .pull-md-11 {\n    right: 91.666667%;\n  }\n  .pull-md-12 {\n    right: 100%;\n  }\n  .push-md-0 {\n    left: auto;\n  }\n  .push-md-1 {\n    left: 8.333333%;\n  }\n  .push-md-2 {\n    left: 16.666667%;\n  }\n  .push-md-3 {\n    left: 25%;\n  }\n  .push-md-4 {\n    left: 33.333333%;\n  }\n  .push-md-5 {\n    left: 41.666667%;\n  }\n  .push-md-6 {\n    left: 50%;\n  }\n  .push-md-7 {\n    left: 58.333333%;\n  }\n  .push-md-8 {\n    left: 66.666667%;\n  }\n  .push-md-9 {\n    left: 75%;\n  }\n  .push-md-10 {\n    left: 83.333333%;\n  }\n  .push-md-11 {\n    left: 91.666667%;\n  }\n  .push-md-12 {\n    left: 100%;\n  }\n  .offset-md-0 {\n    margin-left: 0%;\n  }\n  .offset-md-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-md-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-md-3 {\n    margin-left: 25%;\n  }\n  .offset-md-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-md-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-md-6 {\n    margin-left: 50%;\n  }\n  .offset-md-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-md-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-md-9 {\n    margin-left: 75%;\n  }\n  .offset-md-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-md-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 992px) {\n  .col-lg-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-lg-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-lg-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-lg-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-lg-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-lg-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-lg-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-lg-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-lg-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-lg-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-lg-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-lg-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-lg-0 {\n    right: auto;\n  }\n  .pull-lg-1 {\n    right: 8.333333%;\n  }\n  .pull-lg-2 {\n    right: 16.666667%;\n  }\n  .pull-lg-3 {\n    right: 25%;\n  }\n  .pull-lg-4 {\n    right: 33.333333%;\n  }\n  .pull-lg-5 {\n    right: 41.666667%;\n  }\n  .pull-lg-6 {\n    right: 50%;\n  }\n  .pull-lg-7 {\n    right: 58.333333%;\n  }\n  .pull-lg-8 {\n    right: 66.666667%;\n  }\n  .pull-lg-9 {\n    right: 75%;\n  }\n  .pull-lg-10 {\n    right: 83.333333%;\n  }\n  .pull-lg-11 {\n    right: 91.666667%;\n  }\n  .pull-lg-12 {\n    right: 100%;\n  }\n  .push-lg-0 {\n    left: auto;\n  }\n  .push-lg-1 {\n    left: 8.333333%;\n  }\n  .push-lg-2 {\n    left: 16.666667%;\n  }\n  .push-lg-3 {\n    left: 25%;\n  }\n  .push-lg-4 {\n    left: 33.333333%;\n  }\n  .push-lg-5 {\n    left: 41.666667%;\n  }\n  .push-lg-6 {\n    left: 50%;\n  }\n  .push-lg-7 {\n    left: 58.333333%;\n  }\n  .push-lg-8 {\n    left: 66.666667%;\n  }\n  .push-lg-9 {\n    left: 75%;\n  }\n  .push-lg-10 {\n    left: 83.333333%;\n  }\n  .push-lg-11 {\n    left: 91.666667%;\n  }\n  .push-lg-12 {\n    left: 100%;\n  }\n  .offset-lg-0 {\n    margin-left: 0%;\n  }\n  .offset-lg-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-lg-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-lg-3 {\n    margin-left: 25%;\n  }\n  .offset-lg-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-lg-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-lg-6 {\n    margin-left: 50%;\n  }\n  .offset-lg-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-lg-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-lg-9 {\n    margin-left: 75%;\n  }\n  .offset-lg-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-lg-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 1200px) {\n  .col-xl-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-xl-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-xl-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-xl-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-xl-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-xl-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-xl-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-xl-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-xl-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-xl-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-xl-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-xl-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-xl-0 {\n    right: auto;\n  }\n  .pull-xl-1 {\n    right: 8.333333%;\n  }\n  .pull-xl-2 {\n    right: 16.666667%;\n  }\n  .pull-xl-3 {\n    right: 25%;\n  }\n  .pull-xl-4 {\n    right: 33.333333%;\n  }\n  .pull-xl-5 {\n    right: 41.666667%;\n  }\n  .pull-xl-6 {\n    right: 50%;\n  }\n  .pull-xl-7 {\n    right: 58.333333%;\n  }\n  .pull-xl-8 {\n    right: 66.666667%;\n  }\n  .pull-xl-9 {\n    right: 75%;\n  }\n  .pull-xl-10 {\n    right: 83.333333%;\n  }\n  .pull-xl-11 {\n    right: 91.666667%;\n  }\n  .pull-xl-12 {\n    right: 100%;\n  }\n  .push-xl-0 {\n    left: auto;\n  }\n  .push-xl-1 {\n    left: 8.333333%;\n  }\n  .push-xl-2 {\n    left: 16.666667%;\n  }\n  .push-xl-3 {\n    left: 25%;\n  }\n  .push-xl-4 {\n    left: 33.333333%;\n  }\n  .push-xl-5 {\n    left: 41.666667%;\n  }\n  .push-xl-6 {\n    left: 50%;\n  }\n  .push-xl-7 {\n    left: 58.333333%;\n  }\n  .push-xl-8 {\n    left: 66.666667%;\n  }\n  .push-xl-9 {\n    left: 75%;\n  }\n  .push-xl-10 {\n    left: 83.333333%;\n  }\n  .push-xl-11 {\n    left: 91.666667%;\n  }\n  .push-xl-12 {\n    left: 100%;\n  }\n  .offset-xl-0 {\n    margin-left: 0%;\n  }\n  .offset-xl-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-xl-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-xl-3 {\n    margin-left: 25%;\n  }\n  .offset-xl-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-xl-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-xl-6 {\n    margin-left: 50%;\n  }\n  .offset-xl-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-xl-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-xl-9 {\n    margin-left: 75%;\n  }\n  .offset-xl-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-xl-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n.table {\n  width: 100%;\n  max-width: 100%;\n  margin-bottom: 1rem;\n}\n\n.table th,\n.table td {\n  padding: 0.75rem;\n  vertical-align: top;\n  border-top: 1px solid #eceeef;\n}\n\n.table thead th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #eceeef;\n}\n\n.table tbody + tbody {\n  border-top: 2px solid #eceeef;\n}\n\n.table .table {\n  background-color: #fff;\n}\n\n.table-sm th,\n.table-sm td {\n  padding: 0.3rem;\n}\n\n.table-bordered {\n  border: 1px solid #eceeef;\n}\n\n.table-bordered th,\n.table-bordered td {\n  border: 1px solid #eceeef;\n}\n\n.table-bordered thead th,\n.table-bordered thead td {\n  border-bottom-width: 2px;\n}\n\n.table-striped tbody tr:nth-of-type(odd) {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n\n.table-hover tbody tr:hover {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-active,\n.table-active > th,\n.table-active > td {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-hover .table-active:hover {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-hover .table-active:hover > td,\n.table-hover .table-active:hover > th {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-success,\n.table-success > th,\n.table-success > td {\n  background-color: #dff0d8;\n}\n\n.table-hover .table-success:hover {\n  background-color: #d0e9c6;\n}\n\n.table-hover .table-success:hover > td,\n.table-hover .table-success:hover > th {\n  background-color: #d0e9c6;\n}\n\n.table-info,\n.table-info > th,\n.table-info > td {\n  background-color: #d9edf7;\n}\n\n.table-hover .table-info:hover {\n  background-color: #c4e3f3;\n}\n\n.table-hover .table-info:hover > td,\n.table-hover .table-info:hover > th {\n  background-color: #c4e3f3;\n}\n\n.table-warning,\n.table-warning > th,\n.table-warning > td {\n  background-color: #fcf8e3;\n}\n\n.table-hover .table-warning:hover {\n  background-color: #faf2cc;\n}\n\n.table-hover .table-warning:hover > td,\n.table-hover .table-warning:hover > th {\n  background-color: #faf2cc;\n}\n\n.table-danger,\n.table-danger > th,\n.table-danger > td {\n  background-color: #f2dede;\n}\n\n.table-hover .table-danger:hover {\n  background-color: #ebcccc;\n}\n\n.table-hover .table-danger:hover > td,\n.table-hover .table-danger:hover > th {\n  background-color: #ebcccc;\n}\n\n.thead-inverse th {\n  color: #fff;\n  background-color: #373a3c;\n}\n\n.thead-default th {\n  color: #55595c;\n  background-color: #eceeef;\n}\n\n.table-inverse {\n  color: #eceeef;\n  background-color: #373a3c;\n}\n\n.table-inverse th,\n.table-inverse td,\n.table-inverse thead th {\n  border-color: #55595c;\n}\n\n.table-inverse.table-bordered {\n  border: 0;\n}\n\n.table-responsive {\n  display: block;\n  width: 100%;\n  min-height: 0%;\n  overflow-x: auto;\n}\n\n.table-reflow thead {\n  float: left;\n}\n\n.table-reflow tbody {\n  display: block;\n  white-space: nowrap;\n}\n\n.table-reflow th,\n.table-reflow td {\n  border-top: 1px solid #eceeef;\n  border-left: 1px solid #eceeef;\n}\n\n.table-reflow th:last-child,\n.table-reflow td:last-child {\n  border-right: 1px solid #eceeef;\n}\n\n.table-reflow thead:last-child tr:last-child th,\n.table-reflow thead:last-child tr:last-child td,\n.table-reflow tbody:last-child tr:last-child th,\n.table-reflow tbody:last-child tr:last-child td,\n.table-reflow tfoot:last-child tr:last-child th,\n.table-reflow tfoot:last-child tr:last-child td {\n  border-bottom: 1px solid #eceeef;\n}\n\n.table-reflow tr {\n  float: left;\n}\n\n.table-reflow tr th,\n.table-reflow tr td {\n  display: block !important;\n  border: 1px solid #eceeef;\n}\n\n.form-control {\n  display: block;\n  width: 100%;\n  padding: 0.5rem 0.75rem;\n  font-size: 1rem;\n  line-height: 1.25;\n  color: #55595c;\n  background-color: #fff;\n  background-image: none;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.form-control::-ms-expand {\n  background-color: transparent;\n  border: 0;\n}\n\n.form-control:focus {\n  color: #55595c;\n  background-color: #fff;\n  border-color: #66afe9;\n  outline: none;\n}\n\n.form-control::-webkit-input-placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control::-moz-placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control:-ms-input-placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control::placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control:disabled, .form-control[readonly] {\n  background-color: #eceeef;\n  opacity: 1;\n}\n\n.form-control:disabled {\n  cursor: not-allowed;\n}\n\nselect.form-control:not([size]):not([multiple]) {\n  height: calc(2.5rem - 2px);\n}\n\nselect.form-control:focus::-ms-value {\n  color: #55595c;\n  background-color: #fff;\n}\n\n.form-control-file,\n.form-control-range {\n  display: block;\n}\n\n.col-form-label {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  margin-bottom: 0;\n}\n\n.col-form-label-lg {\n  padding-top: 0.75rem;\n  padding-bottom: 0.75rem;\n  font-size: 1.25rem;\n}\n\n.col-form-label-sm {\n  padding-top: 0.25rem;\n  padding-bottom: 0.25rem;\n  font-size: 0.875rem;\n}\n\n.col-form-legend {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  margin-bottom: 0;\n  font-size: 1rem;\n}\n\n.form-control-static {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  line-height: 1.25;\n  border: solid transparent;\n  border-width: 1px 0;\n}\n\n.form-control-static.form-control-sm, .input-group-sm > .form-control-static.form-control,\n.input-group-sm > .form-control-static.input-group-addon,\n.input-group-sm > .input-group-btn > .form-control-static.btn, .form-control-static.form-control-lg, .input-group-lg > .form-control-static.form-control,\n.input-group-lg > .form-control-static.input-group-addon,\n.input-group-lg > .input-group-btn > .form-control-static.btn {\n  padding-right: 0;\n  padding-left: 0;\n}\n\n.form-control-sm, .input-group-sm > .form-control,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\nselect.form-control-sm:not([size]):not([multiple]), .input-group-sm > select.form-control:not([size]):not([multiple]),\n.input-group-sm > select.input-group-addon:not([size]):not([multiple]),\n.input-group-sm > .input-group-btn > select.btn:not([size]):not([multiple]) {\n  height: 1.8125rem;\n}\n\n.form-control-lg, .input-group-lg > .form-control,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\nselect.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.form-control:not([size]):not([multiple]),\n.input-group-lg > select.input-group-addon:not([size]):not([multiple]),\n.input-group-lg > .input-group-btn > select.btn:not([size]):not([multiple]) {\n  height: 3.166667rem;\n}\n\n.form-group {\n  margin-bottom: 1rem;\n}\n\n.form-text {\n  display: block;\n  margin-top: 0.25rem;\n}\n\n.form-check {\n  position: relative;\n  display: block;\n  margin-bottom: 0.75rem;\n}\n\n.form-check + .form-check {\n  margin-top: -.25rem;\n}\n\n.form-check.disabled .form-check-label {\n  color: #818a91;\n  cursor: not-allowed;\n}\n\n.form-check-label {\n  padding-left: 1.25rem;\n  margin-bottom: 0;\n  cursor: pointer;\n}\n\n.form-check-input {\n  position: absolute;\n  margin-top: .25rem;\n  margin-left: -1.25rem;\n}\n\n.form-check-input:only-child {\n  position: static;\n}\n\n.form-check-inline {\n  position: relative;\n  display: inline-block;\n  padding-left: 1.25rem;\n  margin-bottom: 0;\n  vertical-align: middle;\n  cursor: pointer;\n}\n\n.form-check-inline + .form-check-inline {\n  margin-left: .75rem;\n}\n\n.form-check-inline.disabled {\n  color: #818a91;\n  cursor: not-allowed;\n}\n\n.form-control-feedback {\n  margin-top: 0.25rem;\n}\n\n.form-control-success,\n.form-control-warning,\n.form-control-danger {\n  padding-right: 2.25rem;\n  background-repeat: no-repeat;\n  background-position: center right 0.625rem;\n  -webkit-background-size: 1.25rem 1.25rem;\n          background-size: 1.25rem 1.25rem;\n}\n\n.has-success .form-control-feedback,\n.has-success .form-control-label,\n.has-success .form-check-label,\n.has-success .form-check-inline,\n.has-success .custom-control {\n  color: #5cb85c;\n}\n\n.has-success .form-control {\n  border-color: #5cb85c;\n}\n\n.has-success .form-control:focus {\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #a3d7a3;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #a3d7a3;\n}\n\n.has-success .input-group-addon {\n  color: #5cb85c;\n  border-color: #5cb85c;\n  background-color: #eaf6ea;\n}\n\n.has-success .form-control-success {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#5cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E\");\n}\n\n.has-warning .form-control-feedback,\n.has-warning .form-control-label,\n.has-warning .form-check-label,\n.has-warning .form-check-inline,\n.has-warning .custom-control {\n  color: #f0ad4e;\n}\n\n.has-warning .form-control {\n  border-color: #f0ad4e;\n}\n\n.has-warning .form-control:focus {\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #f8d9ac;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #f8d9ac;\n}\n\n.has-warning .input-group-addon {\n  color: #f0ad4e;\n  border-color: #f0ad4e;\n  background-color: white;\n}\n\n.has-warning .form-control-warning {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#f0ad4e' d='M4.4 5.324h-.8v-2.46h.8zm0 1.42h-.8V5.89h.8zM3.76.63L.04 7.075c-.115.2.016.425.26.426h7.397c.242 0 .372-.226.258-.426C6.726 4.924 5.47 2.79 4.253.63c-.113-.174-.39-.174-.494 0z'/%3E%3C/svg%3E\");\n}\n\n.has-danger .form-control-feedback,\n.has-danger .form-control-label,\n.has-danger .form-check-label,\n.has-danger .form-check-inline,\n.has-danger .custom-control {\n  color: #d9534f;\n}\n\n.has-danger .form-control {\n  border-color: #d9534f;\n}\n\n.has-danger .form-control:focus {\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #eba5a3;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #eba5a3;\n}\n\n.has-danger .input-group-addon {\n  color: #d9534f;\n  border-color: #d9534f;\n  background-color: #fdf7f7;\n}\n\n.has-danger .form-control-danger {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#d9534f' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E\");\n}\n\n@media (min-width: 576px) {\n  .form-inline .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .form-control-static {\n    display: inline-block;\n  }\n  .form-inline .input-group {\n    display: inline-table;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .input-group .input-group-addon,\n  .form-inline .input-group .input-group-btn,\n  .form-inline .input-group .form-control {\n    width: auto;\n  }\n  .form-inline .input-group > .form-control {\n    width: 100%;\n  }\n  .form-inline .form-control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-check {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-check-label {\n    padding-left: 0;\n  }\n  .form-inline .form-check-input {\n    position: relative;\n    margin-left: 0;\n  }\n  .form-inline .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n\n.btn {\n  display: inline-block;\n  font-weight: normal;\n  line-height: 1.25;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  border: 1px solid transparent;\n  padding: 0.5rem 1rem;\n  font-size: 1rem;\n  border-radius: 0.25rem;\n}\n\n.btn:focus, .btn.focus, .btn:active:focus, .btn:active.focus, .btn.active:focus, .btn.active.focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n\n.btn:focus, .btn:hover {\n  text-decoration: none;\n}\n\n.btn.focus {\n  text-decoration: none;\n}\n\n.btn:active, .btn.active {\n  background-image: none;\n  outline: 0;\n}\n\n.btn.disabled, .btn:disabled {\n  cursor: not-allowed;\n  opacity: .65;\n}\n\na.btn.disabled,\nfieldset[disabled] a.btn {\n  pointer-events: none;\n}\n\n.btn-primary {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-primary:hover {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n}\n\n.btn-primary:focus, .btn-primary.focus {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n}\n\n.btn-primary:active, .btn-primary.active,\n.open > .btn-primary.dropdown-toggle {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n  background-image: none;\n}\n\n.btn-primary:active:hover, .btn-primary:active:focus, .btn-primary:active.focus, .btn-primary.active:hover, .btn-primary.active:focus, .btn-primary.active.focus,\n.open > .btn-primary.dropdown-toggle:hover,\n.open > .btn-primary.dropdown-toggle:focus,\n.open > .btn-primary.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #014682;\n  border-color: #01315a;\n}\n\n.btn-primary.disabled:focus, .btn-primary.disabled.focus, .btn-primary:disabled:focus, .btn-primary:disabled.focus {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-primary.disabled:hover, .btn-primary:disabled:hover {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-secondary {\n  color: #373a3c;\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-secondary:hover {\n  color: #373a3c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n\n.btn-secondary:focus, .btn-secondary.focus {\n  color: #373a3c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n\n.btn-secondary:active, .btn-secondary.active,\n.open > .btn-secondary.dropdown-toggle {\n  color: #373a3c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n  background-image: none;\n}\n\n.btn-secondary:active:hover, .btn-secondary:active:focus, .btn-secondary:active.focus, .btn-secondary.active:hover, .btn-secondary.active:focus, .btn-secondary.active.focus,\n.open > .btn-secondary.dropdown-toggle:hover,\n.open > .btn-secondary.dropdown-toggle:focus,\n.open > .btn-secondary.dropdown-toggle.focus {\n  color: #373a3c;\n  background-color: #d4d4d4;\n  border-color: #8c8c8c;\n}\n\n.btn-secondary.disabled:focus, .btn-secondary.disabled.focus, .btn-secondary:disabled:focus, .btn-secondary:disabled.focus {\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-secondary.disabled:hover, .btn-secondary:disabled:hover {\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-info {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-info:hover {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n}\n\n.btn-info:focus, .btn-info.focus {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n}\n\n.btn-info:active, .btn-info.active,\n.open > .btn-info.dropdown-toggle {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n  background-image: none;\n}\n\n.btn-info:active:hover, .btn-info:active:focus, .btn-info:active.focus, .btn-info.active:hover, .btn-info.active:focus, .btn-info.active.focus,\n.open > .btn-info.dropdown-toggle:hover,\n.open > .btn-info.dropdown-toggle:focus,\n.open > .btn-info.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1f7e9a;\n}\n\n.btn-info.disabled:focus, .btn-info.disabled.focus, .btn-info:disabled:focus, .btn-info:disabled.focus {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-info.disabled:hover, .btn-info:disabled:hover {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-success {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-success:hover {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n}\n\n.btn-success:focus, .btn-success.focus {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n}\n\n.btn-success:active, .btn-success.active,\n.open > .btn-success.dropdown-toggle {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n  background-image: none;\n}\n\n.btn-success:active:hover, .btn-success:active:focus, .btn-success:active.focus, .btn-success.active:hover, .btn-success.active:focus, .btn-success.active.focus,\n.open > .btn-success.dropdown-toggle:hover,\n.open > .btn-success.dropdown-toggle:focus,\n.open > .btn-success.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #2d672d;\n}\n\n.btn-success.disabled:focus, .btn-success.disabled.focus, .btn-success:disabled:focus, .btn-success:disabled.focus {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-success.disabled:hover, .btn-success:disabled:hover {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-warning {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-warning:hover {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n}\n\n.btn-warning:focus, .btn-warning.focus {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n}\n\n.btn-warning:active, .btn-warning.active,\n.open > .btn-warning.dropdown-toggle {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n  background-image: none;\n}\n\n.btn-warning:active:hover, .btn-warning:active:focus, .btn-warning:active.focus, .btn-warning.active:hover, .btn-warning.active:focus, .btn-warning.active.focus,\n.open > .btn-warning.dropdown-toggle:hover,\n.open > .btn-warning.dropdown-toggle:focus,\n.open > .btn-warning.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #b06d0f;\n}\n\n.btn-warning.disabled:focus, .btn-warning.disabled.focus, .btn-warning:disabled:focus, .btn-warning:disabled.focus {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-warning.disabled:hover, .btn-warning:disabled:hover {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-danger {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-danger:hover {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n}\n\n.btn-danger:focus, .btn-danger.focus {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n}\n\n.btn-danger:active, .btn-danger.active,\n.open > .btn-danger.dropdown-toggle {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n  background-image: none;\n}\n\n.btn-danger:active:hover, .btn-danger:active:focus, .btn-danger:active.focus, .btn-danger.active:hover, .btn-danger.active:focus, .btn-danger.active.focus,\n.open > .btn-danger.dropdown-toggle:hover,\n.open > .btn-danger.dropdown-toggle:focus,\n.open > .btn-danger.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #8b211e;\n}\n\n.btn-danger.disabled:focus, .btn-danger.disabled.focus, .btn-danger:disabled:focus, .btn-danger:disabled.focus {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-danger.disabled:hover, .btn-danger:disabled:hover {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-primary {\n  color: #0275d8;\n  background-image: none;\n  background-color: transparent;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:hover {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:focus, .btn-outline-primary.focus {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:active, .btn-outline-primary.active,\n.open > .btn-outline-primary.dropdown-toggle {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:active:hover, .btn-outline-primary:active:focus, .btn-outline-primary:active.focus, .btn-outline-primary.active:hover, .btn-outline-primary.active:focus, .btn-outline-primary.active.focus,\n.open > .btn-outline-primary.dropdown-toggle:hover,\n.open > .btn-outline-primary.dropdown-toggle:focus,\n.open > .btn-outline-primary.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #014682;\n  border-color: #01315a;\n}\n\n.btn-outline-primary.disabled:focus, .btn-outline-primary.disabled.focus, .btn-outline-primary:disabled:focus, .btn-outline-primary:disabled.focus {\n  border-color: #43a7fd;\n}\n\n.btn-outline-primary.disabled:hover, .btn-outline-primary:disabled:hover {\n  border-color: #43a7fd;\n}\n\n.btn-outline-secondary {\n  color: #ccc;\n  background-image: none;\n  background-color: transparent;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:hover {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:focus, .btn-outline-secondary.focus {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:active, .btn-outline-secondary.active,\n.open > .btn-outline-secondary.dropdown-toggle {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:active:hover, .btn-outline-secondary:active:focus, .btn-outline-secondary:active.focus, .btn-outline-secondary.active:hover, .btn-outline-secondary.active:focus, .btn-outline-secondary.active.focus,\n.open > .btn-outline-secondary.dropdown-toggle:hover,\n.open > .btn-outline-secondary.dropdown-toggle:focus,\n.open > .btn-outline-secondary.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #a1a1a1;\n  border-color: #8c8c8c;\n}\n\n.btn-outline-secondary.disabled:focus, .btn-outline-secondary.disabled.focus, .btn-outline-secondary:disabled:focus, .btn-outline-secondary:disabled.focus {\n  border-color: white;\n}\n\n.btn-outline-secondary.disabled:hover, .btn-outline-secondary:disabled:hover {\n  border-color: white;\n}\n\n.btn-outline-info {\n  color: #5bc0de;\n  background-image: none;\n  background-color: transparent;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:hover {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:focus, .btn-outline-info.focus {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:active, .btn-outline-info.active,\n.open > .btn-outline-info.dropdown-toggle {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:active:hover, .btn-outline-info:active:focus, .btn-outline-info:active.focus, .btn-outline-info.active:hover, .btn-outline-info.active:focus, .btn-outline-info.active.focus,\n.open > .btn-outline-info.dropdown-toggle:hover,\n.open > .btn-outline-info.dropdown-toggle:focus,\n.open > .btn-outline-info.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1f7e9a;\n}\n\n.btn-outline-info.disabled:focus, .btn-outline-info.disabled.focus, .btn-outline-info:disabled:focus, .btn-outline-info:disabled.focus {\n  border-color: #b0e1ef;\n}\n\n.btn-outline-info.disabled:hover, .btn-outline-info:disabled:hover {\n  border-color: #b0e1ef;\n}\n\n.btn-outline-success {\n  color: #5cb85c;\n  background-image: none;\n  background-color: transparent;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:hover {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:focus, .btn-outline-success.focus {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:active, .btn-outline-success.active,\n.open > .btn-outline-success.dropdown-toggle {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:active:hover, .btn-outline-success:active:focus, .btn-outline-success:active.focus, .btn-outline-success.active:hover, .btn-outline-success.active:focus, .btn-outline-success.active.focus,\n.open > .btn-outline-success.dropdown-toggle:hover,\n.open > .btn-outline-success.dropdown-toggle:focus,\n.open > .btn-outline-success.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #2d672d;\n}\n\n.btn-outline-success.disabled:focus, .btn-outline-success.disabled.focus, .btn-outline-success:disabled:focus, .btn-outline-success:disabled.focus {\n  border-color: #a3d7a3;\n}\n\n.btn-outline-success.disabled:hover, .btn-outline-success:disabled:hover {\n  border-color: #a3d7a3;\n}\n\n.btn-outline-warning {\n  color: #f0ad4e;\n  background-image: none;\n  background-color: transparent;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:hover {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:focus, .btn-outline-warning.focus {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:active, .btn-outline-warning.active,\n.open > .btn-outline-warning.dropdown-toggle {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:active:hover, .btn-outline-warning:active:focus, .btn-outline-warning:active.focus, .btn-outline-warning.active:hover, .btn-outline-warning.active:focus, .btn-outline-warning.active.focus,\n.open > .btn-outline-warning.dropdown-toggle:hover,\n.open > .btn-outline-warning.dropdown-toggle:focus,\n.open > .btn-outline-warning.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #b06d0f;\n}\n\n.btn-outline-warning.disabled:focus, .btn-outline-warning.disabled.focus, .btn-outline-warning:disabled:focus, .btn-outline-warning:disabled.focus {\n  border-color: #f8d9ac;\n}\n\n.btn-outline-warning.disabled:hover, .btn-outline-warning:disabled:hover {\n  border-color: #f8d9ac;\n}\n\n.btn-outline-danger {\n  color: #d9534f;\n  background-image: none;\n  background-color: transparent;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:hover {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:focus, .btn-outline-danger.focus {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:active, .btn-outline-danger.active,\n.open > .btn-outline-danger.dropdown-toggle {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:active:hover, .btn-outline-danger:active:focus, .btn-outline-danger:active.focus, .btn-outline-danger.active:hover, .btn-outline-danger.active:focus, .btn-outline-danger.active.focus,\n.open > .btn-outline-danger.dropdown-toggle:hover,\n.open > .btn-outline-danger.dropdown-toggle:focus,\n.open > .btn-outline-danger.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #8b211e;\n}\n\n.btn-outline-danger.disabled:focus, .btn-outline-danger.disabled.focus, .btn-outline-danger:disabled:focus, .btn-outline-danger:disabled.focus {\n  border-color: #eba5a3;\n}\n\n.btn-outline-danger.disabled:hover, .btn-outline-danger:disabled:hover {\n  border-color: #eba5a3;\n}\n\n.btn-link {\n  font-weight: normal;\n  color: #0275d8;\n  border-radius: 0;\n}\n\n.btn-link, .btn-link:active, .btn-link.active, .btn-link:disabled {\n  background-color: transparent;\n}\n\n.btn-link, .btn-link:focus, .btn-link:active {\n  border-color: transparent;\n}\n\n.btn-link:hover {\n  border-color: transparent;\n}\n\n.btn-link:focus, .btn-link:hover {\n  color: #014c8c;\n  text-decoration: underline;\n  background-color: transparent;\n}\n\n.btn-link:disabled:focus, .btn-link:disabled:hover {\n  color: #818a91;\n  text-decoration: none;\n}\n\n.btn-lg, .btn-group-lg > .btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\n.btn-sm, .btn-group-sm > .btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\n.btn-block {\n  display: block;\n  width: 100%;\n}\n\n.btn-block + .btn-block {\n  margin-top: 0.5rem;\n}\n\ninput[type=\"submit\"].btn-block,\ninput[type=\"reset\"].btn-block,\ninput[type=\"button\"].btn-block {\n  width: 100%;\n}\n\n.fade {\n  opacity: 0;\n  -webkit-transition: opacity .15s linear;\n  -o-transition: opacity .15s linear;\n  transition: opacity .15s linear;\n}\n\n.fade.in {\n  opacity: 1;\n}\n\n.collapse {\n  display: none;\n}\n\n.collapse.in {\n  display: block;\n}\n\ntr.collapse.in {\n  display: table-row;\n}\n\ntbody.collapse.in {\n  display: table-row-group;\n}\n\n.collapsing {\n  position: relative;\n  height: 0;\n  overflow: hidden;\n  -webkit-transition-timing-function: ease;\n       -o-transition-timing-function: ease;\n          transition-timing-function: ease;\n  -webkit-transition-duration: .35s;\n       -o-transition-duration: .35s;\n          transition-duration: .35s;\n  -webkit-transition-property: height;\n  -o-transition-property: height;\n  transition-property: height;\n}\n\n.dropup,\n.dropdown {\n  position: relative;\n}\n\n.dropdown-toggle::after {\n  display: inline-block;\n  width: 0;\n  height: 0;\n  margin-left: 0.3em;\n  vertical-align: middle;\n  content: \"\";\n  border-top: 0.3em solid;\n  border-right: 0.3em solid transparent;\n  border-left: 0.3em solid transparent;\n}\n\n.dropdown-toggle:focus {\n  outline: 0;\n}\n\n.dropup .dropdown-toggle::after {\n  border-top: 0;\n  border-bottom: 0.3em solid;\n}\n\n.dropdown-menu {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 1000;\n  display: none;\n  float: left;\n  min-width: 10rem;\n  padding: 0.5rem 0;\n  margin: 0.125rem 0 0;\n  font-size: 1rem;\n  color: #373a3c;\n  text-align: left;\n  list-style: none;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.dropdown-divider {\n  height: 1px;\n  margin: 0.5rem 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n\n.dropdown-item {\n  display: block;\n  width: 100%;\n  padding: 3px 1.5rem;\n  clear: both;\n  font-weight: normal;\n  color: #373a3c;\n  text-align: inherit;\n  white-space: nowrap;\n  background: none;\n  border: 0;\n}\n\n.dropdown-item:focus, .dropdown-item:hover {\n  color: #2b2d2f;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n\n.dropdown-item.active, .dropdown-item.active:focus, .dropdown-item.active:hover {\n  color: #fff;\n  text-decoration: none;\n  background-color: #0275d8;\n  outline: 0;\n}\n\n.dropdown-item.disabled, .dropdown-item.disabled:focus, .dropdown-item.disabled:hover {\n  color: #818a91;\n}\n\n.dropdown-item.disabled:focus, .dropdown-item.disabled:hover {\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n  background-image: none;\n  filter: \"progid:DXImageTransform.Microsoft.gradient(enabled = false)\";\n}\n\n.open > .dropdown-menu {\n  display: block;\n}\n\n.open > a {\n  outline: 0;\n}\n\n.dropdown-menu-right {\n  right: 0;\n  left: auto;\n}\n\n.dropdown-menu-left {\n  right: auto;\n  left: 0;\n}\n\n.dropdown-header {\n  display: block;\n  padding: 0.5rem 1.5rem;\n  margin-bottom: 0;\n  font-size: 0.875rem;\n  color: #818a91;\n  white-space: nowrap;\n}\n\n.dropdown-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 990;\n}\n\n.dropup .caret,\n.navbar-fixed-bottom .dropdown .caret {\n  content: \"\";\n  border-top: 0;\n  border-bottom: 0.3em solid;\n}\n\n.dropup .dropdown-menu,\n.navbar-fixed-bottom .dropdown .dropdown-menu {\n  top: auto;\n  bottom: 100%;\n  margin-bottom: 0.125rem;\n}\n\n.btn-group,\n.btn-group-vertical {\n  position: relative;\n  display: inline-block;\n  vertical-align: middle;\n}\n\n.btn-group > .btn,\n.btn-group-vertical > .btn {\n  position: relative;\n  float: left;\n  margin-bottom: 0;\n}\n\n.btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active,\n.btn-group-vertical > .btn:focus,\n.btn-group-vertical > .btn:active,\n.btn-group-vertical > .btn.active {\n  z-index: 2;\n}\n\n.btn-group > .btn:hover,\n.btn-group-vertical > .btn:hover {\n  z-index: 2;\n}\n\n.btn-group .btn + .btn,\n.btn-group .btn + .btn-group,\n.btn-group .btn-group + .btn,\n.btn-group .btn-group + .btn-group {\n  margin-left: -1px;\n}\n\n.btn-toolbar {\n  margin-left: -0.5rem;\n}\n\n.btn-toolbar::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.btn-toolbar .btn-group,\n.btn-toolbar .input-group {\n  float: left;\n}\n\n.btn-toolbar > .btn,\n.btn-toolbar > .btn-group,\n.btn-toolbar > .input-group {\n  margin-left: 0.5rem;\n}\n\n.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {\n  border-radius: 0;\n}\n\n.btn-group > .btn:first-child {\n  margin-left: 0;\n}\n\n.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.btn-group > .btn:last-child:not(:first-child),\n.btn-group > .dropdown-toggle:not(:first-child) {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group > .btn-group {\n  float: left;\n}\n\n.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n\n.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group .dropdown-toggle:active,\n.btn-group.open .dropdown-toggle {\n  outline: 0;\n}\n\n.btn + .dropdown-toggle-split {\n  padding-right: 0.75rem;\n  padding-left: 0.75rem;\n}\n\n.btn + .dropdown-toggle-split::after {\n  margin-left: 0;\n}\n\n.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split {\n  padding-right: 0.375rem;\n  padding-left: 0.375rem;\n}\n\n.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {\n  padding-right: 1.125rem;\n  padding-left: 1.125rem;\n}\n\n.btn .caret {\n  margin-left: 0;\n}\n\n.btn-lg .caret, .btn-group-lg > .btn .caret {\n  border-width: 0.3em 0.3em 0;\n  border-bottom-width: 0;\n}\n\n.dropup .btn-lg .caret, .dropup .btn-group-lg > .btn .caret {\n  border-width: 0 0.3em 0.3em;\n}\n\n.btn-group-vertical > .btn,\n.btn-group-vertical > .btn-group,\n.btn-group-vertical > .btn-group > .btn {\n  display: block;\n  float: none;\n  width: 100%;\n  max-width: 100%;\n}\n\n.btn-group-vertical > .btn-group::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.btn-group-vertical > .btn-group > .btn {\n  float: none;\n}\n\n.btn-group-vertical > .btn + .btn,\n.btn-group-vertical > .btn + .btn-group,\n.btn-group-vertical > .btn-group + .btn,\n.btn-group-vertical > .btn-group + .btn-group {\n  margin-top: -1px;\n  margin-left: 0;\n}\n\n.btn-group-vertical > .btn:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n\n.btn-group-vertical > .btn:first-child:not(:last-child) {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n\n.btn-group-vertical > .btn:last-child:not(:first-child) {\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n[data-toggle=\"buttons\"] > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn input[type=\"checkbox\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"checkbox\"] {\n  position: absolute;\n  clip: rect(0, 0, 0, 0);\n  pointer-events: none;\n}\n\n.input-group {\n  position: relative;\n  width: 100%;\n  display: table;\n  border-collapse: separate;\n}\n\n.input-group .form-control {\n  position: relative;\n  z-index: 2;\n  float: left;\n  width: 100%;\n  margin-bottom: 0;\n}\n\n.input-group .form-control:focus, .input-group .form-control:active, .input-group .form-control:hover {\n  z-index: 3;\n}\n\n.input-group-addon,\n.input-group-btn,\n.input-group .form-control {\n  display: table-cell;\n}\n\n.input-group-addon:not(:first-child):not(:last-child),\n.input-group-btn:not(:first-child):not(:last-child),\n.input-group .form-control:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n\n.input-group-addon,\n.input-group-btn {\n  width: 1%;\n  white-space: nowrap;\n  vertical-align: middle;\n}\n\n.input-group-addon {\n  padding: 0.5rem 0.75rem;\n  margin-bottom: 0;\n  font-size: 1rem;\n  font-weight: normal;\n  line-height: 1.25;\n  color: #55595c;\n  text-align: center;\n  background-color: #eceeef;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.input-group-addon.form-control-sm,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .input-group-addon.btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\n.input-group-addon.form-control-lg,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .input-group-addon.btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\n.input-group-addon input[type=\"radio\"],\n.input-group-addon input[type=\"checkbox\"] {\n  margin-top: 0;\n}\n\n.input-group .form-control:not(:last-child),\n.input-group-addon:not(:last-child),\n.input-group-btn:not(:last-child) > .btn,\n.input-group-btn:not(:last-child) > .btn-group > .btn,\n.input-group-btn:not(:last-child) > .dropdown-toggle,\n.input-group-btn:not(:first-child) > .btn:not(:last-child):not(.dropdown-toggle),\n.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > .btn {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.input-group-addon:not(:last-child) {\n  border-right: 0;\n}\n\n.input-group .form-control:not(:first-child),\n.input-group-addon:not(:first-child),\n.input-group-btn:not(:first-child) > .btn,\n.input-group-btn:not(:first-child) > .btn-group > .btn,\n.input-group-btn:not(:first-child) > .dropdown-toggle,\n.input-group-btn:not(:last-child) > .btn:not(:first-child),\n.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.form-control + .input-group-addon:not(:first-child) {\n  border-left: 0;\n}\n\n.input-group-btn {\n  position: relative;\n  font-size: 0;\n  white-space: nowrap;\n}\n\n.input-group-btn > .btn {\n  position: relative;\n}\n\n.input-group-btn > .btn + .btn {\n  margin-left: -1px;\n}\n\n.input-group-btn > .btn:focus, .input-group-btn > .btn:active, .input-group-btn > .btn:hover {\n  z-index: 3;\n}\n\n.input-group-btn:not(:last-child) > .btn,\n.input-group-btn:not(:last-child) > .btn-group {\n  margin-right: -1px;\n}\n\n.input-group-btn:not(:first-child) > .btn,\n.input-group-btn:not(:first-child) > .btn-group {\n  z-index: 2;\n  margin-left: -1px;\n}\n\n.input-group-btn:not(:first-child) > .btn:focus, .input-group-btn:not(:first-child) > .btn:active, .input-group-btn:not(:first-child) > .btn:hover,\n.input-group-btn:not(:first-child) > .btn-group:focus,\n.input-group-btn:not(:first-child) > .btn-group:active,\n.input-group-btn:not(:first-child) > .btn-group:hover {\n  z-index: 3;\n}\n\n.custom-control {\n  position: relative;\n  display: inline-block;\n  padding-left: 1.5rem;\n  cursor: pointer;\n}\n\n.custom-control + .custom-control {\n  margin-left: 1rem;\n}\n\n.custom-control-input {\n  position: absolute;\n  z-index: -1;\n  opacity: 0;\n}\n\n.custom-control-input:checked ~ .custom-control-indicator {\n  color: #fff;\n  background-color: #0074d9;\n}\n\n.custom-control-input:focus ~ .custom-control-indicator {\n  -webkit-box-shadow: 0 0 0 0.075rem #fff, 0 0 0 0.2rem #0074d9;\n          box-shadow: 0 0 0 0.075rem #fff, 0 0 0 0.2rem #0074d9;\n}\n\n.custom-control-input:active ~ .custom-control-indicator {\n  color: #fff;\n  background-color: #84c6ff;\n}\n\n.custom-control-input:disabled ~ .custom-control-indicator {\n  cursor: not-allowed;\n  background-color: #eee;\n}\n\n.custom-control-input:disabled ~ .custom-control-description {\n  color: #767676;\n  cursor: not-allowed;\n}\n\n.custom-control-indicator {\n  position: absolute;\n  top: .25rem;\n  left: 0;\n  display: block;\n  width: 1rem;\n  height: 1rem;\n  pointer-events: none;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-color: #ddd;\n  background-repeat: no-repeat;\n  background-position: center center;\n  -webkit-background-size: 50% 50%;\n          background-size: 50% 50%;\n}\n\n.custom-checkbox .custom-control-indicator {\n  border-radius: 0.25rem;\n}\n\n.custom-checkbox .custom-control-input:checked ~ .custom-control-indicator {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E\");\n}\n\n.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-indicator {\n  background-color: #0074d9;\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath stroke='#fff' d='M0 2h4'/%3E%3C/svg%3E\");\n}\n\n.custom-radio .custom-control-indicator {\n  border-radius: 50%;\n}\n\n.custom-radio .custom-control-input:checked ~ .custom-control-indicator {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='#fff'/%3E%3C/svg%3E\");\n}\n\n.custom-controls-stacked .custom-control {\n  float: left;\n  clear: left;\n}\n\n.custom-controls-stacked .custom-control + .custom-control {\n  margin-left: 0;\n}\n\n.custom-select {\n  display: inline-block;\n  max-width: 100%;\n  height: calc(2.5rem - 2px);\n  padding: 0.375rem 1.75rem 0.375rem 0.75rem;\n  padding-right: 0.75rem \\9;\n  color: #55595c;\n  vertical-align: middle;\n  background: #fff url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='#333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E\") no-repeat right 0.75rem center;\n  background-image: none \\9;\n  -webkit-background-size: 8px 10px;\n          background-size: 8px 10px;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n  -moz-appearance: none;\n  -webkit-appearance: none;\n}\n\n.custom-select:focus {\n  border-color: #51a7e8;\n  outline: none;\n}\n\n.custom-select:focus::-ms-value {\n  color: #55595c;\n  background-color: #fff;\n}\n\n.custom-select:disabled {\n  color: #818a91;\n  cursor: not-allowed;\n  background-color: #eceeef;\n}\n\n.custom-select::-ms-expand {\n  opacity: 0;\n}\n\n.custom-select-sm {\n  padding-top: 0.375rem;\n  padding-bottom: 0.375rem;\n  font-size: 75%;\n}\n\n.custom-file {\n  position: relative;\n  display: inline-block;\n  max-width: 100%;\n  height: 2.5rem;\n  cursor: pointer;\n}\n\n.custom-file-input {\n  min-width: 14rem;\n  max-width: 100%;\n  margin: 0;\n  filter: alpha(opacity=0);\n  opacity: 0;\n}\n\n.custom-file-control {\n  position: absolute;\n  top: 0;\n  right: 0;\n  left: 0;\n  z-index: 5;\n  height: 2.5rem;\n  padding: 0.5rem 1rem;\n  line-height: 1.5;\n  color: #555;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 0.25rem;\n}\n\n.custom-file-control:lang(en)::after {\n  content: \"Choose file...\";\n}\n\n.custom-file-control::before {\n  position: absolute;\n  top: -1px;\n  right: -1px;\n  bottom: -1px;\n  z-index: 6;\n  display: block;\n  height: 2.5rem;\n  padding: 0.5rem 1rem;\n  line-height: 1.5;\n  color: #555;\n  background-color: #eee;\n  border: 1px solid #ddd;\n  border-radius: 0 0.25rem 0.25rem 0;\n}\n\n.custom-file-control:lang(en)::before {\n  content: \"Browse\";\n}\n\n.nav {\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n\n.nav-link {\n  display: inline-block;\n}\n\n.nav-link:focus, .nav-link:hover {\n  text-decoration: none;\n}\n\n.nav-link.disabled {\n  color: #818a91;\n}\n\n.nav-link.disabled, .nav-link.disabled:focus, .nav-link.disabled:hover {\n  color: #818a91;\n  cursor: not-allowed;\n  background-color: transparent;\n}\n\n.nav-inline .nav-item {\n  display: inline-block;\n}\n\n.nav-inline .nav-item + .nav-item,\n.nav-inline .nav-link + .nav-link {\n  margin-left: 1rem;\n}\n\n.nav-tabs {\n  border-bottom: 1px solid #ddd;\n}\n\n.nav-tabs::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.nav-tabs .nav-item {\n  float: left;\n  margin-bottom: -1px;\n}\n\n.nav-tabs .nav-item + .nav-item {\n  margin-left: 0.2rem;\n}\n\n.nav-tabs .nav-link {\n  display: block;\n  padding: 0.5em 1em;\n  border: 1px solid transparent;\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {\n  border-color: #eceeef #eceeef #ddd;\n}\n\n.nav-tabs .nav-link.disabled, .nav-tabs .nav-link.disabled:focus, .nav-tabs .nav-link.disabled:hover {\n  color: #818a91;\n  background-color: transparent;\n  border-color: transparent;\n}\n\n.nav-tabs .nav-link.active, .nav-tabs .nav-link.active:focus, .nav-tabs .nav-link.active:hover,\n.nav-tabs .nav-item.open .nav-link,\n.nav-tabs .nav-item.open .nav-link:focus,\n.nav-tabs .nav-item.open .nav-link:hover {\n  color: #55595c;\n  background-color: #fff;\n  border-color: #ddd #ddd transparent;\n}\n\n.nav-tabs .dropdown-menu {\n  margin-top: -1px;\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.nav-pills::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.nav-pills .nav-item {\n  float: left;\n}\n\n.nav-pills .nav-item + .nav-item {\n  margin-left: 0.2rem;\n}\n\n.nav-pills .nav-link {\n  display: block;\n  padding: 0.5em 1em;\n  border-radius: 0.25rem;\n}\n\n.nav-pills .nav-link.active, .nav-pills .nav-link.active:focus, .nav-pills .nav-link.active:hover,\n.nav-pills .nav-item.open .nav-link,\n.nav-pills .nav-item.open .nav-link:focus,\n.nav-pills .nav-item.open .nav-link:hover {\n  color: #fff;\n  cursor: default;\n  background-color: #0275d8;\n}\n\n.nav-stacked .nav-item {\n  display: block;\n  float: none;\n}\n\n.nav-stacked .nav-item + .nav-item {\n  margin-top: 0.2rem;\n  margin-left: 0;\n}\n\n.tab-content > .tab-pane {\n  display: none;\n}\n\n.tab-content > .active {\n  display: block;\n}\n\n.navbar {\n  position: relative;\n  padding: 0.5rem 1rem;\n}\n\n.navbar::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (min-width: 576px) {\n  .navbar {\n    border-radius: 0.25rem;\n  }\n}\n\n.navbar-full {\n  z-index: 1000;\n}\n\n@media (min-width: 576px) {\n  .navbar-full {\n    border-radius: 0;\n  }\n}\n\n.navbar-fixed-top,\n.navbar-fixed-bottom {\n  position: fixed;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n\n@media (min-width: 576px) {\n  .navbar-fixed-top,\n  .navbar-fixed-bottom {\n    border-radius: 0;\n  }\n}\n\n.navbar-fixed-top {\n  top: 0;\n}\n\n.navbar-fixed-bottom {\n  bottom: 0;\n}\n\n.navbar-sticky-top {\n  position: -webkit-sticky;\n  position: sticky;\n  top: 0;\n  z-index: 1030;\n  width: 100%;\n}\n\n@media (min-width: 576px) {\n  .navbar-sticky-top {\n    border-radius: 0;\n  }\n}\n\n.navbar-brand {\n  float: left;\n  padding-top: 0.25rem;\n  padding-bottom: 0.25rem;\n  margin-right: 1rem;\n  font-size: 1.25rem;\n  line-height: inherit;\n}\n\n.navbar-brand:focus, .navbar-brand:hover {\n  text-decoration: none;\n}\n\n.navbar-divider {\n  float: left;\n  width: 1px;\n  padding-top: 0.425rem;\n  padding-bottom: 0.425rem;\n  margin-right: 1rem;\n  margin-left: 1rem;\n  overflow: hidden;\n}\n\n.navbar-divider::before {\n  content: \"\\00a0\";\n}\n\n.navbar-text {\n  display: inline-block;\n  padding-top: .425rem;\n  padding-bottom: .425rem;\n}\n\n.navbar-toggler {\n  width: 2.5em;\n  height: 2em;\n  padding: 0.5rem 0.75rem;\n  font-size: 1.25rem;\n  line-height: 1;\n  background: transparent no-repeat center center;\n  -webkit-background-size: 24px 24px;\n          background-size: 24px 24px;\n  border: 1px solid transparent;\n  border-radius: 0.25rem;\n}\n\n.navbar-toggler:focus, .navbar-toggler:hover {\n  text-decoration: none;\n}\n\n.navbar-toggleable-xs::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 575px) {\n  .navbar-toggleable-xs .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-xs .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-xs .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 576px) {\n  .navbar-toggleable-xs {\n    display: block;\n  }\n}\n\n.navbar-toggleable-sm::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 767px) {\n  .navbar-toggleable-sm .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-sm .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-sm .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 768px) {\n  .navbar-toggleable-sm {\n    display: block;\n  }\n}\n\n.navbar-toggleable-md::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 991px) {\n  .navbar-toggleable-md .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-md .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-md .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 992px) {\n  .navbar-toggleable-md {\n    display: block;\n  }\n}\n\n.navbar-toggleable-lg::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 1199px) {\n  .navbar-toggleable-lg .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-lg .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-lg .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 1200px) {\n  .navbar-toggleable-lg {\n    display: block;\n  }\n}\n\n.navbar-toggleable-xl {\n  display: block;\n}\n\n.navbar-toggleable-xl::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.navbar-toggleable-xl .navbar-brand {\n  display: block;\n  float: none;\n  margin-top: .5rem;\n  margin-right: 0;\n}\n\n.navbar-toggleable-xl .navbar-nav {\n  margin-top: .5rem;\n  margin-bottom: .5rem;\n}\n\n.navbar-toggleable-xl .navbar-nav .dropdown-menu {\n  position: static;\n  float: none;\n}\n\n.navbar-nav .nav-item {\n  float: left;\n}\n\n.navbar-nav .nav-link {\n  display: block;\n  padding-top: .425rem;\n  padding-bottom: .425rem;\n}\n\n.navbar-nav .nav-link + .nav-link {\n  margin-left: 1rem;\n}\n\n.navbar-nav .nav-item + .nav-item {\n  margin-left: 1rem;\n}\n\n.navbar-light .navbar-brand,\n.navbar-light .navbar-toggler {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-brand:focus, .navbar-light .navbar-brand:hover,\n.navbar-light .navbar-toggler:focus,\n.navbar-light .navbar-toggler:hover {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-nav .nav-link {\n  color: rgba(0, 0, 0, 0.5);\n}\n\n.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {\n  color: rgba(0, 0, 0, 0.7);\n}\n\n.navbar-light .navbar-nav .open > .nav-link, .navbar-light .navbar-nav .open > .nav-link:focus, .navbar-light .navbar-nav .open > .nav-link:hover,\n.navbar-light .navbar-nav .active > .nav-link,\n.navbar-light .navbar-nav .active > .nav-link:focus,\n.navbar-light .navbar-nav .active > .nav-link:hover,\n.navbar-light .navbar-nav .nav-link.open,\n.navbar-light .navbar-nav .nav-link.open:focus,\n.navbar-light .navbar-nav .nav-link.open:hover,\n.navbar-light .navbar-nav .nav-link.active,\n.navbar-light .navbar-nav .nav-link.active:focus,\n.navbar-light .navbar-nav .nav-link.active:hover {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-toggler {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E\");\n  border-color: rgba(0, 0, 0, 0.1);\n}\n\n.navbar-light .navbar-divider {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.navbar-dark .navbar-brand,\n.navbar-dark .navbar-toggler {\n  color: white;\n}\n\n.navbar-dark .navbar-brand:focus, .navbar-dark .navbar-brand:hover,\n.navbar-dark .navbar-toggler:focus,\n.navbar-dark .navbar-toggler:hover {\n  color: white;\n}\n\n.navbar-dark .navbar-nav .nav-link {\n  color: rgba(255, 255, 255, 0.5);\n}\n\n.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link:hover {\n  color: rgba(255, 255, 255, 0.75);\n}\n\n.navbar-dark .navbar-nav .open > .nav-link, .navbar-dark .navbar-nav .open > .nav-link:focus, .navbar-dark .navbar-nav .open > .nav-link:hover,\n.navbar-dark .navbar-nav .active > .nav-link,\n.navbar-dark .navbar-nav .active > .nav-link:focus,\n.navbar-dark .navbar-nav .active > .nav-link:hover,\n.navbar-dark .navbar-nav .nav-link.open,\n.navbar-dark .navbar-nav .nav-link.open:focus,\n.navbar-dark .navbar-nav .nav-link.open:hover,\n.navbar-dark .navbar-nav .nav-link.active,\n.navbar-dark .navbar-nav .nav-link.active:focus,\n.navbar-dark .navbar-nav .nav-link.active:hover {\n  color: white;\n}\n\n.navbar-dark .navbar-toggler {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E\");\n  border-color: rgba(255, 255, 255, 0.1);\n}\n\n.navbar-dark .navbar-divider {\n  background-color: rgba(255, 255, 255, 0.075);\n}\n\n.navbar-toggleable-xs::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 575px) {\n  .navbar-toggleable-xs .navbar-nav .nav-item {\n    float: none;\n    margin-left: 0;\n  }\n}\n\n@media (min-width: 576px) {\n  .navbar-toggleable-xs {\n    display: block !important;\n  }\n}\n\n.navbar-toggleable-sm::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 767px) {\n  .navbar-toggleable-sm .navbar-nav .nav-item {\n    float: none;\n    margin-left: 0;\n  }\n}\n\n@media (min-width: 768px) {\n  .navbar-toggleable-sm {\n    display: block !important;\n  }\n}\n\n.navbar-toggleable-md::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 991px) {\n  .navbar-toggleable-md .navbar-nav .nav-item {\n    float: none;\n    margin-left: 0;\n  }\n}\n\n@media (min-width: 992px) {\n  .navbar-toggleable-md {\n    display: block !important;\n  }\n}\n\n.card {\n  position: relative;\n  display: block;\n  margin-bottom: 0.75rem;\n  background-color: #fff;\n  border-radius: 0.25rem;\n  border: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-block {\n  padding: 1.25rem;\n}\n\n.card-block::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.card-title {\n  margin-bottom: 0.75rem;\n}\n\n.card-subtitle {\n  margin-top: -0.375rem;\n  margin-bottom: 0;\n}\n\n.card-text:last-child {\n  margin-bottom: 0;\n}\n\n.card-link:hover {\n  text-decoration: none;\n}\n\n.card-link + .card-link {\n  margin-left: 1.25rem;\n}\n\n.card > .list-group:first-child .list-group-item:first-child {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.card > .list-group:last-child .list-group-item:last-child {\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.card-header {\n  padding: 0.75rem 1.25rem;\n  margin-bottom: 0;\n  background-color: #f5f5f5;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-header::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.card-header:first-child {\n  border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;\n}\n\n.card-footer {\n  padding: 0.75rem 1.25rem;\n  background-color: #f5f5f5;\n  border-top: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-footer::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.card-footer:last-child {\n  border-radius: 0 0 calc(0.25rem - 1px) calc(0.25rem - 1px);\n}\n\n.card-header-tabs {\n  margin-right: -0.625rem;\n  margin-bottom: -0.75rem;\n  margin-left: -0.625rem;\n  border-bottom: 0;\n}\n\n.card-header-pills {\n  margin-right: -0.625rem;\n  margin-left: -0.625rem;\n}\n\n.card-primary {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.card-primary .card-header,\n.card-primary .card-footer {\n  background-color: transparent;\n}\n\n.card-success {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.card-success .card-header,\n.card-success .card-footer {\n  background-color: transparent;\n}\n\n.card-info {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.card-info .card-header,\n.card-info .card-footer {\n  background-color: transparent;\n}\n\n.card-warning {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.card-warning .card-header,\n.card-warning .card-footer {\n  background-color: transparent;\n}\n\n.card-danger {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.card-danger .card-header,\n.card-danger .card-footer {\n  background-color: transparent;\n}\n\n.card-outline-primary {\n  background-color: transparent;\n  border-color: #0275d8;\n}\n\n.card-outline-secondary {\n  background-color: transparent;\n  border-color: #ccc;\n}\n\n.card-outline-info {\n  background-color: transparent;\n  border-color: #5bc0de;\n}\n\n.card-outline-success {\n  background-color: transparent;\n  border-color: #5cb85c;\n}\n\n.card-outline-warning {\n  background-color: transparent;\n  border-color: #f0ad4e;\n}\n\n.card-outline-danger {\n  background-color: transparent;\n  border-color: #d9534f;\n}\n\n.card-inverse .card-header,\n.card-inverse .card-footer {\n  border-color: rgba(255, 255, 255, 0.2);\n}\n\n.card-inverse .card-header,\n.card-inverse .card-footer,\n.card-inverse .card-title,\n.card-inverse .card-blockquote {\n  color: #fff;\n}\n\n.card-inverse .card-link,\n.card-inverse .card-text,\n.card-inverse .card-subtitle,\n.card-inverse .card-blockquote .blockquote-footer {\n  color: rgba(255, 255, 255, 0.65);\n}\n\n.card-inverse .card-link:focus, .card-inverse .card-link:hover {\n  color: #fff;\n}\n\n.card-blockquote {\n  padding: 0;\n  margin-bottom: 0;\n  border-left: 0;\n}\n\n.card-img {\n  border-radius: calc(0.25rem - 1px);\n}\n\n.card-img-overlay {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  padding: 1.25rem;\n}\n\n.card-img-top {\n  border-top-right-radius: calc(0.25rem - 1px);\n  border-top-left-radius: calc(0.25rem - 1px);\n}\n\n.card-img-bottom {\n  border-bottom-right-radius: calc(0.25rem - 1px);\n  border-bottom-left-radius: calc(0.25rem - 1px);\n}\n\n@media (min-width: 576px) {\n  .card-deck {\n    display: table;\n    width: 100%;\n    margin-bottom: 0.75rem;\n    table-layout: fixed;\n    border-spacing: 1.25rem 0;\n  }\n  .card-deck .card {\n    display: table-cell;\n    margin-bottom: 0;\n    vertical-align: top;\n  }\n  .card-deck-wrapper {\n    margin-right: -1.25rem;\n    margin-left: -1.25rem;\n  }\n}\n\n@media (min-width: 576px) {\n  .card-group {\n    display: table;\n    width: 100%;\n    table-layout: fixed;\n  }\n  .card-group .card {\n    display: table-cell;\n    vertical-align: top;\n  }\n  .card-group .card + .card {\n    margin-left: 0;\n    border-left: 0;\n  }\n  .card-group .card:first-child {\n    border-bottom-right-radius: 0;\n    border-top-right-radius: 0;\n  }\n  .card-group .card:first-child .card-img-top {\n    border-top-right-radius: 0;\n  }\n  .card-group .card:first-child .card-img-bottom {\n    border-bottom-right-radius: 0;\n  }\n  .card-group .card:last-child {\n    border-bottom-left-radius: 0;\n    border-top-left-radius: 0;\n  }\n  .card-group .card:last-child .card-img-top {\n    border-top-left-radius: 0;\n  }\n  .card-group .card:last-child .card-img-bottom {\n    border-bottom-left-radius: 0;\n  }\n  .card-group .card:not(:first-child):not(:last-child) {\n    border-radius: 0;\n  }\n  .card-group .card:not(:first-child):not(:last-child) .card-img-top,\n  .card-group .card:not(:first-child):not(:last-child) .card-img-bottom {\n    border-radius: 0;\n  }\n}\n\n@media (min-width: 576px) {\n  .card-columns {\n    -webkit-column-count: 3;\n       -moz-column-count: 3;\n            column-count: 3;\n    -webkit-column-gap: 1.25rem;\n       -moz-column-gap: 1.25rem;\n            column-gap: 1.25rem;\n  }\n  .card-columns .card {\n    display: inline-block;\n    width: 100%;\n  }\n}\n\n.breadcrumb {\n  padding: 0.75rem 1rem;\n  margin-bottom: 1rem;\n  list-style: none;\n  background-color: #eceeef;\n  border-radius: 0.25rem;\n}\n\n.breadcrumb::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.breadcrumb-item {\n  float: left;\n}\n\n.breadcrumb-item + .breadcrumb-item::before {\n  display: inline-block;\n  padding-right: 0.5rem;\n  padding-left: 0.5rem;\n  color: #818a91;\n  content: \"/\";\n}\n\n.breadcrumb-item + .breadcrumb-item:hover::before {\n  text-decoration: underline;\n}\n\n.breadcrumb-item + .breadcrumb-item:hover::before {\n  text-decoration: none;\n}\n\n.breadcrumb-item.active {\n  color: #818a91;\n}\n\n.pagination {\n  display: inline-block;\n  padding-left: 0;\n  margin-top: 1rem;\n  margin-bottom: 1rem;\n  border-radius: 0.25rem;\n}\n\n.page-item {\n  display: inline;\n}\n\n.page-item:first-child .page-link {\n  margin-left: 0;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.page-item:last-child .page-link {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.page-item.active .page-link, .page-item.active .page-link:focus, .page-item.active .page-link:hover {\n  z-index: 2;\n  color: #fff;\n  cursor: default;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.page-item.disabled .page-link, .page-item.disabled .page-link:focus, .page-item.disabled .page-link:hover {\n  color: #818a91;\n  pointer-events: none;\n  cursor: not-allowed;\n  background-color: #fff;\n  border-color: #ddd;\n}\n\n.page-link {\n  position: relative;\n  float: left;\n  padding: 0.5rem 0.75rem;\n  margin-left: -1px;\n  color: #0275d8;\n  text-decoration: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n\n.page-link:focus, .page-link:hover {\n  color: #014c8c;\n  background-color: #eceeef;\n  border-color: #ddd;\n}\n\n.pagination-lg .page-link {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n}\n\n.pagination-lg .page-item:first-child .page-link {\n  border-bottom-left-radius: 0.3rem;\n  border-top-left-radius: 0.3rem;\n}\n\n.pagination-lg .page-item:last-child .page-link {\n  border-bottom-right-radius: 0.3rem;\n  border-top-right-radius: 0.3rem;\n}\n\n.pagination-sm .page-link {\n  padding: 0.275rem 0.75rem;\n  font-size: 0.875rem;\n}\n\n.pagination-sm .page-item:first-child .page-link {\n  border-bottom-left-radius: 0.2rem;\n  border-top-left-radius: 0.2rem;\n}\n\n.pagination-sm .page-item:last-child .page-link {\n  border-bottom-right-radius: 0.2rem;\n  border-top-right-radius: 0.2rem;\n}\n\n.tag {\n  display: inline-block;\n  padding: 0.25em 0.4em;\n  font-size: 75%;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: baseline;\n  border-radius: 0.25rem;\n}\n\n.tag:empty {\n  display: none;\n}\n\n.btn .tag {\n  position: relative;\n  top: -1px;\n}\n\na.tag:focus, a.tag:hover {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n\n.tag-pill {\n  padding-right: 0.6em;\n  padding-left: 0.6em;\n  border-radius: 10rem;\n}\n\n.tag-default {\n  background-color: #818a91;\n}\n\n.tag-default[href]:focus, .tag-default[href]:hover {\n  background-color: #687077;\n}\n\n.tag-primary {\n  background-color: #0275d8;\n}\n\n.tag-primary[href]:focus, .tag-primary[href]:hover {\n  background-color: #025aa5;\n}\n\n.tag-success {\n  background-color: #5cb85c;\n}\n\n.tag-success[href]:focus, .tag-success[href]:hover {\n  background-color: #449d44;\n}\n\n.tag-info {\n  background-color: #5bc0de;\n}\n\n.tag-info[href]:focus, .tag-info[href]:hover {\n  background-color: #31b0d5;\n}\n\n.tag-warning {\n  background-color: #f0ad4e;\n}\n\n.tag-warning[href]:focus, .tag-warning[href]:hover {\n  background-color: #ec971f;\n}\n\n.tag-danger {\n  background-color: #d9534f;\n}\n\n.tag-danger[href]:focus, .tag-danger[href]:hover {\n  background-color: #c9302c;\n}\n\n.jumbotron {\n  padding: 2rem 1rem;\n  margin-bottom: 2rem;\n  background-color: #eceeef;\n  border-radius: 0.3rem;\n}\n\n@media (min-width: 576px) {\n  .jumbotron {\n    padding: 4rem 2rem;\n  }\n}\n\n.jumbotron-hr {\n  border-top-color: #d0d5d8;\n}\n\n.jumbotron-fluid {\n  padding-right: 0;\n  padding-left: 0;\n  border-radius: 0;\n}\n\n.alert {\n  padding: 0.75rem 1.25rem;\n  margin-bottom: 1rem;\n  border: 1px solid transparent;\n  border-radius: 0.25rem;\n}\n\n.alert-heading {\n  color: inherit;\n}\n\n.alert-link {\n  font-weight: bold;\n}\n\n.alert-dismissible {\n  padding-right: 2.5rem;\n}\n\n.alert-dismissible .close {\n  position: relative;\n  top: -.125rem;\n  right: -1.25rem;\n  color: inherit;\n}\n\n.alert-success {\n  background-color: #dff0d8;\n  border-color: #d0e9c6;\n  color: #3c763d;\n}\n\n.alert-success hr {\n  border-top-color: #c1e2b3;\n}\n\n.alert-success .alert-link {\n  color: #2b542c;\n}\n\n.alert-info {\n  background-color: #d9edf7;\n  border-color: #bcdff1;\n  color: #31708f;\n}\n\n.alert-info hr {\n  border-top-color: #a6d5ec;\n}\n\n.alert-info .alert-link {\n  color: #245269;\n}\n\n.alert-warning {\n  background-color: #fcf8e3;\n  border-color: #faf2cc;\n  color: #8a6d3b;\n}\n\n.alert-warning hr {\n  border-top-color: #f7ecb5;\n}\n\n.alert-warning .alert-link {\n  color: #66512c;\n}\n\n.alert-danger {\n  background-color: #f2dede;\n  border-color: #ebcccc;\n  color: #a94442;\n}\n\n.alert-danger hr {\n  border-top-color: #e4b9b9;\n}\n\n.alert-danger .alert-link {\n  color: #843534;\n}\n\n@-webkit-keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n@-o-keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n@keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n.progress {\n  display: block;\n  width: 100%;\n  height: 1rem;\n  margin-bottom: 1rem;\n}\n\n.progress[value] {\n  background-color: #eee;\n  border: 0;\n  -webkit-appearance: none;\n     -moz-appearance: none;\n          appearance: none;\n  border-radius: 0.25rem;\n}\n\n.progress[value]::-ms-fill {\n  background-color: #0074d9;\n  border: 0;\n}\n\n.progress[value]::-moz-progress-bar {\n  background-color: #0074d9;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.progress[value]::-webkit-progress-value {\n  background-color: #0074d9;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.progress[value=\"100\"]::-moz-progress-bar {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.progress[value=\"100\"]::-webkit-progress-value {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.progress[value]::-webkit-progress-bar {\n  background-color: #eee;\n  border-radius: 0.25rem;\n}\n\nbase::-moz-progress-bar,\n.progress[value] {\n  background-color: #eee;\n  border-radius: 0.25rem;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress {\n    background-color: #eee;\n    border-radius: 0.25rem;\n  }\n  .progress-bar {\n    display: inline-block;\n    height: 1rem;\n    text-indent: -999rem;\n    background-color: #0074d9;\n    border-bottom-left-radius: 0.25rem;\n    border-top-left-radius: 0.25rem;\n  }\n  .progress[width=\"100%\"] {\n    border-bottom-right-radius: 0.25rem;\n    border-top-right-radius: 0.25rem;\n  }\n}\n\n.progress-striped[value]::-webkit-progress-value {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  -webkit-background-size: 1rem 1rem;\n          background-size: 1rem 1rem;\n}\n\n.progress-striped[value]::-moz-progress-bar {\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-size: 1rem 1rem;\n}\n\n.progress-striped[value]::-ms-fill {\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-size: 1rem 1rem;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-bar-striped {\n    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n    background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n    -webkit-background-size: 1rem 1rem;\n            background-size: 1rem 1rem;\n  }\n}\n\n.progress-animated[value]::-webkit-progress-value {\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\n          animation: progress-bar-stripes 2s linear infinite;\n}\n\n.progress-animated[value]::-moz-progress-bar {\n  animation: progress-bar-stripes 2s linear infinite;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-animated .progress-bar-striped {\n    -webkit-animation: progress-bar-stripes 2s linear infinite;\n         -o-animation: progress-bar-stripes 2s linear infinite;\n            animation: progress-bar-stripes 2s linear infinite;\n  }\n}\n\n.progress-success[value]::-webkit-progress-value {\n  background-color: #5cb85c;\n}\n\n.progress-success[value]::-moz-progress-bar {\n  background-color: #5cb85c;\n}\n\n.progress-success[value]::-ms-fill {\n  background-color: #5cb85c;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-success .progress-bar {\n    background-color: #5cb85c;\n  }\n}\n\n.progress-info[value]::-webkit-progress-value {\n  background-color: #5bc0de;\n}\n\n.progress-info[value]::-moz-progress-bar {\n  background-color: #5bc0de;\n}\n\n.progress-info[value]::-ms-fill {\n  background-color: #5bc0de;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-info .progress-bar {\n    background-color: #5bc0de;\n  }\n}\n\n.progress-warning[value]::-webkit-progress-value {\n  background-color: #f0ad4e;\n}\n\n.progress-warning[value]::-moz-progress-bar {\n  background-color: #f0ad4e;\n}\n\n.progress-warning[value]::-ms-fill {\n  background-color: #f0ad4e;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-warning .progress-bar {\n    background-color: #f0ad4e;\n  }\n}\n\n.progress-danger[value]::-webkit-progress-value {\n  background-color: #d9534f;\n}\n\n.progress-danger[value]::-moz-progress-bar {\n  background-color: #d9534f;\n}\n\n.progress-danger[value]::-ms-fill {\n  background-color: #d9534f;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-danger .progress-bar {\n    background-color: #d9534f;\n  }\n}\n\n.media,\n.media-body {\n  overflow: hidden;\n}\n\n.media-body {\n  width: 10000px;\n}\n\n.media-left,\n.media-right,\n.media-body {\n  display: table-cell;\n  vertical-align: top;\n}\n\n.media-middle {\n  vertical-align: middle;\n}\n\n.media-bottom {\n  vertical-align: bottom;\n}\n\n.media-object {\n  display: block;\n}\n\n.media-object.img-thumbnail {\n  max-width: none;\n}\n\n.media-right {\n  padding-left: 10px;\n}\n\n.media-left {\n  padding-right: 10px;\n}\n\n.media-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n\n.media-list {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-group {\n  padding-left: 0;\n  margin-bottom: 0;\n}\n\n.list-group-item {\n  position: relative;\n  display: block;\n  padding: 0.75rem 1.25rem;\n  margin-bottom: -1px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n\n.list-group-item:first-child {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.list-group-item:last-child {\n  margin-bottom: 0;\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.list-group-item.disabled, .list-group-item.disabled:focus, .list-group-item.disabled:hover {\n  color: #818a91;\n  cursor: not-allowed;\n  background-color: #eceeef;\n}\n\n.list-group-item.disabled .list-group-item-heading, .list-group-item.disabled:focus .list-group-item-heading, .list-group-item.disabled:hover .list-group-item-heading {\n  color: inherit;\n}\n\n.list-group-item.disabled .list-group-item-text, .list-group-item.disabled:focus .list-group-item-text, .list-group-item.disabled:hover .list-group-item-text {\n  color: #818a91;\n}\n\n.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {\n  z-index: 2;\n  color: #fff;\n  text-decoration: none;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.list-group-item.active .list-group-item-heading,\n.list-group-item.active .list-group-item-heading > small,\n.list-group-item.active .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading,\n.list-group-item.active:focus .list-group-item-heading > small,\n.list-group-item.active:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading,\n.list-group-item.active:hover .list-group-item-heading > small,\n.list-group-item.active:hover .list-group-item-heading > .small {\n  color: inherit;\n}\n\n.list-group-item.active .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text {\n  color: #a8d6fe;\n}\n\n.list-group-flush .list-group-item {\n  border-right: 0;\n  border-left: 0;\n  border-radius: 0;\n}\n\n.list-group-item-action {\n  width: 100%;\n  color: #555;\n  text-align: inherit;\n}\n\n.list-group-item-action .list-group-item-heading {\n  color: #333;\n}\n\n.list-group-item-action:focus, .list-group-item-action:hover {\n  color: #555;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n\n.list-group-item-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n}\n\na.list-group-item-success,\nbutton.list-group-item-success {\n  color: #3c763d;\n}\n\na.list-group-item-success .list-group-item-heading,\nbutton.list-group-item-success .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-success:focus, a.list-group-item-success:hover,\nbutton.list-group-item-success:focus,\nbutton.list-group-item-success:hover {\n  color: #3c763d;\n  background-color: #d0e9c6;\n}\n\na.list-group-item-success.active, a.list-group-item-success.active:focus, a.list-group-item-success.active:hover,\nbutton.list-group-item-success.active,\nbutton.list-group-item-success.active:focus,\nbutton.list-group-item-success.active:hover {\n  color: #fff;\n  background-color: #3c763d;\n  border-color: #3c763d;\n}\n\n.list-group-item-info {\n  color: #31708f;\n  background-color: #d9edf7;\n}\n\na.list-group-item-info,\nbutton.list-group-item-info {\n  color: #31708f;\n}\n\na.list-group-item-info .list-group-item-heading,\nbutton.list-group-item-info .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-info:focus, a.list-group-item-info:hover,\nbutton.list-group-item-info:focus,\nbutton.list-group-item-info:hover {\n  color: #31708f;\n  background-color: #c4e3f3;\n}\n\na.list-group-item-info.active, a.list-group-item-info.active:focus, a.list-group-item-info.active:hover,\nbutton.list-group-item-info.active,\nbutton.list-group-item-info.active:focus,\nbutton.list-group-item-info.active:hover {\n  color: #fff;\n  background-color: #31708f;\n  border-color: #31708f;\n}\n\n.list-group-item-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n}\n\na.list-group-item-warning,\nbutton.list-group-item-warning {\n  color: #8a6d3b;\n}\n\na.list-group-item-warning .list-group-item-heading,\nbutton.list-group-item-warning .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-warning:focus, a.list-group-item-warning:hover,\nbutton.list-group-item-warning:focus,\nbutton.list-group-item-warning:hover {\n  color: #8a6d3b;\n  background-color: #faf2cc;\n}\n\na.list-group-item-warning.active, a.list-group-item-warning.active:focus, a.list-group-item-warning.active:hover,\nbutton.list-group-item-warning.active,\nbutton.list-group-item-warning.active:focus,\nbutton.list-group-item-warning.active:hover {\n  color: #fff;\n  background-color: #8a6d3b;\n  border-color: #8a6d3b;\n}\n\n.list-group-item-danger {\n  color: #a94442;\n  background-color: #f2dede;\n}\n\na.list-group-item-danger,\nbutton.list-group-item-danger {\n  color: #a94442;\n}\n\na.list-group-item-danger .list-group-item-heading,\nbutton.list-group-item-danger .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-danger:focus, a.list-group-item-danger:hover,\nbutton.list-group-item-danger:focus,\nbutton.list-group-item-danger:hover {\n  color: #a94442;\n  background-color: #ebcccc;\n}\n\na.list-group-item-danger.active, a.list-group-item-danger.active:focus, a.list-group-item-danger.active:hover,\nbutton.list-group-item-danger.active,\nbutton.list-group-item-danger.active:focus,\nbutton.list-group-item-danger.active:hover {\n  color: #fff;\n  background-color: #a94442;\n  border-color: #a94442;\n}\n\n.list-group-item-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n\n.list-group-item-text {\n  margin-bottom: 0;\n  line-height: 1.3;\n}\n\n.embed-responsive {\n  position: relative;\n  display: block;\n  height: 0;\n  padding: 0;\n  overflow: hidden;\n}\n\n.embed-responsive .embed-responsive-item,\n.embed-responsive iframe,\n.embed-responsive embed,\n.embed-responsive object,\n.embed-responsive video {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: 0;\n}\n\n.embed-responsive-21by9 {\n  padding-bottom: 42.857143%;\n}\n\n.embed-responsive-16by9 {\n  padding-bottom: 56.25%;\n}\n\n.embed-responsive-4by3 {\n  padding-bottom: 75%;\n}\n\n.embed-responsive-1by1 {\n  padding-bottom: 100%;\n}\n\n.close {\n  float: right;\n  font-size: 1.5rem;\n  font-weight: bold;\n  line-height: 1;\n  color: #000;\n  text-shadow: 0 1px 0 #fff;\n  opacity: .2;\n}\n\n.close:focus, .close:hover {\n  color: #000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: .5;\n}\n\nbutton.close {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n\n.modal-open {\n  overflow: hidden;\n}\n\n.modal {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1050;\n  display: none;\n  overflow: hidden;\n  outline: 0;\n}\n\n.modal.fade .modal-dialog {\n  -webkit-transition: -webkit-transform .3s ease-out;\n  transition: -webkit-transform .3s ease-out;\n  -o-transition: -o-transform .3s ease-out;\n  transition: transform .3s ease-out;\n  transition: transform .3s ease-out, -webkit-transform .3s ease-out, -o-transform .3s ease-out;\n  -webkit-transform: translate(0, -25%);\n      -ms-transform: translate(0, -25%);\n       -o-transform: translate(0, -25%);\n          transform: translate(0, -25%);\n}\n\n.modal.in .modal-dialog {\n  -webkit-transform: translate(0, 0);\n      -ms-transform: translate(0, 0);\n       -o-transform: translate(0, 0);\n          transform: translate(0, 0);\n}\n\n.modal-open .modal {\n  overflow-x: hidden;\n  overflow-y: auto;\n}\n\n.modal-dialog {\n  position: relative;\n  width: auto;\n  margin: 10px;\n}\n\n.modal-content {\n  position: relative;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  border-radius: 0.3rem;\n  outline: 0;\n}\n\n.modal-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1040;\n  background-color: #000;\n}\n\n.modal-backdrop.fade {\n  opacity: 0;\n}\n\n.modal-backdrop.in {\n  opacity: 0.5;\n}\n\n.modal-header {\n  padding: 15px;\n  border-bottom: 1px solid #e5e5e5;\n}\n\n.modal-header::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.modal-header .close {\n  margin-top: -2px;\n}\n\n.modal-title {\n  margin: 0;\n  line-height: 1.5;\n}\n\n.modal-body {\n  position: relative;\n  padding: 15px;\n}\n\n.modal-footer {\n  padding: 15px;\n  text-align: right;\n  border-top: 1px solid #e5e5e5;\n}\n\n.modal-footer::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.modal-scrollbar-measure {\n  position: absolute;\n  top: -9999px;\n  width: 50px;\n  height: 50px;\n  overflow: scroll;\n}\n\n@media (min-width: 576px) {\n  .modal-dialog {\n    max-width: 600px;\n    margin: 30px auto;\n  }\n  .modal-sm {\n    max-width: 300px;\n  }\n}\n\n@media (min-width: 992px) {\n  .modal-lg {\n    max-width: 900px;\n  }\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 1070;\n  display: block;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  letter-spacing: normal;\n  line-break: auto;\n  line-height: 1.5;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  white-space: normal;\n  word-break: normal;\n  word-spacing: normal;\n  font-size: 0.875rem;\n  word-wrap: break-word;\n  opacity: 0;\n}\n\n.tooltip.in {\n  opacity: 0.9;\n}\n\n.tooltip.tooltip-top, .tooltip.bs-tether-element-attached-bottom {\n  padding: 5px 0;\n  margin-top: -3px;\n}\n\n.tooltip.tooltip-top .tooltip-inner::before, .tooltip.bs-tether-element-attached-bottom .tooltip-inner::before {\n  bottom: 0;\n  left: 50%;\n  margin-left: -5px;\n  content: \"\";\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n\n.tooltip.tooltip-right, .tooltip.bs-tether-element-attached-left {\n  padding: 0 5px;\n  margin-left: 3px;\n}\n\n.tooltip.tooltip-right .tooltip-inner::before, .tooltip.bs-tether-element-attached-left .tooltip-inner::before {\n  top: 50%;\n  left: 0;\n  margin-top: -5px;\n  content: \"\";\n  border-width: 5px 5px 5px 0;\n  border-right-color: #000;\n}\n\n.tooltip.tooltip-bottom, .tooltip.bs-tether-element-attached-top {\n  padding: 5px 0;\n  margin-top: 3px;\n}\n\n.tooltip.tooltip-bottom .tooltip-inner::before, .tooltip.bs-tether-element-attached-top .tooltip-inner::before {\n  top: 0;\n  left: 50%;\n  margin-left: -5px;\n  content: \"\";\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n\n.tooltip.tooltip-left, .tooltip.bs-tether-element-attached-right {\n  padding: 0 5px;\n  margin-left: -3px;\n}\n\n.tooltip.tooltip-left .tooltip-inner::before, .tooltip.bs-tether-element-attached-right .tooltip-inner::before {\n  top: 50%;\n  right: 0;\n  margin-top: -5px;\n  content: \"\";\n  border-width: 5px 0 5px 5px;\n  border-left-color: #000;\n}\n\n.tooltip-inner {\n  max-width: 200px;\n  padding: 3px 8px;\n  color: #fff;\n  text-align: center;\n  background-color: #000;\n  border-radius: 0.25rem;\n}\n\n.tooltip-inner::before {\n  position: absolute;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n\n.popover {\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1060;\n  display: block;\n  max-width: 276px;\n  padding: 1px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  letter-spacing: normal;\n  line-break: auto;\n  line-height: 1.5;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  white-space: normal;\n  word-break: normal;\n  word-spacing: normal;\n  font-size: 0.875rem;\n  word-wrap: break-word;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  border-radius: 0.3rem;\n}\n\n.popover.popover-top, .popover.bs-tether-element-attached-bottom {\n  margin-top: -10px;\n}\n\n.popover.popover-top::before, .popover.popover-top::after, .popover.bs-tether-element-attached-bottom::before, .popover.bs-tether-element-attached-bottom::after {\n  left: 50%;\n  border-bottom-width: 0;\n}\n\n.popover.popover-top::before, .popover.bs-tether-element-attached-bottom::before {\n  bottom: -11px;\n  margin-left: -11px;\n  border-top-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-top::after, .popover.bs-tether-element-attached-bottom::after {\n  bottom: -10px;\n  margin-left: -10px;\n  border-top-color: #fff;\n}\n\n.popover.popover-right, .popover.bs-tether-element-attached-left {\n  margin-left: 10px;\n}\n\n.popover.popover-right::before, .popover.popover-right::after, .popover.bs-tether-element-attached-left::before, .popover.bs-tether-element-attached-left::after {\n  top: 50%;\n  border-left-width: 0;\n}\n\n.popover.popover-right::before, .popover.bs-tether-element-attached-left::before {\n  left: -11px;\n  margin-top: -11px;\n  border-right-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-right::after, .popover.bs-tether-element-attached-left::after {\n  left: -10px;\n  margin-top: -10px;\n  border-right-color: #fff;\n}\n\n.popover.popover-bottom, .popover.bs-tether-element-attached-top {\n  margin-top: 10px;\n}\n\n.popover.popover-bottom::before, .popover.popover-bottom::after, .popover.bs-tether-element-attached-top::before, .popover.bs-tether-element-attached-top::after {\n  left: 50%;\n  border-top-width: 0;\n}\n\n.popover.popover-bottom::before, .popover.bs-tether-element-attached-top::before {\n  top: -11px;\n  margin-left: -11px;\n  border-bottom-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-bottom::after, .popover.bs-tether-element-attached-top::after {\n  top: -10px;\n  margin-left: -10px;\n  border-bottom-color: #f7f7f7;\n}\n\n.popover.popover-bottom .popover-title::before, .popover.bs-tether-element-attached-top .popover-title::before {\n  position: absolute;\n  top: 0;\n  left: 50%;\n  display: block;\n  width: 20px;\n  margin-left: -10px;\n  content: \"\";\n  border-bottom: 1px solid #f7f7f7;\n}\n\n.popover.popover-left, .popover.bs-tether-element-attached-right {\n  margin-left: -10px;\n}\n\n.popover.popover-left::before, .popover.popover-left::after, .popover.bs-tether-element-attached-right::before, .popover.bs-tether-element-attached-right::after {\n  top: 50%;\n  border-right-width: 0;\n}\n\n.popover.popover-left::before, .popover.bs-tether-element-attached-right::before {\n  right: -11px;\n  margin-top: -11px;\n  border-left-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-left::after, .popover.bs-tether-element-attached-right::after {\n  right: -10px;\n  margin-top: -10px;\n  border-left-color: #fff;\n}\n\n.popover-title {\n  padding: 8px 14px;\n  margin: 0;\n  font-size: 1rem;\n  background-color: #f7f7f7;\n  border-bottom: 1px solid #ebebeb;\n  border-radius: 0.2375rem 0.2375rem 0 0;\n}\n\n.popover-title:empty {\n  display: none;\n}\n\n.popover-content {\n  padding: 9px 14px;\n}\n\n.popover::before,\n.popover::after {\n  position: absolute;\n  display: block;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n\n.popover::before {\n  content: \"\";\n  border-width: 11px;\n}\n\n.popover::after {\n  content: \"\";\n  border-width: 10px;\n}\n\n.carousel {\n  position: relative;\n}\n\n.carousel-inner {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n}\n\n.carousel-inner > .carousel-item {\n  position: relative;\n  display: none;\n  -webkit-transition: .6s ease-in-out left;\n  -o-transition: .6s ease-in-out left;\n  transition: .6s ease-in-out left;\n}\n\n.carousel-inner > .carousel-item > img,\n.carousel-inner > .carousel-item > a > img {\n  line-height: 1;\n}\n\n@media all and (transform-3d), (-webkit-transform-3d) {\n  .carousel-inner > .carousel-item {\n    -webkit-transition: -webkit-transform .6s ease-in-out;\n    transition: -webkit-transform .6s ease-in-out;\n    -o-transition: -o-transform .6s ease-in-out;\n    transition: transform .6s ease-in-out;\n    transition: transform .6s ease-in-out, -webkit-transform .6s ease-in-out, -o-transform .6s ease-in-out;\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n  .carousel-inner > .carousel-item.next, .carousel-inner > .carousel-item.active.right {\n    left: 0;\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-inner > .carousel-item.prev, .carousel-inner > .carousel-item.active.left {\n    left: 0;\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n  .carousel-inner > .carousel-item.next.left, .carousel-inner > .carousel-item.prev.right, .carousel-inner > .carousel-item.active {\n    left: 0;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n\n.carousel-inner > .active,\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  display: block;\n}\n\n.carousel-inner > .active {\n  left: 0;\n}\n\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  position: absolute;\n  top: 0;\n  width: 100%;\n}\n\n.carousel-inner > .next {\n  left: 100%;\n}\n\n.carousel-inner > .prev {\n  left: -100%;\n}\n\n.carousel-inner > .next.left,\n.carousel-inner > .prev.right {\n  left: 0;\n}\n\n.carousel-inner > .active.left {\n  left: -100%;\n}\n\n.carousel-inner > .active.right {\n  left: 100%;\n}\n\n.carousel-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 15%;\n  font-size: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);\n  opacity: 0.5;\n}\n\n.carousel-control.left {\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.0001)));\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);\n  background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);\n  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);\n}\n\n.carousel-control.right {\n  right: 0;\n  left: auto;\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.0001)), to(rgba(0, 0, 0, 0.5)));\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);\n  background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);\n  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);\n}\n\n.carousel-control:focus, .carousel-control:hover {\n  color: #fff;\n  text-decoration: none;\n  outline: 0;\n  opacity: .9;\n}\n\n.carousel-control .icon-prev,\n.carousel-control .icon-next {\n  position: absolute;\n  top: 50%;\n  z-index: 5;\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  margin-top: -10px;\n  font-family: serif;\n  line-height: 1;\n}\n\n.carousel-control .icon-prev {\n  left: 50%;\n  margin-left: -10px;\n}\n\n.carousel-control .icon-next {\n  right: 50%;\n  margin-right: -10px;\n}\n\n.carousel-control .icon-prev::before {\n  content: \"\\2039\";\n}\n\n.carousel-control .icon-next::before {\n  content: \"\\203a\";\n}\n\n.carousel-indicators {\n  position: absolute;\n  bottom: 10px;\n  left: 50%;\n  z-index: 15;\n  width: 60%;\n  padding-left: 0;\n  margin-left: -30%;\n  text-align: center;\n  list-style: none;\n}\n\n.carousel-indicators li {\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  margin: 1px;\n  text-indent: -999px;\n  cursor: pointer;\n  background-color: transparent;\n  border: 1px solid #fff;\n  border-radius: 10px;\n}\n\n.carousel-indicators .active {\n  width: 12px;\n  height: 12px;\n  margin: 0;\n  background-color: #fff;\n}\n\n.carousel-caption {\n  position: absolute;\n  right: 15%;\n  bottom: 20px;\n  left: 15%;\n  z-index: 10;\n  padding-top: 20px;\n  padding-bottom: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);\n}\n\n.carousel-caption .btn {\n  text-shadow: none;\n}\n\n@media (min-width: 576px) {\n  .carousel-control .icon-prev,\n  .carousel-control .icon-next {\n    width: 30px;\n    height: 30px;\n    margin-top: -15px;\n    font-size: 30px;\n  }\n  .carousel-control .icon-prev {\n    margin-left: -15px;\n  }\n  .carousel-control .icon-next {\n    margin-right: -15px;\n  }\n  .carousel-caption {\n    right: 20%;\n    left: 20%;\n    padding-bottom: 30px;\n  }\n  .carousel-indicators {\n    bottom: 20px;\n  }\n}\n\n.align-baseline {\n  vertical-align: baseline !important;\n}\n\n.align-top {\n  vertical-align: top !important;\n}\n\n.align-middle {\n  vertical-align: middle !important;\n}\n\n.align-bottom {\n  vertical-align: bottom !important;\n}\n\n.align-text-bottom {\n  vertical-align: text-bottom !important;\n}\n\n.align-text-top {\n  vertical-align: text-top !important;\n}\n\n.bg-faded {\n  background-color: #f7f7f9;\n}\n\n.bg-primary {\n  background-color: #0275d8 !important;\n}\n\na.bg-primary:focus, a.bg-primary:hover {\n  background-color: #025aa5 !important;\n}\n\n.bg-success {\n  background-color: #5cb85c !important;\n}\n\na.bg-success:focus, a.bg-success:hover {\n  background-color: #449d44 !important;\n}\n\n.bg-info {\n  background-color: #5bc0de !important;\n}\n\na.bg-info:focus, a.bg-info:hover {\n  background-color: #31b0d5 !important;\n}\n\n.bg-warning {\n  background-color: #f0ad4e !important;\n}\n\na.bg-warning:focus, a.bg-warning:hover {\n  background-color: #ec971f !important;\n}\n\n.bg-danger {\n  background-color: #d9534f !important;\n}\n\na.bg-danger:focus, a.bg-danger:hover {\n  background-color: #c9302c !important;\n}\n\n.bg-inverse {\n  background-color: #373a3c !important;\n}\n\na.bg-inverse:focus, a.bg-inverse:hover {\n  background-color: #1f2021 !important;\n}\n\n.rounded {\n  border-radius: 0.25rem;\n}\n\n.rounded-top {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.rounded-right {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.rounded-bottom {\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.rounded-left {\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.rounded-circle {\n  border-radius: 50%;\n}\n\n.clearfix::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.d-block {\n  display: block !important;\n}\n\n.d-inline-block {\n  display: inline-block !important;\n}\n\n.d-inline {\n  display: inline !important;\n}\n\n.float-xs-left {\n  float: left !important;\n}\n\n.float-xs-right {\n  float: right !important;\n}\n\n.float-xs-none {\n  float: none !important;\n}\n\n@media (min-width: 576px) {\n  .float-sm-left {\n    float: left !important;\n  }\n  .float-sm-right {\n    float: right !important;\n  }\n  .float-sm-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .float-md-left {\n    float: left !important;\n  }\n  .float-md-right {\n    float: right !important;\n  }\n  .float-md-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .float-lg-left {\n    float: left !important;\n  }\n  .float-lg-right {\n    float: right !important;\n  }\n  .float-lg-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .float-xl-left {\n    float: left !important;\n  }\n  .float-xl-right {\n    float: right !important;\n  }\n  .float-xl-none {\n    float: none !important;\n  }\n}\n\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n\n.sr-only-focusable:active, .sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n\n.w-100 {\n  width: 100% !important;\n}\n\n.h-100 {\n  height: 100% !important;\n}\n\n.mx-auto {\n  margin-right: auto !important;\n  margin-left: auto !important;\n}\n\n.m-0 {\n  margin: 0 0 !important;\n}\n\n.mt-0 {\n  margin-top: 0 !important;\n}\n\n.mr-0 {\n  margin-right: 0 !important;\n}\n\n.mb-0 {\n  margin-bottom: 0 !important;\n}\n\n.ml-0 {\n  margin-left: 0 !important;\n}\n\n.mx-0 {\n  margin-right: 0 !important;\n  margin-left: 0 !important;\n}\n\n.my-0 {\n  margin-top: 0 !important;\n  margin-bottom: 0 !important;\n}\n\n.m-1 {\n  margin: 1rem 1rem !important;\n}\n\n.mt-1 {\n  margin-top: 1rem !important;\n}\n\n.mr-1 {\n  margin-right: 1rem !important;\n}\n\n.mb-1 {\n  margin-bottom: 1rem !important;\n}\n\n.ml-1 {\n  margin-left: 1rem !important;\n}\n\n.mx-1 {\n  margin-right: 1rem !important;\n  margin-left: 1rem !important;\n}\n\n.my-1 {\n  margin-top: 1rem !important;\n  margin-bottom: 1rem !important;\n}\n\n.m-2 {\n  margin: 1.5rem 1.5rem !important;\n}\n\n.mt-2 {\n  margin-top: 1.5rem !important;\n}\n\n.mr-2 {\n  margin-right: 1.5rem !important;\n}\n\n.mb-2 {\n  margin-bottom: 1.5rem !important;\n}\n\n.ml-2 {\n  margin-left: 1.5rem !important;\n}\n\n.mx-2 {\n  margin-right: 1.5rem !important;\n  margin-left: 1.5rem !important;\n}\n\n.my-2 {\n  margin-top: 1.5rem !important;\n  margin-bottom: 1.5rem !important;\n}\n\n.m-3 {\n  margin: 3rem 3rem !important;\n}\n\n.mt-3 {\n  margin-top: 3rem !important;\n}\n\n.mr-3 {\n  margin-right: 3rem !important;\n}\n\n.mb-3 {\n  margin-bottom: 3rem !important;\n}\n\n.ml-3 {\n  margin-left: 3rem !important;\n}\n\n.mx-3 {\n  margin-right: 3rem !important;\n  margin-left: 3rem !important;\n}\n\n.my-3 {\n  margin-top: 3rem !important;\n  margin-bottom: 3rem !important;\n}\n\n.p-0 {\n  padding: 0 0 !important;\n}\n\n.pt-0 {\n  padding-top: 0 !important;\n}\n\n.pr-0 {\n  padding-right: 0 !important;\n}\n\n.pb-0 {\n  padding-bottom: 0 !important;\n}\n\n.pl-0 {\n  padding-left: 0 !important;\n}\n\n.px-0 {\n  padding-right: 0 !important;\n  padding-left: 0 !important;\n}\n\n.py-0 {\n  padding-top: 0 !important;\n  padding-bottom: 0 !important;\n}\n\n.p-1 {\n  padding: 1rem 1rem !important;\n}\n\n.pt-1 {\n  padding-top: 1rem !important;\n}\n\n.pr-1 {\n  padding-right: 1rem !important;\n}\n\n.pb-1 {\n  padding-bottom: 1rem !important;\n}\n\n.pl-1 {\n  padding-left: 1rem !important;\n}\n\n.px-1 {\n  padding-right: 1rem !important;\n  padding-left: 1rem !important;\n}\n\n.py-1 {\n  padding-top: 1rem !important;\n  padding-bottom: 1rem !important;\n}\n\n.p-2 {\n  padding: 1.5rem 1.5rem !important;\n}\n\n.pt-2 {\n  padding-top: 1.5rem !important;\n}\n\n.pr-2 {\n  padding-right: 1.5rem !important;\n}\n\n.pb-2 {\n  padding-bottom: 1.5rem !important;\n}\n\n.pl-2 {\n  padding-left: 1.5rem !important;\n}\n\n.px-2 {\n  padding-right: 1.5rem !important;\n  padding-left: 1.5rem !important;\n}\n\n.py-2 {\n  padding-top: 1.5rem !important;\n  padding-bottom: 1.5rem !important;\n}\n\n.p-3 {\n  padding: 3rem 3rem !important;\n}\n\n.pt-3 {\n  padding-top: 3rem !important;\n}\n\n.pr-3 {\n  padding-right: 3rem !important;\n}\n\n.pb-3 {\n  padding-bottom: 3rem !important;\n}\n\n.pl-3 {\n  padding-left: 3rem !important;\n}\n\n.px-3 {\n  padding-right: 3rem !important;\n  padding-left: 3rem !important;\n}\n\n.py-3 {\n  padding-top: 3rem !important;\n  padding-bottom: 3rem !important;\n}\n\n.pos-f-t {\n  position: fixed;\n  top: 0;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n\n.text-justify {\n  text-align: justify !important;\n}\n\n.text-nowrap {\n  white-space: nowrap !important;\n}\n\n.text-truncate {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.text-xs-left {\n  text-align: left !important;\n}\n\n.text-xs-right {\n  text-align: right !important;\n}\n\n.text-xs-center {\n  text-align: center !important;\n}\n\n@media (min-width: 576px) {\n  .text-sm-left {\n    text-align: left !important;\n  }\n  .text-sm-right {\n    text-align: right !important;\n  }\n  .text-sm-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .text-md-left {\n    text-align: left !important;\n  }\n  .text-md-right {\n    text-align: right !important;\n  }\n  .text-md-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .text-lg-left {\n    text-align: left !important;\n  }\n  .text-lg-right {\n    text-align: right !important;\n  }\n  .text-lg-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .text-xl-left {\n    text-align: left !important;\n  }\n  .text-xl-right {\n    text-align: right !important;\n  }\n  .text-xl-center {\n    text-align: center !important;\n  }\n}\n\n.text-lowercase {\n  text-transform: lowercase !important;\n}\n\n.text-uppercase {\n  text-transform: uppercase !important;\n}\n\n.text-capitalize {\n  text-transform: capitalize !important;\n}\n\n.font-weight-normal {\n  font-weight: normal;\n}\n\n.font-weight-bold {\n  font-weight: bold;\n}\n\n.font-italic {\n  font-style: italic;\n}\n\n.text-white {\n  color: #fff !important;\n}\n\n.text-muted {\n  color: #818a91 !important;\n}\n\na.text-muted:focus, a.text-muted:hover {\n  color: #687077 !important;\n}\n\n.text-primary {\n  color: #0275d8 !important;\n}\n\na.text-primary:focus, a.text-primary:hover {\n  color: #025aa5 !important;\n}\n\n.text-success {\n  color: #5cb85c !important;\n}\n\na.text-success:focus, a.text-success:hover {\n  color: #449d44 !important;\n}\n\n.text-info {\n  color: #5bc0de !important;\n}\n\na.text-info:focus, a.text-info:hover {\n  color: #31b0d5 !important;\n}\n\n.text-warning {\n  color: #f0ad4e !important;\n}\n\na.text-warning:focus, a.text-warning:hover {\n  color: #ec971f !important;\n}\n\n.text-danger {\n  color: #d9534f !important;\n}\n\na.text-danger:focus, a.text-danger:hover {\n  color: #c9302c !important;\n}\n\n.text-gray-dark {\n  color: #373a3c !important;\n}\n\na.text-gray-dark:focus, a.text-gray-dark:hover {\n  color: #1f2021 !important;\n}\n\n.text-hide {\n  font: 0/0 a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n\n.invisible {\n  visibility: hidden !important;\n}\n\n.hidden-xs-up {\n  display: none !important;\n}\n\n@media (max-width: 575px) {\n  .hidden-xs-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 576px) {\n  .hidden-sm-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 767px) {\n  .hidden-sm-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .hidden-md-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 991px) {\n  .hidden-md-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .hidden-lg-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 1199px) {\n  .hidden-lg-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .hidden-xl-up {\n    display: none !important;\n  }\n}\n\n.hidden-xl-down {\n  display: none !important;\n}\n\n.visible-print-block {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-block {\n    display: block !important;\n  }\n}\n\n.visible-print-inline {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-inline {\n    display: inline !important;\n  }\n}\n\n.visible-print-inline-block {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-inline-block {\n    display: inline-block !important;\n  }\n}\n\n@media print {\n  .hidden-print {\n    display: none !important;\n  }\n}\n/*# sourceMappingURL=bootstrap.css.map */"; });
+define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Origin = exports.metadata = undefined;
+  exports.decorators = decorators;
+  exports.deprecated = deprecated;
+  exports.mixin = mixin;
+  exports.protocol = protocol;
+
+  var _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  function isObject(val) {
+    return val && (typeof val === 'function' || (typeof val === 'undefined' ? 'undefined' : _typeof(val)) === 'object');
+  }
+
+  var metadata = exports.metadata = {
+    resource: 'aurelia:resource',
+    paramTypes: 'design:paramtypes',
+    propertyType: 'design:type',
+    properties: 'design:properties',
+    get: function get(metadataKey, target, targetKey) {
+      if (!isObject(target)) {
+        return undefined;
+      }
+      var result = metadata.getOwn(metadataKey, target, targetKey);
+      return result === undefined ? metadata.get(metadataKey, Object.getPrototypeOf(target), targetKey) : result;
+    },
+    getOwn: function getOwn(metadataKey, target, targetKey) {
+      if (!isObject(target)) {
+        return undefined;
+      }
+      return Reflect.getOwnMetadata(metadataKey, target, targetKey);
+    },
+    define: function define(metadataKey, metadataValue, target, targetKey) {
+      Reflect.defineMetadata(metadataKey, metadataValue, target, targetKey);
+    },
+    getOrCreateOwn: function getOrCreateOwn(metadataKey, Type, target, targetKey) {
+      var result = metadata.getOwn(metadataKey, target, targetKey);
+
+      if (result === undefined) {
+        result = new Type();
+        Reflect.defineMetadata(metadataKey, result, target, targetKey);
+      }
+
+      return result;
+    }
+  };
+
+  var originStorage = new Map();
+  var unknownOrigin = Object.freeze({ moduleId: undefined, moduleMember: undefined });
+
+  var Origin = exports.Origin = function () {
+    function Origin(moduleId, moduleMember) {
+      
+
+      this.moduleId = moduleId;
+      this.moduleMember = moduleMember;
+    }
+
+    Origin.get = function get(fn) {
+      var origin = originStorage.get(fn);
+
+      if (origin === undefined) {
+        _aureliaPal.PLATFORM.eachModule(function (key, value) {
+          if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+            for (var name in value) {
+              var exp = value[name];
+              if (exp === fn) {
+                originStorage.set(fn, origin = new Origin(key, name));
+                return true;
+              }
+            }
+          }
+
+          if (value === fn) {
+            originStorage.set(fn, origin = new Origin(key, 'default'));
+            return true;
+          }
+
+          return false;
+        });
+      }
+
+      return origin || unknownOrigin;
+    };
+
+    Origin.set = function set(fn, origin) {
+      originStorage.set(fn, origin);
+    };
+
+    return Origin;
+  }();
+
+  function decorators() {
+    for (var _len = arguments.length, rest = Array(_len), _key = 0; _key < _len; _key++) {
+      rest[_key] = arguments[_key];
+    }
+
+    var applicator = function applicator(target, key, descriptor) {
+      var i = rest.length;
+
+      if (key) {
+        descriptor = descriptor || {
+          value: target[key],
+          writable: true,
+          configurable: true,
+          enumerable: true
+        };
+
+        while (i--) {
+          descriptor = rest[i](target, key, descriptor) || descriptor;
+        }
+
+        Object.defineProperty(target, key, descriptor);
+      } else {
+        while (i--) {
+          target = rest[i](target) || target;
+        }
+      }
+
+      return target;
+    };
+
+    applicator.on = applicator;
+    return applicator;
+  }
+
+  function deprecated(optionsOrTarget, maybeKey, maybeDescriptor) {
+    function decorator(target, key, descriptor) {
+      var methodSignature = target.constructor.name + '#' + key;
+      var options = maybeKey ? {} : optionsOrTarget || {};
+      var message = 'DEPRECATION - ' + methodSignature;
+
+      if (typeof descriptor.value !== 'function') {
+        throw new SyntaxError('Only methods can be marked as deprecated.');
+      }
+
+      if (options.message) {
+        message += ' - ' + options.message;
+      }
+
+      return _extends({}, descriptor, {
+        value: function deprecationWrapper() {
+          if (options.error) {
+            throw new Error(message);
+          } else {
+            console.warn(message);
+          }
+
+          return descriptor.value.apply(this, arguments);
+        }
+      });
+    }
+
+    return maybeKey ? decorator(optionsOrTarget, maybeKey, maybeDescriptor) : decorator;
+  }
+
+  function mixin(behavior) {
+    var instanceKeys = Object.keys(behavior);
+
+    function _mixin(possible) {
+      var decorator = function decorator(target) {
+        var resolvedTarget = typeof target === 'function' ? target.prototype : target;
+
+        var i = instanceKeys.length;
+        while (i--) {
+          var property = instanceKeys[i];
+          Object.defineProperty(resolvedTarget, property, {
+            value: behavior[property],
+            writable: true
+          });
+        }
+      };
+
+      return possible ? decorator(possible) : decorator;
+    }
+
+    return _mixin;
+  }
+
+  function alwaysValid() {
+    return true;
+  }
+  function noCompose() {}
+
+  function ensureProtocolOptions(options) {
+    if (options === undefined) {
+      options = {};
+    } else if (typeof options === 'function') {
+      options = {
+        validate: options
+      };
+    }
+
+    if (!options.validate) {
+      options.validate = alwaysValid;
+    }
+
+    if (!options.compose) {
+      options.compose = noCompose;
+    }
+
+    return options;
+  }
+
+  function createProtocolValidator(validate) {
+    return function (target) {
+      var result = validate(target);
+      return result === true;
+    };
+  }
+
+  function createProtocolAsserter(name, validate) {
+    return function (target) {
+      var result = validate(target);
+      if (result !== true) {
+        throw new Error(result || name + ' was not correctly implemented.');
+      }
+    };
+  }
+
+  function protocol(name, options) {
+    options = ensureProtocolOptions(options);
+
+    var result = function result(target) {
+      var resolvedTarget = typeof target === 'function' ? target.prototype : target;
+
+      options.compose(resolvedTarget);
+      result.assert(resolvedTarget);
+
+      Object.defineProperty(resolvedTarget, 'protocol:' + name, {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: true
+      });
+    };
+
+    result.validate = createProtocolValidator(options.validate);
+    result.assert = createProtocolAsserter(name, options.validate);
+
+    return result;
+  }
+
+  protocol.create = function (name, options) {
+    options = ensureProtocolOptions(options);
+    var hidden = 'protocol:' + name;
+    var result = function result(target) {
+      var decorator = protocol(name, options);
+      return target ? decorator(target) : decorator;
+    };
+
+    result.decorates = function (obj) {
+      return obj[hidden] === true;
+    };
+    result.validate = createProtocolValidator(options.validate);
+    result.assert = createProtocolAsserter(name, options.validate);
+
+    return result;
+  };
+});
 define('aurelia-testing/aurelia-testing',['exports', './compile-spy', './view-spy', './component-tester'], function (exports, _compileSpy, _viewSpy, _componentTester) {
   'use strict';
 
@@ -36357,24 +31704,754 @@ define('aurelia-testing/component-tester',['exports', 'aurelia-templating', 'aur
     return ComponentTester;
   }();
 });
-/*!
- * Bootstrap v4.0.0-alpha.5 (https://getbootstrap.com)
- * Copyright 2011-2016 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- */
-if("undefined"==typeof jQuery)throw new Error("Bootstrap's JavaScript requires jQuery");+function(a){var b=a.fn.jquery.split(" ")[0].split(".");if(b[0]<2&&b[1]<9||1==b[0]&&9==b[1]&&b[2]<1||b[0]>=4)throw new Error("Bootstrap's JavaScript requires at least jQuery v1.9.1 but less than v4.0.0")}(jQuery),+function(){function a(a,b){if(!a)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!b||"object"!=typeof b&&"function"!=typeof b?a:b}function b(a,b){if("function"!=typeof b&&null!==b)throw new TypeError("Super expression must either be null or a function, not "+typeof b);a.prototype=Object.create(b&&b.prototype,{constructor:{value:a,enumerable:!1,writable:!0,configurable:!0}}),b&&(Object.setPrototypeOf?Object.setPrototypeOf(a,b):a.__proto__=b)}function c(a,b){if(!(a instanceof b))throw new TypeError("Cannot call a class as a function")}var d="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(a){return typeof a}:function(a){return a&&"function"==typeof Symbol&&a.constructor===Symbol&&a!==Symbol.prototype?"symbol":typeof a},e=function(){function a(a,b){for(var c=0;c<b.length;c++){var d=b[c];d.enumerable=d.enumerable||!1,d.configurable=!0,"value"in d&&(d.writable=!0),Object.defineProperty(a,d.key,d)}}return function(b,c,d){return c&&a(b.prototype,c),d&&a(b,d),b}}(),f=function(a){function b(a){return{}.toString.call(a).match(/\s([a-zA-Z]+)/)[1].toLowerCase()}function c(a){return(a[0]||a).nodeType}function d(){return{bindType:h.end,delegateType:h.end,handle:function(b){if(a(b.target).is(this))return b.handleObj.handler.apply(this,arguments)}}}function e(){if(window.QUnit)return!1;var a=document.createElement("bootstrap");for(var b in j)if(void 0!==a.style[b])return{end:j[b]};return!1}function f(b){var c=this,d=!1;return a(this).one(k.TRANSITION_END,function(){d=!0}),setTimeout(function(){d||k.triggerTransitionEnd(c)},b),this}function g(){h=e(),a.fn.emulateTransitionEnd=f,k.supportsTransitionEnd()&&(a.event.special[k.TRANSITION_END]=d())}var h=!1,i=1e6,j={WebkitTransition:"webkitTransitionEnd",MozTransition:"transitionend",OTransition:"oTransitionEnd otransitionend",transition:"transitionend"},k={TRANSITION_END:"bsTransitionEnd",getUID:function(a){do a+=~~(Math.random()*i);while(document.getElementById(a));return a},getSelectorFromElement:function(a){var b=a.getAttribute("data-target");return b||(b=a.getAttribute("href")||"",b=/^#[a-z]/i.test(b)?b:null),b},reflow:function(a){new Function("bs","return bs")(a.offsetHeight)},triggerTransitionEnd:function(b){a(b).trigger(h.end)},supportsTransitionEnd:function(){return Boolean(h)},typeCheckConfig:function(a,d,e){for(var f in e)if(e.hasOwnProperty(f)){var g=e[f],h=d[f],i=void 0;if(i=h&&c(h)?"element":b(h),!new RegExp(g).test(i))throw new Error(a.toUpperCase()+": "+('Option "'+f+'" provided type "'+i+'" ')+('but expected type "'+g+'".'))}}};return g(),k}(jQuery),g=(function(a){var b="alert",d="4.0.0-alpha.5",g="bs.alert",h="."+g,i=".data-api",j=a.fn[b],k=150,l={DISMISS:'[data-dismiss="alert"]'},m={CLOSE:"close"+h,CLOSED:"closed"+h,CLICK_DATA_API:"click"+h+i},n={ALERT:"alert",FADE:"fade",IN:"in"},o=function(){function b(a){c(this,b),this._element=a}return b.prototype.close=function(a){a=a||this._element;var b=this._getRootElement(a),c=this._triggerCloseEvent(b);c.isDefaultPrevented()||this._removeElement(b)},b.prototype.dispose=function(){a.removeData(this._element,g),this._element=null},b.prototype._getRootElement=function(b){var c=f.getSelectorFromElement(b),d=!1;return c&&(d=a(c)[0]),d||(d=a(b).closest("."+n.ALERT)[0]),d},b.prototype._triggerCloseEvent=function(b){var c=a.Event(m.CLOSE);return a(b).trigger(c),c},b.prototype._removeElement=function(b){return a(b).removeClass(n.IN),f.supportsTransitionEnd()&&a(b).hasClass(n.FADE)?void a(b).one(f.TRANSITION_END,a.proxy(this._destroyElement,this,b)).emulateTransitionEnd(k):void this._destroyElement(b)},b.prototype._destroyElement=function(b){a(b).detach().trigger(m.CLOSED).remove()},b._jQueryInterface=function(c){return this.each(function(){var d=a(this),e=d.data(g);e||(e=new b(this),d.data(g,e)),"close"===c&&e[c](this)})},b._handleDismiss=function(a){return function(b){b&&b.preventDefault(),a.close(this)}},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(m.CLICK_DATA_API,l.DISMISS,o._handleDismiss(new o)),a.fn[b]=o._jQueryInterface,a.fn[b].Constructor=o,a.fn[b].noConflict=function(){return a.fn[b]=j,o._jQueryInterface},o}(jQuery),function(a){var b="button",d="4.0.0-alpha.5",f="bs.button",g="."+f,h=".data-api",i=a.fn[b],j={ACTIVE:"active",BUTTON:"btn",FOCUS:"focus"},k={DATA_TOGGLE_CARROT:'[data-toggle^="button"]',DATA_TOGGLE:'[data-toggle="buttons"]',INPUT:"input",ACTIVE:".active",BUTTON:".btn"},l={CLICK_DATA_API:"click"+g+h,FOCUS_BLUR_DATA_API:"focus"+g+h+" "+("blur"+g+h)},m=function(){function b(a){c(this,b),this._element=a}return b.prototype.toggle=function(){var b=!0,c=a(this._element).closest(k.DATA_TOGGLE)[0];if(c){var d=a(this._element).find(k.INPUT)[0];if(d){if("radio"===d.type)if(d.checked&&a(this._element).hasClass(j.ACTIVE))b=!1;else{var e=a(c).find(k.ACTIVE)[0];e&&a(e).removeClass(j.ACTIVE)}b&&(d.checked=!a(this._element).hasClass(j.ACTIVE),a(this._element).trigger("change")),d.focus()}}else this._element.setAttribute("aria-pressed",!a(this._element).hasClass(j.ACTIVE));b&&a(this._element).toggleClass(j.ACTIVE)},b.prototype.dispose=function(){a.removeData(this._element,f),this._element=null},b._jQueryInterface=function(c){return this.each(function(){var d=a(this).data(f);d||(d=new b(this),a(this).data(f,d)),"toggle"===c&&d[c]()})},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(l.CLICK_DATA_API,k.DATA_TOGGLE_CARROT,function(b){b.preventDefault();var c=b.target;a(c).hasClass(j.BUTTON)||(c=a(c).closest(k.BUTTON)),m._jQueryInterface.call(a(c),"toggle")}).on(l.FOCUS_BLUR_DATA_API,k.DATA_TOGGLE_CARROT,function(b){var c=a(b.target).closest(k.BUTTON)[0];a(c).toggleClass(j.FOCUS,/^focus(in)?$/.test(b.type))}),a.fn[b]=m._jQueryInterface,a.fn[b].Constructor=m,a.fn[b].noConflict=function(){return a.fn[b]=i,m._jQueryInterface},m}(jQuery),function(a){var b="carousel",g="4.0.0-alpha.5",h="bs.carousel",i="."+h,j=".data-api",k=a.fn[b],l=600,m=37,n=39,o={interval:5e3,keyboard:!0,slide:!1,pause:"hover",wrap:!0},p={interval:"(number|boolean)",keyboard:"boolean",slide:"(boolean|string)",pause:"(string|boolean)",wrap:"boolean"},q={NEXT:"next",PREVIOUS:"prev"},r={SLIDE:"slide"+i,SLID:"slid"+i,KEYDOWN:"keydown"+i,MOUSEENTER:"mouseenter"+i,MOUSELEAVE:"mouseleave"+i,LOAD_DATA_API:"load"+i+j,CLICK_DATA_API:"click"+i+j},s={CAROUSEL:"carousel",ACTIVE:"active",SLIDE:"slide",RIGHT:"right",LEFT:"left",ITEM:"carousel-item"},t={ACTIVE:".active",ACTIVE_ITEM:".active.carousel-item",ITEM:".carousel-item",NEXT_PREV:".next, .prev",INDICATORS:".carousel-indicators",DATA_SLIDE:"[data-slide], [data-slide-to]",DATA_RIDE:'[data-ride="carousel"]'},u=function(){function j(b,d){c(this,j),this._items=null,this._interval=null,this._activeElement=null,this._isPaused=!1,this._isSliding=!1,this._config=this._getConfig(d),this._element=a(b)[0],this._indicatorsElement=a(this._element).find(t.INDICATORS)[0],this._addEventListeners()}return j.prototype.next=function(){this._isSliding||this._slide(q.NEXT)},j.prototype.nextWhenVisible=function(){document.hidden||this.next()},j.prototype.prev=function(){this._isSliding||this._slide(q.PREVIOUS)},j.prototype.pause=function(b){b||(this._isPaused=!0),a(this._element).find(t.NEXT_PREV)[0]&&f.supportsTransitionEnd()&&(f.triggerTransitionEnd(this._element),this.cycle(!0)),clearInterval(this._interval),this._interval=null},j.prototype.cycle=function(b){b||(this._isPaused=!1),this._interval&&(clearInterval(this._interval),this._interval=null),this._config.interval&&!this._isPaused&&(this._interval=setInterval(a.proxy(document.visibilityState?this.nextWhenVisible:this.next,this),this._config.interval))},j.prototype.to=function(b){var c=this;this._activeElement=a(this._element).find(t.ACTIVE_ITEM)[0];var d=this._getItemIndex(this._activeElement);if(!(b>this._items.length-1||b<0)){if(this._isSliding)return void a(this._element).one(r.SLID,function(){return c.to(b)});if(d===b)return this.pause(),void this.cycle();var e=b>d?q.NEXT:q.PREVIOUS;this._slide(e,this._items[b])}},j.prototype.dispose=function(){a(this._element).off(i),a.removeData(this._element,h),this._items=null,this._config=null,this._element=null,this._interval=null,this._isPaused=null,this._isSliding=null,this._activeElement=null,this._indicatorsElement=null},j.prototype._getConfig=function(c){return c=a.extend({},o,c),f.typeCheckConfig(b,c,p),c},j.prototype._addEventListeners=function(){this._config.keyboard&&a(this._element).on(r.KEYDOWN,a.proxy(this._keydown,this)),"hover"!==this._config.pause||"ontouchstart"in document.documentElement||a(this._element).on(r.MOUSEENTER,a.proxy(this.pause,this)).on(r.MOUSELEAVE,a.proxy(this.cycle,this))},j.prototype._keydown=function(a){if(a.preventDefault(),!/input|textarea/i.test(a.target.tagName))switch(a.which){case m:this.prev();break;case n:this.next();break;default:return}},j.prototype._getItemIndex=function(b){return this._items=a.makeArray(a(b).parent().find(t.ITEM)),this._items.indexOf(b)},j.prototype._getItemByDirection=function(a,b){var c=a===q.NEXT,d=a===q.PREVIOUS,e=this._getItemIndex(b),f=this._items.length-1,g=d&&0===e||c&&e===f;if(g&&!this._config.wrap)return b;var h=a===q.PREVIOUS?-1:1,i=(e+h)%this._items.length;return i===-1?this._items[this._items.length-1]:this._items[i]},j.prototype._triggerSlideEvent=function(b,c){var d=a.Event(r.SLIDE,{relatedTarget:b,direction:c});return a(this._element).trigger(d),d},j.prototype._setActiveIndicatorElement=function(b){if(this._indicatorsElement){a(this._indicatorsElement).find(t.ACTIVE).removeClass(s.ACTIVE);var c=this._indicatorsElement.children[this._getItemIndex(b)];c&&a(c).addClass(s.ACTIVE)}},j.prototype._slide=function(b,c){var d=this,e=a(this._element).find(t.ACTIVE_ITEM)[0],g=c||e&&this._getItemByDirection(b,e),h=Boolean(this._interval),i=b===q.NEXT?s.LEFT:s.RIGHT;if(g&&a(g).hasClass(s.ACTIVE))return void(this._isSliding=!1);var j=this._triggerSlideEvent(g,i);if(!j.isDefaultPrevented()&&e&&g){this._isSliding=!0,h&&this.pause(),this._setActiveIndicatorElement(g);var k=a.Event(r.SLID,{relatedTarget:g,direction:i});f.supportsTransitionEnd()&&a(this._element).hasClass(s.SLIDE)?(a(g).addClass(b),f.reflow(g),a(e).addClass(i),a(g).addClass(i),a(e).one(f.TRANSITION_END,function(){a(g).removeClass(i).removeClass(b),a(g).addClass(s.ACTIVE),a(e).removeClass(s.ACTIVE).removeClass(b).removeClass(i),d._isSliding=!1,setTimeout(function(){return a(d._element).trigger(k)},0)}).emulateTransitionEnd(l)):(a(e).removeClass(s.ACTIVE),a(g).addClass(s.ACTIVE),this._isSliding=!1,a(this._element).trigger(k)),h&&this.cycle()}},j._jQueryInterface=function(b){return this.each(function(){var c=a(this).data(h),e=a.extend({},o,a(this).data());"object"===("undefined"==typeof b?"undefined":d(b))&&a.extend(e,b);var f="string"==typeof b?b:e.slide;if(c||(c=new j(this,e),a(this).data(h,c)),"number"==typeof b)c.to(b);else if("string"==typeof f){if(void 0===c[f])throw new Error('No method named "'+f+'"');c[f]()}else e.interval&&(c.pause(),c.cycle())})},j._dataApiClickHandler=function(b){var c=f.getSelectorFromElement(this);if(c){var d=a(c)[0];if(d&&a(d).hasClass(s.CAROUSEL)){var e=a.extend({},a(d).data(),a(this).data()),g=this.getAttribute("data-slide-to");g&&(e.interval=!1),j._jQueryInterface.call(a(d),e),g&&a(d).data(h).to(g),b.preventDefault()}}},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return o}}]),j}();return a(document).on(r.CLICK_DATA_API,t.DATA_SLIDE,u._dataApiClickHandler),a(window).on(r.LOAD_DATA_API,function(){a(t.DATA_RIDE).each(function(){var b=a(this);u._jQueryInterface.call(b,b.data())})}),a.fn[b]=u._jQueryInterface,a.fn[b].Constructor=u,a.fn[b].noConflict=function(){return a.fn[b]=k,u._jQueryInterface},u}(jQuery),function(a){var b="collapse",g="4.0.0-alpha.5",h="bs.collapse",i="."+h,j=".data-api",k=a.fn[b],l=600,m={toggle:!0,parent:""},n={toggle:"boolean",parent:"string"},o={SHOW:"show"+i,SHOWN:"shown"+i,HIDE:"hide"+i,HIDDEN:"hidden"+i,CLICK_DATA_API:"click"+i+j},p={IN:"in",COLLAPSE:"collapse",COLLAPSING:"collapsing",COLLAPSED:"collapsed"},q={WIDTH:"width",HEIGHT:"height"},r={ACTIVES:".card > .in, .card > .collapsing",DATA_TOGGLE:'[data-toggle="collapse"]'},s=function(){function i(b,d){c(this,i),this._isTransitioning=!1,this._element=b,this._config=this._getConfig(d),this._triggerArray=a.makeArray(a('[data-toggle="collapse"][href="#'+b.id+'"],'+('[data-toggle="collapse"][data-target="#'+b.id+'"]'))),this._parent=this._config.parent?this._getParent():null,this._config.parent||this._addAriaAndCollapsedClass(this._element,this._triggerArray),this._config.toggle&&this.toggle()}return i.prototype.toggle=function(){a(this._element).hasClass(p.IN)?this.hide():this.show()},i.prototype.show=function(){var b=this;if(!this._isTransitioning&&!a(this._element).hasClass(p.IN)){var c=void 0,d=void 0;if(this._parent&&(c=a.makeArray(a(r.ACTIVES)),c.length||(c=null)),!(c&&(d=a(c).data(h),d&&d._isTransitioning))){var e=a.Event(o.SHOW);if(a(this._element).trigger(e),!e.isDefaultPrevented()){c&&(i._jQueryInterface.call(a(c),"hide"),d||a(c).data(h,null));var g=this._getDimension();a(this._element).removeClass(p.COLLAPSE).addClass(p.COLLAPSING),this._element.style[g]=0,this._element.setAttribute("aria-expanded",!0),this._triggerArray.length&&a(this._triggerArray).removeClass(p.COLLAPSED).attr("aria-expanded",!0),this.setTransitioning(!0);var j=function(){a(b._element).removeClass(p.COLLAPSING).addClass(p.COLLAPSE).addClass(p.IN),b._element.style[g]="",b.setTransitioning(!1),a(b._element).trigger(o.SHOWN)};if(!f.supportsTransitionEnd())return void j();var k=g[0].toUpperCase()+g.slice(1),m="scroll"+k;a(this._element).one(f.TRANSITION_END,j).emulateTransitionEnd(l),this._element.style[g]=this._element[m]+"px"}}}},i.prototype.hide=function(){var b=this;if(!this._isTransitioning&&a(this._element).hasClass(p.IN)){var c=a.Event(o.HIDE);if(a(this._element).trigger(c),!c.isDefaultPrevented()){var d=this._getDimension(),e=d===q.WIDTH?"offsetWidth":"offsetHeight";this._element.style[d]=this._element[e]+"px",f.reflow(this._element),a(this._element).addClass(p.COLLAPSING).removeClass(p.COLLAPSE).removeClass(p.IN),this._element.setAttribute("aria-expanded",!1),this._triggerArray.length&&a(this._triggerArray).addClass(p.COLLAPSED).attr("aria-expanded",!1),this.setTransitioning(!0);var g=function(){b.setTransitioning(!1),a(b._element).removeClass(p.COLLAPSING).addClass(p.COLLAPSE).trigger(o.HIDDEN)};return this._element.style[d]="",f.supportsTransitionEnd()?void a(this._element).one(f.TRANSITION_END,g).emulateTransitionEnd(l):void g()}}},i.prototype.setTransitioning=function(a){this._isTransitioning=a},i.prototype.dispose=function(){a.removeData(this._element,h),this._config=null,this._parent=null,this._element=null,this._triggerArray=null,this._isTransitioning=null},i.prototype._getConfig=function(c){return c=a.extend({},m,c),c.toggle=Boolean(c.toggle),f.typeCheckConfig(b,c,n),c},i.prototype._getDimension=function(){var b=a(this._element).hasClass(q.WIDTH);return b?q.WIDTH:q.HEIGHT},i.prototype._getParent=function(){var b=this,c=a(this._config.parent)[0],d='[data-toggle="collapse"][data-parent="'+this._config.parent+'"]';return a(c).find(d).each(function(a,c){b._addAriaAndCollapsedClass(i._getTargetFromElement(c),[c])}),c},i.prototype._addAriaAndCollapsedClass=function(b,c){if(b){var d=a(b).hasClass(p.IN);b.setAttribute("aria-expanded",d),c.length&&a(c).toggleClass(p.COLLAPSED,!d).attr("aria-expanded",d)}},i._getTargetFromElement=function(b){var c=f.getSelectorFromElement(b);return c?a(c)[0]:null},i._jQueryInterface=function(b){return this.each(function(){var c=a(this),e=c.data(h),f=a.extend({},m,c.data(),"object"===("undefined"==typeof b?"undefined":d(b))&&b);if(!e&&f.toggle&&/show|hide/.test(b)&&(f.toggle=!1),e||(e=new i(this,f),c.data(h,e)),"string"==typeof b){if(void 0===e[b])throw new Error('No method named "'+b+'"');e[b]()}})},e(i,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return m}}]),i}();return a(document).on(o.CLICK_DATA_API,r.DATA_TOGGLE,function(b){b.preventDefault();var c=s._getTargetFromElement(this),d=a(c).data(h),e=d?"toggle":a(this).data();s._jQueryInterface.call(a(c),e)}),a.fn[b]=s._jQueryInterface,a.fn[b].Constructor=s,a.fn[b].noConflict=function(){return a.fn[b]=k,s._jQueryInterface},s}(jQuery),function(a){var b="dropdown",d="4.0.0-alpha.5",g="bs.dropdown",h="."+g,i=".data-api",j=a.fn[b],k=27,l=38,m=40,n=3,o={HIDE:"hide"+h,HIDDEN:"hidden"+h,SHOW:"show"+h,SHOWN:"shown"+h,CLICK:"click"+h,CLICK_DATA_API:"click"+h+i,KEYDOWN_DATA_API:"keydown"+h+i},p={BACKDROP:"dropdown-backdrop",DISABLED:"disabled",OPEN:"open"},q={BACKDROP:".dropdown-backdrop",DATA_TOGGLE:'[data-toggle="dropdown"]',FORM_CHILD:".dropdown form",ROLE_MENU:'[role="menu"]',ROLE_LISTBOX:'[role="listbox"]',NAVBAR_NAV:".navbar-nav",VISIBLE_ITEMS:'[role="menu"] li:not(.disabled) a, [role="listbox"] li:not(.disabled) a'},r=function(){function b(a){c(this,b),this._element=a,this._addEventListeners()}return b.prototype.toggle=function(){if(this.disabled||a(this).hasClass(p.DISABLED))return!1;var c=b._getParentFromElement(this),d=a(c).hasClass(p.OPEN);if(b._clearMenus(),d)return!1;if("ontouchstart"in document.documentElement&&!a(c).closest(q.NAVBAR_NAV).length){var e=document.createElement("div");e.className=p.BACKDROP,a(e).insertBefore(this),a(e).on("click",b._clearMenus)}var f={relatedTarget:this},g=a.Event(o.SHOW,f);return a(c).trigger(g),!g.isDefaultPrevented()&&(this.focus(),this.setAttribute("aria-expanded","true"),a(c).toggleClass(p.OPEN),a(c).trigger(a.Event(o.SHOWN,f)),!1)},b.prototype.dispose=function(){a.removeData(this._element,g),a(this._element).off(h),this._element=null},b.prototype._addEventListeners=function(){a(this._element).on(o.CLICK,this.toggle)},b._jQueryInterface=function(c){return this.each(function(){var d=a(this).data(g);if(d||a(this).data(g,d=new b(this)),"string"==typeof c){if(void 0===d[c])throw new Error('No method named "'+c+'"');d[c].call(this)}})},b._clearMenus=function(c){if(!c||c.which!==n){var d=a(q.BACKDROP)[0];d&&d.parentNode.removeChild(d);for(var e=a.makeArray(a(q.DATA_TOGGLE)),f=0;f<e.length;f++){var g=b._getParentFromElement(e[f]),h={relatedTarget:e[f]};if(a(g).hasClass(p.OPEN)&&!(c&&"click"===c.type&&/input|textarea/i.test(c.target.tagName)&&a.contains(g,c.target))){var i=a.Event(o.HIDE,h);a(g).trigger(i),i.isDefaultPrevented()||(e[f].setAttribute("aria-expanded","false"),a(g).removeClass(p.OPEN).trigger(a.Event(o.HIDDEN,h)))}}}},b._getParentFromElement=function(b){var c=void 0,d=f.getSelectorFromElement(b);return d&&(c=a(d)[0]),c||b.parentNode},b._dataApiKeydownHandler=function(c){if(/(38|40|27|32)/.test(c.which)&&!/input|textarea/i.test(c.target.tagName)&&(c.preventDefault(),c.stopPropagation(),!this.disabled&&!a(this).hasClass(p.DISABLED))){var d=b._getParentFromElement(this),e=a(d).hasClass(p.OPEN);if(!e&&c.which!==k||e&&c.which===k){if(c.which===k){var f=a(d).find(q.DATA_TOGGLE)[0];a(f).trigger("focus")}return void a(this).trigger("click")}var g=a.makeArray(a(q.VISIBLE_ITEMS));if(g=g.filter(function(a){return a.offsetWidth||a.offsetHeight}),g.length){var h=g.indexOf(c.target);c.which===l&&h>0&&h--,c.which===m&&h<g.length-1&&h++,h<0&&(h=0),g[h].focus()}}},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(o.KEYDOWN_DATA_API,q.DATA_TOGGLE,r._dataApiKeydownHandler).on(o.KEYDOWN_DATA_API,q.ROLE_MENU,r._dataApiKeydownHandler).on(o.KEYDOWN_DATA_API,q.ROLE_LISTBOX,r._dataApiKeydownHandler).on(o.CLICK_DATA_API,r._clearMenus).on(o.CLICK_DATA_API,q.DATA_TOGGLE,r.prototype.toggle).on(o.CLICK_DATA_API,q.FORM_CHILD,function(a){a.stopPropagation()}),a.fn[b]=r._jQueryInterface,a.fn[b].Constructor=r,a.fn[b].noConflict=function(){return a.fn[b]=j,r._jQueryInterface},r}(jQuery),function(a){var b="modal",g="4.0.0-alpha.5",h="bs.modal",i="."+h,j=".data-api",k=a.fn[b],l=300,m=150,n=27,o={backdrop:!0,keyboard:!0,focus:!0,show:!0},p={backdrop:"(boolean|string)",keyboard:"boolean",focus:"boolean",show:"boolean"},q={HIDE:"hide"+i,HIDDEN:"hidden"+i,SHOW:"show"+i,SHOWN:"shown"+i,FOCUSIN:"focusin"+i,RESIZE:"resize"+i,CLICK_DISMISS:"click.dismiss"+i,KEYDOWN_DISMISS:"keydown.dismiss"+i,MOUSEUP_DISMISS:"mouseup.dismiss"+i,MOUSEDOWN_DISMISS:"mousedown.dismiss"+i,CLICK_DATA_API:"click"+i+j},r={SCROLLBAR_MEASURER:"modal-scrollbar-measure",BACKDROP:"modal-backdrop",OPEN:"modal-open",FADE:"fade",IN:"in"},s={DIALOG:".modal-dialog",DATA_TOGGLE:'[data-toggle="modal"]',DATA_DISMISS:'[data-dismiss="modal"]',FIXED_CONTENT:".navbar-fixed-top, .navbar-fixed-bottom, .is-fixed"},t=function(){function j(b,d){c(this,j),this._config=this._getConfig(d),this._element=b,this._dialog=a(b).find(s.DIALOG)[0],this._backdrop=null,this._isShown=!1,this._isBodyOverflowing=!1,this._ignoreBackdropClick=!1,this._originalBodyPadding=0,this._scrollbarWidth=0}return j.prototype.toggle=function(a){return this._isShown?this.hide():this.show(a)},j.prototype.show=function(b){var c=this,d=a.Event(q.SHOW,{relatedTarget:b});a(this._element).trigger(d),this._isShown||d.isDefaultPrevented()||(this._isShown=!0,this._checkScrollbar(),this._setScrollbar(),a(document.body).addClass(r.OPEN),this._setEscapeEvent(),this._setResizeEvent(),a(this._element).on(q.CLICK_DISMISS,s.DATA_DISMISS,a.proxy(this.hide,this)),a(this._dialog).on(q.MOUSEDOWN_DISMISS,function(){a(c._element).one(q.MOUSEUP_DISMISS,function(b){a(b.target).is(c._element)&&(c._ignoreBackdropClick=!0)})}),this._showBackdrop(a.proxy(this._showElement,this,b)))},j.prototype.hide=function(b){b&&b.preventDefault();var c=a.Event(q.HIDE);a(this._element).trigger(c),this._isShown&&!c.isDefaultPrevented()&&(this._isShown=!1,this._setEscapeEvent(),this._setResizeEvent(),a(document).off(q.FOCUSIN),a(this._element).removeClass(r.IN),a(this._element).off(q.CLICK_DISMISS),a(this._dialog).off(q.MOUSEDOWN_DISMISS),f.supportsTransitionEnd()&&a(this._element).hasClass(r.FADE)?a(this._element).one(f.TRANSITION_END,a.proxy(this._hideModal,this)).emulateTransitionEnd(l):this._hideModal())},j.prototype.dispose=function(){a.removeData(this._element,h),a(window).off(i),a(document).off(i),a(this._element).off(i),a(this._backdrop).off(i),this._config=null,this._element=null,this._dialog=null,this._backdrop=null,this._isShown=null,this._isBodyOverflowing=null,this._ignoreBackdropClick=null,this._originalBodyPadding=null,this._scrollbarWidth=null},j.prototype._getConfig=function(c){return c=a.extend({},o,c),f.typeCheckConfig(b,c,p),c},j.prototype._showElement=function(b){var c=this,d=f.supportsTransitionEnd()&&a(this._element).hasClass(r.FADE);this._element.parentNode&&this._element.parentNode.nodeType===Node.ELEMENT_NODE||document.body.appendChild(this._element),this._element.style.display="block",this._element.removeAttribute("aria-hidden"),this._element.scrollTop=0,d&&f.reflow(this._element),a(this._element).addClass(r.IN),this._config.focus&&this._enforceFocus();var e=a.Event(q.SHOWN,{relatedTarget:b}),g=function(){c._config.focus&&c._element.focus(),a(c._element).trigger(e)};d?a(this._dialog).one(f.TRANSITION_END,g).emulateTransitionEnd(l):g()},j.prototype._enforceFocus=function(){var b=this;a(document).off(q.FOCUSIN).on(q.FOCUSIN,function(c){document===c.target||b._element===c.target||a(b._element).has(c.target).length||b._element.focus()})},j.prototype._setEscapeEvent=function(){var b=this;this._isShown&&this._config.keyboard?a(this._element).on(q.KEYDOWN_DISMISS,function(a){a.which===n&&b.hide()}):this._isShown||a(this._element).off(q.KEYDOWN_DISMISS)},j.prototype._setResizeEvent=function(){this._isShown?a(window).on(q.RESIZE,a.proxy(this._handleUpdate,this)):a(window).off(q.RESIZE)},j.prototype._hideModal=function(){var b=this;this._element.style.display="none",this._element.setAttribute("aria-hidden","true"),this._showBackdrop(function(){a(document.body).removeClass(r.OPEN),b._resetAdjustments(),b._resetScrollbar(),a(b._element).trigger(q.HIDDEN)})},j.prototype._removeBackdrop=function(){this._backdrop&&(a(this._backdrop).remove(),this._backdrop=null)},j.prototype._showBackdrop=function(b){var c=this,d=a(this._element).hasClass(r.FADE)?r.FADE:"";if(this._isShown&&this._config.backdrop){var e=f.supportsTransitionEnd()&&d;if(this._backdrop=document.createElement("div"),this._backdrop.className=r.BACKDROP,d&&a(this._backdrop).addClass(d),a(this._backdrop).appendTo(document.body),a(this._element).on(q.CLICK_DISMISS,function(a){return c._ignoreBackdropClick?void(c._ignoreBackdropClick=!1):void(a.target===a.currentTarget&&("static"===c._config.backdrop?c._element.focus():c.hide()))}),e&&f.reflow(this._backdrop),a(this._backdrop).addClass(r.IN),!b)return;if(!e)return void b();a(this._backdrop).one(f.TRANSITION_END,b).emulateTransitionEnd(m)}else if(!this._isShown&&this._backdrop){a(this._backdrop).removeClass(r.IN);var g=function(){c._removeBackdrop(),b&&b()};f.supportsTransitionEnd()&&a(this._element).hasClass(r.FADE)?a(this._backdrop).one(f.TRANSITION_END,g).emulateTransitionEnd(m):g()}else b&&b()},j.prototype._handleUpdate=function(){this._adjustDialog()},j.prototype._adjustDialog=function(){var a=this._element.scrollHeight>document.documentElement.clientHeight;!this._isBodyOverflowing&&a&&(this._element.style.paddingLeft=this._scrollbarWidth+"px"),this._isBodyOverflowing&&!a&&(this._element.style.paddingRight=this._scrollbarWidth+"px")},j.prototype._resetAdjustments=function(){this._element.style.paddingLeft="",this._element.style.paddingRight=""},j.prototype._checkScrollbar=function(){this._isBodyOverflowing=document.body.clientWidth<window.innerWidth,this._scrollbarWidth=this._getScrollbarWidth()},j.prototype._setScrollbar=function(){var b=parseInt(a(s.FIXED_CONTENT).css("padding-right")||0,10);this._originalBodyPadding=document.body.style.paddingRight||"",this._isBodyOverflowing&&(document.body.style.paddingRight=b+this._scrollbarWidth+"px")},j.prototype._resetScrollbar=function(){document.body.style.paddingRight=this._originalBodyPadding},j.prototype._getScrollbarWidth=function(){var a=document.createElement("div");a.className=r.SCROLLBAR_MEASURER,document.body.appendChild(a);var b=a.offsetWidth-a.clientWidth;return document.body.removeChild(a),b},j._jQueryInterface=function(b,c){return this.each(function(){var e=a(this).data(h),f=a.extend({},j.Default,a(this).data(),"object"===("undefined"==typeof b?"undefined":d(b))&&b);if(e||(e=new j(this,f),a(this).data(h,e)),"string"==typeof b){if(void 0===e[b])throw new Error('No method named "'+b+'"');e[b](c)}else f.show&&e.show(c)})},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return o}}]),j}();return a(document).on(q.CLICK_DATA_API,s.DATA_TOGGLE,function(b){var c=this,d=void 0,e=f.getSelectorFromElement(this);e&&(d=a(e)[0]);var g=a(d).data(h)?"toggle":a.extend({},a(d).data(),a(this).data());"A"===this.tagName&&b.preventDefault();var i=a(d).one(q.SHOW,function(b){b.isDefaultPrevented()||i.one(q.HIDDEN,function(){a(c).is(":visible")&&c.focus()})});t._jQueryInterface.call(a(d),g,this)}),a.fn[b]=t._jQueryInterface,a.fn[b].Constructor=t,a.fn[b].noConflict=function(){return a.fn[b]=k,t._jQueryInterface},t}(jQuery),function(a){var b="scrollspy",g="4.0.0-alpha.5",h="bs.scrollspy",i="."+h,j=".data-api",k=a.fn[b],l={offset:10,method:"auto",target:""},m={offset:"number",method:"string",target:"(string|element)"},n={ACTIVATE:"activate"+i,SCROLL:"scroll"+i,LOAD_DATA_API:"load"+i+j},o={DROPDOWN_ITEM:"dropdown-item",DROPDOWN_MENU:"dropdown-menu",NAV_LINK:"nav-link",NAV:"nav",ACTIVE:"active"},p={DATA_SPY:'[data-spy="scroll"]',ACTIVE:".active",LIST_ITEM:".list-item",LI:"li",LI_DROPDOWN:"li.dropdown",NAV_LINKS:".nav-link",DROPDOWN:".dropdown",DROPDOWN_ITEMS:".dropdown-item",DROPDOWN_TOGGLE:".dropdown-toggle"},q={OFFSET:"offset",POSITION:"position"},r=function(){function j(b,d){c(this,j),this._element=b,this._scrollElement="BODY"===b.tagName?window:b,this._config=this._getConfig(d),this._selector=this._config.target+" "+p.NAV_LINKS+","+(this._config.target+" "+p.DROPDOWN_ITEMS),this._offsets=[],this._targets=[],this._activeTarget=null,this._scrollHeight=0,a(this._scrollElement).on(n.SCROLL,a.proxy(this._process,this)),this.refresh(),this._process()}return j.prototype.refresh=function(){var b=this,c=this._scrollElement!==this._scrollElement.window?q.POSITION:q.OFFSET,d="auto"===this._config.method?c:this._config.method,e=d===q.POSITION?this._getScrollTop():0;this._offsets=[],this._targets=[],this._scrollHeight=this._getScrollHeight();var g=a.makeArray(a(this._selector));g.map(function(b){var c=void 0,g=f.getSelectorFromElement(b);return g&&(c=a(g)[0]),c&&(c.offsetWidth||c.offsetHeight)?[a(c)[d]().top+e,g]:null}).filter(function(a){return a}).sort(function(a,b){return a[0]-b[0]}).forEach(function(a){b._offsets.push(a[0]),b._targets.push(a[1])})},j.prototype.dispose=function(){a.removeData(this._element,h),a(this._scrollElement).off(i),this._element=null,this._scrollElement=null,this._config=null,this._selector=null,this._offsets=null,this._targets=null,this._activeTarget=null,this._scrollHeight=null},j.prototype._getConfig=function(c){if(c=a.extend({},l,c),"string"!=typeof c.target){var d=a(c.target).attr("id");d||(d=f.getUID(b),a(c.target).attr("id",d)),c.target="#"+d}return f.typeCheckConfig(b,c,m),c},j.prototype._getScrollTop=function(){return this._scrollElement===window?this._scrollElement.scrollY:this._scrollElement.scrollTop},j.prototype._getScrollHeight=function(){return this._scrollElement.scrollHeight||Math.max(document.body.scrollHeight,document.documentElement.scrollHeight)},j.prototype._process=function(){var a=this._getScrollTop()+this._config.offset,b=this._getScrollHeight(),c=this._config.offset+b-this._scrollElement.offsetHeight;if(this._scrollHeight!==b&&this.refresh(),a>=c){var d=this._targets[this._targets.length-1];this._activeTarget!==d&&this._activate(d)}if(this._activeTarget&&a<this._offsets[0])return this._activeTarget=null,void this._clear();for(var e=this._offsets.length;e--;){var f=this._activeTarget!==this._targets[e]&&a>=this._offsets[e]&&(void 0===this._offsets[e+1]||a<this._offsets[e+1]);f&&this._activate(this._targets[e])}},j.prototype._activate=function(b){this._activeTarget=b,this._clear();var c=this._selector.split(",");c=c.map(function(a){return a+'[data-target="'+b+'"],'+(a+'[href="'+b+'"]')});var d=a(c.join(","));d.hasClass(o.DROPDOWN_ITEM)?(d.closest(p.DROPDOWN).find(p.DROPDOWN_TOGGLE).addClass(o.ACTIVE),d.addClass(o.ACTIVE)):d.parents(p.LI).find(p.NAV_LINKS).addClass(o.ACTIVE),a(this._scrollElement).trigger(n.ACTIVATE,{relatedTarget:b})},j.prototype._clear=function(){a(this._selector).filter(p.ACTIVE).removeClass(o.ACTIVE)},j._jQueryInterface=function(b){return this.each(function(){var c=a(this).data(h),e="object"===("undefined"==typeof b?"undefined":d(b))&&b||null;if(c||(c=new j(this,e),a(this).data(h,c)),"string"==typeof b){if(void 0===c[b])throw new Error('No method named "'+b+'"');c[b]()}})},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return l}}]),j}();return a(window).on(n.LOAD_DATA_API,function(){for(var b=a.makeArray(a(p.DATA_SPY)),c=b.length;c--;){var d=a(b[c]);r._jQueryInterface.call(d,d.data())}}),a.fn[b]=r._jQueryInterface,a.fn[b].Constructor=r,a.fn[b].noConflict=function(){return a.fn[b]=k,r._jQueryInterface},r}(jQuery),function(a){var b="tab",d="4.0.0-alpha.5",g="bs.tab",h="."+g,i=".data-api",j=a.fn[b],k=150,l={HIDE:"hide"+h,HIDDEN:"hidden"+h,SHOW:"show"+h,SHOWN:"shown"+h,CLICK_DATA_API:"click"+h+i},m={DROPDOWN_MENU:"dropdown-menu",ACTIVE:"active",FADE:"fade",IN:"in"},n={A:"a",LI:"li",DROPDOWN:".dropdown",UL:"ul:not(.dropdown-menu)",FADE_CHILD:"> .nav-item .fade, > .fade",ACTIVE:".active",ACTIVE_CHILD:"> .nav-item > .active, > .active",DATA_TOGGLE:'[data-toggle="tab"], [data-toggle="pill"]',
-DROPDOWN_TOGGLE:".dropdown-toggle",DROPDOWN_ACTIVE_CHILD:"> .dropdown-menu .active"},o=function(){function b(a){c(this,b),this._element=a}return b.prototype.show=function(){var b=this;if(!this._element.parentNode||this._element.parentNode.nodeType!==Node.ELEMENT_NODE||!a(this._element).hasClass(m.ACTIVE)){var c=void 0,d=void 0,e=a(this._element).closest(n.UL)[0],g=f.getSelectorFromElement(this._element);e&&(d=a.makeArray(a(e).find(n.ACTIVE)),d=d[d.length-1]);var h=a.Event(l.HIDE,{relatedTarget:this._element}),i=a.Event(l.SHOW,{relatedTarget:d});if(d&&a(d).trigger(h),a(this._element).trigger(i),!i.isDefaultPrevented()&&!h.isDefaultPrevented()){g&&(c=a(g)[0]),this._activate(this._element,e);var j=function(){var c=a.Event(l.HIDDEN,{relatedTarget:b._element}),e=a.Event(l.SHOWN,{relatedTarget:d});a(d).trigger(c),a(b._element).trigger(e)};c?this._activate(c,c.parentNode,j):j()}}},b.prototype.dispose=function(){a.removeClass(this._element,g),this._element=null},b.prototype._activate=function(b,c,d){var e=a(c).find(n.ACTIVE_CHILD)[0],g=d&&f.supportsTransitionEnd()&&(e&&a(e).hasClass(m.FADE)||Boolean(a(c).find(n.FADE_CHILD)[0])),h=a.proxy(this._transitionComplete,this,b,e,g,d);e&&g?a(e).one(f.TRANSITION_END,h).emulateTransitionEnd(k):h(),e&&a(e).removeClass(m.IN)},b.prototype._transitionComplete=function(b,c,d,e){if(c){a(c).removeClass(m.ACTIVE);var g=a(c).find(n.DROPDOWN_ACTIVE_CHILD)[0];g&&a(g).removeClass(m.ACTIVE),c.setAttribute("aria-expanded",!1)}if(a(b).addClass(m.ACTIVE),b.setAttribute("aria-expanded",!0),d?(f.reflow(b),a(b).addClass(m.IN)):a(b).removeClass(m.FADE),b.parentNode&&a(b.parentNode).hasClass(m.DROPDOWN_MENU)){var h=a(b).closest(n.DROPDOWN)[0];h&&a(h).find(n.DROPDOWN_TOGGLE).addClass(m.ACTIVE),b.setAttribute("aria-expanded",!0)}e&&e()},b._jQueryInterface=function(c){return this.each(function(){var d=a(this),e=d.data(g);if(e||(e=e=new b(this),d.data(g,e)),"string"==typeof c){if(void 0===e[c])throw new Error('No method named "'+c+'"');e[c]()}})},e(b,null,[{key:"VERSION",get:function(){return d}}]),b}();return a(document).on(l.CLICK_DATA_API,n.DATA_TOGGLE,function(b){b.preventDefault(),o._jQueryInterface.call(a(this),"show")}),a.fn[b]=o._jQueryInterface,a.fn[b].Constructor=o,a.fn[b].noConflict=function(){return a.fn[b]=j,o._jQueryInterface},o}(jQuery),function(a){if(void 0===window.Tether)throw new Error("Bootstrap tooltips require Tether (http://tether.io/)");var b="tooltip",g="4.0.0-alpha.5",h="bs.tooltip",i="."+h,j=a.fn[b],k=150,l="bs-tether",m={animation:!0,template:'<div class="tooltip" role="tooltip"><div class="tooltip-inner"></div></div>',trigger:"hover focus",title:"",delay:0,html:!1,selector:!1,placement:"top",offset:"0 0",constraints:[]},n={animation:"boolean",template:"string",title:"(string|element|function)",trigger:"string",delay:"(number|object)",html:"boolean",selector:"(string|boolean)",placement:"(string|function)",offset:"string",constraints:"array"},o={TOP:"bottom center",RIGHT:"middle left",BOTTOM:"top center",LEFT:"middle right"},p={IN:"in",OUT:"out"},q={HIDE:"hide"+i,HIDDEN:"hidden"+i,SHOW:"show"+i,SHOWN:"shown"+i,INSERTED:"inserted"+i,CLICK:"click"+i,FOCUSIN:"focusin"+i,FOCUSOUT:"focusout"+i,MOUSEENTER:"mouseenter"+i,MOUSELEAVE:"mouseleave"+i},r={FADE:"fade",IN:"in"},s={TOOLTIP:".tooltip",TOOLTIP_INNER:".tooltip-inner"},t={element:!1,enabled:!1},u={HOVER:"hover",FOCUS:"focus",CLICK:"click",MANUAL:"manual"},v=function(){function j(a,b){c(this,j),this._isEnabled=!0,this._timeout=0,this._hoverState="",this._activeTrigger={},this._tether=null,this.element=a,this.config=this._getConfig(b),this.tip=null,this._setListeners()}return j.prototype.enable=function(){this._isEnabled=!0},j.prototype.disable=function(){this._isEnabled=!1},j.prototype.toggleEnabled=function(){this._isEnabled=!this._isEnabled},j.prototype.toggle=function(b){if(b){var c=this.constructor.DATA_KEY,d=a(b.currentTarget).data(c);d||(d=new this.constructor(b.currentTarget,this._getDelegateConfig()),a(b.currentTarget).data(c,d)),d._activeTrigger.click=!d._activeTrigger.click,d._isWithActiveTrigger()?d._enter(null,d):d._leave(null,d)}else{if(a(this.getTipElement()).hasClass(r.IN))return void this._leave(null,this);this._enter(null,this)}},j.prototype.dispose=function(){clearTimeout(this._timeout),this.cleanupTether(),a.removeData(this.element,this.constructor.DATA_KEY),a(this.element).off(this.constructor.EVENT_KEY),this.tip&&a(this.tip).remove(),this._isEnabled=null,this._timeout=null,this._hoverState=null,this._activeTrigger=null,this._tether=null,this.element=null,this.config=null,this.tip=null},j.prototype.show=function(){var b=this,c=a.Event(this.constructor.Event.SHOW);if(this.isWithContent()&&this._isEnabled){a(this.element).trigger(c);var d=a.contains(this.element.ownerDocument.documentElement,this.element);if(c.isDefaultPrevented()||!d)return;var e=this.getTipElement(),g=f.getUID(this.constructor.NAME);e.setAttribute("id",g),this.element.setAttribute("aria-describedby",g),this.setContent(),this.config.animation&&a(e).addClass(r.FADE);var h="function"==typeof this.config.placement?this.config.placement.call(this,e,this.element):this.config.placement,i=this._getAttachment(h);a(e).data(this.constructor.DATA_KEY,this).appendTo(document.body),a(this.element).trigger(this.constructor.Event.INSERTED),this._tether=new Tether({attachment:i,element:e,target:this.element,classes:t,classPrefix:l,offset:this.config.offset,constraints:this.config.constraints,addTargetClasses:!1}),f.reflow(e),this._tether.position(),a(e).addClass(r.IN);var k=function(){var c=b._hoverState;b._hoverState=null,a(b.element).trigger(b.constructor.Event.SHOWN),c===p.OUT&&b._leave(null,b)};if(f.supportsTransitionEnd()&&a(this.tip).hasClass(r.FADE))return void a(this.tip).one(f.TRANSITION_END,k).emulateTransitionEnd(j._TRANSITION_DURATION);k()}},j.prototype.hide=function(b){var c=this,d=this.getTipElement(),e=a.Event(this.constructor.Event.HIDE),g=function(){c._hoverState!==p.IN&&d.parentNode&&d.parentNode.removeChild(d),c.element.removeAttribute("aria-describedby"),a(c.element).trigger(c.constructor.Event.HIDDEN),c.cleanupTether(),b&&b()};a(this.element).trigger(e),e.isDefaultPrevented()||(a(d).removeClass(r.IN),f.supportsTransitionEnd()&&a(this.tip).hasClass(r.FADE)?a(d).one(f.TRANSITION_END,g).emulateTransitionEnd(k):g(),this._hoverState="")},j.prototype.isWithContent=function(){return Boolean(this.getTitle())},j.prototype.getTipElement=function(){return this.tip=this.tip||a(this.config.template)[0]},j.prototype.setContent=function(){var b=a(this.getTipElement());this.setElementContent(b.find(s.TOOLTIP_INNER),this.getTitle()),b.removeClass(r.FADE).removeClass(r.IN),this.cleanupTether()},j.prototype.setElementContent=function(b,c){var e=this.config.html;"object"===("undefined"==typeof c?"undefined":d(c))&&(c.nodeType||c.jquery)?e?a(c).parent().is(b)||b.empty().append(c):b.text(a(c).text()):b[e?"html":"text"](c)},j.prototype.getTitle=function(){var a=this.element.getAttribute("data-original-title");return a||(a="function"==typeof this.config.title?this.config.title.call(this.element):this.config.title),a},j.prototype.cleanupTether=function(){this._tether&&this._tether.destroy()},j.prototype._getAttachment=function(a){return o[a.toUpperCase()]},j.prototype._setListeners=function(){var b=this,c=this.config.trigger.split(" ");c.forEach(function(c){if("click"===c)a(b.element).on(b.constructor.Event.CLICK,b.config.selector,a.proxy(b.toggle,b));else if(c!==u.MANUAL){var d=c===u.HOVER?b.constructor.Event.MOUSEENTER:b.constructor.Event.FOCUSIN,e=c===u.HOVER?b.constructor.Event.MOUSELEAVE:b.constructor.Event.FOCUSOUT;a(b.element).on(d,b.config.selector,a.proxy(b._enter,b)).on(e,b.config.selector,a.proxy(b._leave,b))}}),this.config.selector?this.config=a.extend({},this.config,{trigger:"manual",selector:""}):this._fixTitle()},j.prototype._fixTitle=function(){var a=d(this.element.getAttribute("data-original-title"));(this.element.getAttribute("title")||"string"!==a)&&(this.element.setAttribute("data-original-title",this.element.getAttribute("title")||""),this.element.setAttribute("title",""))},j.prototype._enter=function(b,c){var d=this.constructor.DATA_KEY;return c=c||a(b.currentTarget).data(d),c||(c=new this.constructor(b.currentTarget,this._getDelegateConfig()),a(b.currentTarget).data(d,c)),b&&(c._activeTrigger["focusin"===b.type?u.FOCUS:u.HOVER]=!0),a(c.getTipElement()).hasClass(r.IN)||c._hoverState===p.IN?void(c._hoverState=p.IN):(clearTimeout(c._timeout),c._hoverState=p.IN,c.config.delay&&c.config.delay.show?void(c._timeout=setTimeout(function(){c._hoverState===p.IN&&c.show()},c.config.delay.show)):void c.show())},j.prototype._leave=function(b,c){var d=this.constructor.DATA_KEY;if(c=c||a(b.currentTarget).data(d),c||(c=new this.constructor(b.currentTarget,this._getDelegateConfig()),a(b.currentTarget).data(d,c)),b&&(c._activeTrigger["focusout"===b.type?u.FOCUS:u.HOVER]=!1),!c._isWithActiveTrigger())return clearTimeout(c._timeout),c._hoverState=p.OUT,c.config.delay&&c.config.delay.hide?void(c._timeout=setTimeout(function(){c._hoverState===p.OUT&&c.hide()},c.config.delay.hide)):void c.hide()},j.prototype._isWithActiveTrigger=function(){for(var a in this._activeTrigger)if(this._activeTrigger[a])return!0;return!1},j.prototype._getConfig=function(c){return c=a.extend({},this.constructor.Default,a(this.element).data(),c),c.delay&&"number"==typeof c.delay&&(c.delay={show:c.delay,hide:c.delay}),f.typeCheckConfig(b,c,this.constructor.DefaultType),c},j.prototype._getDelegateConfig=function(){var a={};if(this.config)for(var b in this.config)this.constructor.Default[b]!==this.config[b]&&(a[b]=this.config[b]);return a},j._jQueryInterface=function(b){return this.each(function(){var c=a(this).data(h),e="object"===("undefined"==typeof b?"undefined":d(b))?b:null;if((c||!/dispose|hide/.test(b))&&(c||(c=new j(this,e),a(this).data(h,c)),"string"==typeof b)){if(void 0===c[b])throw new Error('No method named "'+b+'"');c[b]()}})},e(j,null,[{key:"VERSION",get:function(){return g}},{key:"Default",get:function(){return m}},{key:"NAME",get:function(){return b}},{key:"DATA_KEY",get:function(){return h}},{key:"Event",get:function(){return q}},{key:"EVENT_KEY",get:function(){return i}},{key:"DefaultType",get:function(){return n}}]),j}();return a.fn[b]=v._jQueryInterface,a.fn[b].Constructor=v,a.fn[b].noConflict=function(){return a.fn[b]=j,v._jQueryInterface},v}(jQuery));(function(f){var h="popover",i="4.0.0-alpha.5",j="bs.popover",k="."+j,l=f.fn[h],m=f.extend({},g.Default,{placement:"right",trigger:"click",content:"",template:'<div class="popover" role="tooltip"><h3 class="popover-title"></h3><div class="popover-content"></div></div>'}),n=f.extend({},g.DefaultType,{content:"(string|element|function)"}),o={FADE:"fade",IN:"in"},p={TITLE:".popover-title",CONTENT:".popover-content"},q={HIDE:"hide"+k,HIDDEN:"hidden"+k,SHOW:"show"+k,SHOWN:"shown"+k,INSERTED:"inserted"+k,CLICK:"click"+k,FOCUSIN:"focusin"+k,FOCUSOUT:"focusout"+k,MOUSEENTER:"mouseenter"+k,MOUSELEAVE:"mouseleave"+k},r=function(g){function l(){return c(this,l),a(this,g.apply(this,arguments))}return b(l,g),l.prototype.isWithContent=function(){return this.getTitle()||this._getContent()},l.prototype.getTipElement=function(){return this.tip=this.tip||f(this.config.template)[0]},l.prototype.setContent=function(){var a=f(this.getTipElement());this.setElementContent(a.find(p.TITLE),this.getTitle()),this.setElementContent(a.find(p.CONTENT),this._getContent()),a.removeClass(o.FADE).removeClass(o.IN),this.cleanupTether()},l.prototype._getContent=function(){return this.element.getAttribute("data-content")||("function"==typeof this.config.content?this.config.content.call(this.element):this.config.content)},l._jQueryInterface=function(a){return this.each(function(){var b=f(this).data(j),c="object"===("undefined"==typeof a?"undefined":d(a))?a:null;if((b||!/destroy|hide/.test(a))&&(b||(b=new l(this,c),f(this).data(j,b)),"string"==typeof a)){if(void 0===b[a])throw new Error('No method named "'+a+'"');b[a]()}})},e(l,null,[{key:"VERSION",get:function(){return i}},{key:"Default",get:function(){return m}},{key:"NAME",get:function(){return h}},{key:"DATA_KEY",get:function(){return j}},{key:"Event",get:function(){return q}},{key:"EVENT_KEY",get:function(){return k}},{key:"DefaultType",get:function(){return n}}]),l}(g);return f.fn[h]=r._jQueryInterface,f.fn[h].Constructor=r,f.fn[h].noConflict=function(){return f.fn[h]=l,r._jQueryInterface},r})(jQuery)}();
-define("bootstrap4/js/bootstrap.min", ["jquery"], (function (global) {
-  return function () {
-    var ret, fn;
-    return ret || global.$;
-  };
-}(this)));
-;define('bootstrap4', ['bootstrap4/js/bootstrap.min'], function (main) { return main; });
-
-define('text!bootstrap4/css/bootstrap.css', ['module'], function(module) { module.exports = "/*!\n * Bootstrap v4.0.0-alpha.5 (https://getbootstrap.com)\n * Copyright 2011-2016 The Bootstrap Authors\n * Copyright 2011-2016 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\n/*! normalize.css v4.2.0 | MIT License | github.com/necolas/normalize.css */\nhtml {\n  font-family: sans-serif;\n  line-height: 1.15;\n  -ms-text-size-adjust: 100%;\n  -webkit-text-size-adjust: 100%;\n}\n\nbody {\n  margin: 0;\n}\n\narticle,\naside,\ndetails,\nfigcaption,\nfigure,\nfooter,\nheader,\nmain,\nmenu,\nnav,\nsection,\nsummary {\n  display: block;\n}\n\naudio,\ncanvas,\nprogress,\nvideo {\n  display: inline-block;\n}\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\nprogress {\n  vertical-align: baseline;\n}\n\ntemplate,\n[hidden] {\n  display: none;\n}\n\na {\n  background-color: transparent;\n  -webkit-text-decoration-skip: objects;\n}\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\nabbr[title] {\n  border-bottom: none;\n  text-decoration: underline;\n  text-decoration: underline dotted;\n}\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\ndfn {\n  font-style: italic;\n}\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\nsmall {\n  font-size: 80%;\n}\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\nimg {\n  border-style: none;\n}\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\n\nfigure {\n  margin: 1em 40px;\n}\n\nhr {\n  -webkit-box-sizing: content-box;\n          box-sizing: content-box;\n  height: 0;\n  overflow: visible;\n}\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font: inherit;\n  margin: 0;\n}\n\noptgroup {\n  font-weight: bold;\n}\n\nbutton,\ninput {\n  overflow: visible;\n}\n\nbutton,\nselect {\n  text-transform: none;\n}\n\nbutton,\nhtml [type=\"button\"],\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button;\n}\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\nlegend {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  display: table;\n  max-width: 100%;\n  padding: 0;\n  white-space: normal;\n}\n\ntextarea {\n  overflow: auto;\n}\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  padding: 0;\n}\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n[type=\"search\"] {\n  -webkit-appearance: textfield;\n  outline-offset: -2px;\n}\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n::-webkit-input-placeholder {\n  color: inherit;\n  opacity: 0.54;\n}\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button;\n  font: inherit;\n}\n\n@media print {\n  *,\n  *::before,\n  *::after,\n  *::first-letter,\n  p::first-line,\n  div::first-line,\n  blockquote::first-line,\n  li::first-line {\n    text-shadow: none !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n  abbr[title]::after {\n    content: \" (\" attr(title) \")\";\n  }\n  pre {\n    white-space: pre-wrap !important;\n  }\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n  thead {\n    display: table-header-group;\n  }\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n  .navbar {\n    display: none;\n  }\n  .btn > .caret,\n  .dropup > .btn > .caret {\n    border-top-color: #000 !important;\n  }\n  .tag {\n    border: 1px solid #000;\n  }\n  .table {\n    border-collapse: collapse !important;\n  }\n  .table td,\n  .table th {\n    background-color: #fff !important;\n  }\n  .table-bordered th,\n  .table-bordered td {\n    border: 1px solid #ddd !important;\n  }\n}\n\nhtml {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n\n*,\n*::before,\n*::after {\n  -webkit-box-sizing: inherit;\n          box-sizing: inherit;\n}\n\n@-ms-viewport {\n  width: device-width;\n}\n\nhtml {\n  font-size: 16px;\n  -ms-overflow-style: scrollbar;\n  -webkit-tap-highlight-color: transparent;\n}\n\nbody {\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-size: 1rem;\n  line-height: 1.5;\n  color: #373a3c;\n  background-color: #fff;\n}\n\n[tabindex=\"-1\"]:focus {\n  outline: none !important;\n}\n\nh1, h2, h3, h4, h5, h6 {\n  margin-top: 0;\n  margin-bottom: .5rem;\n}\n\np {\n  margin-top: 0;\n  margin-bottom: 1rem;\n}\n\nabbr[title],\nabbr[data-original-title] {\n  cursor: help;\n  border-bottom: 1px dotted #818a91;\n}\n\naddress {\n  margin-bottom: 1rem;\n  font-style: normal;\n  line-height: inherit;\n}\n\nol,\nul,\ndl {\n  margin-top: 0;\n  margin-bottom: 1rem;\n}\n\nol ol,\nul ul,\nol ul,\nul ol {\n  margin-bottom: 0;\n}\n\ndt {\n  font-weight: bold;\n}\n\ndd {\n  margin-bottom: .5rem;\n  margin-left: 0;\n}\n\nblockquote {\n  margin: 0 0 1rem;\n}\n\na {\n  color: #0275d8;\n  text-decoration: none;\n}\n\na:focus, a:hover {\n  color: #014c8c;\n  text-decoration: underline;\n}\n\na:focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n\na:not([href]):not([tabindex]) {\n  color: inherit;\n  text-decoration: none;\n}\n\na:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {\n  color: inherit;\n  text-decoration: none;\n}\n\na:not([href]):not([tabindex]):focus {\n  outline: none;\n}\n\npre {\n  margin-top: 0;\n  margin-bottom: 1rem;\n  overflow: auto;\n}\n\nfigure {\n  margin: 0 0 1rem;\n}\n\nimg {\n  vertical-align: middle;\n}\n\n[role=\"button\"] {\n  cursor: pointer;\n}\n\na,\narea,\nbutton,\n[role=\"button\"],\ninput,\nlabel,\nselect,\nsummary,\ntextarea {\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n}\n\ntable {\n  border-collapse: collapse;\n  background-color: transparent;\n}\n\ncaption {\n  padding-top: 0.75rem;\n  padding-bottom: 0.75rem;\n  color: #818a91;\n  text-align: left;\n  caption-side: bottom;\n}\n\nth {\n  text-align: left;\n}\n\nlabel {\n  display: inline-block;\n  margin-bottom: .5rem;\n}\n\nbutton:focus {\n  outline: 1px dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n}\n\ninput,\nbutton,\nselect,\ntextarea {\n  line-height: inherit;\n}\n\ninput[type=\"radio\"]:disabled,\ninput[type=\"checkbox\"]:disabled {\n  cursor: not-allowed;\n}\n\ninput[type=\"date\"],\ninput[type=\"time\"],\ninput[type=\"datetime-local\"],\ninput[type=\"month\"] {\n  -webkit-appearance: listbox;\n}\n\ntextarea {\n  resize: vertical;\n}\n\nfieldset {\n  min-width: 0;\n  padding: 0;\n  margin: 0;\n  border: 0;\n}\n\nlegend {\n  display: block;\n  width: 100%;\n  padding: 0;\n  margin-bottom: .5rem;\n  font-size: 1.5rem;\n  line-height: inherit;\n}\n\ninput[type=\"search\"] {\n  -webkit-appearance: none;\n}\n\noutput {\n  display: inline-block;\n}\n\n[hidden] {\n  display: none !important;\n}\n\nh1, h2, h3, h4, h5, h6,\n.h1, .h2, .h3, .h4, .h5, .h6 {\n  margin-bottom: 0.5rem;\n  font-family: inherit;\n  font-weight: 500;\n  line-height: 1.1;\n  color: inherit;\n}\n\nh1, .h1 {\n  font-size: 2.5rem;\n}\n\nh2, .h2 {\n  font-size: 2rem;\n}\n\nh3, .h3 {\n  font-size: 1.75rem;\n}\n\nh4, .h4 {\n  font-size: 1.5rem;\n}\n\nh5, .h5 {\n  font-size: 1.25rem;\n}\n\nh6, .h6 {\n  font-size: 1rem;\n}\n\n.lead {\n  font-size: 1.25rem;\n  font-weight: 300;\n}\n\n.display-1 {\n  font-size: 6rem;\n  font-weight: 300;\n}\n\n.display-2 {\n  font-size: 5.5rem;\n  font-weight: 300;\n}\n\n.display-3 {\n  font-size: 4.5rem;\n  font-weight: 300;\n}\n\n.display-4 {\n  font-size: 3.5rem;\n  font-weight: 300;\n}\n\nhr {\n  margin-top: 1rem;\n  margin-bottom: 1rem;\n  border: 0;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n}\n\nsmall,\n.small {\n  font-size: 80%;\n  font-weight: normal;\n}\n\nmark,\n.mark {\n  padding: 0.2em;\n  background-color: #fcf8e3;\n}\n\n.list-unstyled {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-inline {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-inline-item {\n  display: inline-block;\n}\n\n.list-inline-item:not(:last-child) {\n  margin-right: 5px;\n}\n\n.initialism {\n  font-size: 90%;\n  text-transform: uppercase;\n}\n\n.blockquote {\n  padding: 0.5rem 1rem;\n  margin-bottom: 1rem;\n  font-size: 1.25rem;\n  border-left: 0.25rem solid #eceeef;\n}\n\n.blockquote-footer {\n  display: block;\n  font-size: 80%;\n  color: #818a91;\n}\n\n.blockquote-footer::before {\n  content: \"\\2014 \\00A0\";\n}\n\n.blockquote-reverse {\n  padding-right: 1rem;\n  padding-left: 0;\n  text-align: right;\n  border-right: 0.25rem solid #eceeef;\n  border-left: 0;\n}\n\n.blockquote-reverse .blockquote-footer::before {\n  content: \"\";\n}\n\n.blockquote-reverse .blockquote-footer::after {\n  content: \"\\00A0 \\2014\";\n}\n\ndl.row > dd + dt {\n  clear: left;\n}\n\n.img-fluid, .carousel-inner > .carousel-item > img,\n.carousel-inner > .carousel-item > a > img {\n  max-width: 100%;\n  height: auto;\n}\n\n.img-thumbnail {\n  padding: 0.25rem;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 0.25rem;\n  -webkit-transition: all .2s ease-in-out;\n  -o-transition: all .2s ease-in-out;\n  transition: all .2s ease-in-out;\n  max-width: 100%;\n  height: auto;\n}\n\n.figure {\n  display: inline-block;\n}\n\n.figure-img {\n  margin-bottom: 0.5rem;\n  line-height: 1;\n}\n\n.figure-caption {\n  font-size: 90%;\n  color: #818a91;\n}\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n}\n\ncode {\n  padding: 0.2rem 0.4rem;\n  font-size: 90%;\n  color: #bd4147;\n  background-color: #f7f7f9;\n  border-radius: 0.25rem;\n}\n\nkbd {\n  padding: 0.2rem 0.4rem;\n  font-size: 90%;\n  color: #fff;\n  background-color: #333;\n  border-radius: 0.2rem;\n}\n\nkbd kbd {\n  padding: 0;\n  font-size: 100%;\n  font-weight: bold;\n}\n\npre {\n  display: block;\n  margin-top: 0;\n  margin-bottom: 1rem;\n  font-size: 90%;\n  color: #373a3c;\n}\n\npre code {\n  padding: 0;\n  font-size: inherit;\n  color: inherit;\n  background-color: transparent;\n  border-radius: 0;\n}\n\n.pre-scrollable {\n  max-height: 340px;\n  overflow-y: scroll;\n}\n\n.container {\n  margin-left: auto;\n  margin-right: auto;\n  padding-left: 15px;\n  padding-right: 15px;\n}\n\n.container::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (min-width: 576px) {\n  .container {\n    width: 540px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 768px) {\n  .container {\n    width: 720px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 992px) {\n  .container {\n    width: 960px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 1200px) {\n  .container {\n    width: 1140px;\n    max-width: 100%;\n  }\n}\n\n.container-fluid {\n  margin-left: auto;\n  margin-right: auto;\n  padding-left: 15px;\n  padding-right: 15px;\n}\n\n.container-fluid::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.row {\n  margin-right: -15px;\n  margin-left: -15px;\n}\n\n.row::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (min-width: 576px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n.col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n  position: relative;\n  min-height: 1px;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n\n@media (min-width: 576px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .col-xs, .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .col-sm, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-md, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-lg, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-xl, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12 {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n.col-xs-1 {\n  float: left;\n  width: 8.333333%;\n}\n\n.col-xs-2 {\n  float: left;\n  width: 16.666667%;\n}\n\n.col-xs-3 {\n  float: left;\n  width: 25%;\n}\n\n.col-xs-4 {\n  float: left;\n  width: 33.333333%;\n}\n\n.col-xs-5 {\n  float: left;\n  width: 41.666667%;\n}\n\n.col-xs-6 {\n  float: left;\n  width: 50%;\n}\n\n.col-xs-7 {\n  float: left;\n  width: 58.333333%;\n}\n\n.col-xs-8 {\n  float: left;\n  width: 66.666667%;\n}\n\n.col-xs-9 {\n  float: left;\n  width: 75%;\n}\n\n.col-xs-10 {\n  float: left;\n  width: 83.333333%;\n}\n\n.col-xs-11 {\n  float: left;\n  width: 91.666667%;\n}\n\n.col-xs-12 {\n  float: left;\n  width: 100%;\n}\n\n.pull-xs-0 {\n  right: auto;\n}\n\n.pull-xs-1 {\n  right: 8.333333%;\n}\n\n.pull-xs-2 {\n  right: 16.666667%;\n}\n\n.pull-xs-3 {\n  right: 25%;\n}\n\n.pull-xs-4 {\n  right: 33.333333%;\n}\n\n.pull-xs-5 {\n  right: 41.666667%;\n}\n\n.pull-xs-6 {\n  right: 50%;\n}\n\n.pull-xs-7 {\n  right: 58.333333%;\n}\n\n.pull-xs-8 {\n  right: 66.666667%;\n}\n\n.pull-xs-9 {\n  right: 75%;\n}\n\n.pull-xs-10 {\n  right: 83.333333%;\n}\n\n.pull-xs-11 {\n  right: 91.666667%;\n}\n\n.pull-xs-12 {\n  right: 100%;\n}\n\n.push-xs-0 {\n  left: auto;\n}\n\n.push-xs-1 {\n  left: 8.333333%;\n}\n\n.push-xs-2 {\n  left: 16.666667%;\n}\n\n.push-xs-3 {\n  left: 25%;\n}\n\n.push-xs-4 {\n  left: 33.333333%;\n}\n\n.push-xs-5 {\n  left: 41.666667%;\n}\n\n.push-xs-6 {\n  left: 50%;\n}\n\n.push-xs-7 {\n  left: 58.333333%;\n}\n\n.push-xs-8 {\n  left: 66.666667%;\n}\n\n.push-xs-9 {\n  left: 75%;\n}\n\n.push-xs-10 {\n  left: 83.333333%;\n}\n\n.push-xs-11 {\n  left: 91.666667%;\n}\n\n.push-xs-12 {\n  left: 100%;\n}\n\n.offset-xs-1 {\n  margin-left: 8.333333%;\n}\n\n.offset-xs-2 {\n  margin-left: 16.666667%;\n}\n\n.offset-xs-3 {\n  margin-left: 25%;\n}\n\n.offset-xs-4 {\n  margin-left: 33.333333%;\n}\n\n.offset-xs-5 {\n  margin-left: 41.666667%;\n}\n\n.offset-xs-6 {\n  margin-left: 50%;\n}\n\n.offset-xs-7 {\n  margin-left: 58.333333%;\n}\n\n.offset-xs-8 {\n  margin-left: 66.666667%;\n}\n\n.offset-xs-9 {\n  margin-left: 75%;\n}\n\n.offset-xs-10 {\n  margin-left: 83.333333%;\n}\n\n.offset-xs-11 {\n  margin-left: 91.666667%;\n}\n\n@media (min-width: 576px) {\n  .col-sm-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-sm-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-sm-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-sm-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-sm-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-sm-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-sm-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-sm-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-sm-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-sm-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-sm-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-sm-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-sm-0 {\n    right: auto;\n  }\n  .pull-sm-1 {\n    right: 8.333333%;\n  }\n  .pull-sm-2 {\n    right: 16.666667%;\n  }\n  .pull-sm-3 {\n    right: 25%;\n  }\n  .pull-sm-4 {\n    right: 33.333333%;\n  }\n  .pull-sm-5 {\n    right: 41.666667%;\n  }\n  .pull-sm-6 {\n    right: 50%;\n  }\n  .pull-sm-7 {\n    right: 58.333333%;\n  }\n  .pull-sm-8 {\n    right: 66.666667%;\n  }\n  .pull-sm-9 {\n    right: 75%;\n  }\n  .pull-sm-10 {\n    right: 83.333333%;\n  }\n  .pull-sm-11 {\n    right: 91.666667%;\n  }\n  .pull-sm-12 {\n    right: 100%;\n  }\n  .push-sm-0 {\n    left: auto;\n  }\n  .push-sm-1 {\n    left: 8.333333%;\n  }\n  .push-sm-2 {\n    left: 16.666667%;\n  }\n  .push-sm-3 {\n    left: 25%;\n  }\n  .push-sm-4 {\n    left: 33.333333%;\n  }\n  .push-sm-5 {\n    left: 41.666667%;\n  }\n  .push-sm-6 {\n    left: 50%;\n  }\n  .push-sm-7 {\n    left: 58.333333%;\n  }\n  .push-sm-8 {\n    left: 66.666667%;\n  }\n  .push-sm-9 {\n    left: 75%;\n  }\n  .push-sm-10 {\n    left: 83.333333%;\n  }\n  .push-sm-11 {\n    left: 91.666667%;\n  }\n  .push-sm-12 {\n    left: 100%;\n  }\n  .offset-sm-0 {\n    margin-left: 0%;\n  }\n  .offset-sm-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-sm-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-sm-3 {\n    margin-left: 25%;\n  }\n  .offset-sm-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-sm-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-sm-6 {\n    margin-left: 50%;\n  }\n  .offset-sm-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-sm-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-sm-9 {\n    margin-left: 75%;\n  }\n  .offset-sm-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-sm-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 768px) {\n  .col-md-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-md-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-md-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-md-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-md-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-md-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-md-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-md-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-md-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-md-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-md-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-md-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-md-0 {\n    right: auto;\n  }\n  .pull-md-1 {\n    right: 8.333333%;\n  }\n  .pull-md-2 {\n    right: 16.666667%;\n  }\n  .pull-md-3 {\n    right: 25%;\n  }\n  .pull-md-4 {\n    right: 33.333333%;\n  }\n  .pull-md-5 {\n    right: 41.666667%;\n  }\n  .pull-md-6 {\n    right: 50%;\n  }\n  .pull-md-7 {\n    right: 58.333333%;\n  }\n  .pull-md-8 {\n    right: 66.666667%;\n  }\n  .pull-md-9 {\n    right: 75%;\n  }\n  .pull-md-10 {\n    right: 83.333333%;\n  }\n  .pull-md-11 {\n    right: 91.666667%;\n  }\n  .pull-md-12 {\n    right: 100%;\n  }\n  .push-md-0 {\n    left: auto;\n  }\n  .push-md-1 {\n    left: 8.333333%;\n  }\n  .push-md-2 {\n    left: 16.666667%;\n  }\n  .push-md-3 {\n    left: 25%;\n  }\n  .push-md-4 {\n    left: 33.333333%;\n  }\n  .push-md-5 {\n    left: 41.666667%;\n  }\n  .push-md-6 {\n    left: 50%;\n  }\n  .push-md-7 {\n    left: 58.333333%;\n  }\n  .push-md-8 {\n    left: 66.666667%;\n  }\n  .push-md-9 {\n    left: 75%;\n  }\n  .push-md-10 {\n    left: 83.333333%;\n  }\n  .push-md-11 {\n    left: 91.666667%;\n  }\n  .push-md-12 {\n    left: 100%;\n  }\n  .offset-md-0 {\n    margin-left: 0%;\n  }\n  .offset-md-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-md-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-md-3 {\n    margin-left: 25%;\n  }\n  .offset-md-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-md-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-md-6 {\n    margin-left: 50%;\n  }\n  .offset-md-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-md-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-md-9 {\n    margin-left: 75%;\n  }\n  .offset-md-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-md-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 992px) {\n  .col-lg-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-lg-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-lg-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-lg-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-lg-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-lg-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-lg-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-lg-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-lg-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-lg-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-lg-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-lg-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-lg-0 {\n    right: auto;\n  }\n  .pull-lg-1 {\n    right: 8.333333%;\n  }\n  .pull-lg-2 {\n    right: 16.666667%;\n  }\n  .pull-lg-3 {\n    right: 25%;\n  }\n  .pull-lg-4 {\n    right: 33.333333%;\n  }\n  .pull-lg-5 {\n    right: 41.666667%;\n  }\n  .pull-lg-6 {\n    right: 50%;\n  }\n  .pull-lg-7 {\n    right: 58.333333%;\n  }\n  .pull-lg-8 {\n    right: 66.666667%;\n  }\n  .pull-lg-9 {\n    right: 75%;\n  }\n  .pull-lg-10 {\n    right: 83.333333%;\n  }\n  .pull-lg-11 {\n    right: 91.666667%;\n  }\n  .pull-lg-12 {\n    right: 100%;\n  }\n  .push-lg-0 {\n    left: auto;\n  }\n  .push-lg-1 {\n    left: 8.333333%;\n  }\n  .push-lg-2 {\n    left: 16.666667%;\n  }\n  .push-lg-3 {\n    left: 25%;\n  }\n  .push-lg-4 {\n    left: 33.333333%;\n  }\n  .push-lg-5 {\n    left: 41.666667%;\n  }\n  .push-lg-6 {\n    left: 50%;\n  }\n  .push-lg-7 {\n    left: 58.333333%;\n  }\n  .push-lg-8 {\n    left: 66.666667%;\n  }\n  .push-lg-9 {\n    left: 75%;\n  }\n  .push-lg-10 {\n    left: 83.333333%;\n  }\n  .push-lg-11 {\n    left: 91.666667%;\n  }\n  .push-lg-12 {\n    left: 100%;\n  }\n  .offset-lg-0 {\n    margin-left: 0%;\n  }\n  .offset-lg-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-lg-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-lg-3 {\n    margin-left: 25%;\n  }\n  .offset-lg-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-lg-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-lg-6 {\n    margin-left: 50%;\n  }\n  .offset-lg-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-lg-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-lg-9 {\n    margin-left: 75%;\n  }\n  .offset-lg-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-lg-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 1200px) {\n  .col-xl-1 {\n    float: left;\n    width: 8.333333%;\n  }\n  .col-xl-2 {\n    float: left;\n    width: 16.666667%;\n  }\n  .col-xl-3 {\n    float: left;\n    width: 25%;\n  }\n  .col-xl-4 {\n    float: left;\n    width: 33.333333%;\n  }\n  .col-xl-5 {\n    float: left;\n    width: 41.666667%;\n  }\n  .col-xl-6 {\n    float: left;\n    width: 50%;\n  }\n  .col-xl-7 {\n    float: left;\n    width: 58.333333%;\n  }\n  .col-xl-8 {\n    float: left;\n    width: 66.666667%;\n  }\n  .col-xl-9 {\n    float: left;\n    width: 75%;\n  }\n  .col-xl-10 {\n    float: left;\n    width: 83.333333%;\n  }\n  .col-xl-11 {\n    float: left;\n    width: 91.666667%;\n  }\n  .col-xl-12 {\n    float: left;\n    width: 100%;\n  }\n  .pull-xl-0 {\n    right: auto;\n  }\n  .pull-xl-1 {\n    right: 8.333333%;\n  }\n  .pull-xl-2 {\n    right: 16.666667%;\n  }\n  .pull-xl-3 {\n    right: 25%;\n  }\n  .pull-xl-4 {\n    right: 33.333333%;\n  }\n  .pull-xl-5 {\n    right: 41.666667%;\n  }\n  .pull-xl-6 {\n    right: 50%;\n  }\n  .pull-xl-7 {\n    right: 58.333333%;\n  }\n  .pull-xl-8 {\n    right: 66.666667%;\n  }\n  .pull-xl-9 {\n    right: 75%;\n  }\n  .pull-xl-10 {\n    right: 83.333333%;\n  }\n  .pull-xl-11 {\n    right: 91.666667%;\n  }\n  .pull-xl-12 {\n    right: 100%;\n  }\n  .push-xl-0 {\n    left: auto;\n  }\n  .push-xl-1 {\n    left: 8.333333%;\n  }\n  .push-xl-2 {\n    left: 16.666667%;\n  }\n  .push-xl-3 {\n    left: 25%;\n  }\n  .push-xl-4 {\n    left: 33.333333%;\n  }\n  .push-xl-5 {\n    left: 41.666667%;\n  }\n  .push-xl-6 {\n    left: 50%;\n  }\n  .push-xl-7 {\n    left: 58.333333%;\n  }\n  .push-xl-8 {\n    left: 66.666667%;\n  }\n  .push-xl-9 {\n    left: 75%;\n  }\n  .push-xl-10 {\n    left: 83.333333%;\n  }\n  .push-xl-11 {\n    left: 91.666667%;\n  }\n  .push-xl-12 {\n    left: 100%;\n  }\n  .offset-xl-0 {\n    margin-left: 0%;\n  }\n  .offset-xl-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-xl-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-xl-3 {\n    margin-left: 25%;\n  }\n  .offset-xl-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-xl-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-xl-6 {\n    margin-left: 50%;\n  }\n  .offset-xl-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-xl-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-xl-9 {\n    margin-left: 75%;\n  }\n  .offset-xl-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-xl-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n.table {\n  width: 100%;\n  max-width: 100%;\n  margin-bottom: 1rem;\n}\n\n.table th,\n.table td {\n  padding: 0.75rem;\n  vertical-align: top;\n  border-top: 1px solid #eceeef;\n}\n\n.table thead th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #eceeef;\n}\n\n.table tbody + tbody {\n  border-top: 2px solid #eceeef;\n}\n\n.table .table {\n  background-color: #fff;\n}\n\n.table-sm th,\n.table-sm td {\n  padding: 0.3rem;\n}\n\n.table-bordered {\n  border: 1px solid #eceeef;\n}\n\n.table-bordered th,\n.table-bordered td {\n  border: 1px solid #eceeef;\n}\n\n.table-bordered thead th,\n.table-bordered thead td {\n  border-bottom-width: 2px;\n}\n\n.table-striped tbody tr:nth-of-type(odd) {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n\n.table-hover tbody tr:hover {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-active,\n.table-active > th,\n.table-active > td {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-hover .table-active:hover {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-hover .table-active:hover > td,\n.table-hover .table-active:hover > th {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-success,\n.table-success > th,\n.table-success > td {\n  background-color: #dff0d8;\n}\n\n.table-hover .table-success:hover {\n  background-color: #d0e9c6;\n}\n\n.table-hover .table-success:hover > td,\n.table-hover .table-success:hover > th {\n  background-color: #d0e9c6;\n}\n\n.table-info,\n.table-info > th,\n.table-info > td {\n  background-color: #d9edf7;\n}\n\n.table-hover .table-info:hover {\n  background-color: #c4e3f3;\n}\n\n.table-hover .table-info:hover > td,\n.table-hover .table-info:hover > th {\n  background-color: #c4e3f3;\n}\n\n.table-warning,\n.table-warning > th,\n.table-warning > td {\n  background-color: #fcf8e3;\n}\n\n.table-hover .table-warning:hover {\n  background-color: #faf2cc;\n}\n\n.table-hover .table-warning:hover > td,\n.table-hover .table-warning:hover > th {\n  background-color: #faf2cc;\n}\n\n.table-danger,\n.table-danger > th,\n.table-danger > td {\n  background-color: #f2dede;\n}\n\n.table-hover .table-danger:hover {\n  background-color: #ebcccc;\n}\n\n.table-hover .table-danger:hover > td,\n.table-hover .table-danger:hover > th {\n  background-color: #ebcccc;\n}\n\n.thead-inverse th {\n  color: #fff;\n  background-color: #373a3c;\n}\n\n.thead-default th {\n  color: #55595c;\n  background-color: #eceeef;\n}\n\n.table-inverse {\n  color: #eceeef;\n  background-color: #373a3c;\n}\n\n.table-inverse th,\n.table-inverse td,\n.table-inverse thead th {\n  border-color: #55595c;\n}\n\n.table-inverse.table-bordered {\n  border: 0;\n}\n\n.table-responsive {\n  display: block;\n  width: 100%;\n  min-height: 0%;\n  overflow-x: auto;\n}\n\n.table-reflow thead {\n  float: left;\n}\n\n.table-reflow tbody {\n  display: block;\n  white-space: nowrap;\n}\n\n.table-reflow th,\n.table-reflow td {\n  border-top: 1px solid #eceeef;\n  border-left: 1px solid #eceeef;\n}\n\n.table-reflow th:last-child,\n.table-reflow td:last-child {\n  border-right: 1px solid #eceeef;\n}\n\n.table-reflow thead:last-child tr:last-child th,\n.table-reflow thead:last-child tr:last-child td,\n.table-reflow tbody:last-child tr:last-child th,\n.table-reflow tbody:last-child tr:last-child td,\n.table-reflow tfoot:last-child tr:last-child th,\n.table-reflow tfoot:last-child tr:last-child td {\n  border-bottom: 1px solid #eceeef;\n}\n\n.table-reflow tr {\n  float: left;\n}\n\n.table-reflow tr th,\n.table-reflow tr td {\n  display: block !important;\n  border: 1px solid #eceeef;\n}\n\n.form-control {\n  display: block;\n  width: 100%;\n  padding: 0.5rem 0.75rem;\n  font-size: 1rem;\n  line-height: 1.25;\n  color: #55595c;\n  background-color: #fff;\n  background-image: none;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.form-control::-ms-expand {\n  background-color: transparent;\n  border: 0;\n}\n\n.form-control:focus {\n  color: #55595c;\n  background-color: #fff;\n  border-color: #66afe9;\n  outline: none;\n}\n\n.form-control::-webkit-input-placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control::-moz-placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control:-ms-input-placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control::placeholder {\n  color: #999;\n  opacity: 1;\n}\n\n.form-control:disabled, .form-control[readonly] {\n  background-color: #eceeef;\n  opacity: 1;\n}\n\n.form-control:disabled {\n  cursor: not-allowed;\n}\n\nselect.form-control:not([size]):not([multiple]) {\n  height: calc(2.5rem - 2px);\n}\n\nselect.form-control:focus::-ms-value {\n  color: #55595c;\n  background-color: #fff;\n}\n\n.form-control-file,\n.form-control-range {\n  display: block;\n}\n\n.col-form-label {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  margin-bottom: 0;\n}\n\n.col-form-label-lg {\n  padding-top: 0.75rem;\n  padding-bottom: 0.75rem;\n  font-size: 1.25rem;\n}\n\n.col-form-label-sm {\n  padding-top: 0.25rem;\n  padding-bottom: 0.25rem;\n  font-size: 0.875rem;\n}\n\n.col-form-legend {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  margin-bottom: 0;\n  font-size: 1rem;\n}\n\n.form-control-static {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  line-height: 1.25;\n  border: solid transparent;\n  border-width: 1px 0;\n}\n\n.form-control-static.form-control-sm, .input-group-sm > .form-control-static.form-control,\n.input-group-sm > .form-control-static.input-group-addon,\n.input-group-sm > .input-group-btn > .form-control-static.btn, .form-control-static.form-control-lg, .input-group-lg > .form-control-static.form-control,\n.input-group-lg > .form-control-static.input-group-addon,\n.input-group-lg > .input-group-btn > .form-control-static.btn {\n  padding-right: 0;\n  padding-left: 0;\n}\n\n.form-control-sm, .input-group-sm > .form-control,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\nselect.form-control-sm:not([size]):not([multiple]), .input-group-sm > select.form-control:not([size]):not([multiple]),\n.input-group-sm > select.input-group-addon:not([size]):not([multiple]),\n.input-group-sm > .input-group-btn > select.btn:not([size]):not([multiple]) {\n  height: 1.8125rem;\n}\n\n.form-control-lg, .input-group-lg > .form-control,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\nselect.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.form-control:not([size]):not([multiple]),\n.input-group-lg > select.input-group-addon:not([size]):not([multiple]),\n.input-group-lg > .input-group-btn > select.btn:not([size]):not([multiple]) {\n  height: 3.166667rem;\n}\n\n.form-group {\n  margin-bottom: 1rem;\n}\n\n.form-text {\n  display: block;\n  margin-top: 0.25rem;\n}\n\n.form-check {\n  position: relative;\n  display: block;\n  margin-bottom: 0.75rem;\n}\n\n.form-check + .form-check {\n  margin-top: -.25rem;\n}\n\n.form-check.disabled .form-check-label {\n  color: #818a91;\n  cursor: not-allowed;\n}\n\n.form-check-label {\n  padding-left: 1.25rem;\n  margin-bottom: 0;\n  cursor: pointer;\n}\n\n.form-check-input {\n  position: absolute;\n  margin-top: .25rem;\n  margin-left: -1.25rem;\n}\n\n.form-check-input:only-child {\n  position: static;\n}\n\n.form-check-inline {\n  position: relative;\n  display: inline-block;\n  padding-left: 1.25rem;\n  margin-bottom: 0;\n  vertical-align: middle;\n  cursor: pointer;\n}\n\n.form-check-inline + .form-check-inline {\n  margin-left: .75rem;\n}\n\n.form-check-inline.disabled {\n  color: #818a91;\n  cursor: not-allowed;\n}\n\n.form-control-feedback {\n  margin-top: 0.25rem;\n}\n\n.form-control-success,\n.form-control-warning,\n.form-control-danger {\n  padding-right: 2.25rem;\n  background-repeat: no-repeat;\n  background-position: center right 0.625rem;\n  -webkit-background-size: 1.25rem 1.25rem;\n          background-size: 1.25rem 1.25rem;\n}\n\n.has-success .form-control-feedback,\n.has-success .form-control-label,\n.has-success .form-check-label,\n.has-success .form-check-inline,\n.has-success .custom-control {\n  color: #5cb85c;\n}\n\n.has-success .form-control {\n  border-color: #5cb85c;\n}\n\n.has-success .form-control:focus {\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #a3d7a3;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #a3d7a3;\n}\n\n.has-success .input-group-addon {\n  color: #5cb85c;\n  border-color: #5cb85c;\n  background-color: #eaf6ea;\n}\n\n.has-success .form-control-success {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#5cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E\");\n}\n\n.has-warning .form-control-feedback,\n.has-warning .form-control-label,\n.has-warning .form-check-label,\n.has-warning .form-check-inline,\n.has-warning .custom-control {\n  color: #f0ad4e;\n}\n\n.has-warning .form-control {\n  border-color: #f0ad4e;\n}\n\n.has-warning .form-control:focus {\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #f8d9ac;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #f8d9ac;\n}\n\n.has-warning .input-group-addon {\n  color: #f0ad4e;\n  border-color: #f0ad4e;\n  background-color: white;\n}\n\n.has-warning .form-control-warning {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#f0ad4e' d='M4.4 5.324h-.8v-2.46h.8zm0 1.42h-.8V5.89h.8zM3.76.63L.04 7.075c-.115.2.016.425.26.426h7.397c.242 0 .372-.226.258-.426C6.726 4.924 5.47 2.79 4.253.63c-.113-.174-.39-.174-.494 0z'/%3E%3C/svg%3E\");\n}\n\n.has-danger .form-control-feedback,\n.has-danger .form-control-label,\n.has-danger .form-check-label,\n.has-danger .form-check-inline,\n.has-danger .custom-control {\n  color: #d9534f;\n}\n\n.has-danger .form-control {\n  border-color: #d9534f;\n}\n\n.has-danger .form-control:focus {\n  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #eba5a3;\n          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #eba5a3;\n}\n\n.has-danger .input-group-addon {\n  color: #d9534f;\n  border-color: #d9534f;\n  background-color: #fdf7f7;\n}\n\n.has-danger .form-control-danger {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='#d9534f' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E\");\n}\n\n@media (min-width: 576px) {\n  .form-inline .form-group {\n    display: inline-block;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .form-control-static {\n    display: inline-block;\n  }\n  .form-inline .input-group {\n    display: inline-table;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .input-group .input-group-addon,\n  .form-inline .input-group .input-group-btn,\n  .form-inline .input-group .form-control {\n    width: auto;\n  }\n  .form-inline .input-group > .form-control {\n    width: 100%;\n  }\n  .form-inline .form-control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-check {\n    display: inline-block;\n    margin-top: 0;\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-check-label {\n    padding-left: 0;\n  }\n  .form-inline .form-check-input {\n    position: relative;\n    margin-left: 0;\n  }\n  .form-inline .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n\n.btn {\n  display: inline-block;\n  font-weight: normal;\n  line-height: 1.25;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  cursor: pointer;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  border: 1px solid transparent;\n  padding: 0.5rem 1rem;\n  font-size: 1rem;\n  border-radius: 0.25rem;\n}\n\n.btn:focus, .btn.focus, .btn:active:focus, .btn:active.focus, .btn.active:focus, .btn.active.focus {\n  outline: 5px auto -webkit-focus-ring-color;\n  outline-offset: -2px;\n}\n\n.btn:focus, .btn:hover {\n  text-decoration: none;\n}\n\n.btn.focus {\n  text-decoration: none;\n}\n\n.btn:active, .btn.active {\n  background-image: none;\n  outline: 0;\n}\n\n.btn.disabled, .btn:disabled {\n  cursor: not-allowed;\n  opacity: .65;\n}\n\na.btn.disabled,\nfieldset[disabled] a.btn {\n  pointer-events: none;\n}\n\n.btn-primary {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-primary:hover {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n}\n\n.btn-primary:focus, .btn-primary.focus {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n}\n\n.btn-primary:active, .btn-primary.active,\n.open > .btn-primary.dropdown-toggle {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n  background-image: none;\n}\n\n.btn-primary:active:hover, .btn-primary:active:focus, .btn-primary:active.focus, .btn-primary.active:hover, .btn-primary.active:focus, .btn-primary.active.focus,\n.open > .btn-primary.dropdown-toggle:hover,\n.open > .btn-primary.dropdown-toggle:focus,\n.open > .btn-primary.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #014682;\n  border-color: #01315a;\n}\n\n.btn-primary.disabled:focus, .btn-primary.disabled.focus, .btn-primary:disabled:focus, .btn-primary:disabled.focus {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-primary.disabled:hover, .btn-primary:disabled:hover {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-secondary {\n  color: #373a3c;\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-secondary:hover {\n  color: #373a3c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n\n.btn-secondary:focus, .btn-secondary.focus {\n  color: #373a3c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n\n.btn-secondary:active, .btn-secondary.active,\n.open > .btn-secondary.dropdown-toggle {\n  color: #373a3c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n  background-image: none;\n}\n\n.btn-secondary:active:hover, .btn-secondary:active:focus, .btn-secondary:active.focus, .btn-secondary.active:hover, .btn-secondary.active:focus, .btn-secondary.active.focus,\n.open > .btn-secondary.dropdown-toggle:hover,\n.open > .btn-secondary.dropdown-toggle:focus,\n.open > .btn-secondary.dropdown-toggle.focus {\n  color: #373a3c;\n  background-color: #d4d4d4;\n  border-color: #8c8c8c;\n}\n\n.btn-secondary.disabled:focus, .btn-secondary.disabled.focus, .btn-secondary:disabled:focus, .btn-secondary:disabled.focus {\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-secondary.disabled:hover, .btn-secondary:disabled:hover {\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-info {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-info:hover {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n}\n\n.btn-info:focus, .btn-info.focus {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n}\n\n.btn-info:active, .btn-info.active,\n.open > .btn-info.dropdown-toggle {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n  background-image: none;\n}\n\n.btn-info:active:hover, .btn-info:active:focus, .btn-info:active.focus, .btn-info.active:hover, .btn-info.active:focus, .btn-info.active.focus,\n.open > .btn-info.dropdown-toggle:hover,\n.open > .btn-info.dropdown-toggle:focus,\n.open > .btn-info.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1f7e9a;\n}\n\n.btn-info.disabled:focus, .btn-info.disabled.focus, .btn-info:disabled:focus, .btn-info:disabled.focus {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-info.disabled:hover, .btn-info:disabled:hover {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-success {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-success:hover {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n}\n\n.btn-success:focus, .btn-success.focus {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n}\n\n.btn-success:active, .btn-success.active,\n.open > .btn-success.dropdown-toggle {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n  background-image: none;\n}\n\n.btn-success:active:hover, .btn-success:active:focus, .btn-success:active.focus, .btn-success.active:hover, .btn-success.active:focus, .btn-success.active.focus,\n.open > .btn-success.dropdown-toggle:hover,\n.open > .btn-success.dropdown-toggle:focus,\n.open > .btn-success.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #2d672d;\n}\n\n.btn-success.disabled:focus, .btn-success.disabled.focus, .btn-success:disabled:focus, .btn-success:disabled.focus {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-success.disabled:hover, .btn-success:disabled:hover {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-warning {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-warning:hover {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n}\n\n.btn-warning:focus, .btn-warning.focus {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n}\n\n.btn-warning:active, .btn-warning.active,\n.open > .btn-warning.dropdown-toggle {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n  background-image: none;\n}\n\n.btn-warning:active:hover, .btn-warning:active:focus, .btn-warning:active.focus, .btn-warning.active:hover, .btn-warning.active:focus, .btn-warning.active.focus,\n.open > .btn-warning.dropdown-toggle:hover,\n.open > .btn-warning.dropdown-toggle:focus,\n.open > .btn-warning.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #b06d0f;\n}\n\n.btn-warning.disabled:focus, .btn-warning.disabled.focus, .btn-warning:disabled:focus, .btn-warning:disabled.focus {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-warning.disabled:hover, .btn-warning:disabled:hover {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-danger {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-danger:hover {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n}\n\n.btn-danger:focus, .btn-danger.focus {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n}\n\n.btn-danger:active, .btn-danger.active,\n.open > .btn-danger.dropdown-toggle {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n  background-image: none;\n}\n\n.btn-danger:active:hover, .btn-danger:active:focus, .btn-danger:active.focus, .btn-danger.active:hover, .btn-danger.active:focus, .btn-danger.active.focus,\n.open > .btn-danger.dropdown-toggle:hover,\n.open > .btn-danger.dropdown-toggle:focus,\n.open > .btn-danger.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #8b211e;\n}\n\n.btn-danger.disabled:focus, .btn-danger.disabled.focus, .btn-danger:disabled:focus, .btn-danger:disabled.focus {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-danger.disabled:hover, .btn-danger:disabled:hover {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-primary {\n  color: #0275d8;\n  background-image: none;\n  background-color: transparent;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:hover {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:focus, .btn-outline-primary.focus {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:active, .btn-outline-primary.active,\n.open > .btn-outline-primary.dropdown-toggle {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:active:hover, .btn-outline-primary:active:focus, .btn-outline-primary:active.focus, .btn-outline-primary.active:hover, .btn-outline-primary.active:focus, .btn-outline-primary.active.focus,\n.open > .btn-outline-primary.dropdown-toggle:hover,\n.open > .btn-outline-primary.dropdown-toggle:focus,\n.open > .btn-outline-primary.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #014682;\n  border-color: #01315a;\n}\n\n.btn-outline-primary.disabled:focus, .btn-outline-primary.disabled.focus, .btn-outline-primary:disabled:focus, .btn-outline-primary:disabled.focus {\n  border-color: #43a7fd;\n}\n\n.btn-outline-primary.disabled:hover, .btn-outline-primary:disabled:hover {\n  border-color: #43a7fd;\n}\n\n.btn-outline-secondary {\n  color: #ccc;\n  background-image: none;\n  background-color: transparent;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:hover {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:focus, .btn-outline-secondary.focus {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:active, .btn-outline-secondary.active,\n.open > .btn-outline-secondary.dropdown-toggle {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:active:hover, .btn-outline-secondary:active:focus, .btn-outline-secondary:active.focus, .btn-outline-secondary.active:hover, .btn-outline-secondary.active:focus, .btn-outline-secondary.active.focus,\n.open > .btn-outline-secondary.dropdown-toggle:hover,\n.open > .btn-outline-secondary.dropdown-toggle:focus,\n.open > .btn-outline-secondary.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #a1a1a1;\n  border-color: #8c8c8c;\n}\n\n.btn-outline-secondary.disabled:focus, .btn-outline-secondary.disabled.focus, .btn-outline-secondary:disabled:focus, .btn-outline-secondary:disabled.focus {\n  border-color: white;\n}\n\n.btn-outline-secondary.disabled:hover, .btn-outline-secondary:disabled:hover {\n  border-color: white;\n}\n\n.btn-outline-info {\n  color: #5bc0de;\n  background-image: none;\n  background-color: transparent;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:hover {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:focus, .btn-outline-info.focus {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:active, .btn-outline-info.active,\n.open > .btn-outline-info.dropdown-toggle {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:active:hover, .btn-outline-info:active:focus, .btn-outline-info:active.focus, .btn-outline-info.active:hover, .btn-outline-info.active:focus, .btn-outline-info.active.focus,\n.open > .btn-outline-info.dropdown-toggle:hover,\n.open > .btn-outline-info.dropdown-toggle:focus,\n.open > .btn-outline-info.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #269abc;\n  border-color: #1f7e9a;\n}\n\n.btn-outline-info.disabled:focus, .btn-outline-info.disabled.focus, .btn-outline-info:disabled:focus, .btn-outline-info:disabled.focus {\n  border-color: #b0e1ef;\n}\n\n.btn-outline-info.disabled:hover, .btn-outline-info:disabled:hover {\n  border-color: #b0e1ef;\n}\n\n.btn-outline-success {\n  color: #5cb85c;\n  background-image: none;\n  background-color: transparent;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:hover {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:focus, .btn-outline-success.focus {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:active, .btn-outline-success.active,\n.open > .btn-outline-success.dropdown-toggle {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:active:hover, .btn-outline-success:active:focus, .btn-outline-success:active.focus, .btn-outline-success.active:hover, .btn-outline-success.active:focus, .btn-outline-success.active.focus,\n.open > .btn-outline-success.dropdown-toggle:hover,\n.open > .btn-outline-success.dropdown-toggle:focus,\n.open > .btn-outline-success.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #398439;\n  border-color: #2d672d;\n}\n\n.btn-outline-success.disabled:focus, .btn-outline-success.disabled.focus, .btn-outline-success:disabled:focus, .btn-outline-success:disabled.focus {\n  border-color: #a3d7a3;\n}\n\n.btn-outline-success.disabled:hover, .btn-outline-success:disabled:hover {\n  border-color: #a3d7a3;\n}\n\n.btn-outline-warning {\n  color: #f0ad4e;\n  background-image: none;\n  background-color: transparent;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:hover {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:focus, .btn-outline-warning.focus {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:active, .btn-outline-warning.active,\n.open > .btn-outline-warning.dropdown-toggle {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:active:hover, .btn-outline-warning:active:focus, .btn-outline-warning:active.focus, .btn-outline-warning.active:hover, .btn-outline-warning.active:focus, .btn-outline-warning.active.focus,\n.open > .btn-outline-warning.dropdown-toggle:hover,\n.open > .btn-outline-warning.dropdown-toggle:focus,\n.open > .btn-outline-warning.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #d58512;\n  border-color: #b06d0f;\n}\n\n.btn-outline-warning.disabled:focus, .btn-outline-warning.disabled.focus, .btn-outline-warning:disabled:focus, .btn-outline-warning:disabled.focus {\n  border-color: #f8d9ac;\n}\n\n.btn-outline-warning.disabled:hover, .btn-outline-warning:disabled:hover {\n  border-color: #f8d9ac;\n}\n\n.btn-outline-danger {\n  color: #d9534f;\n  background-image: none;\n  background-color: transparent;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:hover {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:focus, .btn-outline-danger.focus {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:active, .btn-outline-danger.active,\n.open > .btn-outline-danger.dropdown-toggle {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:active:hover, .btn-outline-danger:active:focus, .btn-outline-danger:active.focus, .btn-outline-danger.active:hover, .btn-outline-danger.active:focus, .btn-outline-danger.active.focus,\n.open > .btn-outline-danger.dropdown-toggle:hover,\n.open > .btn-outline-danger.dropdown-toggle:focus,\n.open > .btn-outline-danger.dropdown-toggle.focus {\n  color: #fff;\n  background-color: #ac2925;\n  border-color: #8b211e;\n}\n\n.btn-outline-danger.disabled:focus, .btn-outline-danger.disabled.focus, .btn-outline-danger:disabled:focus, .btn-outline-danger:disabled.focus {\n  border-color: #eba5a3;\n}\n\n.btn-outline-danger.disabled:hover, .btn-outline-danger:disabled:hover {\n  border-color: #eba5a3;\n}\n\n.btn-link {\n  font-weight: normal;\n  color: #0275d8;\n  border-radius: 0;\n}\n\n.btn-link, .btn-link:active, .btn-link.active, .btn-link:disabled {\n  background-color: transparent;\n}\n\n.btn-link, .btn-link:focus, .btn-link:active {\n  border-color: transparent;\n}\n\n.btn-link:hover {\n  border-color: transparent;\n}\n\n.btn-link:focus, .btn-link:hover {\n  color: #014c8c;\n  text-decoration: underline;\n  background-color: transparent;\n}\n\n.btn-link:disabled:focus, .btn-link:disabled:hover {\n  color: #818a91;\n  text-decoration: none;\n}\n\n.btn-lg, .btn-group-lg > .btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\n.btn-sm, .btn-group-sm > .btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\n.btn-block {\n  display: block;\n  width: 100%;\n}\n\n.btn-block + .btn-block {\n  margin-top: 0.5rem;\n}\n\ninput[type=\"submit\"].btn-block,\ninput[type=\"reset\"].btn-block,\ninput[type=\"button\"].btn-block {\n  width: 100%;\n}\n\n.fade {\n  opacity: 0;\n  -webkit-transition: opacity .15s linear;\n  -o-transition: opacity .15s linear;\n  transition: opacity .15s linear;\n}\n\n.fade.in {\n  opacity: 1;\n}\n\n.collapse {\n  display: none;\n}\n\n.collapse.in {\n  display: block;\n}\n\ntr.collapse.in {\n  display: table-row;\n}\n\ntbody.collapse.in {\n  display: table-row-group;\n}\n\n.collapsing {\n  position: relative;\n  height: 0;\n  overflow: hidden;\n  -webkit-transition-timing-function: ease;\n       -o-transition-timing-function: ease;\n          transition-timing-function: ease;\n  -webkit-transition-duration: .35s;\n       -o-transition-duration: .35s;\n          transition-duration: .35s;\n  -webkit-transition-property: height;\n  -o-transition-property: height;\n  transition-property: height;\n}\n\n.dropup,\n.dropdown {\n  position: relative;\n}\n\n.dropdown-toggle::after {\n  display: inline-block;\n  width: 0;\n  height: 0;\n  margin-left: 0.3em;\n  vertical-align: middle;\n  content: \"\";\n  border-top: 0.3em solid;\n  border-right: 0.3em solid transparent;\n  border-left: 0.3em solid transparent;\n}\n\n.dropdown-toggle:focus {\n  outline: 0;\n}\n\n.dropup .dropdown-toggle::after {\n  border-top: 0;\n  border-bottom: 0.3em solid;\n}\n\n.dropdown-menu {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 1000;\n  display: none;\n  float: left;\n  min-width: 10rem;\n  padding: 0.5rem 0;\n  margin: 0.125rem 0 0;\n  font-size: 1rem;\n  color: #373a3c;\n  text-align: left;\n  list-style: none;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.dropdown-divider {\n  height: 1px;\n  margin: 0.5rem 0;\n  overflow: hidden;\n  background-color: #e5e5e5;\n}\n\n.dropdown-item {\n  display: block;\n  width: 100%;\n  padding: 3px 1.5rem;\n  clear: both;\n  font-weight: normal;\n  color: #373a3c;\n  text-align: inherit;\n  white-space: nowrap;\n  background: none;\n  border: 0;\n}\n\n.dropdown-item:focus, .dropdown-item:hover {\n  color: #2b2d2f;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n\n.dropdown-item.active, .dropdown-item.active:focus, .dropdown-item.active:hover {\n  color: #fff;\n  text-decoration: none;\n  background-color: #0275d8;\n  outline: 0;\n}\n\n.dropdown-item.disabled, .dropdown-item.disabled:focus, .dropdown-item.disabled:hover {\n  color: #818a91;\n}\n\n.dropdown-item.disabled:focus, .dropdown-item.disabled:hover {\n  text-decoration: none;\n  cursor: not-allowed;\n  background-color: transparent;\n  background-image: none;\n  filter: \"progid:DXImageTransform.Microsoft.gradient(enabled = false)\";\n}\n\n.open > .dropdown-menu {\n  display: block;\n}\n\n.open > a {\n  outline: 0;\n}\n\n.dropdown-menu-right {\n  right: 0;\n  left: auto;\n}\n\n.dropdown-menu-left {\n  right: auto;\n  left: 0;\n}\n\n.dropdown-header {\n  display: block;\n  padding: 0.5rem 1.5rem;\n  margin-bottom: 0;\n  font-size: 0.875rem;\n  color: #818a91;\n  white-space: nowrap;\n}\n\n.dropdown-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 990;\n}\n\n.dropup .caret,\n.navbar-fixed-bottom .dropdown .caret {\n  content: \"\";\n  border-top: 0;\n  border-bottom: 0.3em solid;\n}\n\n.dropup .dropdown-menu,\n.navbar-fixed-bottom .dropdown .dropdown-menu {\n  top: auto;\n  bottom: 100%;\n  margin-bottom: 0.125rem;\n}\n\n.btn-group,\n.btn-group-vertical {\n  position: relative;\n  display: inline-block;\n  vertical-align: middle;\n}\n\n.btn-group > .btn,\n.btn-group-vertical > .btn {\n  position: relative;\n  float: left;\n  margin-bottom: 0;\n}\n\n.btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active,\n.btn-group-vertical > .btn:focus,\n.btn-group-vertical > .btn:active,\n.btn-group-vertical > .btn.active {\n  z-index: 2;\n}\n\n.btn-group > .btn:hover,\n.btn-group-vertical > .btn:hover {\n  z-index: 2;\n}\n\n.btn-group .btn + .btn,\n.btn-group .btn + .btn-group,\n.btn-group .btn-group + .btn,\n.btn-group .btn-group + .btn-group {\n  margin-left: -1px;\n}\n\n.btn-toolbar {\n  margin-left: -0.5rem;\n}\n\n.btn-toolbar::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.btn-toolbar .btn-group,\n.btn-toolbar .input-group {\n  float: left;\n}\n\n.btn-toolbar > .btn,\n.btn-toolbar > .btn-group,\n.btn-toolbar > .input-group {\n  margin-left: 0.5rem;\n}\n\n.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {\n  border-radius: 0;\n}\n\n.btn-group > .btn:first-child {\n  margin-left: 0;\n}\n\n.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.btn-group > .btn:last-child:not(:first-child),\n.btn-group > .dropdown-toggle:not(:first-child) {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group > .btn-group {\n  float: left;\n}\n\n.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n\n.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group .dropdown-toggle:active,\n.btn-group.open .dropdown-toggle {\n  outline: 0;\n}\n\n.btn + .dropdown-toggle-split {\n  padding-right: 0.75rem;\n  padding-left: 0.75rem;\n}\n\n.btn + .dropdown-toggle-split::after {\n  margin-left: 0;\n}\n\n.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split {\n  padding-right: 0.375rem;\n  padding-left: 0.375rem;\n}\n\n.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {\n  padding-right: 1.125rem;\n  padding-left: 1.125rem;\n}\n\n.btn .caret {\n  margin-left: 0;\n}\n\n.btn-lg .caret, .btn-group-lg > .btn .caret {\n  border-width: 0.3em 0.3em 0;\n  border-bottom-width: 0;\n}\n\n.dropup .btn-lg .caret, .dropup .btn-group-lg > .btn .caret {\n  border-width: 0 0.3em 0.3em;\n}\n\n.btn-group-vertical > .btn,\n.btn-group-vertical > .btn-group,\n.btn-group-vertical > .btn-group > .btn {\n  display: block;\n  float: none;\n  width: 100%;\n  max-width: 100%;\n}\n\n.btn-group-vertical > .btn-group::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.btn-group-vertical > .btn-group > .btn {\n  float: none;\n}\n\n.btn-group-vertical > .btn + .btn,\n.btn-group-vertical > .btn + .btn-group,\n.btn-group-vertical > .btn-group + .btn,\n.btn-group-vertical > .btn-group + .btn-group {\n  margin-top: -1px;\n  margin-left: 0;\n}\n\n.btn-group-vertical > .btn:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n\n.btn-group-vertical > .btn:first-child:not(:last-child) {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n\n.btn-group-vertical > .btn:last-child:not(:first-child) {\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n[data-toggle=\"buttons\"] > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn input[type=\"checkbox\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"checkbox\"] {\n  position: absolute;\n  clip: rect(0, 0, 0, 0);\n  pointer-events: none;\n}\n\n.input-group {\n  position: relative;\n  width: 100%;\n  display: table;\n  border-collapse: separate;\n}\n\n.input-group .form-control {\n  position: relative;\n  z-index: 2;\n  float: left;\n  width: 100%;\n  margin-bottom: 0;\n}\n\n.input-group .form-control:focus, .input-group .form-control:active, .input-group .form-control:hover {\n  z-index: 3;\n}\n\n.input-group-addon,\n.input-group-btn,\n.input-group .form-control {\n  display: table-cell;\n}\n\n.input-group-addon:not(:first-child):not(:last-child),\n.input-group-btn:not(:first-child):not(:last-child),\n.input-group .form-control:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n\n.input-group-addon,\n.input-group-btn {\n  width: 1%;\n  white-space: nowrap;\n  vertical-align: middle;\n}\n\n.input-group-addon {\n  padding: 0.5rem 0.75rem;\n  margin-bottom: 0;\n  font-size: 1rem;\n  font-weight: normal;\n  line-height: 1.25;\n  color: #55595c;\n  text-align: center;\n  background-color: #eceeef;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.input-group-addon.form-control-sm,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .input-group-addon.btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\n.input-group-addon.form-control-lg,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .input-group-addon.btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\n.input-group-addon input[type=\"radio\"],\n.input-group-addon input[type=\"checkbox\"] {\n  margin-top: 0;\n}\n\n.input-group .form-control:not(:last-child),\n.input-group-addon:not(:last-child),\n.input-group-btn:not(:last-child) > .btn,\n.input-group-btn:not(:last-child) > .btn-group > .btn,\n.input-group-btn:not(:last-child) > .dropdown-toggle,\n.input-group-btn:not(:first-child) > .btn:not(:last-child):not(.dropdown-toggle),\n.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > .btn {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.input-group-addon:not(:last-child) {\n  border-right: 0;\n}\n\n.input-group .form-control:not(:first-child),\n.input-group-addon:not(:first-child),\n.input-group-btn:not(:first-child) > .btn,\n.input-group-btn:not(:first-child) > .btn-group > .btn,\n.input-group-btn:not(:first-child) > .dropdown-toggle,\n.input-group-btn:not(:last-child) > .btn:not(:first-child),\n.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.form-control + .input-group-addon:not(:first-child) {\n  border-left: 0;\n}\n\n.input-group-btn {\n  position: relative;\n  font-size: 0;\n  white-space: nowrap;\n}\n\n.input-group-btn > .btn {\n  position: relative;\n}\n\n.input-group-btn > .btn + .btn {\n  margin-left: -1px;\n}\n\n.input-group-btn > .btn:focus, .input-group-btn > .btn:active, .input-group-btn > .btn:hover {\n  z-index: 3;\n}\n\n.input-group-btn:not(:last-child) > .btn,\n.input-group-btn:not(:last-child) > .btn-group {\n  margin-right: -1px;\n}\n\n.input-group-btn:not(:first-child) > .btn,\n.input-group-btn:not(:first-child) > .btn-group {\n  z-index: 2;\n  margin-left: -1px;\n}\n\n.input-group-btn:not(:first-child) > .btn:focus, .input-group-btn:not(:first-child) > .btn:active, .input-group-btn:not(:first-child) > .btn:hover,\n.input-group-btn:not(:first-child) > .btn-group:focus,\n.input-group-btn:not(:first-child) > .btn-group:active,\n.input-group-btn:not(:first-child) > .btn-group:hover {\n  z-index: 3;\n}\n\n.custom-control {\n  position: relative;\n  display: inline-block;\n  padding-left: 1.5rem;\n  cursor: pointer;\n}\n\n.custom-control + .custom-control {\n  margin-left: 1rem;\n}\n\n.custom-control-input {\n  position: absolute;\n  z-index: -1;\n  opacity: 0;\n}\n\n.custom-control-input:checked ~ .custom-control-indicator {\n  color: #fff;\n  background-color: #0074d9;\n}\n\n.custom-control-input:focus ~ .custom-control-indicator {\n  -webkit-box-shadow: 0 0 0 0.075rem #fff, 0 0 0 0.2rem #0074d9;\n          box-shadow: 0 0 0 0.075rem #fff, 0 0 0 0.2rem #0074d9;\n}\n\n.custom-control-input:active ~ .custom-control-indicator {\n  color: #fff;\n  background-color: #84c6ff;\n}\n\n.custom-control-input:disabled ~ .custom-control-indicator {\n  cursor: not-allowed;\n  background-color: #eee;\n}\n\n.custom-control-input:disabled ~ .custom-control-description {\n  color: #767676;\n  cursor: not-allowed;\n}\n\n.custom-control-indicator {\n  position: absolute;\n  top: .25rem;\n  left: 0;\n  display: block;\n  width: 1rem;\n  height: 1rem;\n  pointer-events: none;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-color: #ddd;\n  background-repeat: no-repeat;\n  background-position: center center;\n  -webkit-background-size: 50% 50%;\n          background-size: 50% 50%;\n}\n\n.custom-checkbox .custom-control-indicator {\n  border-radius: 0.25rem;\n}\n\n.custom-checkbox .custom-control-input:checked ~ .custom-control-indicator {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='#fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E\");\n}\n\n.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-indicator {\n  background-color: #0074d9;\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath stroke='#fff' d='M0 2h4'/%3E%3C/svg%3E\");\n}\n\n.custom-radio .custom-control-indicator {\n  border-radius: 50%;\n}\n\n.custom-radio .custom-control-input:checked ~ .custom-control-indicator {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='#fff'/%3E%3C/svg%3E\");\n}\n\n.custom-controls-stacked .custom-control {\n  float: left;\n  clear: left;\n}\n\n.custom-controls-stacked .custom-control + .custom-control {\n  margin-left: 0;\n}\n\n.custom-select {\n  display: inline-block;\n  max-width: 100%;\n  height: calc(2.5rem - 2px);\n  padding: 0.375rem 1.75rem 0.375rem 0.75rem;\n  padding-right: 0.75rem \\9;\n  color: #55595c;\n  vertical-align: middle;\n  background: #fff url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='#333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E\") no-repeat right 0.75rem center;\n  background-image: none \\9;\n  -webkit-background-size: 8px 10px;\n          background-size: 8px 10px;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n  -moz-appearance: none;\n  -webkit-appearance: none;\n}\n\n.custom-select:focus {\n  border-color: #51a7e8;\n  outline: none;\n}\n\n.custom-select:focus::-ms-value {\n  color: #55595c;\n  background-color: #fff;\n}\n\n.custom-select:disabled {\n  color: #818a91;\n  cursor: not-allowed;\n  background-color: #eceeef;\n}\n\n.custom-select::-ms-expand {\n  opacity: 0;\n}\n\n.custom-select-sm {\n  padding-top: 0.375rem;\n  padding-bottom: 0.375rem;\n  font-size: 75%;\n}\n\n.custom-file {\n  position: relative;\n  display: inline-block;\n  max-width: 100%;\n  height: 2.5rem;\n  cursor: pointer;\n}\n\n.custom-file-input {\n  min-width: 14rem;\n  max-width: 100%;\n  margin: 0;\n  filter: alpha(opacity=0);\n  opacity: 0;\n}\n\n.custom-file-control {\n  position: absolute;\n  top: 0;\n  right: 0;\n  left: 0;\n  z-index: 5;\n  height: 2.5rem;\n  padding: 0.5rem 1rem;\n  line-height: 1.5;\n  color: #555;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 0.25rem;\n}\n\n.custom-file-control:lang(en)::after {\n  content: \"Choose file...\";\n}\n\n.custom-file-control::before {\n  position: absolute;\n  top: -1px;\n  right: -1px;\n  bottom: -1px;\n  z-index: 6;\n  display: block;\n  height: 2.5rem;\n  padding: 0.5rem 1rem;\n  line-height: 1.5;\n  color: #555;\n  background-color: #eee;\n  border: 1px solid #ddd;\n  border-radius: 0 0.25rem 0.25rem 0;\n}\n\n.custom-file-control:lang(en)::before {\n  content: \"Browse\";\n}\n\n.nav {\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n\n.nav-link {\n  display: inline-block;\n}\n\n.nav-link:focus, .nav-link:hover {\n  text-decoration: none;\n}\n\n.nav-link.disabled {\n  color: #818a91;\n}\n\n.nav-link.disabled, .nav-link.disabled:focus, .nav-link.disabled:hover {\n  color: #818a91;\n  cursor: not-allowed;\n  background-color: transparent;\n}\n\n.nav-inline .nav-item {\n  display: inline-block;\n}\n\n.nav-inline .nav-item + .nav-item,\n.nav-inline .nav-link + .nav-link {\n  margin-left: 1rem;\n}\n\n.nav-tabs {\n  border-bottom: 1px solid #ddd;\n}\n\n.nav-tabs::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.nav-tabs .nav-item {\n  float: left;\n  margin-bottom: -1px;\n}\n\n.nav-tabs .nav-item + .nav-item {\n  margin-left: 0.2rem;\n}\n\n.nav-tabs .nav-link {\n  display: block;\n  padding: 0.5em 1em;\n  border: 1px solid transparent;\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {\n  border-color: #eceeef #eceeef #ddd;\n}\n\n.nav-tabs .nav-link.disabled, .nav-tabs .nav-link.disabled:focus, .nav-tabs .nav-link.disabled:hover {\n  color: #818a91;\n  background-color: transparent;\n  border-color: transparent;\n}\n\n.nav-tabs .nav-link.active, .nav-tabs .nav-link.active:focus, .nav-tabs .nav-link.active:hover,\n.nav-tabs .nav-item.open .nav-link,\n.nav-tabs .nav-item.open .nav-link:focus,\n.nav-tabs .nav-item.open .nav-link:hover {\n  color: #55595c;\n  background-color: #fff;\n  border-color: #ddd #ddd transparent;\n}\n\n.nav-tabs .dropdown-menu {\n  margin-top: -1px;\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.nav-pills::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.nav-pills .nav-item {\n  float: left;\n}\n\n.nav-pills .nav-item + .nav-item {\n  margin-left: 0.2rem;\n}\n\n.nav-pills .nav-link {\n  display: block;\n  padding: 0.5em 1em;\n  border-radius: 0.25rem;\n}\n\n.nav-pills .nav-link.active, .nav-pills .nav-link.active:focus, .nav-pills .nav-link.active:hover,\n.nav-pills .nav-item.open .nav-link,\n.nav-pills .nav-item.open .nav-link:focus,\n.nav-pills .nav-item.open .nav-link:hover {\n  color: #fff;\n  cursor: default;\n  background-color: #0275d8;\n}\n\n.nav-stacked .nav-item {\n  display: block;\n  float: none;\n}\n\n.nav-stacked .nav-item + .nav-item {\n  margin-top: 0.2rem;\n  margin-left: 0;\n}\n\n.tab-content > .tab-pane {\n  display: none;\n}\n\n.tab-content > .active {\n  display: block;\n}\n\n.navbar {\n  position: relative;\n  padding: 0.5rem 1rem;\n}\n\n.navbar::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (min-width: 576px) {\n  .navbar {\n    border-radius: 0.25rem;\n  }\n}\n\n.navbar-full {\n  z-index: 1000;\n}\n\n@media (min-width: 576px) {\n  .navbar-full {\n    border-radius: 0;\n  }\n}\n\n.navbar-fixed-top,\n.navbar-fixed-bottom {\n  position: fixed;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n\n@media (min-width: 576px) {\n  .navbar-fixed-top,\n  .navbar-fixed-bottom {\n    border-radius: 0;\n  }\n}\n\n.navbar-fixed-top {\n  top: 0;\n}\n\n.navbar-fixed-bottom {\n  bottom: 0;\n}\n\n.navbar-sticky-top {\n  position: -webkit-sticky;\n  position: sticky;\n  top: 0;\n  z-index: 1030;\n  width: 100%;\n}\n\n@media (min-width: 576px) {\n  .navbar-sticky-top {\n    border-radius: 0;\n  }\n}\n\n.navbar-brand {\n  float: left;\n  padding-top: 0.25rem;\n  padding-bottom: 0.25rem;\n  margin-right: 1rem;\n  font-size: 1.25rem;\n  line-height: inherit;\n}\n\n.navbar-brand:focus, .navbar-brand:hover {\n  text-decoration: none;\n}\n\n.navbar-divider {\n  float: left;\n  width: 1px;\n  padding-top: 0.425rem;\n  padding-bottom: 0.425rem;\n  margin-right: 1rem;\n  margin-left: 1rem;\n  overflow: hidden;\n}\n\n.navbar-divider::before {\n  content: \"\\00a0\";\n}\n\n.navbar-text {\n  display: inline-block;\n  padding-top: .425rem;\n  padding-bottom: .425rem;\n}\n\n.navbar-toggler {\n  width: 2.5em;\n  height: 2em;\n  padding: 0.5rem 0.75rem;\n  font-size: 1.25rem;\n  line-height: 1;\n  background: transparent no-repeat center center;\n  -webkit-background-size: 24px 24px;\n          background-size: 24px 24px;\n  border: 1px solid transparent;\n  border-radius: 0.25rem;\n}\n\n.navbar-toggler:focus, .navbar-toggler:hover {\n  text-decoration: none;\n}\n\n.navbar-toggleable-xs::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 575px) {\n  .navbar-toggleable-xs .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-xs .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-xs .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 576px) {\n  .navbar-toggleable-xs {\n    display: block;\n  }\n}\n\n.navbar-toggleable-sm::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 767px) {\n  .navbar-toggleable-sm .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-sm .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-sm .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 768px) {\n  .navbar-toggleable-sm {\n    display: block;\n  }\n}\n\n.navbar-toggleable-md::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 991px) {\n  .navbar-toggleable-md .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-md .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-md .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 992px) {\n  .navbar-toggleable-md {\n    display: block;\n  }\n}\n\n.navbar-toggleable-lg::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 1199px) {\n  .navbar-toggleable-lg .navbar-brand {\n    display: block;\n    float: none;\n    margin-top: .5rem;\n    margin-right: 0;\n  }\n  .navbar-toggleable-lg .navbar-nav {\n    margin-top: .5rem;\n    margin-bottom: .5rem;\n  }\n  .navbar-toggleable-lg .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n}\n\n@media (min-width: 1200px) {\n  .navbar-toggleable-lg {\n    display: block;\n  }\n}\n\n.navbar-toggleable-xl {\n  display: block;\n}\n\n.navbar-toggleable-xl::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.navbar-toggleable-xl .navbar-brand {\n  display: block;\n  float: none;\n  margin-top: .5rem;\n  margin-right: 0;\n}\n\n.navbar-toggleable-xl .navbar-nav {\n  margin-top: .5rem;\n  margin-bottom: .5rem;\n}\n\n.navbar-toggleable-xl .navbar-nav .dropdown-menu {\n  position: static;\n  float: none;\n}\n\n.navbar-nav .nav-item {\n  float: left;\n}\n\n.navbar-nav .nav-link {\n  display: block;\n  padding-top: .425rem;\n  padding-bottom: .425rem;\n}\n\n.navbar-nav .nav-link + .nav-link {\n  margin-left: 1rem;\n}\n\n.navbar-nav .nav-item + .nav-item {\n  margin-left: 1rem;\n}\n\n.navbar-light .navbar-brand,\n.navbar-light .navbar-toggler {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-brand:focus, .navbar-light .navbar-brand:hover,\n.navbar-light .navbar-toggler:focus,\n.navbar-light .navbar-toggler:hover {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-nav .nav-link {\n  color: rgba(0, 0, 0, 0.5);\n}\n\n.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {\n  color: rgba(0, 0, 0, 0.7);\n}\n\n.navbar-light .navbar-nav .open > .nav-link, .navbar-light .navbar-nav .open > .nav-link:focus, .navbar-light .navbar-nav .open > .nav-link:hover,\n.navbar-light .navbar-nav .active > .nav-link,\n.navbar-light .navbar-nav .active > .nav-link:focus,\n.navbar-light .navbar-nav .active > .nav-link:hover,\n.navbar-light .navbar-nav .nav-link.open,\n.navbar-light .navbar-nav .nav-link.open:focus,\n.navbar-light .navbar-nav .nav-link.open:hover,\n.navbar-light .navbar-nav .nav-link.active,\n.navbar-light .navbar-nav .nav-link.active:focus,\n.navbar-light .navbar-nav .nav-link.active:hover {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-toggler {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E\");\n  border-color: rgba(0, 0, 0, 0.1);\n}\n\n.navbar-light .navbar-divider {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.navbar-dark .navbar-brand,\n.navbar-dark .navbar-toggler {\n  color: white;\n}\n\n.navbar-dark .navbar-brand:focus, .navbar-dark .navbar-brand:hover,\n.navbar-dark .navbar-toggler:focus,\n.navbar-dark .navbar-toggler:hover {\n  color: white;\n}\n\n.navbar-dark .navbar-nav .nav-link {\n  color: rgba(255, 255, 255, 0.5);\n}\n\n.navbar-dark .navbar-nav .nav-link:focus, .navbar-dark .navbar-nav .nav-link:hover {\n  color: rgba(255, 255, 255, 0.75);\n}\n\n.navbar-dark .navbar-nav .open > .nav-link, .navbar-dark .navbar-nav .open > .nav-link:focus, .navbar-dark .navbar-nav .open > .nav-link:hover,\n.navbar-dark .navbar-nav .active > .nav-link,\n.navbar-dark .navbar-nav .active > .nav-link:focus,\n.navbar-dark .navbar-nav .active > .nav-link:hover,\n.navbar-dark .navbar-nav .nav-link.open,\n.navbar-dark .navbar-nav .nav-link.open:focus,\n.navbar-dark .navbar-nav .nav-link.open:hover,\n.navbar-dark .navbar-nav .nav-link.active,\n.navbar-dark .navbar-nav .nav-link.active:focus,\n.navbar-dark .navbar-nav .nav-link.active:hover {\n  color: white;\n}\n\n.navbar-dark .navbar-toggler {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E\");\n  border-color: rgba(255, 255, 255, 0.1);\n}\n\n.navbar-dark .navbar-divider {\n  background-color: rgba(255, 255, 255, 0.075);\n}\n\n.navbar-toggleable-xs::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 575px) {\n  .navbar-toggleable-xs .navbar-nav .nav-item {\n    float: none;\n    margin-left: 0;\n  }\n}\n\n@media (min-width: 576px) {\n  .navbar-toggleable-xs {\n    display: block !important;\n  }\n}\n\n.navbar-toggleable-sm::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 767px) {\n  .navbar-toggleable-sm .navbar-nav .nav-item {\n    float: none;\n    margin-left: 0;\n  }\n}\n\n@media (min-width: 768px) {\n  .navbar-toggleable-sm {\n    display: block !important;\n  }\n}\n\n.navbar-toggleable-md::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n@media (max-width: 991px) {\n  .navbar-toggleable-md .navbar-nav .nav-item {\n    float: none;\n    margin-left: 0;\n  }\n}\n\n@media (min-width: 992px) {\n  .navbar-toggleable-md {\n    display: block !important;\n  }\n}\n\n.card {\n  position: relative;\n  display: block;\n  margin-bottom: 0.75rem;\n  background-color: #fff;\n  border-radius: 0.25rem;\n  border: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-block {\n  padding: 1.25rem;\n}\n\n.card-block::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.card-title {\n  margin-bottom: 0.75rem;\n}\n\n.card-subtitle {\n  margin-top: -0.375rem;\n  margin-bottom: 0;\n}\n\n.card-text:last-child {\n  margin-bottom: 0;\n}\n\n.card-link:hover {\n  text-decoration: none;\n}\n\n.card-link + .card-link {\n  margin-left: 1.25rem;\n}\n\n.card > .list-group:first-child .list-group-item:first-child {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.card > .list-group:last-child .list-group-item:last-child {\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.card-header {\n  padding: 0.75rem 1.25rem;\n  margin-bottom: 0;\n  background-color: #f5f5f5;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-header::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.card-header:first-child {\n  border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;\n}\n\n.card-footer {\n  padding: 0.75rem 1.25rem;\n  background-color: #f5f5f5;\n  border-top: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-footer::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.card-footer:last-child {\n  border-radius: 0 0 calc(0.25rem - 1px) calc(0.25rem - 1px);\n}\n\n.card-header-tabs {\n  margin-right: -0.625rem;\n  margin-bottom: -0.75rem;\n  margin-left: -0.625rem;\n  border-bottom: 0;\n}\n\n.card-header-pills {\n  margin-right: -0.625rem;\n  margin-left: -0.625rem;\n}\n\n.card-primary {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.card-primary .card-header,\n.card-primary .card-footer {\n  background-color: transparent;\n}\n\n.card-success {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.card-success .card-header,\n.card-success .card-footer {\n  background-color: transparent;\n}\n\n.card-info {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.card-info .card-header,\n.card-info .card-footer {\n  background-color: transparent;\n}\n\n.card-warning {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.card-warning .card-header,\n.card-warning .card-footer {\n  background-color: transparent;\n}\n\n.card-danger {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.card-danger .card-header,\n.card-danger .card-footer {\n  background-color: transparent;\n}\n\n.card-outline-primary {\n  background-color: transparent;\n  border-color: #0275d8;\n}\n\n.card-outline-secondary {\n  background-color: transparent;\n  border-color: #ccc;\n}\n\n.card-outline-info {\n  background-color: transparent;\n  border-color: #5bc0de;\n}\n\n.card-outline-success {\n  background-color: transparent;\n  border-color: #5cb85c;\n}\n\n.card-outline-warning {\n  background-color: transparent;\n  border-color: #f0ad4e;\n}\n\n.card-outline-danger {\n  background-color: transparent;\n  border-color: #d9534f;\n}\n\n.card-inverse .card-header,\n.card-inverse .card-footer {\n  border-color: rgba(255, 255, 255, 0.2);\n}\n\n.card-inverse .card-header,\n.card-inverse .card-footer,\n.card-inverse .card-title,\n.card-inverse .card-blockquote {\n  color: #fff;\n}\n\n.card-inverse .card-link,\n.card-inverse .card-text,\n.card-inverse .card-subtitle,\n.card-inverse .card-blockquote .blockquote-footer {\n  color: rgba(255, 255, 255, 0.65);\n}\n\n.card-inverse .card-link:focus, .card-inverse .card-link:hover {\n  color: #fff;\n}\n\n.card-blockquote {\n  padding: 0;\n  margin-bottom: 0;\n  border-left: 0;\n}\n\n.card-img {\n  border-radius: calc(0.25rem - 1px);\n}\n\n.card-img-overlay {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  padding: 1.25rem;\n}\n\n.card-img-top {\n  border-top-right-radius: calc(0.25rem - 1px);\n  border-top-left-radius: calc(0.25rem - 1px);\n}\n\n.card-img-bottom {\n  border-bottom-right-radius: calc(0.25rem - 1px);\n  border-bottom-left-radius: calc(0.25rem - 1px);\n}\n\n@media (min-width: 576px) {\n  .card-deck {\n    display: table;\n    width: 100%;\n    margin-bottom: 0.75rem;\n    table-layout: fixed;\n    border-spacing: 1.25rem 0;\n  }\n  .card-deck .card {\n    display: table-cell;\n    margin-bottom: 0;\n    vertical-align: top;\n  }\n  .card-deck-wrapper {\n    margin-right: -1.25rem;\n    margin-left: -1.25rem;\n  }\n}\n\n@media (min-width: 576px) {\n  .card-group {\n    display: table;\n    width: 100%;\n    table-layout: fixed;\n  }\n  .card-group .card {\n    display: table-cell;\n    vertical-align: top;\n  }\n  .card-group .card + .card {\n    margin-left: 0;\n    border-left: 0;\n  }\n  .card-group .card:first-child {\n    border-bottom-right-radius: 0;\n    border-top-right-radius: 0;\n  }\n  .card-group .card:first-child .card-img-top {\n    border-top-right-radius: 0;\n  }\n  .card-group .card:first-child .card-img-bottom {\n    border-bottom-right-radius: 0;\n  }\n  .card-group .card:last-child {\n    border-bottom-left-radius: 0;\n    border-top-left-radius: 0;\n  }\n  .card-group .card:last-child .card-img-top {\n    border-top-left-radius: 0;\n  }\n  .card-group .card:last-child .card-img-bottom {\n    border-bottom-left-radius: 0;\n  }\n  .card-group .card:not(:first-child):not(:last-child) {\n    border-radius: 0;\n  }\n  .card-group .card:not(:first-child):not(:last-child) .card-img-top,\n  .card-group .card:not(:first-child):not(:last-child) .card-img-bottom {\n    border-radius: 0;\n  }\n}\n\n@media (min-width: 576px) {\n  .card-columns {\n    -webkit-column-count: 3;\n       -moz-column-count: 3;\n            column-count: 3;\n    -webkit-column-gap: 1.25rem;\n       -moz-column-gap: 1.25rem;\n            column-gap: 1.25rem;\n  }\n  .card-columns .card {\n    display: inline-block;\n    width: 100%;\n  }\n}\n\n.breadcrumb {\n  padding: 0.75rem 1rem;\n  margin-bottom: 1rem;\n  list-style: none;\n  background-color: #eceeef;\n  border-radius: 0.25rem;\n}\n\n.breadcrumb::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.breadcrumb-item {\n  float: left;\n}\n\n.breadcrumb-item + .breadcrumb-item::before {\n  display: inline-block;\n  padding-right: 0.5rem;\n  padding-left: 0.5rem;\n  color: #818a91;\n  content: \"/\";\n}\n\n.breadcrumb-item + .breadcrumb-item:hover::before {\n  text-decoration: underline;\n}\n\n.breadcrumb-item + .breadcrumb-item:hover::before {\n  text-decoration: none;\n}\n\n.breadcrumb-item.active {\n  color: #818a91;\n}\n\n.pagination {\n  display: inline-block;\n  padding-left: 0;\n  margin-top: 1rem;\n  margin-bottom: 1rem;\n  border-radius: 0.25rem;\n}\n\n.page-item {\n  display: inline;\n}\n\n.page-item:first-child .page-link {\n  margin-left: 0;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.page-item:last-child .page-link {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.page-item.active .page-link, .page-item.active .page-link:focus, .page-item.active .page-link:hover {\n  z-index: 2;\n  color: #fff;\n  cursor: default;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.page-item.disabled .page-link, .page-item.disabled .page-link:focus, .page-item.disabled .page-link:hover {\n  color: #818a91;\n  pointer-events: none;\n  cursor: not-allowed;\n  background-color: #fff;\n  border-color: #ddd;\n}\n\n.page-link {\n  position: relative;\n  float: left;\n  padding: 0.5rem 0.75rem;\n  margin-left: -1px;\n  color: #0275d8;\n  text-decoration: none;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n\n.page-link:focus, .page-link:hover {\n  color: #014c8c;\n  background-color: #eceeef;\n  border-color: #ddd;\n}\n\n.pagination-lg .page-link {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n}\n\n.pagination-lg .page-item:first-child .page-link {\n  border-bottom-left-radius: 0.3rem;\n  border-top-left-radius: 0.3rem;\n}\n\n.pagination-lg .page-item:last-child .page-link {\n  border-bottom-right-radius: 0.3rem;\n  border-top-right-radius: 0.3rem;\n}\n\n.pagination-sm .page-link {\n  padding: 0.275rem 0.75rem;\n  font-size: 0.875rem;\n}\n\n.pagination-sm .page-item:first-child .page-link {\n  border-bottom-left-radius: 0.2rem;\n  border-top-left-radius: 0.2rem;\n}\n\n.pagination-sm .page-item:last-child .page-link {\n  border-bottom-right-radius: 0.2rem;\n  border-top-right-radius: 0.2rem;\n}\n\n.tag {\n  display: inline-block;\n  padding: 0.25em 0.4em;\n  font-size: 75%;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: baseline;\n  border-radius: 0.25rem;\n}\n\n.tag:empty {\n  display: none;\n}\n\n.btn .tag {\n  position: relative;\n  top: -1px;\n}\n\na.tag:focus, a.tag:hover {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n\n.tag-pill {\n  padding-right: 0.6em;\n  padding-left: 0.6em;\n  border-radius: 10rem;\n}\n\n.tag-default {\n  background-color: #818a91;\n}\n\n.tag-default[href]:focus, .tag-default[href]:hover {\n  background-color: #687077;\n}\n\n.tag-primary {\n  background-color: #0275d8;\n}\n\n.tag-primary[href]:focus, .tag-primary[href]:hover {\n  background-color: #025aa5;\n}\n\n.tag-success {\n  background-color: #5cb85c;\n}\n\n.tag-success[href]:focus, .tag-success[href]:hover {\n  background-color: #449d44;\n}\n\n.tag-info {\n  background-color: #5bc0de;\n}\n\n.tag-info[href]:focus, .tag-info[href]:hover {\n  background-color: #31b0d5;\n}\n\n.tag-warning {\n  background-color: #f0ad4e;\n}\n\n.tag-warning[href]:focus, .tag-warning[href]:hover {\n  background-color: #ec971f;\n}\n\n.tag-danger {\n  background-color: #d9534f;\n}\n\n.tag-danger[href]:focus, .tag-danger[href]:hover {\n  background-color: #c9302c;\n}\n\n.jumbotron {\n  padding: 2rem 1rem;\n  margin-bottom: 2rem;\n  background-color: #eceeef;\n  border-radius: 0.3rem;\n}\n\n@media (min-width: 576px) {\n  .jumbotron {\n    padding: 4rem 2rem;\n  }\n}\n\n.jumbotron-hr {\n  border-top-color: #d0d5d8;\n}\n\n.jumbotron-fluid {\n  padding-right: 0;\n  padding-left: 0;\n  border-radius: 0;\n}\n\n.alert {\n  padding: 0.75rem 1.25rem;\n  margin-bottom: 1rem;\n  border: 1px solid transparent;\n  border-radius: 0.25rem;\n}\n\n.alert-heading {\n  color: inherit;\n}\n\n.alert-link {\n  font-weight: bold;\n}\n\n.alert-dismissible {\n  padding-right: 2.5rem;\n}\n\n.alert-dismissible .close {\n  position: relative;\n  top: -.125rem;\n  right: -1.25rem;\n  color: inherit;\n}\n\n.alert-success {\n  background-color: #dff0d8;\n  border-color: #d0e9c6;\n  color: #3c763d;\n}\n\n.alert-success hr {\n  border-top-color: #c1e2b3;\n}\n\n.alert-success .alert-link {\n  color: #2b542c;\n}\n\n.alert-info {\n  background-color: #d9edf7;\n  border-color: #bcdff1;\n  color: #31708f;\n}\n\n.alert-info hr {\n  border-top-color: #a6d5ec;\n}\n\n.alert-info .alert-link {\n  color: #245269;\n}\n\n.alert-warning {\n  background-color: #fcf8e3;\n  border-color: #faf2cc;\n  color: #8a6d3b;\n}\n\n.alert-warning hr {\n  border-top-color: #f7ecb5;\n}\n\n.alert-warning .alert-link {\n  color: #66512c;\n}\n\n.alert-danger {\n  background-color: #f2dede;\n  border-color: #ebcccc;\n  color: #a94442;\n}\n\n.alert-danger hr {\n  border-top-color: #e4b9b9;\n}\n\n.alert-danger .alert-link {\n  color: #843534;\n}\n\n@-webkit-keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n@-o-keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n@keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n.progress {\n  display: block;\n  width: 100%;\n  height: 1rem;\n  margin-bottom: 1rem;\n}\n\n.progress[value] {\n  background-color: #eee;\n  border: 0;\n  -webkit-appearance: none;\n     -moz-appearance: none;\n          appearance: none;\n  border-radius: 0.25rem;\n}\n\n.progress[value]::-ms-fill {\n  background-color: #0074d9;\n  border: 0;\n}\n\n.progress[value]::-moz-progress-bar {\n  background-color: #0074d9;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.progress[value]::-webkit-progress-value {\n  background-color: #0074d9;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.progress[value=\"100\"]::-moz-progress-bar {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.progress[value=\"100\"]::-webkit-progress-value {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.progress[value]::-webkit-progress-bar {\n  background-color: #eee;\n  border-radius: 0.25rem;\n}\n\nbase::-moz-progress-bar,\n.progress[value] {\n  background-color: #eee;\n  border-radius: 0.25rem;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress {\n    background-color: #eee;\n    border-radius: 0.25rem;\n  }\n  .progress-bar {\n    display: inline-block;\n    height: 1rem;\n    text-indent: -999rem;\n    background-color: #0074d9;\n    border-bottom-left-radius: 0.25rem;\n    border-top-left-radius: 0.25rem;\n  }\n  .progress[width=\"100%\"] {\n    border-bottom-right-radius: 0.25rem;\n    border-top-right-radius: 0.25rem;\n  }\n}\n\n.progress-striped[value]::-webkit-progress-value {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  -webkit-background-size: 1rem 1rem;\n          background-size: 1rem 1rem;\n}\n\n.progress-striped[value]::-moz-progress-bar {\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-size: 1rem 1rem;\n}\n\n.progress-striped[value]::-ms-fill {\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-size: 1rem 1rem;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-bar-striped {\n    background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n    background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n    -webkit-background-size: 1rem 1rem;\n            background-size: 1rem 1rem;\n  }\n}\n\n.progress-animated[value]::-webkit-progress-value {\n  -webkit-animation: progress-bar-stripes 2s linear infinite;\n          animation: progress-bar-stripes 2s linear infinite;\n}\n\n.progress-animated[value]::-moz-progress-bar {\n  animation: progress-bar-stripes 2s linear infinite;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-animated .progress-bar-striped {\n    -webkit-animation: progress-bar-stripes 2s linear infinite;\n         -o-animation: progress-bar-stripes 2s linear infinite;\n            animation: progress-bar-stripes 2s linear infinite;\n  }\n}\n\n.progress-success[value]::-webkit-progress-value {\n  background-color: #5cb85c;\n}\n\n.progress-success[value]::-moz-progress-bar {\n  background-color: #5cb85c;\n}\n\n.progress-success[value]::-ms-fill {\n  background-color: #5cb85c;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-success .progress-bar {\n    background-color: #5cb85c;\n  }\n}\n\n.progress-info[value]::-webkit-progress-value {\n  background-color: #5bc0de;\n}\n\n.progress-info[value]::-moz-progress-bar {\n  background-color: #5bc0de;\n}\n\n.progress-info[value]::-ms-fill {\n  background-color: #5bc0de;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-info .progress-bar {\n    background-color: #5bc0de;\n  }\n}\n\n.progress-warning[value]::-webkit-progress-value {\n  background-color: #f0ad4e;\n}\n\n.progress-warning[value]::-moz-progress-bar {\n  background-color: #f0ad4e;\n}\n\n.progress-warning[value]::-ms-fill {\n  background-color: #f0ad4e;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-warning .progress-bar {\n    background-color: #f0ad4e;\n  }\n}\n\n.progress-danger[value]::-webkit-progress-value {\n  background-color: #d9534f;\n}\n\n.progress-danger[value]::-moz-progress-bar {\n  background-color: #d9534f;\n}\n\n.progress-danger[value]::-ms-fill {\n  background-color: #d9534f;\n}\n\n@media screen and (min-width: 0\\0) {\n  .progress-danger .progress-bar {\n    background-color: #d9534f;\n  }\n}\n\n.media,\n.media-body {\n  overflow: hidden;\n}\n\n.media-body {\n  width: 10000px;\n}\n\n.media-left,\n.media-right,\n.media-body {\n  display: table-cell;\n  vertical-align: top;\n}\n\n.media-middle {\n  vertical-align: middle;\n}\n\n.media-bottom {\n  vertical-align: bottom;\n}\n\n.media-object {\n  display: block;\n}\n\n.media-object.img-thumbnail {\n  max-width: none;\n}\n\n.media-right {\n  padding-left: 10px;\n}\n\n.media-left {\n  padding-right: 10px;\n}\n\n.media-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n\n.media-list {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-group {\n  padding-left: 0;\n  margin-bottom: 0;\n}\n\n.list-group-item {\n  position: relative;\n  display: block;\n  padding: 0.75rem 1.25rem;\n  margin-bottom: -1px;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n\n.list-group-item:first-child {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.list-group-item:last-child {\n  margin-bottom: 0;\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.list-group-item.disabled, .list-group-item.disabled:focus, .list-group-item.disabled:hover {\n  color: #818a91;\n  cursor: not-allowed;\n  background-color: #eceeef;\n}\n\n.list-group-item.disabled .list-group-item-heading, .list-group-item.disabled:focus .list-group-item-heading, .list-group-item.disabled:hover .list-group-item-heading {\n  color: inherit;\n}\n\n.list-group-item.disabled .list-group-item-text, .list-group-item.disabled:focus .list-group-item-text, .list-group-item.disabled:hover .list-group-item-text {\n  color: #818a91;\n}\n\n.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {\n  z-index: 2;\n  color: #fff;\n  text-decoration: none;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.list-group-item.active .list-group-item-heading,\n.list-group-item.active .list-group-item-heading > small,\n.list-group-item.active .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading,\n.list-group-item.active:focus .list-group-item-heading > small,\n.list-group-item.active:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading,\n.list-group-item.active:hover .list-group-item-heading > small,\n.list-group-item.active:hover .list-group-item-heading > .small {\n  color: inherit;\n}\n\n.list-group-item.active .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text {\n  color: #a8d6fe;\n}\n\n.list-group-flush .list-group-item {\n  border-right: 0;\n  border-left: 0;\n  border-radius: 0;\n}\n\n.list-group-item-action {\n  width: 100%;\n  color: #555;\n  text-align: inherit;\n}\n\n.list-group-item-action .list-group-item-heading {\n  color: #333;\n}\n\n.list-group-item-action:focus, .list-group-item-action:hover {\n  color: #555;\n  text-decoration: none;\n  background-color: #f5f5f5;\n}\n\n.list-group-item-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n}\n\na.list-group-item-success,\nbutton.list-group-item-success {\n  color: #3c763d;\n}\n\na.list-group-item-success .list-group-item-heading,\nbutton.list-group-item-success .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-success:focus, a.list-group-item-success:hover,\nbutton.list-group-item-success:focus,\nbutton.list-group-item-success:hover {\n  color: #3c763d;\n  background-color: #d0e9c6;\n}\n\na.list-group-item-success.active, a.list-group-item-success.active:focus, a.list-group-item-success.active:hover,\nbutton.list-group-item-success.active,\nbutton.list-group-item-success.active:focus,\nbutton.list-group-item-success.active:hover {\n  color: #fff;\n  background-color: #3c763d;\n  border-color: #3c763d;\n}\n\n.list-group-item-info {\n  color: #31708f;\n  background-color: #d9edf7;\n}\n\na.list-group-item-info,\nbutton.list-group-item-info {\n  color: #31708f;\n}\n\na.list-group-item-info .list-group-item-heading,\nbutton.list-group-item-info .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-info:focus, a.list-group-item-info:hover,\nbutton.list-group-item-info:focus,\nbutton.list-group-item-info:hover {\n  color: #31708f;\n  background-color: #c4e3f3;\n}\n\na.list-group-item-info.active, a.list-group-item-info.active:focus, a.list-group-item-info.active:hover,\nbutton.list-group-item-info.active,\nbutton.list-group-item-info.active:focus,\nbutton.list-group-item-info.active:hover {\n  color: #fff;\n  background-color: #31708f;\n  border-color: #31708f;\n}\n\n.list-group-item-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n}\n\na.list-group-item-warning,\nbutton.list-group-item-warning {\n  color: #8a6d3b;\n}\n\na.list-group-item-warning .list-group-item-heading,\nbutton.list-group-item-warning .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-warning:focus, a.list-group-item-warning:hover,\nbutton.list-group-item-warning:focus,\nbutton.list-group-item-warning:hover {\n  color: #8a6d3b;\n  background-color: #faf2cc;\n}\n\na.list-group-item-warning.active, a.list-group-item-warning.active:focus, a.list-group-item-warning.active:hover,\nbutton.list-group-item-warning.active,\nbutton.list-group-item-warning.active:focus,\nbutton.list-group-item-warning.active:hover {\n  color: #fff;\n  background-color: #8a6d3b;\n  border-color: #8a6d3b;\n}\n\n.list-group-item-danger {\n  color: #a94442;\n  background-color: #f2dede;\n}\n\na.list-group-item-danger,\nbutton.list-group-item-danger {\n  color: #a94442;\n}\n\na.list-group-item-danger .list-group-item-heading,\nbutton.list-group-item-danger .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-danger:focus, a.list-group-item-danger:hover,\nbutton.list-group-item-danger:focus,\nbutton.list-group-item-danger:hover {\n  color: #a94442;\n  background-color: #ebcccc;\n}\n\na.list-group-item-danger.active, a.list-group-item-danger.active:focus, a.list-group-item-danger.active:hover,\nbutton.list-group-item-danger.active,\nbutton.list-group-item-danger.active:focus,\nbutton.list-group-item-danger.active:hover {\n  color: #fff;\n  background-color: #a94442;\n  border-color: #a94442;\n}\n\n.list-group-item-heading {\n  margin-top: 0;\n  margin-bottom: 5px;\n}\n\n.list-group-item-text {\n  margin-bottom: 0;\n  line-height: 1.3;\n}\n\n.embed-responsive {\n  position: relative;\n  display: block;\n  height: 0;\n  padding: 0;\n  overflow: hidden;\n}\n\n.embed-responsive .embed-responsive-item,\n.embed-responsive iframe,\n.embed-responsive embed,\n.embed-responsive object,\n.embed-responsive video {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: 0;\n}\n\n.embed-responsive-21by9 {\n  padding-bottom: 42.857143%;\n}\n\n.embed-responsive-16by9 {\n  padding-bottom: 56.25%;\n}\n\n.embed-responsive-4by3 {\n  padding-bottom: 75%;\n}\n\n.embed-responsive-1by1 {\n  padding-bottom: 100%;\n}\n\n.close {\n  float: right;\n  font-size: 1.5rem;\n  font-weight: bold;\n  line-height: 1;\n  color: #000;\n  text-shadow: 0 1px 0 #fff;\n  opacity: .2;\n}\n\n.close:focus, .close:hover {\n  color: #000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: .5;\n}\n\nbutton.close {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n\n.modal-open {\n  overflow: hidden;\n}\n\n.modal {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1050;\n  display: none;\n  overflow: hidden;\n  outline: 0;\n}\n\n.modal.fade .modal-dialog {\n  -webkit-transition: -webkit-transform .3s ease-out;\n  transition: -webkit-transform .3s ease-out;\n  -o-transition: -o-transform .3s ease-out;\n  transition: transform .3s ease-out;\n  transition: transform .3s ease-out, -webkit-transform .3s ease-out, -o-transform .3s ease-out;\n  -webkit-transform: translate(0, -25%);\n      -ms-transform: translate(0, -25%);\n       -o-transform: translate(0, -25%);\n          transform: translate(0, -25%);\n}\n\n.modal.in .modal-dialog {\n  -webkit-transform: translate(0, 0);\n      -ms-transform: translate(0, 0);\n       -o-transform: translate(0, 0);\n          transform: translate(0, 0);\n}\n\n.modal-open .modal {\n  overflow-x: hidden;\n  overflow-y: auto;\n}\n\n.modal-dialog {\n  position: relative;\n  width: auto;\n  margin: 10px;\n}\n\n.modal-content {\n  position: relative;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  border-radius: 0.3rem;\n  outline: 0;\n}\n\n.modal-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1040;\n  background-color: #000;\n}\n\n.modal-backdrop.fade {\n  opacity: 0;\n}\n\n.modal-backdrop.in {\n  opacity: 0.5;\n}\n\n.modal-header {\n  padding: 15px;\n  border-bottom: 1px solid #e5e5e5;\n}\n\n.modal-header::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.modal-header .close {\n  margin-top: -2px;\n}\n\n.modal-title {\n  margin: 0;\n  line-height: 1.5;\n}\n\n.modal-body {\n  position: relative;\n  padding: 15px;\n}\n\n.modal-footer {\n  padding: 15px;\n  text-align: right;\n  border-top: 1px solid #e5e5e5;\n}\n\n.modal-footer::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.modal-scrollbar-measure {\n  position: absolute;\n  top: -9999px;\n  width: 50px;\n  height: 50px;\n  overflow: scroll;\n}\n\n@media (min-width: 576px) {\n  .modal-dialog {\n    max-width: 600px;\n    margin: 30px auto;\n  }\n  .modal-sm {\n    max-width: 300px;\n  }\n}\n\n@media (min-width: 992px) {\n  .modal-lg {\n    max-width: 900px;\n  }\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 1070;\n  display: block;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  letter-spacing: normal;\n  line-break: auto;\n  line-height: 1.5;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  white-space: normal;\n  word-break: normal;\n  word-spacing: normal;\n  font-size: 0.875rem;\n  word-wrap: break-word;\n  opacity: 0;\n}\n\n.tooltip.in {\n  opacity: 0.9;\n}\n\n.tooltip.tooltip-top, .tooltip.bs-tether-element-attached-bottom {\n  padding: 5px 0;\n  margin-top: -3px;\n}\n\n.tooltip.tooltip-top .tooltip-inner::before, .tooltip.bs-tether-element-attached-bottom .tooltip-inner::before {\n  bottom: 0;\n  left: 50%;\n  margin-left: -5px;\n  content: \"\";\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n\n.tooltip.tooltip-right, .tooltip.bs-tether-element-attached-left {\n  padding: 0 5px;\n  margin-left: 3px;\n}\n\n.tooltip.tooltip-right .tooltip-inner::before, .tooltip.bs-tether-element-attached-left .tooltip-inner::before {\n  top: 50%;\n  left: 0;\n  margin-top: -5px;\n  content: \"\";\n  border-width: 5px 5px 5px 0;\n  border-right-color: #000;\n}\n\n.tooltip.tooltip-bottom, .tooltip.bs-tether-element-attached-top {\n  padding: 5px 0;\n  margin-top: 3px;\n}\n\n.tooltip.tooltip-bottom .tooltip-inner::before, .tooltip.bs-tether-element-attached-top .tooltip-inner::before {\n  top: 0;\n  left: 50%;\n  margin-left: -5px;\n  content: \"\";\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n\n.tooltip.tooltip-left, .tooltip.bs-tether-element-attached-right {\n  padding: 0 5px;\n  margin-left: -3px;\n}\n\n.tooltip.tooltip-left .tooltip-inner::before, .tooltip.bs-tether-element-attached-right .tooltip-inner::before {\n  top: 50%;\n  right: 0;\n  margin-top: -5px;\n  content: \"\";\n  border-width: 5px 0 5px 5px;\n  border-left-color: #000;\n}\n\n.tooltip-inner {\n  max-width: 200px;\n  padding: 3px 8px;\n  color: #fff;\n  text-align: center;\n  background-color: #000;\n  border-radius: 0.25rem;\n}\n\n.tooltip-inner::before {\n  position: absolute;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n\n.popover {\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1060;\n  display: block;\n  max-width: 276px;\n  padding: 1px;\n  font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  letter-spacing: normal;\n  line-break: auto;\n  line-height: 1.5;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  white-space: normal;\n  word-break: normal;\n  word-spacing: normal;\n  font-size: 0.875rem;\n  word-wrap: break-word;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  border-radius: 0.3rem;\n}\n\n.popover.popover-top, .popover.bs-tether-element-attached-bottom {\n  margin-top: -10px;\n}\n\n.popover.popover-top::before, .popover.popover-top::after, .popover.bs-tether-element-attached-bottom::before, .popover.bs-tether-element-attached-bottom::after {\n  left: 50%;\n  border-bottom-width: 0;\n}\n\n.popover.popover-top::before, .popover.bs-tether-element-attached-bottom::before {\n  bottom: -11px;\n  margin-left: -11px;\n  border-top-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-top::after, .popover.bs-tether-element-attached-bottom::after {\n  bottom: -10px;\n  margin-left: -10px;\n  border-top-color: #fff;\n}\n\n.popover.popover-right, .popover.bs-tether-element-attached-left {\n  margin-left: 10px;\n}\n\n.popover.popover-right::before, .popover.popover-right::after, .popover.bs-tether-element-attached-left::before, .popover.bs-tether-element-attached-left::after {\n  top: 50%;\n  border-left-width: 0;\n}\n\n.popover.popover-right::before, .popover.bs-tether-element-attached-left::before {\n  left: -11px;\n  margin-top: -11px;\n  border-right-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-right::after, .popover.bs-tether-element-attached-left::after {\n  left: -10px;\n  margin-top: -10px;\n  border-right-color: #fff;\n}\n\n.popover.popover-bottom, .popover.bs-tether-element-attached-top {\n  margin-top: 10px;\n}\n\n.popover.popover-bottom::before, .popover.popover-bottom::after, .popover.bs-tether-element-attached-top::before, .popover.bs-tether-element-attached-top::after {\n  left: 50%;\n  border-top-width: 0;\n}\n\n.popover.popover-bottom::before, .popover.bs-tether-element-attached-top::before {\n  top: -11px;\n  margin-left: -11px;\n  border-bottom-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-bottom::after, .popover.bs-tether-element-attached-top::after {\n  top: -10px;\n  margin-left: -10px;\n  border-bottom-color: #f7f7f7;\n}\n\n.popover.popover-bottom .popover-title::before, .popover.bs-tether-element-attached-top .popover-title::before {\n  position: absolute;\n  top: 0;\n  left: 50%;\n  display: block;\n  width: 20px;\n  margin-left: -10px;\n  content: \"\";\n  border-bottom: 1px solid #f7f7f7;\n}\n\n.popover.popover-left, .popover.bs-tether-element-attached-right {\n  margin-left: -10px;\n}\n\n.popover.popover-left::before, .popover.popover-left::after, .popover.bs-tether-element-attached-right::before, .popover.bs-tether-element-attached-right::after {\n  top: 50%;\n  border-right-width: 0;\n}\n\n.popover.popover-left::before, .popover.bs-tether-element-attached-right::before {\n  right: -11px;\n  margin-top: -11px;\n  border-left-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-left::after, .popover.bs-tether-element-attached-right::after {\n  right: -10px;\n  margin-top: -10px;\n  border-left-color: #fff;\n}\n\n.popover-title {\n  padding: 8px 14px;\n  margin: 0;\n  font-size: 1rem;\n  background-color: #f7f7f7;\n  border-bottom: 1px solid #ebebeb;\n  border-radius: 0.2375rem 0.2375rem 0 0;\n}\n\n.popover-title:empty {\n  display: none;\n}\n\n.popover-content {\n  padding: 9px 14px;\n}\n\n.popover::before,\n.popover::after {\n  position: absolute;\n  display: block;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n\n.popover::before {\n  content: \"\";\n  border-width: 11px;\n}\n\n.popover::after {\n  content: \"\";\n  border-width: 10px;\n}\n\n.carousel {\n  position: relative;\n}\n\n.carousel-inner {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n}\n\n.carousel-inner > .carousel-item {\n  position: relative;\n  display: none;\n  -webkit-transition: .6s ease-in-out left;\n  -o-transition: .6s ease-in-out left;\n  transition: .6s ease-in-out left;\n}\n\n.carousel-inner > .carousel-item > img,\n.carousel-inner > .carousel-item > a > img {\n  line-height: 1;\n}\n\n@media all and (transform-3d), (-webkit-transform-3d) {\n  .carousel-inner > .carousel-item {\n    -webkit-transition: -webkit-transform .6s ease-in-out;\n    transition: -webkit-transform .6s ease-in-out;\n    -o-transition: -o-transform .6s ease-in-out;\n    transition: transform .6s ease-in-out;\n    transition: transform .6s ease-in-out, -webkit-transform .6s ease-in-out, -o-transform .6s ease-in-out;\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n  .carousel-inner > .carousel-item.next, .carousel-inner > .carousel-item.active.right {\n    left: 0;\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-inner > .carousel-item.prev, .carousel-inner > .carousel-item.active.left {\n    left: 0;\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n  .carousel-inner > .carousel-item.next.left, .carousel-inner > .carousel-item.prev.right, .carousel-inner > .carousel-item.active {\n    left: 0;\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n}\n\n.carousel-inner > .active,\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  display: block;\n}\n\n.carousel-inner > .active {\n  left: 0;\n}\n\n.carousel-inner > .next,\n.carousel-inner > .prev {\n  position: absolute;\n  top: 0;\n  width: 100%;\n}\n\n.carousel-inner > .next {\n  left: 100%;\n}\n\n.carousel-inner > .prev {\n  left: -100%;\n}\n\n.carousel-inner > .next.left,\n.carousel-inner > .prev.right {\n  left: 0;\n}\n\n.carousel-inner > .active.left {\n  left: -100%;\n}\n\n.carousel-inner > .active.right {\n  left: 100%;\n}\n\n.carousel-control {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 15%;\n  font-size: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);\n  opacity: 0.5;\n}\n\n.carousel-control.left {\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.0001)));\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);\n  background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);\n  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.0001) 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#80000000', endColorstr='#00000000', GradientType=1);\n}\n\n.carousel-control.right {\n  right: 0;\n  left: auto;\n  background-image: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0.0001)), to(rgba(0, 0, 0, 0.5)));\n  background-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);\n  background-image: -o-linear-gradient(left, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);\n  background-image: linear-gradient(to right, rgba(0, 0, 0, 0.0001) 0%, rgba(0, 0, 0, 0.5) 100%);\n  background-repeat: repeat-x;\n  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#80000000', GradientType=1);\n}\n\n.carousel-control:focus, .carousel-control:hover {\n  color: #fff;\n  text-decoration: none;\n  outline: 0;\n  opacity: .9;\n}\n\n.carousel-control .icon-prev,\n.carousel-control .icon-next {\n  position: absolute;\n  top: 50%;\n  z-index: 5;\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  margin-top: -10px;\n  font-family: serif;\n  line-height: 1;\n}\n\n.carousel-control .icon-prev {\n  left: 50%;\n  margin-left: -10px;\n}\n\n.carousel-control .icon-next {\n  right: 50%;\n  margin-right: -10px;\n}\n\n.carousel-control .icon-prev::before {\n  content: \"\\2039\";\n}\n\n.carousel-control .icon-next::before {\n  content: \"\\203a\";\n}\n\n.carousel-indicators {\n  position: absolute;\n  bottom: 10px;\n  left: 50%;\n  z-index: 15;\n  width: 60%;\n  padding-left: 0;\n  margin-left: -30%;\n  text-align: center;\n  list-style: none;\n}\n\n.carousel-indicators li {\n  display: inline-block;\n  width: 10px;\n  height: 10px;\n  margin: 1px;\n  text-indent: -999px;\n  cursor: pointer;\n  background-color: transparent;\n  border: 1px solid #fff;\n  border-radius: 10px;\n}\n\n.carousel-indicators .active {\n  width: 12px;\n  height: 12px;\n  margin: 0;\n  background-color: #fff;\n}\n\n.carousel-caption {\n  position: absolute;\n  right: 15%;\n  bottom: 20px;\n  left: 15%;\n  z-index: 10;\n  padding-top: 20px;\n  padding-bottom: 20px;\n  color: #fff;\n  text-align: center;\n  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);\n}\n\n.carousel-caption .btn {\n  text-shadow: none;\n}\n\n@media (min-width: 576px) {\n  .carousel-control .icon-prev,\n  .carousel-control .icon-next {\n    width: 30px;\n    height: 30px;\n    margin-top: -15px;\n    font-size: 30px;\n  }\n  .carousel-control .icon-prev {\n    margin-left: -15px;\n  }\n  .carousel-control .icon-next {\n    margin-right: -15px;\n  }\n  .carousel-caption {\n    right: 20%;\n    left: 20%;\n    padding-bottom: 30px;\n  }\n  .carousel-indicators {\n    bottom: 20px;\n  }\n}\n\n.align-baseline {\n  vertical-align: baseline !important;\n}\n\n.align-top {\n  vertical-align: top !important;\n}\n\n.align-middle {\n  vertical-align: middle !important;\n}\n\n.align-bottom {\n  vertical-align: bottom !important;\n}\n\n.align-text-bottom {\n  vertical-align: text-bottom !important;\n}\n\n.align-text-top {\n  vertical-align: text-top !important;\n}\n\n.bg-faded {\n  background-color: #f7f7f9;\n}\n\n.bg-primary {\n  background-color: #0275d8 !important;\n}\n\na.bg-primary:focus, a.bg-primary:hover {\n  background-color: #025aa5 !important;\n}\n\n.bg-success {\n  background-color: #5cb85c !important;\n}\n\na.bg-success:focus, a.bg-success:hover {\n  background-color: #449d44 !important;\n}\n\n.bg-info {\n  background-color: #5bc0de !important;\n}\n\na.bg-info:focus, a.bg-info:hover {\n  background-color: #31b0d5 !important;\n}\n\n.bg-warning {\n  background-color: #f0ad4e !important;\n}\n\na.bg-warning:focus, a.bg-warning:hover {\n  background-color: #ec971f !important;\n}\n\n.bg-danger {\n  background-color: #d9534f !important;\n}\n\na.bg-danger:focus, a.bg-danger:hover {\n  background-color: #c9302c !important;\n}\n\n.bg-inverse {\n  background-color: #373a3c !important;\n}\n\na.bg-inverse:focus, a.bg-inverse:hover {\n  background-color: #1f2021 !important;\n}\n\n.rounded {\n  border-radius: 0.25rem;\n}\n\n.rounded-top {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.rounded-right {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.rounded-bottom {\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.rounded-left {\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.rounded-circle {\n  border-radius: 50%;\n}\n\n.clearfix::after {\n  content: \"\";\n  display: table;\n  clear: both;\n}\n\n.d-block {\n  display: block !important;\n}\n\n.d-inline-block {\n  display: inline-block !important;\n}\n\n.d-inline {\n  display: inline !important;\n}\n\n.float-xs-left {\n  float: left !important;\n}\n\n.float-xs-right {\n  float: right !important;\n}\n\n.float-xs-none {\n  float: none !important;\n}\n\n@media (min-width: 576px) {\n  .float-sm-left {\n    float: left !important;\n  }\n  .float-sm-right {\n    float: right !important;\n  }\n  .float-sm-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .float-md-left {\n    float: left !important;\n  }\n  .float-md-right {\n    float: right !important;\n  }\n  .float-md-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .float-lg-left {\n    float: left !important;\n  }\n  .float-lg-right {\n    float: right !important;\n  }\n  .float-lg-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .float-xl-left {\n    float: left !important;\n  }\n  .float-xl-right {\n    float: right !important;\n  }\n  .float-xl-none {\n    float: none !important;\n  }\n}\n\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n\n.sr-only-focusable:active, .sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n\n.w-100 {\n  width: 100% !important;\n}\n\n.h-100 {\n  height: 100% !important;\n}\n\n.mx-auto {\n  margin-right: auto !important;\n  margin-left: auto !important;\n}\n\n.m-0 {\n  margin: 0 0 !important;\n}\n\n.mt-0 {\n  margin-top: 0 !important;\n}\n\n.mr-0 {\n  margin-right: 0 !important;\n}\n\n.mb-0 {\n  margin-bottom: 0 !important;\n}\n\n.ml-0 {\n  margin-left: 0 !important;\n}\n\n.mx-0 {\n  margin-right: 0 !important;\n  margin-left: 0 !important;\n}\n\n.my-0 {\n  margin-top: 0 !important;\n  margin-bottom: 0 !important;\n}\n\n.m-1 {\n  margin: 1rem 1rem !important;\n}\n\n.mt-1 {\n  margin-top: 1rem !important;\n}\n\n.mr-1 {\n  margin-right: 1rem !important;\n}\n\n.mb-1 {\n  margin-bottom: 1rem !important;\n}\n\n.ml-1 {\n  margin-left: 1rem !important;\n}\n\n.mx-1 {\n  margin-right: 1rem !important;\n  margin-left: 1rem !important;\n}\n\n.my-1 {\n  margin-top: 1rem !important;\n  margin-bottom: 1rem !important;\n}\n\n.m-2 {\n  margin: 1.5rem 1.5rem !important;\n}\n\n.mt-2 {\n  margin-top: 1.5rem !important;\n}\n\n.mr-2 {\n  margin-right: 1.5rem !important;\n}\n\n.mb-2 {\n  margin-bottom: 1.5rem !important;\n}\n\n.ml-2 {\n  margin-left: 1.5rem !important;\n}\n\n.mx-2 {\n  margin-right: 1.5rem !important;\n  margin-left: 1.5rem !important;\n}\n\n.my-2 {\n  margin-top: 1.5rem !important;\n  margin-bottom: 1.5rem !important;\n}\n\n.m-3 {\n  margin: 3rem 3rem !important;\n}\n\n.mt-3 {\n  margin-top: 3rem !important;\n}\n\n.mr-3 {\n  margin-right: 3rem !important;\n}\n\n.mb-3 {\n  margin-bottom: 3rem !important;\n}\n\n.ml-3 {\n  margin-left: 3rem !important;\n}\n\n.mx-3 {\n  margin-right: 3rem !important;\n  margin-left: 3rem !important;\n}\n\n.my-3 {\n  margin-top: 3rem !important;\n  margin-bottom: 3rem !important;\n}\n\n.p-0 {\n  padding: 0 0 !important;\n}\n\n.pt-0 {\n  padding-top: 0 !important;\n}\n\n.pr-0 {\n  padding-right: 0 !important;\n}\n\n.pb-0 {\n  padding-bottom: 0 !important;\n}\n\n.pl-0 {\n  padding-left: 0 !important;\n}\n\n.px-0 {\n  padding-right: 0 !important;\n  padding-left: 0 !important;\n}\n\n.py-0 {\n  padding-top: 0 !important;\n  padding-bottom: 0 !important;\n}\n\n.p-1 {\n  padding: 1rem 1rem !important;\n}\n\n.pt-1 {\n  padding-top: 1rem !important;\n}\n\n.pr-1 {\n  padding-right: 1rem !important;\n}\n\n.pb-1 {\n  padding-bottom: 1rem !important;\n}\n\n.pl-1 {\n  padding-left: 1rem !important;\n}\n\n.px-1 {\n  padding-right: 1rem !important;\n  padding-left: 1rem !important;\n}\n\n.py-1 {\n  padding-top: 1rem !important;\n  padding-bottom: 1rem !important;\n}\n\n.p-2 {\n  padding: 1.5rem 1.5rem !important;\n}\n\n.pt-2 {\n  padding-top: 1.5rem !important;\n}\n\n.pr-2 {\n  padding-right: 1.5rem !important;\n}\n\n.pb-2 {\n  padding-bottom: 1.5rem !important;\n}\n\n.pl-2 {\n  padding-left: 1.5rem !important;\n}\n\n.px-2 {\n  padding-right: 1.5rem !important;\n  padding-left: 1.5rem !important;\n}\n\n.py-2 {\n  padding-top: 1.5rem !important;\n  padding-bottom: 1.5rem !important;\n}\n\n.p-3 {\n  padding: 3rem 3rem !important;\n}\n\n.pt-3 {\n  padding-top: 3rem !important;\n}\n\n.pr-3 {\n  padding-right: 3rem !important;\n}\n\n.pb-3 {\n  padding-bottom: 3rem !important;\n}\n\n.pl-3 {\n  padding-left: 3rem !important;\n}\n\n.px-3 {\n  padding-right: 3rem !important;\n  padding-left: 3rem !important;\n}\n\n.py-3 {\n  padding-top: 3rem !important;\n  padding-bottom: 3rem !important;\n}\n\n.pos-f-t {\n  position: fixed;\n  top: 0;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n\n.text-justify {\n  text-align: justify !important;\n}\n\n.text-nowrap {\n  white-space: nowrap !important;\n}\n\n.text-truncate {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.text-xs-left {\n  text-align: left !important;\n}\n\n.text-xs-right {\n  text-align: right !important;\n}\n\n.text-xs-center {\n  text-align: center !important;\n}\n\n@media (min-width: 576px) {\n  .text-sm-left {\n    text-align: left !important;\n  }\n  .text-sm-right {\n    text-align: right !important;\n  }\n  .text-sm-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .text-md-left {\n    text-align: left !important;\n  }\n  .text-md-right {\n    text-align: right !important;\n  }\n  .text-md-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .text-lg-left {\n    text-align: left !important;\n  }\n  .text-lg-right {\n    text-align: right !important;\n  }\n  .text-lg-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .text-xl-left {\n    text-align: left !important;\n  }\n  .text-xl-right {\n    text-align: right !important;\n  }\n  .text-xl-center {\n    text-align: center !important;\n  }\n}\n\n.text-lowercase {\n  text-transform: lowercase !important;\n}\n\n.text-uppercase {\n  text-transform: uppercase !important;\n}\n\n.text-capitalize {\n  text-transform: capitalize !important;\n}\n\n.font-weight-normal {\n  font-weight: normal;\n}\n\n.font-weight-bold {\n  font-weight: bold;\n}\n\n.font-italic {\n  font-style: italic;\n}\n\n.text-white {\n  color: #fff !important;\n}\n\n.text-muted {\n  color: #818a91 !important;\n}\n\na.text-muted:focus, a.text-muted:hover {\n  color: #687077 !important;\n}\n\n.text-primary {\n  color: #0275d8 !important;\n}\n\na.text-primary:focus, a.text-primary:hover {\n  color: #025aa5 !important;\n}\n\n.text-success {\n  color: #5cb85c !important;\n}\n\na.text-success:focus, a.text-success:hover {\n  color: #449d44 !important;\n}\n\n.text-info {\n  color: #5bc0de !important;\n}\n\na.text-info:focus, a.text-info:hover {\n  color: #31b0d5 !important;\n}\n\n.text-warning {\n  color: #f0ad4e !important;\n}\n\na.text-warning:focus, a.text-warning:hover {\n  color: #ec971f !important;\n}\n\n.text-danger {\n  color: #d9534f !important;\n}\n\na.text-danger:focus, a.text-danger:hover {\n  color: #c9302c !important;\n}\n\n.text-gray-dark {\n  color: #373a3c !important;\n}\n\na.text-gray-dark:focus, a.text-gray-dark:hover {\n  color: #1f2021 !important;\n}\n\n.text-hide {\n  font: 0/0 a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n\n.invisible {\n  visibility: hidden !important;\n}\n\n.hidden-xs-up {\n  display: none !important;\n}\n\n@media (max-width: 575px) {\n  .hidden-xs-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 576px) {\n  .hidden-sm-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 767px) {\n  .hidden-sm-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .hidden-md-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 991px) {\n  .hidden-md-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .hidden-lg-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 1199px) {\n  .hidden-lg-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .hidden-xl-up {\n    display: none !important;\n  }\n}\n\n.hidden-xl-down {\n  display: none !important;\n}\n\n.visible-print-block {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-block {\n    display: block !important;\n  }\n}\n\n.visible-print-inline {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-inline {\n    display: inline !important;\n  }\n}\n\n.visible-print-inline-block {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-inline-block {\n    display: inline-block !important;\n  }\n}\n\n@media print {\n  .hidden-print {\n    display: none !important;\n  }\n}\n/*# sourceMappingURL=bootstrap.css.map */"; });
-define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
+define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
   'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
+
+  
+
+  var State = exports.State = function () {
+    function State(charSpec) {
+      
+
+      this.charSpec = charSpec;
+      this.nextStates = [];
+    }
+
+    State.prototype.get = function get(charSpec) {
+      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++];
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value;
+        }
+
+        var child = _ref;
+
+        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
+
+        if (isEqual) {
+          return child;
+        }
+      }
+
+      return undefined;
+    };
+
+    State.prototype.put = function put(charSpec) {
+      var state = this.get(charSpec);
+
+      if (state) {
+        return state;
+      }
+
+      state = new State(charSpec);
+
+      this.nextStates.push(state);
+
+      if (charSpec.repeat) {
+        state.nextStates.push(state);
+      }
+
+      return state;
+    };
+
+    State.prototype.match = function match(ch) {
+      var nextStates = this.nextStates;
+      var results = [];
+
+      for (var i = 0, l = nextStates.length; i < l; i++) {
+        var child = nextStates[i];
+        var charSpec = child.charSpec;
+
+        if (charSpec.validChars !== undefined) {
+          if (charSpec.validChars.indexOf(ch) !== -1) {
+            results.push(child);
+          }
+        } else if (charSpec.invalidChars !== undefined) {
+          if (charSpec.invalidChars.indexOf(ch) === -1) {
+            results.push(child);
+          }
+        }
+      }
+
+      return results;
+    };
+
+    return State;
+  }();
+
+  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
+
+  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
+
+  var StaticSegment = exports.StaticSegment = function () {
+    function StaticSegment(string, caseSensitive) {
+      
+
+      this.string = string;
+      this.caseSensitive = caseSensitive;
+    }
+
+    StaticSegment.prototype.eachChar = function eachChar(callback) {
+      var s = this.string;
+      for (var i = 0, ii = s.length; i < ii; ++i) {
+        var ch = s[i];
+        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
+      }
+    };
+
+    StaticSegment.prototype.regex = function regex() {
+      return this.string.replace(escapeRegex, '\\$1');
+    };
+
+    StaticSegment.prototype.generate = function generate() {
+      return this.string;
+    };
+
+    return StaticSegment;
+  }();
+
+  var DynamicSegment = exports.DynamicSegment = function () {
+    function DynamicSegment(name, optional) {
+      
+
+      this.name = name;
+      this.optional = optional;
+    }
+
+    DynamicSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '/', repeat: true });
+    };
+
+    DynamicSegment.prototype.regex = function regex() {
+      return this.optional ? '([^/]+)?' : '([^/]+)';
+    };
+
+    DynamicSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return DynamicSegment;
+  }();
+
+  var StarSegment = exports.StarSegment = function () {
+    function StarSegment(name) {
+      
+
+      this.name = name;
+    }
+
+    StarSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '', repeat: true });
+    };
+
+    StarSegment.prototype.regex = function regex() {
+      return '(.+)';
+    };
+
+    StarSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return StarSegment;
+  }();
+
+  var EpsilonSegment = exports.EpsilonSegment = function () {
+    function EpsilonSegment() {
+      
+    }
+
+    EpsilonSegment.prototype.eachChar = function eachChar() {};
+
+    EpsilonSegment.prototype.regex = function regex() {
+      return '';
+    };
+
+    EpsilonSegment.prototype.generate = function generate() {
+      return '';
+    };
+
+    return EpsilonSegment;
+  }();
+
+  var RouteRecognizer = exports.RouteRecognizer = function () {
+    function RouteRecognizer() {
+      
+
+      this.rootState = new State();
+      this.names = {};
+    }
+
+    RouteRecognizer.prototype.add = function add(route) {
+      var _this = this;
+
+      if (Array.isArray(route)) {
+        route.forEach(function (r) {
+          return _this.add(r);
+        });
+        return undefined;
+      }
+
+      var currentState = this.rootState;
+      var regex = '^';
+      var types = { statics: 0, dynamics: 0, stars: 0 };
+      var names = [];
+      var routeName = route.handler.name;
+      var isEmpty = true;
+      var isAllOptional = true;
+      var segments = parse(route.path, names, types, route.caseSensitive);
+
+      for (var i = 0, ii = segments.length; i < ii; i++) {
+        var segment = segments[i];
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        isEmpty = false;
+        isAllOptional = isAllOptional && segment.optional;
+
+        currentState = addSegment(currentState, segment);
+        regex += segment.optional ? '/?' : '/';
+        regex += segment.regex();
+      }
+
+      if (isAllOptional) {
+        if (isEmpty) {
+          currentState = currentState.put({ validChars: '/' });
+          regex += '/';
+        } else {
+          var finalState = this.rootState.put({ validChars: '/' });
+          currentState.epsilon = [finalState];
+          currentState = finalState;
+        }
+      }
+
+      var handlers = [{ handler: route.handler, names: names }];
+
+      if (routeName) {
+        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
+        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
+          this.names[routeNames[_i2]] = {
+            segments: segments,
+            handlers: handlers
+          };
+        }
+      }
+
+      currentState.handlers = handlers;
+      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
+      currentState.types = types;
+
+      return currentState;
+    };
+
+    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      return [].concat(route.handlers);
+    };
+
+    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
+      return !!this.names[name];
+    };
+
+    RouteRecognizer.prototype.generate = function generate(name, params) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      var handler = route.handlers[0].handler;
+      if (handler.generationUsesHref) {
+        return handler.href;
+      }
+
+      var routeParams = Object.assign({}, params);
+      var segments = route.segments;
+      var consumed = {};
+      var output = '';
+
+      for (var i = 0, l = segments.length; i < l; i++) {
+        var segment = segments[i];
+
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        var segmentValue = segment.generate(routeParams, consumed);
+        if (segmentValue === null || segmentValue === undefined) {
+          if (!segment.optional) {
+            throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
+          }
+        } else {
+          output += '/';
+          output += segmentValue;
+        }
+      }
+
+      if (output.charAt(0) !== '/') {
+        output = '/' + output;
+      }
+
+      for (var param in consumed) {
+        delete routeParams[param];
+      }
+
+      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
+      output += queryString ? '?' + queryString : '';
+
+      return output;
+    };
+
+    RouteRecognizer.prototype.recognize = function recognize(path) {
+      var states = [this.rootState];
+      var queryParams = {};
+      var isSlashDropped = false;
+      var normalizedPath = path;
+
+      var queryStart = normalizedPath.indexOf('?');
+      if (queryStart !== -1) {
+        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
+        normalizedPath = normalizedPath.substr(0, queryStart);
+        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
+      }
+
+      normalizedPath = decodeURI(normalizedPath);
+
+      if (normalizedPath.charAt(0) !== '/') {
+        normalizedPath = '/' + normalizedPath;
+      }
+
+      var pathLen = normalizedPath.length;
+      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
+        normalizedPath = normalizedPath.substr(0, pathLen - 1);
+        isSlashDropped = true;
+      }
+
+      for (var i = 0, l = normalizedPath.length; i < l; i++) {
+        states = recognizeChar(states, normalizedPath.charAt(i));
+        if (!states.length) {
+          break;
+        }
+      }
+
+      var solutions = [];
+      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
+        if (states[_i3].handlers) {
+          solutions.push(states[_i3]);
+        }
+      }
+
+      states = sortSolutions(solutions);
+
+      var state = solutions[0];
+      if (state && state.handlers) {
+        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
+          normalizedPath = normalizedPath + '/';
+        }
+
+        return findHandler(state, normalizedPath, queryParams);
+      }
+
+      return undefined;
+    };
+
+    return RouteRecognizer;
+  }();
+
+  var RecognizeResults = function RecognizeResults(queryParams) {
+    
+
+    this.splice = Array.prototype.splice;
+    this.slice = Array.prototype.slice;
+    this.push = Array.prototype.push;
+    this.length = 0;
+    this.queryParams = queryParams || {};
+  };
+
+  function parse(route, names, types, caseSensitive) {
+    var normalizedRoute = route;
+    if (route.charAt(0) === '/') {
+      normalizedRoute = route.substr(1);
+    }
+
+    var results = [];
+
+    var splitRoute = normalizedRoute.split('/');
+    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
+      var segment = splitRoute[i];
+
+      var match = segment.match(/^:([^?]+)(\?)?$/);
+      if (match) {
+        var _match = match;
+        var _name = _match[1];
+        var optional = _match[2];
+
+        if (_name.indexOf('=') !== -1) {
+          throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
+        }
+        results.push(new DynamicSegment(_name, !!optional));
+        names.push(_name);
+        types.dynamics++;
+        continue;
+      }
+
+      match = segment.match(/^\*(.+)$/);
+      if (match) {
+        results.push(new StarSegment(match[1]));
+        names.push(match[1]);
+        types.stars++;
+      } else if (segment === '') {
+        results.push(new EpsilonSegment());
+      } else {
+        results.push(new StaticSegment(segment, caseSensitive));
+        types.statics++;
+      }
+    }
+
+    return results;
+  }
+
+  function sortSolutions(states) {
+    return states.sort(function (a, b) {
+      if (a.types.stars !== b.types.stars) {
+        return a.types.stars - b.types.stars;
+      }
+
+      if (a.types.stars) {
+        if (a.types.statics !== b.types.statics) {
+          return b.types.statics - a.types.statics;
+        }
+        if (a.types.dynamics !== b.types.dynamics) {
+          return b.types.dynamics - a.types.dynamics;
+        }
+      }
+
+      if (a.types.dynamics !== b.types.dynamics) {
+        return a.types.dynamics - b.types.dynamics;
+      }
+
+      if (a.types.statics !== b.types.statics) {
+        return b.types.statics - a.types.statics;
+      }
+
+      return 0;
+    });
+  }
+
+  function recognizeChar(states, ch) {
+    var nextStates = [];
+
+    for (var i = 0, l = states.length; i < l; i++) {
+      var state = states[i];
+      nextStates.push.apply(nextStates, state.match(ch));
+    }
+
+    var skippableStates = nextStates.filter(function (s) {
+      return s.epsilon;
+    });
+
+    var _loop = function _loop() {
+      var newStates = [];
+      skippableStates.forEach(function (s) {
+        nextStates.push.apply(nextStates, s.epsilon);
+        newStates.push.apply(newStates, s.epsilon);
+      });
+      skippableStates = newStates.filter(function (s) {
+        return s.epsilon;
+      });
+    };
+
+    while (skippableStates.length > 0) {
+      _loop();
+    }
+
+    return nextStates;
+  }
+
+  function findHandler(state, path, queryParams) {
+    var handlers = state.handlers;
+    var regex = state.regex;
+    var captures = path.match(regex);
+    var currentCapture = 1;
+    var result = new RecognizeResults(queryParams);
+
+    for (var i = 0, l = handlers.length; i < l; i++) {
+      var _handler = handlers[i];
+      var _names = _handler.names;
+      var _params = {};
+
+      for (var j = 0, m = _names.length; j < m; j++) {
+        _params[_names[j]] = captures[currentCapture++];
+      }
+
+      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
+    }
+
+    return result;
+  }
+
+  function addSegment(currentState, segment) {
+    var state = currentState.put({ validChars: '/' });
+    segment.eachChar(function (ch) {
+      state = state.put(ch);
+    });
+
+    if (segment.optional) {
+      currentState.epsilon = currentState.epsilon || [];
+      currentState.epsilon.push(state);
+    }
+
+    return state;
+  }
+});
+define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.EventAggregator = undefined;
+  exports.includeEventsIn = includeEventsIn;
+  exports.configure = configure;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var logger = LogManager.getLogger('event-aggregator');
+
+  var Handler = function () {
+    function Handler(messageType, callback) {
+      
+
+      this.messageType = messageType;
+      this.callback = callback;
+    }
+
+    Handler.prototype.handle = function handle(message) {
+      if (message instanceof this.messageType) {
+        this.callback.call(null, message);
+      }
+    };
+
+    return Handler;
+  }();
+
+  function invokeCallback(callback, data, event) {
+    try {
+      callback(data, event);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  function invokeHandler(handler, data) {
+    try {
+      handler.handle(data);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  var EventAggregator = exports.EventAggregator = function () {
+    function EventAggregator() {
+      
+
+      this.eventLookup = {};
+      this.messageHandlers = [];
+    }
+
+    EventAggregator.prototype.publish = function publish(event, data) {
+      var subscribers = void 0;
+      var i = void 0;
+
+      if (!event) {
+        throw new Error('Event was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        subscribers = this.eventLookup[event];
+        if (subscribers) {
+          subscribers = subscribers.slice();
+          i = subscribers.length;
+
+          while (i--) {
+            invokeCallback(subscribers[i], data, event);
+          }
+        }
+      } else {
+        subscribers = this.messageHandlers.slice();
+        i = subscribers.length;
+
+        while (i--) {
+          invokeHandler(subscribers[i], event);
+        }
+      }
+    };
+
+    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
+      var handler = void 0;
+      var subscribers = void 0;
+
+      if (!event) {
+        throw new Error('Event channel/type was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        handler = callback;
+        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
+      } else {
+        handler = new Handler(event, callback);
+        subscribers = this.messageHandlers;
+      }
+
+      subscribers.push(handler);
+
+      return {
+        dispose: function dispose() {
+          var idx = subscribers.indexOf(handler);
+          if (idx !== -1) {
+            subscribers.splice(idx, 1);
+          }
+        }
+      };
+    };
+
+    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
+      var sub = this.subscribe(event, function (a, b) {
+        sub.dispose();
+        return callback(a, b);
+      });
+
+      return sub;
+    };
+
+    return EventAggregator;
+  }();
+
+  function includeEventsIn(obj) {
+    var ea = new EventAggregator();
+
+    obj.subscribeOnce = function (event, callback) {
+      return ea.subscribeOnce(event, callback);
+    };
+
+    obj.subscribe = function (event, callback) {
+      return ea.subscribe(event, callback);
+    };
+
+    obj.publish = function (event, data) {
+      ea.publish(event, data);
+    };
+
+    return ea;
+  }
+
+  function configure(config) {
+    config.instance(EventAggregator, includeEventsIn(config.aurelia));
+  }
+});
+define('aurelia-templating',['exports', 'aurelia-logging', 'aurelia-metadata', 'aurelia-pal', 'aurelia-path', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-task-queue'], function (exports, _aureliaLogging, _aureliaMetadata, _aureliaPal, _aureliaPath, _aureliaLoader, _aureliaDependencyInjection, _aureliaBinding, _aureliaTaskQueue) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TemplatingEngine = exports.ElementConfigResource = exports.CompositionEngine = exports.HtmlBehaviorResource = exports.BindableProperty = exports.BehaviorPropertyObserver = exports.Controller = exports.ViewEngine = exports.ModuleAnalyzer = exports.ResourceDescription = exports.ResourceModule = exports.ViewCompiler = exports.ViewFactory = exports.BoundViewFactory = exports.ViewSlot = exports.View = exports.ViewResources = exports.ShadowDOM = exports.ShadowSlot = exports.PassThroughSlot = exports.SlotCustomAttribute = exports.BindingLanguage = exports.ViewLocator = exports.InlineViewStrategy = exports.TemplateRegistryViewStrategy = exports.NoViewStrategy = exports.ConventionalViewStrategy = exports.RelativeViewStrategy = exports.viewStrategy = exports.TargetInstruction = exports.BehaviorInstruction = exports.ViewCompileInstruction = exports.ResourceLoadContext = exports.ElementEvents = exports.ViewEngineHooksResource = exports.CompositionTransaction = exports.CompositionTransactionOwnershipToken = exports.CompositionTransactionNotifier = exports.Animator = exports.animationEvent = undefined;
+  exports._hyphenate = _hyphenate;
+  exports._isAllWhitespace = _isAllWhitespace;
+  exports.viewEngineHooks = viewEngineHooks;
+  exports.children = children;
+  exports.child = child;
+  exports.resource = resource;
+  exports.behavior = behavior;
+  exports.customElement = customElement;
+  exports.customAttribute = customAttribute;
+  exports.templateController = templateController;
+  exports.bindable = bindable;
+  exports.dynamicOptions = dynamicOptions;
+  exports.useShadowDOM = useShadowDOM;
+  exports.processAttributes = processAttributes;
+  exports.processContent = processContent;
+  exports.containerless = containerless;
+  exports.useViewStrategy = useViewStrategy;
+  exports.useView = useView;
+  exports.inlineView = inlineView;
+  exports.noView = noView;
+  exports.elementConfig = elementConfig;
+  exports.viewResources = viewResources;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  var _class4, _temp, _dec, _class5, _dec2, _class6, _dec3, _class7, _dec4, _class8, _dec5, _class9, _class10, _temp2, _dec6, _class11, _class12, _temp3, _class15, _dec7, _class17, _dec8, _class18, _class19, _temp4, _dec9, _class21, _dec10, _class22, _dec11, _class23;
 
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
     return typeof obj;
@@ -36382,804 +32459,4727 @@ define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
     return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
   };
 
-  (function (Object, GOPS) {
-    'use strict';
+  
 
-    if (GOPS in Object) return;
+  var animationEvent = exports.animationEvent = {
+    enterBegin: 'animation:enter:begin',
+    enterActive: 'animation:enter:active',
+    enterDone: 'animation:enter:done',
+    enterTimeout: 'animation:enter:timeout',
 
-    var setDescriptor,
-        G = _aureliaPal.PLATFORM.global,
-        id = 0,
-        random = '' + Math.random(),
-        prefix = '__\x01symbol:',
-        prefixLength = prefix.length,
-        internalSymbol = '__\x01symbol@@' + random,
-        DP = 'defineProperty',
-        DPies = 'defineProperties',
-        GOPN = 'getOwnPropertyNames',
-        GOPD = 'getOwnPropertyDescriptor',
-        PIE = 'propertyIsEnumerable',
-        gOPN = Object[GOPN],
-        gOPD = Object[GOPD],
-        create = Object.create,
-        keys = Object.keys,
-        defineProperty = Object[DP],
-        $defineProperties = Object[DPies],
-        descriptor = gOPD(Object, GOPN),
-        ObjectProto = Object.prototype,
-        hOP = ObjectProto.hasOwnProperty,
-        pIE = ObjectProto[PIE],
-        toString = ObjectProto.toString,
-        indexOf = Array.prototype.indexOf || function (v) {
-      for (var i = this.length; i-- && this[i] !== v;) {}
-      return i;
-    },
-        addInternalIfNeeded = function addInternalIfNeeded(o, uid, enumerable) {
-      if (!hOP.call(o, internalSymbol)) {
-        defineProperty(o, internalSymbol, {
-          enumerable: false,
-          configurable: false,
-          writable: false,
-          value: {}
-        });
-      }
-      o[internalSymbol]['@@' + uid] = enumerable;
-    },
-        createWithSymbols = function createWithSymbols(proto, descriptors) {
-      var self = create(proto);
-      gOPN(descriptors).forEach(function (key) {
-        if (propertyIsEnumerable.call(descriptors, key)) {
-          $defineProperty(self, key, descriptors[key]);
-        }
+    leaveBegin: 'animation:leave:begin',
+    leaveActive: 'animation:leave:active',
+    leaveDone: 'animation:leave:done',
+    leaveTimeout: 'animation:leave:timeout',
+
+    staggerNext: 'animation:stagger:next',
+
+    removeClassBegin: 'animation:remove-class:begin',
+    removeClassActive: 'animation:remove-class:active',
+    removeClassDone: 'animation:remove-class:done',
+    removeClassTimeout: 'animation:remove-class:timeout',
+
+    addClassBegin: 'animation:add-class:begin',
+    addClassActive: 'animation:add-class:active',
+    addClassDone: 'animation:add-class:done',
+    addClassTimeout: 'animation:add-class:timeout',
+
+    animateBegin: 'animation:animate:begin',
+    animateActive: 'animation:animate:active',
+    animateDone: 'animation:animate:done',
+    animateTimeout: 'animation:animate:timeout',
+
+    sequenceBegin: 'animation:sequence:begin',
+    sequenceDone: 'animation:sequence:done'
+  };
+
+  var Animator = exports.Animator = function () {
+    function Animator() {
+      
+    }
+
+    Animator.prototype.enter = function enter(element) {
+      return Promise.resolve(false);
+    };
+
+    Animator.prototype.leave = function leave(element) {
+      return Promise.resolve(false);
+    };
+
+    Animator.prototype.removeClass = function removeClass(element, className) {
+      element.classList.remove(className);
+      return Promise.resolve(false);
+    };
+
+    Animator.prototype.addClass = function addClass(element, className) {
+      element.classList.add(className);
+      return Promise.resolve(false);
+    };
+
+    Animator.prototype.animate = function animate(element, className) {
+      return Promise.resolve(false);
+    };
+
+    Animator.prototype.runSequence = function runSequence(animations) {};
+
+    Animator.prototype.registerEffect = function registerEffect(effectName, properties) {};
+
+    Animator.prototype.unregisterEffect = function unregisterEffect(effectName) {};
+
+    return Animator;
+  }();
+
+  var CompositionTransactionNotifier = exports.CompositionTransactionNotifier = function () {
+    function CompositionTransactionNotifier(owner) {
+      
+
+      this.owner = owner;
+      this.owner._compositionCount++;
+    }
+
+    CompositionTransactionNotifier.prototype.done = function done() {
+      this.owner._compositionCount--;
+      this.owner._tryCompleteTransaction();
+    };
+
+    return CompositionTransactionNotifier;
+  }();
+
+  var CompositionTransactionOwnershipToken = exports.CompositionTransactionOwnershipToken = function () {
+    function CompositionTransactionOwnershipToken(owner) {
+      
+
+      this.owner = owner;
+      this.owner._ownershipToken = this;
+      this.thenable = this._createThenable();
+    }
+
+    CompositionTransactionOwnershipToken.prototype.waitForCompositionComplete = function waitForCompositionComplete() {
+      this.owner._tryCompleteTransaction();
+      return this.thenable;
+    };
+
+    CompositionTransactionOwnershipToken.prototype.resolve = function resolve() {
+      this._resolveCallback();
+    };
+
+    CompositionTransactionOwnershipToken.prototype._createThenable = function _createThenable() {
+      var _this = this;
+
+      return new Promise(function (resolve, reject) {
+        _this._resolveCallback = resolve;
       });
-      return self;
-    },
-        copyAsNonEnumerable = function copyAsNonEnumerable(descriptor) {
-      var newDescriptor = create(descriptor);
-      newDescriptor.enumerable = false;
-      return newDescriptor;
-    },
-        get = function get() {},
-        onlyNonSymbols = function onlyNonSymbols(name) {
-      return name != internalSymbol && !hOP.call(source, name);
-    },
-        onlySymbols = function onlySymbols(name) {
-      return name != internalSymbol && hOP.call(source, name);
-    },
-        propertyIsEnumerable = function propertyIsEnumerable(key) {
-      var uid = '' + key;
-      return onlySymbols(uid) ? hOP.call(this, uid) && this[internalSymbol]['@@' + uid] : pIE.call(this, key);
-    },
-        setAndGetSymbol = function setAndGetSymbol(uid) {
-      var descriptor = {
-        enumerable: false,
-        configurable: true,
-        get: get,
-        set: function set(value) {
-          setDescriptor(this, uid, {
-            enumerable: false,
-            configurable: true,
-            writable: true,
-            value: value
-          });
-          addInternalIfNeeded(this, uid, true);
+    };
+
+    return CompositionTransactionOwnershipToken;
+  }();
+
+  var CompositionTransaction = exports.CompositionTransaction = function () {
+    function CompositionTransaction() {
+      
+
+      this._ownershipToken = null;
+      this._compositionCount = 0;
+    }
+
+    CompositionTransaction.prototype.tryCapture = function tryCapture() {
+      return this._ownershipToken === null ? new CompositionTransactionOwnershipToken(this) : null;
+    };
+
+    CompositionTransaction.prototype.enlist = function enlist() {
+      return new CompositionTransactionNotifier(this);
+    };
+
+    CompositionTransaction.prototype._tryCompleteTransaction = function _tryCompleteTransaction() {
+      if (this._compositionCount <= 0) {
+        this._compositionCount = 0;
+
+        if (this._ownershipToken !== null) {
+          var token = this._ownershipToken;
+          this._ownershipToken = null;
+          token.resolve();
         }
-      };
-      defineProperty(ObjectProto, uid, descriptor);
-      return source[uid] = defineProperty(Object(uid), 'constructor', sourceConstructor);
-    },
-        _Symbol = function _Symbol2(description) {
-      if (this && this !== G) {
-        throw new TypeError('Symbol is not a constructor');
       }
-      return setAndGetSymbol(prefix.concat(description || '', random, ++id));
-    },
-        source = create(null),
-        sourceConstructor = { value: _Symbol },
-        sourceMap = function sourceMap(uid) {
-      return source[uid];
-    },
-        $defineProperty = function defineProp(o, key, descriptor) {
-      var uid = '' + key;
-      if (onlySymbols(uid)) {
-        setDescriptor(o, uid, descriptor.enumerable ? copyAsNonEnumerable(descriptor) : descriptor);
-        addInternalIfNeeded(o, uid, !!descriptor.enumerable);
-      } else {
-        defineProperty(o, key, descriptor);
-      }
-      return o;
-    },
-        $getOwnPropertySymbols = function getOwnPropertySymbols(o) {
-      var cof = toString.call(o);
-      o = cof === '[object String]' ? o.split('') : Object(o);
-      return gOPN(o).filter(onlySymbols).map(sourceMap);
     };
 
-    descriptor.value = $defineProperty;
-    defineProperty(Object, DP, descriptor);
+    return CompositionTransaction;
+  }();
 
-    descriptor.value = $getOwnPropertySymbols;
-    defineProperty(Object, GOPS, descriptor);
+  var capitalMatcher = /([A-Z])/g;
 
-    descriptor.value = function getOwnPropertyNames(o) {
-      return gOPN(o).filter(onlyNonSymbols);
+  function addHyphenAndLower(char) {
+    return '-' + char.toLowerCase();
+  }
+
+  function _hyphenate(name) {
+    return (name.charAt(0).toLowerCase() + name.slice(1)).replace(capitalMatcher, addHyphenAndLower);
+  }
+
+  function _isAllWhitespace(node) {
+    return !(node.auInterpolationTarget || /[^\t\n\r ]/.test(node.textContent));
+  }
+
+  var ViewEngineHooksResource = exports.ViewEngineHooksResource = function () {
+    function ViewEngineHooksResource() {
+      
+    }
+
+    ViewEngineHooksResource.prototype.initialize = function initialize(container, target) {
+      this.instance = container.get(target);
     };
-    defineProperty(Object, GOPN, descriptor);
 
-    descriptor.value = function defineProperties(o, descriptors) {
-      var symbols = $getOwnPropertySymbols(descriptors);
-      if (symbols.length) {
-        keys(descriptors).concat(symbols).forEach(function (uid) {
-          if (propertyIsEnumerable.call(descriptors, uid)) {
-            $defineProperty(o, uid, descriptors[uid]);
+    ViewEngineHooksResource.prototype.register = function register(registry, name) {
+      registry.registerViewEngineHooks(this.instance);
+    };
+
+    ViewEngineHooksResource.prototype.load = function load(container, target) {};
+
+    ViewEngineHooksResource.convention = function convention(name) {
+      if (name.endsWith('ViewEngineHooks')) {
+        return new ViewEngineHooksResource();
+      }
+    };
+
+    return ViewEngineHooksResource;
+  }();
+
+  function viewEngineHooks(target) {
+    var deco = function deco(t) {
+      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, new ViewEngineHooksResource(), t);
+    };
+
+    return target ? deco(target) : deco;
+  }
+
+  var ElementEvents = exports.ElementEvents = function () {
+    function ElementEvents(element) {
+      
+
+      this.element = element;
+      this.subscriptions = {};
+    }
+
+    ElementEvents.prototype._enqueueHandler = function _enqueueHandler(handler) {
+      this.subscriptions[handler.eventName] = this.subscriptions[handler.eventName] || [];
+      this.subscriptions[handler.eventName].push(handler);
+    };
+
+    ElementEvents.prototype._dequeueHandler = function _dequeueHandler(handler) {
+      var index = void 0;
+      var subscriptions = this.subscriptions[handler.eventName];
+      if (subscriptions) {
+        index = subscriptions.indexOf(handler);
+        if (index > -1) {
+          subscriptions.splice(index, 1);
+        }
+      }
+      return handler;
+    };
+
+    ElementEvents.prototype.publish = function publish(eventName) {
+      var detail = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var bubbles = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+      var cancelable = arguments.length <= 3 || arguments[3] === undefined ? true : arguments[3];
+
+      var event = _aureliaPal.DOM.createCustomEvent(eventName, { cancelable: cancelable, bubbles: bubbles, detail: detail });
+      this.element.dispatchEvent(event);
+    };
+
+    ElementEvents.prototype.subscribe = function subscribe(eventName, handler) {
+      var _this2 = this;
+
+      var bubbles = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+
+      if (handler && typeof handler === 'function') {
+        handler.eventName = eventName;
+        handler.handler = handler;
+        handler.bubbles = bubbles;
+        handler.dispose = function () {
+          _this2.element.removeEventListener(eventName, handler, bubbles);
+          _this2._dequeueHandler(handler);
+        };
+        this.element.addEventListener(eventName, handler, bubbles);
+        this._enqueueHandler(handler);
+        return handler;
+      }
+
+      return undefined;
+    };
+
+    ElementEvents.prototype.subscribeOnce = function subscribeOnce(eventName, handler) {
+      var _this3 = this;
+
+      var bubbles = arguments.length <= 2 || arguments[2] === undefined ? true : arguments[2];
+
+      if (handler && typeof handler === 'function') {
+        var _ret = function () {
+          var _handler = function _handler(event) {
+            handler(event);
+            _handler.dispose();
+          };
+          return {
+            v: _this3.subscribe(eventName, _handler, bubbles)
+          };
+        }();
+
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      }
+
+      return undefined;
+    };
+
+    ElementEvents.prototype.dispose = function dispose(eventName) {
+      if (eventName && typeof eventName === 'string') {
+        var subscriptions = this.subscriptions[eventName];
+        if (subscriptions) {
+          while (subscriptions.length) {
+            var subscription = subscriptions.pop();
+            if (subscription) {
+              subscription.dispose();
+            }
           }
+        }
+      } else {
+        this.disposeAll();
+      }
+    };
+
+    ElementEvents.prototype.disposeAll = function disposeAll() {
+      for (var key in this.subscriptions) {
+        this.dispose(key);
+      }
+    };
+
+    return ElementEvents;
+  }();
+
+  var ResourceLoadContext = exports.ResourceLoadContext = function () {
+    function ResourceLoadContext() {
+      
+
+      this.dependencies = {};
+    }
+
+    ResourceLoadContext.prototype.addDependency = function addDependency(url) {
+      this.dependencies[url] = true;
+    };
+
+    ResourceLoadContext.prototype.hasDependency = function hasDependency(url) {
+      return url in this.dependencies;
+    };
+
+    return ResourceLoadContext;
+  }();
+
+  var ViewCompileInstruction = exports.ViewCompileInstruction = function ViewCompileInstruction() {
+    var targetShadowDOM = arguments.length <= 0 || arguments[0] === undefined ? false : arguments[0];
+    var compileSurrogate = arguments.length <= 1 || arguments[1] === undefined ? false : arguments[1];
+
+    
+
+    this.targetShadowDOM = targetShadowDOM;
+    this.compileSurrogate = compileSurrogate;
+    this.associatedModuleId = null;
+  };
+
+  ViewCompileInstruction.normal = new ViewCompileInstruction();
+
+  var BehaviorInstruction = exports.BehaviorInstruction = function () {
+    BehaviorInstruction.enhance = function enhance() {
+      var instruction = new BehaviorInstruction();
+      instruction.enhance = true;
+      return instruction;
+    };
+
+    BehaviorInstruction.unitTest = function unitTest(type, attributes) {
+      var instruction = new BehaviorInstruction();
+      instruction.type = type;
+      instruction.attributes = attributes || {};
+      return instruction;
+    };
+
+    BehaviorInstruction.element = function element(node, type) {
+      var instruction = new BehaviorInstruction();
+      instruction.type = type;
+      instruction.attributes = {};
+      instruction.anchorIsContainer = !(node.hasAttribute('containerless') || type.containerless);
+      instruction.initiatedByBehavior = true;
+      return instruction;
+    };
+
+    BehaviorInstruction.attribute = function attribute(attrName, type) {
+      var instruction = new BehaviorInstruction();
+      instruction.attrName = attrName;
+      instruction.type = type || null;
+      instruction.attributes = {};
+      return instruction;
+    };
+
+    BehaviorInstruction.dynamic = function dynamic(host, viewModel, viewFactory) {
+      var instruction = new BehaviorInstruction();
+      instruction.host = host;
+      instruction.viewModel = viewModel;
+      instruction.viewFactory = viewFactory;
+      instruction.inheritBindingContext = true;
+      return instruction;
+    };
+
+    function BehaviorInstruction() {
+      
+
+      this.initiatedByBehavior = false;
+      this.enhance = false;
+      this.partReplacements = null;
+      this.viewFactory = null;
+      this.originalAttrName = null;
+      this.skipContentProcessing = false;
+      this.contentFactory = null;
+      this.viewModel = null;
+      this.anchorIsContainer = false;
+      this.host = null;
+      this.attributes = null;
+      this.type = null;
+      this.attrName = null;
+      this.inheritBindingContext = false;
+    }
+
+    return BehaviorInstruction;
+  }();
+
+  BehaviorInstruction.normal = new BehaviorInstruction();
+
+  var TargetInstruction = exports.TargetInstruction = (_temp = _class4 = function () {
+    TargetInstruction.shadowSlot = function shadowSlot(parentInjectorId) {
+      var instruction = new TargetInstruction();
+      instruction.parentInjectorId = parentInjectorId;
+      instruction.shadowSlot = true;
+      return instruction;
+    };
+
+    TargetInstruction.contentExpression = function contentExpression(expression) {
+      var instruction = new TargetInstruction();
+      instruction.contentExpression = expression;
+      return instruction;
+    };
+
+    TargetInstruction.lifting = function lifting(parentInjectorId, liftingInstruction) {
+      var instruction = new TargetInstruction();
+      instruction.parentInjectorId = parentInjectorId;
+      instruction.expressions = TargetInstruction.noExpressions;
+      instruction.behaviorInstructions = [liftingInstruction];
+      instruction.viewFactory = liftingInstruction.viewFactory;
+      instruction.providers = [liftingInstruction.type.target];
+      instruction.lifting = true;
+      return instruction;
+    };
+
+    TargetInstruction.normal = function normal(injectorId, parentInjectorId, providers, behaviorInstructions, expressions, elementInstruction) {
+      var instruction = new TargetInstruction();
+      instruction.injectorId = injectorId;
+      instruction.parentInjectorId = parentInjectorId;
+      instruction.providers = providers;
+      instruction.behaviorInstructions = behaviorInstructions;
+      instruction.expressions = expressions;
+      instruction.anchorIsContainer = elementInstruction ? elementInstruction.anchorIsContainer : true;
+      instruction.elementInstruction = elementInstruction;
+      return instruction;
+    };
+
+    TargetInstruction.surrogate = function surrogate(providers, behaviorInstructions, expressions, values) {
+      var instruction = new TargetInstruction();
+      instruction.expressions = expressions;
+      instruction.behaviorInstructions = behaviorInstructions;
+      instruction.providers = providers;
+      instruction.values = values;
+      return instruction;
+    };
+
+    function TargetInstruction() {
+      
+
+      this.injectorId = null;
+      this.parentInjectorId = null;
+
+      this.shadowSlot = false;
+      this.slotName = null;
+      this.slotFallbackFactory = null;
+
+      this.contentExpression = null;
+
+      this.expressions = null;
+      this.behaviorInstructions = null;
+      this.providers = null;
+
+      this.viewFactory = null;
+
+      this.anchorIsContainer = false;
+      this.elementInstruction = null;
+      this.lifting = false;
+
+      this.values = null;
+    }
+
+    return TargetInstruction;
+  }(), _class4.noExpressions = Object.freeze([]), _temp);
+  var viewStrategy = exports.viewStrategy = _aureliaMetadata.protocol.create('aurelia:view-strategy', {
+    validate: function validate(target) {
+      if (!(typeof target.loadViewFactory === 'function')) {
+        return 'View strategies must implement: loadViewFactory(viewEngine: ViewEngine, compileInstruction: ViewCompileInstruction, loadContext?: ResourceLoadContext): Promise<ViewFactory>';
+      }
+
+      return true;
+    },
+    compose: function compose(target) {
+      if (!(typeof target.makeRelativeTo === 'function')) {
+        target.makeRelativeTo = _aureliaPal.PLATFORM.noop;
+      }
+    }
+  });
+
+  var RelativeViewStrategy = exports.RelativeViewStrategy = (_dec = viewStrategy(), _dec(_class5 = function () {
+    function RelativeViewStrategy(path) {
+      
+
+      this.path = path;
+      this.absolutePath = null;
+    }
+
+    RelativeViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
+      if (this.absolutePath === null && this.moduleId) {
+        this.absolutePath = (0, _aureliaPath.relativeToFile)(this.path, this.moduleId);
+      }
+
+      compileInstruction.associatedModuleId = this.moduleId;
+      return viewEngine.loadViewFactory(this.absolutePath || this.path, compileInstruction, loadContext, target);
+    };
+
+    RelativeViewStrategy.prototype.makeRelativeTo = function makeRelativeTo(file) {
+      if (this.absolutePath === null) {
+        this.absolutePath = (0, _aureliaPath.relativeToFile)(this.path, file);
+      }
+    };
+
+    return RelativeViewStrategy;
+  }()) || _class5);
+  var ConventionalViewStrategy = exports.ConventionalViewStrategy = (_dec2 = viewStrategy(), _dec2(_class6 = function () {
+    function ConventionalViewStrategy(viewLocator, origin) {
+      
+
+      this.moduleId = origin.moduleId;
+      this.viewUrl = viewLocator.convertOriginToViewUrl(origin);
+    }
+
+    ConventionalViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
+      compileInstruction.associatedModuleId = this.moduleId;
+      return viewEngine.loadViewFactory(this.viewUrl, compileInstruction, loadContext, target);
+    };
+
+    return ConventionalViewStrategy;
+  }()) || _class6);
+  var NoViewStrategy = exports.NoViewStrategy = (_dec3 = viewStrategy(), _dec3(_class7 = function () {
+    function NoViewStrategy(dependencies, dependencyBaseUrl) {
+      
+
+      this.dependencies = dependencies || null;
+      this.dependencyBaseUrl = dependencyBaseUrl || '';
+    }
+
+    NoViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
+      var entry = this.entry;
+      var dependencies = this.dependencies;
+
+      if (entry && entry.factoryIsReady) {
+        return Promise.resolve(null);
+      }
+
+      this.entry = entry = new _aureliaLoader.TemplateRegistryEntry(this.moduleId || this.dependencyBaseUrl);
+
+      entry.dependencies = [];
+      entry.templateIsLoaded = true;
+
+      if (dependencies !== null) {
+        for (var i = 0, ii = dependencies.length; i < ii; ++i) {
+          var current = dependencies[i];
+
+          if (typeof current === 'string' || typeof current === 'function') {
+            entry.addDependency(current);
+          } else {
+            entry.addDependency(current.from, current.as);
+          }
+        }
+      }
+
+      compileInstruction.associatedModuleId = this.moduleId;
+
+      return viewEngine.loadViewFactory(entry, compileInstruction, loadContext, target);
+    };
+
+    return NoViewStrategy;
+  }()) || _class7);
+  var TemplateRegistryViewStrategy = exports.TemplateRegistryViewStrategy = (_dec4 = viewStrategy(), _dec4(_class8 = function () {
+    function TemplateRegistryViewStrategy(moduleId, entry) {
+      
+
+      this.moduleId = moduleId;
+      this.entry = entry;
+    }
+
+    TemplateRegistryViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
+      var entry = this.entry;
+
+      if (entry.factoryIsReady) {
+        return Promise.resolve(entry.factory);
+      }
+
+      compileInstruction.associatedModuleId = this.moduleId;
+      return viewEngine.loadViewFactory(entry, compileInstruction, loadContext, target);
+    };
+
+    return TemplateRegistryViewStrategy;
+  }()) || _class8);
+  var InlineViewStrategy = exports.InlineViewStrategy = (_dec5 = viewStrategy(), _dec5(_class9 = function () {
+    function InlineViewStrategy(markup, dependencies, dependencyBaseUrl) {
+      
+
+      this.markup = markup;
+      this.dependencies = dependencies || null;
+      this.dependencyBaseUrl = dependencyBaseUrl || '';
+    }
+
+    InlineViewStrategy.prototype.loadViewFactory = function loadViewFactory(viewEngine, compileInstruction, loadContext, target) {
+      var entry = this.entry;
+      var dependencies = this.dependencies;
+
+      if (entry && entry.factoryIsReady) {
+        return Promise.resolve(entry.factory);
+      }
+
+      this.entry = entry = new _aureliaLoader.TemplateRegistryEntry(this.moduleId || this.dependencyBaseUrl);
+      entry.template = _aureliaPal.DOM.createTemplateFromMarkup(this.markup);
+
+      if (dependencies !== null) {
+        for (var i = 0, ii = dependencies.length; i < ii; ++i) {
+          var current = dependencies[i];
+
+          if (typeof current === 'string' || typeof current === 'function') {
+            entry.addDependency(current);
+          } else {
+            entry.addDependency(current.from, current.as);
+          }
+        }
+      }
+
+      compileInstruction.associatedModuleId = this.moduleId;
+      return viewEngine.loadViewFactory(entry, compileInstruction, loadContext, target);
+    };
+
+    return InlineViewStrategy;
+  }()) || _class9);
+  var ViewLocator = exports.ViewLocator = (_temp2 = _class10 = function () {
+    function ViewLocator() {
+      
+    }
+
+    ViewLocator.prototype.getViewStrategy = function getViewStrategy(value) {
+      if (!value) {
+        return null;
+      }
+
+      if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && 'getViewStrategy' in value) {
+        var _origin = _aureliaMetadata.Origin.get(value.constructor);
+
+        value = value.getViewStrategy();
+
+        if (typeof value === 'string') {
+          value = new RelativeViewStrategy(value);
+        }
+
+        viewStrategy.assert(value);
+
+        if (_origin.moduleId) {
+          value.makeRelativeTo(_origin.moduleId);
+        }
+
+        return value;
+      }
+
+      if (typeof value === 'string') {
+        value = new RelativeViewStrategy(value);
+      }
+
+      if (viewStrategy.validate(value)) {
+        return value;
+      }
+
+      if (typeof value !== 'function') {
+        value = value.constructor;
+      }
+
+      var origin = _aureliaMetadata.Origin.get(value);
+      var strategy = _aureliaMetadata.metadata.get(ViewLocator.viewStrategyMetadataKey, value);
+
+      if (!strategy) {
+        if (!origin.moduleId) {
+          throw new Error('Cannot determine default view strategy for object.', value);
+        }
+
+        strategy = this.createFallbackViewStrategy(origin);
+      } else if (origin.moduleId) {
+        strategy.moduleId = origin.moduleId;
+      }
+
+      return strategy;
+    };
+
+    ViewLocator.prototype.createFallbackViewStrategy = function createFallbackViewStrategy(origin) {
+      return new ConventionalViewStrategy(this, origin);
+    };
+
+    ViewLocator.prototype.convertOriginToViewUrl = function convertOriginToViewUrl(origin) {
+      var moduleId = origin.moduleId;
+      var id = moduleId.endsWith('.js') || moduleId.endsWith('.ts') ? moduleId.substring(0, moduleId.length - 3) : moduleId;
+      return id + '.html';
+    };
+
+    return ViewLocator;
+  }(), _class10.viewStrategyMetadataKey = 'aurelia:view-strategy', _temp2);
+
+
+  function mi(name) {
+    throw new Error('BindingLanguage must implement ' + name + '().');
+  }
+
+  var BindingLanguage = exports.BindingLanguage = function () {
+    function BindingLanguage() {
+      
+    }
+
+    BindingLanguage.prototype.inspectAttribute = function inspectAttribute(resources, elementName, attrName, attrValue) {
+      mi('inspectAttribute');
+    };
+
+    BindingLanguage.prototype.createAttributeInstruction = function createAttributeInstruction(resources, element, info, existingInstruction) {
+      mi('createAttributeInstruction');
+    };
+
+    BindingLanguage.prototype.inspectTextContent = function inspectTextContent(resources, value) {
+      mi('inspectTextContent');
+    };
+
+    return BindingLanguage;
+  }();
+
+  var noNodes = Object.freeze([]);
+
+  var SlotCustomAttribute = exports.SlotCustomAttribute = (_dec6 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element), _dec6(_class11 = function () {
+    function SlotCustomAttribute(element) {
+      
+
+      this.element = element;
+      this.element.auSlotAttribute = this;
+    }
+
+    SlotCustomAttribute.prototype.valueChanged = function valueChanged(newValue, oldValue) {};
+
+    return SlotCustomAttribute;
+  }()) || _class11);
+
+  var PassThroughSlot = exports.PassThroughSlot = function () {
+    function PassThroughSlot(anchor, name, destinationName, fallbackFactory) {
+      
+
+      this.anchor = anchor;
+      this.anchor.viewSlot = this;
+      this.name = name;
+      this.destinationName = destinationName;
+      this.fallbackFactory = fallbackFactory;
+      this.destinationSlot = null;
+      this.projections = 0;
+      this.contentView = null;
+
+      var attr = new SlotCustomAttribute(this.anchor);
+      attr.value = this.destinationName;
+    }
+
+    PassThroughSlot.prototype.renderFallbackContent = function renderFallbackContent(view, nodes, projectionSource, index) {
+      if (this.contentView === null) {
+        this.contentView = this.fallbackFactory.create(this.ownerView.container);
+        this.contentView.bind(this.ownerView.bindingContext, this.ownerView.overrideContext);
+
+        var slots = Object.create(null);
+        slots[this.destinationSlot.name] = this.destinationSlot;
+
+        ShadowDOM.distributeView(this.contentView, slots, projectionSource, index, this.destinationSlot.name);
+      }
+    };
+
+    PassThroughSlot.prototype.passThroughTo = function passThroughTo(destinationSlot) {
+      this.destinationSlot = destinationSlot;
+    };
+
+    PassThroughSlot.prototype.addNode = function addNode(view, node, projectionSource, index) {
+      if (this.contentView !== null) {
+        this.contentView.removeNodes();
+        this.contentView.detached();
+        this.contentView.unbind();
+        this.contentView = null;
+      }
+
+      if (node.viewSlot instanceof PassThroughSlot) {
+        node.viewSlot.passThroughTo(this);
+        return;
+      }
+
+      this.projections++;
+      this.destinationSlot.addNode(view, node, projectionSource, index);
+    };
+
+    PassThroughSlot.prototype.removeView = function removeView(view, projectionSource) {
+      this.projections--;
+      this.destinationSlot.removeView(view, projectionSource);
+
+      if (this.needsFallbackRendering) {
+        this.renderFallbackContent(null, noNodes, projectionSource);
+      }
+    };
+
+    PassThroughSlot.prototype.removeAll = function removeAll(projectionSource) {
+      this.projections = 0;
+      this.destinationSlot.removeAll(projectionSource);
+
+      if (this.needsFallbackRendering) {
+        this.renderFallbackContent(null, noNodes, projectionSource);
+      }
+    };
+
+    PassThroughSlot.prototype.projectFrom = function projectFrom(view, projectionSource) {
+      this.destinationSlot.projectFrom(view, projectionSource);
+    };
+
+    PassThroughSlot.prototype.created = function created(ownerView) {
+      this.ownerView = ownerView;
+    };
+
+    PassThroughSlot.prototype.bind = function bind(view) {
+      if (this.contentView) {
+        this.contentView.bind(view.bindingContext, view.overrideContext);
+      }
+    };
+
+    PassThroughSlot.prototype.attached = function attached() {
+      if (this.contentView) {
+        this.contentView.attached();
+      }
+    };
+
+    PassThroughSlot.prototype.detached = function detached() {
+      if (this.contentView) {
+        this.contentView.detached();
+      }
+    };
+
+    PassThroughSlot.prototype.unbind = function unbind() {
+      if (this.contentView) {
+        this.contentView.unbind();
+      }
+    };
+
+    _createClass(PassThroughSlot, [{
+      key: 'needsFallbackRendering',
+      get: function get() {
+        return this.fallbackFactory && this.projections === 0;
+      }
+    }]);
+
+    return PassThroughSlot;
+  }();
+
+  var ShadowSlot = exports.ShadowSlot = function () {
+    function ShadowSlot(anchor, name, fallbackFactory) {
+      
+
+      this.anchor = anchor;
+      this.anchor.isContentProjectionSource = true;
+      this.anchor.viewSlot = this;
+      this.name = name;
+      this.fallbackFactory = fallbackFactory;
+      this.contentView = null;
+      this.projections = 0;
+      this.children = [];
+      this.projectFromAnchors = null;
+      this.destinationSlots = null;
+    }
+
+    ShadowSlot.prototype.addNode = function addNode(view, node, projectionSource, index, destination) {
+      if (this.contentView !== null) {
+        this.contentView.removeNodes();
+        this.contentView.detached();
+        this.contentView.unbind();
+        this.contentView = null;
+      }
+
+      if (node.viewSlot instanceof PassThroughSlot) {
+        node.viewSlot.passThroughTo(this);
+        return;
+      }
+
+      if (this.destinationSlots !== null) {
+        ShadowDOM.distributeNodes(view, [node], this.destinationSlots, this, index);
+      } else {
+        node.auOwnerView = view;
+        node.auProjectionSource = projectionSource;
+        node.auAssignedSlot = this;
+
+        var anchor = this._findAnchor(view, node, projectionSource, index);
+        var parent = anchor.parentNode;
+
+        parent.insertBefore(node, anchor);
+        this.children.push(node);
+        this.projections++;
+      }
+    };
+
+    ShadowSlot.prototype.removeView = function removeView(view, projectionSource) {
+      if (this.destinationSlots !== null) {
+        ShadowDOM.undistributeView(view, this.destinationSlots, this);
+      } else if (this.contentView && this.contentView.hasSlots) {
+        ShadowDOM.undistributeView(view, this.contentView.slots, projectionSource);
+      } else {
+        var found = this.children.find(function (x) {
+          return x.auSlotProjectFrom === projectionSource;
         });
-      } else {
-        $defineProperties(o, descriptors);
-      }
-      return o;
-    };
-    defineProperty(Object, DPies, descriptor);
+        if (found) {
+          var _children = found.auProjectionChildren;
 
-    descriptor.value = propertyIsEnumerable;
-    defineProperty(ObjectProto, PIE, descriptor);
+          for (var i = 0, ii = _children.length; i < ii; ++i) {
+            var _child = _children[i];
 
-    descriptor.value = _Symbol;
-    defineProperty(G, 'Symbol', descriptor);
-
-    descriptor.value = function (key) {
-      var uid = prefix.concat(prefix, key, random);
-      return uid in ObjectProto ? source[uid] : setAndGetSymbol(uid);
-    };
-    defineProperty(_Symbol, 'for', descriptor);
-
-    descriptor.value = function (symbol) {
-      return hOP.call(source, symbol) ? symbol.slice(prefixLength * 2, -random.length) : void 0;
-    };
-    defineProperty(_Symbol, 'keyFor', descriptor);
-
-    descriptor.value = function getOwnPropertyDescriptor(o, key) {
-      var descriptor = gOPD(o, key);
-      if (descriptor && onlySymbols(key)) {
-        descriptor.enumerable = propertyIsEnumerable.call(o, key);
-      }
-      return descriptor;
-    };
-    defineProperty(Object, GOPD, descriptor);
-
-    descriptor.value = function (proto, descriptors) {
-      return arguments.length === 1 ? create(proto) : createWithSymbols(proto, descriptors);
-    };
-    defineProperty(Object, 'create', descriptor);
-
-    descriptor.value = function () {
-      var str = toString.call(this);
-      return str === '[object String]' && onlySymbols(this) ? '[object Symbol]' : str;
-    };
-    defineProperty(ObjectProto, 'toString', descriptor);
-
-    try {
-      setDescriptor = create(defineProperty({}, prefix, {
-        get: function get() {
-          return defineProperty(this, prefix, { value: false })[prefix];
-        }
-      }))[prefix] || defineProperty;
-    } catch (o_O) {
-      setDescriptor = function setDescriptor(o, key, descriptor) {
-        var protoDescriptor = gOPD(ObjectProto, key);
-        delete ObjectProto[key];
-        defineProperty(o, key, descriptor);
-        defineProperty(ObjectProto, key, protoDescriptor);
-      };
-    }
-  })(Object, 'getOwnPropertySymbols');
-
-  (function (O, S) {
-    var dP = O.defineProperty,
-        ObjectProto = O.prototype,
-        toString = ObjectProto.toString,
-        toStringTag = 'toStringTag',
-        descriptor;
-    ['iterator', 'match', 'replace', 'search', 'split', 'hasInstance', 'isConcatSpreadable', 'unscopables', 'species', 'toPrimitive', toStringTag].forEach(function (name) {
-      if (!(name in Symbol)) {
-        dP(Symbol, name, { value: Symbol(name) });
-        switch (name) {
-          case toStringTag:
-            descriptor = O.getOwnPropertyDescriptor(ObjectProto, 'toString');
-            descriptor.value = function () {
-              var str = toString.call(this),
-                  tst = typeof this === 'undefined' || this === null ? undefined : this[Symbol.toStringTag];
-              return typeof tst === 'undefined' ? str : '[object ' + tst + ']';
-            };
-            dP(ObjectProto, 'toString', descriptor);
-            break;
-        }
-      }
-    });
-  })(Object, Symbol);
-
-  (function (Si, AP, SP) {
-
-    function returnThis() {
-      return this;
-    }
-
-    if (!AP[Si]) AP[Si] = function () {
-      var i = 0,
-          self = this,
-          iterator = {
-        next: function next() {
-          var done = self.length <= i;
-          return done ? { done: done } : { done: done, value: self[i++] };
-        }
-      };
-      iterator[Si] = returnThis;
-      return iterator;
-    };
-
-    if (!SP[Si]) SP[Si] = function () {
-      var fromCodePoint = String.fromCodePoint,
-          self = this,
-          i = 0,
-          length = self.length,
-          iterator = {
-        next: function next() {
-          var done = length <= i,
-              c = done ? '' : fromCodePoint(self.codePointAt(i));
-          i += c.length;
-          return done ? { done: done } : { done: done, value: c };
-        }
-      };
-      iterator[Si] = returnThis;
-      return iterator;
-    };
-  })(Symbol.iterator, Array.prototype, String.prototype);
-
-  Number.isNaN = Number.isNaN || function (value) {
-    return value !== value;
-  };
-
-  Number.isFinite = Number.isFinite || function (value) {
-    return typeof value === "number" && isFinite(value);
-  };
-  if (!String.prototype.endsWith || function () {
-    try {
-      return !"ab".endsWith("a", 1);
-    } catch (e) {
-      return true;
-    }
-  }()) {
-    String.prototype.endsWith = function (searchString, position) {
-      var subjectString = this.toString();
-      if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
-        position = subjectString.length;
-      }
-      position -= searchString.length;
-      var lastIndex = subjectString.indexOf(searchString, position);
-      return lastIndex !== -1 && lastIndex === position;
-    };
-  }
-
-  if (!String.prototype.startsWith || function () {
-    try {
-      return !"ab".startsWith("b", 1);
-    } catch (e) {
-      return true;
-    }
-  }()) {
-    String.prototype.startsWith = function (searchString, position) {
-      position = position || 0;
-      return this.substr(position, searchString.length) === searchString;
-    };
-  }
-
-  if (!Array.from) {
-    Array.from = function () {
-      var toInteger = function toInteger(it) {
-        return isNaN(it = +it) ? 0 : (it > 0 ? Math.floor : Math.ceil)(it);
-      };
-      var toLength = function toLength(it) {
-        return it > 0 ? Math.min(toInteger(it), 0x1fffffffffffff) : 0;
-      };
-      var iterCall = function iterCall(iter, fn, val, index) {
-        try {
-          return fn(val, index);
-        } catch (E) {
-          if (typeof iter.return == 'function') iter.return();
-          throw E;
-        }
-      };
-
-      return function from(arrayLike) {
-        var O = Object(arrayLike),
-            C = typeof this == 'function' ? this : Array,
-            aLen = arguments.length,
-            mapfn = aLen > 1 ? arguments[1] : undefined,
-            mapping = mapfn !== undefined,
-            index = 0,
-            iterFn = O[Symbol.iterator],
-            length,
-            result,
-            step,
-            iterator;
-        if (mapping) mapfn = mapfn.bind(aLen > 2 ? arguments[2] : undefined);
-        if (iterFn != undefined && !Array.isArray(arrayLike)) {
-          for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-            result[index] = mapping ? iterCall(iterator, mapfn, step.value, index) : step.value;
-          }
-        } else {
-          length = toLength(O.length);
-          for (result = new C(length); length > index; index++) {
-            result[index] = mapping ? mapfn(O[index], index) : O[index];
-          }
-        }
-        result.length = index;
-        return result;
-      };
-    }();
-  }
-
-  if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-      configurable: true,
-      writable: true,
-      enumerable: false,
-      value: function value(predicate) {
-        if (this === null) {
-          throw new TypeError('Array.prototype.find called on null or undefined');
-        }
-        if (typeof predicate !== 'function') {
-          throw new TypeError('predicate must be a function');
-        }
-        var list = Object(this);
-        var length = list.length >>> 0;
-        var thisArg = arguments[1];
-        var value;
-
-        for (var i = 0; i < length; i++) {
-          value = list[i];
-          if (predicate.call(thisArg, value, i, list)) {
-            return value;
-          }
-        }
-        return undefined;
-      }
-    });
-  }
-
-  if (!Array.prototype.findIndex) {
-    Object.defineProperty(Array.prototype, 'findIndex', {
-      configurable: true,
-      writable: true,
-      enumerable: false,
-      value: function value(predicate) {
-        if (this === null) {
-          throw new TypeError('Array.prototype.findIndex called on null or undefined');
-        }
-        if (typeof predicate !== 'function') {
-          throw new TypeError('predicate must be a function');
-        }
-        var list = Object(this);
-        var length = list.length >>> 0;
-        var thisArg = arguments[1];
-        var value;
-
-        for (var i = 0; i < length; i++) {
-          value = list[i];
-          if (predicate.call(thisArg, value, i, list)) {
-            return i;
-          }
-        }
-        return -1;
-      }
-    });
-  }
-
-  if (!Array.prototype.includes) {
-    Object.defineProperty(Array.prototype, 'includes', {
-      configurable: true,
-      writable: true,
-      enumerable: false,
-      value: function value(searchElement) {
-        var O = Object(this);
-        var len = parseInt(O.length) || 0;
-        if (len === 0) {
-          return false;
-        }
-        var n = parseInt(arguments[1]) || 0;
-        var k;
-        if (n >= 0) {
-          k = n;
-        } else {
-          k = len + n;
-          if (k < 0) {
-            k = 0;
-          }
-        }
-        var currentElement;
-        while (k < len) {
-          currentElement = O[k];
-          if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
-            return true;
-          }
-          k++;
-        }
-        return false;
-      }
-    });
-  }
-
-  (function () {
-    var needsFix = false;
-
-    try {
-      var s = Object.keys('a');
-      needsFix = s.length !== 1 || s[0] !== '0';
-    } catch (e) {
-      needsFix = true;
-    }
-
-    if (needsFix) {
-      Object.keys = function () {
-        var hasOwnProperty = Object.prototype.hasOwnProperty,
-            hasDontEnumBug = !{ toString: null }.propertyIsEnumerable('toString'),
-            dontEnums = ['toString', 'toLocaleString', 'valueOf', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'constructor'],
-            dontEnumsLength = dontEnums.length;
-
-        return function (obj) {
-          if (obj === undefined || obj === null) {
-            throw TypeError('Cannot convert undefined or null to object');
-          }
-
-          obj = Object(obj);
-
-          var result = [],
-              prop,
-              i;
-
-          for (prop in obj) {
-            if (hasOwnProperty.call(obj, prop)) {
-              result.push(prop);
+            if (_child.auOwnerView === view) {
+              _children.splice(i, 1);
+              view.fragment.appendChild(_child);
+              i--;ii--;
+              this.projections--;
             }
           }
 
-          if (hasDontEnumBug) {
-            for (i = 0; i < dontEnumsLength; i++) {
-              if (hasOwnProperty.call(obj, dontEnums[i])) {
-                result.push(dontEnums[i]);
+          if (this.needsFallbackRendering) {
+            this.renderFallbackContent(view, noNodes, projectionSource);
+          }
+        }
+      }
+    };
+
+    ShadowSlot.prototype.removeAll = function removeAll(projectionSource) {
+      if (this.destinationSlots !== null) {
+        ShadowDOM.undistributeAll(this.destinationSlots, this);
+      } else if (this.contentView && this.contentView.hasSlots) {
+        ShadowDOM.undistributeAll(this.contentView.slots, projectionSource);
+      } else {
+        var found = this.children.find(function (x) {
+          return x.auSlotProjectFrom === projectionSource;
+        });
+
+        if (found) {
+          var _children2 = found.auProjectionChildren;
+          for (var i = 0, ii = _children2.length; i < ii; ++i) {
+            var _child2 = _children2[i];
+            _child2.auOwnerView.fragment.appendChild(_child2);
+            this.projections--;
+          }
+
+          found.auProjectionChildren = [];
+
+          if (this.needsFallbackRendering) {
+            this.renderFallbackContent(null, noNodes, projectionSource);
+          }
+        }
+      }
+    };
+
+    ShadowSlot.prototype._findAnchor = function _findAnchor(view, node, projectionSource, index) {
+      if (projectionSource) {
+        var found = this.children.find(function (x) {
+          return x.auSlotProjectFrom === projectionSource;
+        });
+        if (found) {
+          if (index !== undefined) {
+            var _children3 = found.auProjectionChildren;
+            var viewIndex = -1;
+            var lastView = void 0;
+
+            for (var i = 0, ii = _children3.length; i < ii; ++i) {
+              var current = _children3[i];
+
+              if (current.auOwnerView !== lastView) {
+                viewIndex++;
+                lastView = current.auOwnerView;
+
+                if (viewIndex >= index && lastView !== view) {
+                  _children3.splice(i, 0, node);
+                  return current;
+                }
               }
             }
           }
 
-          return result;
-        };
-      }();
-    }
-  })();
+          found.auProjectionChildren.push(node);
+          return found;
+        }
+      }
 
-  (function (O) {
-    if ('assign' in O) {
+      return this.anchor;
+    };
+
+    ShadowSlot.prototype.projectTo = function projectTo(slots) {
+      this.destinationSlots = slots;
+    };
+
+    ShadowSlot.prototype.projectFrom = function projectFrom(view, projectionSource) {
+      var anchor = _aureliaPal.DOM.createComment('anchor');
+      var parent = this.anchor.parentNode;
+      anchor.auSlotProjectFrom = projectionSource;
+      anchor.auOwnerView = view;
+      anchor.auProjectionChildren = [];
+      parent.insertBefore(anchor, this.anchor);
+      this.children.push(anchor);
+
+      if (this.projectFromAnchors === null) {
+        this.projectFromAnchors = [];
+      }
+
+      this.projectFromAnchors.push(anchor);
+    };
+
+    ShadowSlot.prototype.renderFallbackContent = function renderFallbackContent(view, nodes, projectionSource, index) {
+      if (this.contentView === null) {
+        this.contentView = this.fallbackFactory.create(this.ownerView.container);
+        this.contentView.bind(this.ownerView.bindingContext, this.ownerView.overrideContext);
+        this.contentView.insertNodesBefore(this.anchor);
+      }
+
+      if (this.contentView.hasSlots) {
+        var slots = this.contentView.slots;
+        var projectFromAnchors = this.projectFromAnchors;
+
+        if (projectFromAnchors !== null) {
+          for (var slotName in slots) {
+            var slot = slots[slotName];
+
+            for (var i = 0, ii = projectFromAnchors.length; i < ii; ++i) {
+              var anchor = projectFromAnchors[i];
+              slot.projectFrom(anchor.auOwnerView, anchor.auSlotProjectFrom);
+            }
+          }
+        }
+
+        this.fallbackSlots = slots;
+        ShadowDOM.distributeNodes(view, nodes, slots, projectionSource, index);
+      }
+    };
+
+    ShadowSlot.prototype.created = function created(ownerView) {
+      this.ownerView = ownerView;
+    };
+
+    ShadowSlot.prototype.bind = function bind(view) {
+      if (this.contentView) {
+        this.contentView.bind(view.bindingContext, view.overrideContext);
+      }
+    };
+
+    ShadowSlot.prototype.attached = function attached() {
+      if (this.contentView) {
+        this.contentView.attached();
+      }
+    };
+
+    ShadowSlot.prototype.detached = function detached() {
+      if (this.contentView) {
+        this.contentView.detached();
+      }
+    };
+
+    ShadowSlot.prototype.unbind = function unbind() {
+      if (this.contentView) {
+        this.contentView.unbind();
+      }
+    };
+
+    _createClass(ShadowSlot, [{
+      key: 'needsFallbackRendering',
+      get: function get() {
+        return this.fallbackFactory && this.projections === 0;
+      }
+    }]);
+
+    return ShadowSlot;
+  }();
+
+  var ShadowDOM = exports.ShadowDOM = (_temp3 = _class12 = function () {
+    function ShadowDOM() {
+      
+    }
+
+    ShadowDOM.getSlotName = function getSlotName(node) {
+      if (node.auSlotAttribute === undefined) {
+        return ShadowDOM.defaultSlotKey;
+      }
+
+      return node.auSlotAttribute.value;
+    };
+
+    ShadowDOM.distributeView = function distributeView(view, slots, projectionSource, index, destinationOverride) {
+      var nodes = void 0;
+
+      if (view === null) {
+        nodes = noNodes;
+      } else {
+        var childNodes = view.fragment.childNodes;
+        var ii = childNodes.length;
+        nodes = new Array(ii);
+
+        for (var i = 0; i < ii; ++i) {
+          nodes[i] = childNodes[i];
+        }
+      }
+
+      ShadowDOM.distributeNodes(view, nodes, slots, projectionSource, index, destinationOverride);
+    };
+
+    ShadowDOM.undistributeView = function undistributeView(view, slots, projectionSource) {
+      for (var slotName in slots) {
+        slots[slotName].removeView(view, projectionSource);
+      }
+    };
+
+    ShadowDOM.undistributeAll = function undistributeAll(slots, projectionSource) {
+      for (var slotName in slots) {
+        slots[slotName].removeAll(projectionSource);
+      }
+    };
+
+    ShadowDOM.distributeNodes = function distributeNodes(view, nodes, slots, projectionSource, index, destinationOverride) {
+      for (var i = 0, ii = nodes.length; i < ii; ++i) {
+        var currentNode = nodes[i];
+        var nodeType = currentNode.nodeType;
+
+        if (currentNode.isContentProjectionSource) {
+          currentNode.viewSlot.projectTo(slots);
+
+          for (var slotName in slots) {
+            slots[slotName].projectFrom(view, currentNode.viewSlot);
+          }
+
+          nodes.splice(i, 1);
+          ii--;i--;
+        } else if (nodeType === 1 || nodeType === 3 || currentNode.viewSlot instanceof PassThroughSlot) {
+          if (nodeType === 3 && _isAllWhitespace(currentNode)) {
+            nodes.splice(i, 1);
+            ii--;i--;
+          } else {
+            var found = slots[destinationOverride || ShadowDOM.getSlotName(currentNode)];
+
+            if (found) {
+              found.addNode(view, currentNode, projectionSource, index);
+              nodes.splice(i, 1);
+              ii--;i--;
+            }
+          }
+        } else {
+          nodes.splice(i, 1);
+          ii--;i--;
+        }
+      }
+
+      for (var _slotName in slots) {
+        var slot = slots[_slotName];
+
+        if (slot.needsFallbackRendering) {
+          slot.renderFallbackContent(view, nodes, projectionSource, index);
+        }
+      }
+    };
+
+    return ShadowDOM;
+  }(), _class12.defaultSlotKey = '__au-default-slot-key__', _temp3);
+
+
+  function register(lookup, name, resource, type) {
+    if (!name) {
       return;
     }
 
-    O.defineProperty(O, 'assign', {
-      configurable: true,
-      writable: true,
-      value: function () {
-        var gOPS = O.getOwnPropertySymbols,
-            pIE = O.propertyIsEnumerable,
-            filterOS = gOPS ? function (self) {
-          return gOPS(self).filter(pIE, self);
-        } : function () {
-          return Array.prototype;
-        };
+    var existing = lookup[name];
+    if (existing) {
+      if (existing !== resource) {
+        throw new Error('Attempted to register ' + type + ' when one with the same name already exists. Name: ' + name + '.');
+      }
 
-        return function assign(where) {
-          if (gOPS && !(where instanceof O)) {
-            console.warn('problematic Symbols', where);
+      return;
+    }
+
+    lookup[name] = resource;
+  }
+
+  var ViewResources = exports.ViewResources = function () {
+    function ViewResources(parent, viewUrl) {
+      
+
+      this.bindingLanguage = null;
+
+      this.parent = parent || null;
+      this.hasParent = this.parent !== null;
+      this.viewUrl = viewUrl || '';
+      this.lookupFunctions = {
+        valueConverters: this.getValueConverter.bind(this),
+        bindingBehaviors: this.getBindingBehavior.bind(this)
+      };
+      this.attributes = Object.create(null);
+      this.elements = Object.create(null);
+      this.valueConverters = Object.create(null);
+      this.bindingBehaviors = Object.create(null);
+      this.attributeMap = Object.create(null);
+      this.values = Object.create(null);
+      this.beforeCompile = this.afterCompile = this.beforeCreate = this.afterCreate = this.beforeBind = this.beforeUnbind = false;
+    }
+
+    ViewResources.prototype._tryAddHook = function _tryAddHook(obj, name) {
+      if (typeof obj[name] === 'function') {
+        var func = obj[name].bind(obj);
+        var counter = 1;
+        var callbackName = void 0;
+
+        while (this[callbackName = name + counter.toString()] !== undefined) {
+          counter++;
+        }
+
+        this[name] = true;
+        this[callbackName] = func;
+      }
+    };
+
+    ViewResources.prototype._invokeHook = function _invokeHook(name, one, two, three, four) {
+      if (this.hasParent) {
+        this.parent._invokeHook(name, one, two, three, four);
+      }
+
+      if (this[name]) {
+        this[name + '1'](one, two, three, four);
+
+        var callbackName = name + '2';
+        if (this[callbackName]) {
+          this[callbackName](one, two, three, four);
+
+          callbackName = name + '3';
+          if (this[callbackName]) {
+            this[callbackName](one, two, three, four);
+
+            var counter = 4;
+
+            while (this[callbackName = name + counter.toString()] !== undefined) {
+              this[callbackName](one, two, three, four);
+              counter++;
+            }
+          }
+        }
+      }
+    };
+
+    ViewResources.prototype.registerViewEngineHooks = function registerViewEngineHooks(hooks) {
+      this._tryAddHook(hooks, 'beforeCompile');
+      this._tryAddHook(hooks, 'afterCompile');
+      this._tryAddHook(hooks, 'beforeCreate');
+      this._tryAddHook(hooks, 'afterCreate');
+      this._tryAddHook(hooks, 'beforeBind');
+      this._tryAddHook(hooks, 'beforeUnbind');
+    };
+
+    ViewResources.prototype.getBindingLanguage = function getBindingLanguage(bindingLanguageFallback) {
+      return this.bindingLanguage || (this.bindingLanguage = bindingLanguageFallback);
+    };
+
+    ViewResources.prototype.patchInParent = function patchInParent(newParent) {
+      var originalParent = this.parent;
+
+      this.parent = newParent || null;
+      this.hasParent = this.parent !== null;
+
+      if (newParent.parent === null) {
+        newParent.parent = originalParent;
+        newParent.hasParent = originalParent !== null;
+      }
+    };
+
+    ViewResources.prototype.relativeToView = function relativeToView(path) {
+      return (0, _aureliaPath.relativeToFile)(path, this.viewUrl);
+    };
+
+    ViewResources.prototype.registerElement = function registerElement(tagName, behavior) {
+      register(this.elements, tagName, behavior, 'an Element');
+    };
+
+    ViewResources.prototype.getElement = function getElement(tagName) {
+      return this.elements[tagName] || (this.hasParent ? this.parent.getElement(tagName) : null);
+    };
+
+    ViewResources.prototype.mapAttribute = function mapAttribute(attribute) {
+      return this.attributeMap[attribute] || (this.hasParent ? this.parent.mapAttribute(attribute) : null);
+    };
+
+    ViewResources.prototype.registerAttribute = function registerAttribute(attribute, behavior, knownAttribute) {
+      this.attributeMap[attribute] = knownAttribute;
+      register(this.attributes, attribute, behavior, 'an Attribute');
+    };
+
+    ViewResources.prototype.getAttribute = function getAttribute(attribute) {
+      return this.attributes[attribute] || (this.hasParent ? this.parent.getAttribute(attribute) : null);
+    };
+
+    ViewResources.prototype.registerValueConverter = function registerValueConverter(name, valueConverter) {
+      register(this.valueConverters, name, valueConverter, 'a ValueConverter');
+    };
+
+    ViewResources.prototype.getValueConverter = function getValueConverter(name) {
+      return this.valueConverters[name] || (this.hasParent ? this.parent.getValueConverter(name) : null);
+    };
+
+    ViewResources.prototype.registerBindingBehavior = function registerBindingBehavior(name, bindingBehavior) {
+      register(this.bindingBehaviors, name, bindingBehavior, 'a BindingBehavior');
+    };
+
+    ViewResources.prototype.getBindingBehavior = function getBindingBehavior(name) {
+      return this.bindingBehaviors[name] || (this.hasParent ? this.parent.getBindingBehavior(name) : null);
+    };
+
+    ViewResources.prototype.registerValue = function registerValue(name, value) {
+      register(this.values, name, value, 'a value');
+    };
+
+    ViewResources.prototype.getValue = function getValue(name) {
+      return this.values[name] || (this.hasParent ? this.parent.getValue(name) : null);
+    };
+
+    return ViewResources;
+  }();
+
+  var View = exports.View = function () {
+    function View(container, viewFactory, fragment, controllers, bindings, children, slots) {
+      
+
+      this.container = container;
+      this.viewFactory = viewFactory;
+      this.resources = viewFactory.resources;
+      this.fragment = fragment;
+      this.firstChild = fragment.firstChild;
+      this.lastChild = fragment.lastChild;
+      this.controllers = controllers;
+      this.bindings = bindings;
+      this.children = children;
+      this.slots = slots;
+      this.hasSlots = false;
+      this.fromCache = false;
+      this.isBound = false;
+      this.isAttached = false;
+      this.bindingContext = null;
+      this.overrideContext = null;
+      this.controller = null;
+      this.viewModelScope = null;
+      this.animatableElement = undefined;
+      this._isUserControlled = false;
+      this.contentView = null;
+
+      for (var key in slots) {
+        this.hasSlots = true;
+        break;
+      }
+    }
+
+    View.prototype.returnToCache = function returnToCache() {
+      this.viewFactory.returnViewToCache(this);
+    };
+
+    View.prototype.created = function created() {
+      var i = void 0;
+      var ii = void 0;
+      var controllers = this.controllers;
+
+      for (i = 0, ii = controllers.length; i < ii; ++i) {
+        controllers[i].created(this);
+      }
+    };
+
+    View.prototype.bind = function bind(bindingContext, overrideContext, _systemUpdate) {
+      var controllers = void 0;
+      var bindings = void 0;
+      var children = void 0;
+      var i = void 0;
+      var ii = void 0;
+
+      if (_systemUpdate && this._isUserControlled) {
+        return;
+      }
+
+      if (this.isBound) {
+        if (this.bindingContext === bindingContext) {
+          return;
+        }
+
+        this.unbind();
+      }
+
+      this.isBound = true;
+      this.bindingContext = bindingContext;
+      this.overrideContext = overrideContext || (0, _aureliaBinding.createOverrideContext)(bindingContext);
+
+      this.resources._invokeHook('beforeBind', this);
+
+      bindings = this.bindings;
+      for (i = 0, ii = bindings.length; i < ii; ++i) {
+        bindings[i].bind(this);
+      }
+
+      if (this.viewModelScope !== null) {
+        bindingContext.bind(this.viewModelScope.bindingContext, this.viewModelScope.overrideContext);
+        this.viewModelScope = null;
+      }
+
+      controllers = this.controllers;
+      for (i = 0, ii = controllers.length; i < ii; ++i) {
+        controllers[i].bind(this);
+      }
+
+      children = this.children;
+      for (i = 0, ii = children.length; i < ii; ++i) {
+        children[i].bind(bindingContext, overrideContext, true);
+      }
+
+      if (this.hasSlots) {
+        ShadowDOM.distributeView(this.contentView, this.slots);
+      }
+    };
+
+    View.prototype.addBinding = function addBinding(binding) {
+      this.bindings.push(binding);
+
+      if (this.isBound) {
+        binding.bind(this);
+      }
+    };
+
+    View.prototype.unbind = function unbind() {
+      var controllers = void 0;
+      var bindings = void 0;
+      var children = void 0;
+      var i = void 0;
+      var ii = void 0;
+
+      if (this.isBound) {
+        this.isBound = false;
+        this.resources._invokeHook('beforeUnbind', this);
+
+        if (this.controller !== null) {
+          this.controller.unbind();
+        }
+
+        bindings = this.bindings;
+        for (i = 0, ii = bindings.length; i < ii; ++i) {
+          bindings[i].unbind();
+        }
+
+        controllers = this.controllers;
+        for (i = 0, ii = controllers.length; i < ii; ++i) {
+          controllers[i].unbind();
+        }
+
+        children = this.children;
+        for (i = 0, ii = children.length; i < ii; ++i) {
+          children[i].unbind();
+        }
+
+        this.bindingContext = null;
+        this.overrideContext = null;
+      }
+    };
+
+    View.prototype.insertNodesBefore = function insertNodesBefore(refNode) {
+      refNode.parentNode.insertBefore(this.fragment, refNode);
+    };
+
+    View.prototype.appendNodesTo = function appendNodesTo(parent) {
+      parent.appendChild(this.fragment);
+    };
+
+    View.prototype.removeNodes = function removeNodes() {
+      var fragment = this.fragment;
+      var current = this.firstChild;
+      var end = this.lastChild;
+      var next = void 0;
+
+      while (current) {
+        next = current.nextSibling;
+        fragment.appendChild(current);
+
+        if (current === end) {
+          break;
+        }
+
+        current = next;
+      }
+    };
+
+    View.prototype.attached = function attached() {
+      var controllers = void 0;
+      var children = void 0;
+      var i = void 0;
+      var ii = void 0;
+
+      if (this.isAttached) {
+        return;
+      }
+
+      this.isAttached = true;
+
+      if (this.controller !== null) {
+        this.controller.attached();
+      }
+
+      controllers = this.controllers;
+      for (i = 0, ii = controllers.length; i < ii; ++i) {
+        controllers[i].attached();
+      }
+
+      children = this.children;
+      for (i = 0, ii = children.length; i < ii; ++i) {
+        children[i].attached();
+      }
+    };
+
+    View.prototype.detached = function detached() {
+      var controllers = void 0;
+      var children = void 0;
+      var i = void 0;
+      var ii = void 0;
+
+      if (this.isAttached) {
+        this.isAttached = false;
+
+        if (this.controller !== null) {
+          this.controller.detached();
+        }
+
+        controllers = this.controllers;
+        for (i = 0, ii = controllers.length; i < ii; ++i) {
+          controllers[i].detached();
+        }
+
+        children = this.children;
+        for (i = 0, ii = children.length; i < ii; ++i) {
+          children[i].detached();
+        }
+      }
+    };
+
+    return View;
+  }();
+
+  function getAnimatableElement(view) {
+    if (view.animatableElement !== undefined) {
+      return view.animatableElement;
+    }
+
+    var current = view.firstChild;
+
+    while (current && current.nodeType !== 1) {
+      current = current.nextSibling;
+    }
+
+    if (current && current.nodeType === 1) {
+      return view.animatableElement = current.classList.contains('au-animate') ? current : null;
+    }
+
+    return view.animatableElement = null;
+  }
+
+  var ViewSlot = exports.ViewSlot = function () {
+    function ViewSlot(anchor, anchorIsContainer) {
+      var animator = arguments.length <= 2 || arguments[2] === undefined ? Animator.instance : arguments[2];
+
+      
+
+      this.anchor = anchor;
+      this.anchorIsContainer = anchorIsContainer;
+      this.bindingContext = null;
+      this.overrideContext = null;
+      this.animator = animator;
+      this.children = [];
+      this.isBound = false;
+      this.isAttached = false;
+      this.contentSelectors = null;
+      anchor.viewSlot = this;
+      anchor.isContentProjectionSource = false;
+    }
+
+    ViewSlot.prototype.animateView = function animateView(view) {
+      var direction = arguments.length <= 1 || arguments[1] === undefined ? 'enter' : arguments[1];
+
+      var animatableElement = getAnimatableElement(view);
+
+      if (animatableElement !== null) {
+        switch (direction) {
+          case 'enter':
+            return this.animator.enter(animatableElement);
+          case 'leave':
+            return this.animator.leave(animatableElement);
+          default:
+            throw new Error('Invalid animation direction: ' + direction);
+        }
+      }
+    };
+
+    ViewSlot.prototype.transformChildNodesIntoView = function transformChildNodesIntoView() {
+      var parent = this.anchor;
+
+      this.children.push({
+        fragment: parent,
+        firstChild: parent.firstChild,
+        lastChild: parent.lastChild,
+        returnToCache: function returnToCache() {},
+        removeNodes: function removeNodes() {
+          var last = void 0;
+
+          while (last = parent.lastChild) {
+            parent.removeChild(last);
+          }
+        },
+        created: function created() {},
+        bind: function bind() {},
+        unbind: function unbind() {},
+        attached: function attached() {},
+        detached: function detached() {}
+      });
+    };
+
+    ViewSlot.prototype.bind = function bind(bindingContext, overrideContext) {
+      var i = void 0;
+      var ii = void 0;
+      var children = void 0;
+
+      if (this.isBound) {
+        if (this.bindingContext === bindingContext) {
+          return;
+        }
+
+        this.unbind();
+      }
+
+      this.isBound = true;
+      this.bindingContext = bindingContext = bindingContext || this.bindingContext;
+      this.overrideContext = overrideContext = overrideContext || this.overrideContext;
+
+      children = this.children;
+      for (i = 0, ii = children.length; i < ii; ++i) {
+        children[i].bind(bindingContext, overrideContext, true);
+      }
+    };
+
+    ViewSlot.prototype.unbind = function unbind() {
+      if (this.isBound) {
+        var i = void 0;
+        var ii = void 0;
+        var _children4 = this.children;
+
+        this.isBound = false;
+        this.bindingContext = null;
+        this.overrideContext = null;
+
+        for (i = 0, ii = _children4.length; i < ii; ++i) {
+          _children4[i].unbind();
+        }
+      }
+    };
+
+    ViewSlot.prototype.add = function add(view) {
+      if (this.anchorIsContainer) {
+        view.appendNodesTo(this.anchor);
+      } else {
+        view.insertNodesBefore(this.anchor);
+      }
+
+      this.children.push(view);
+
+      if (this.isAttached) {
+        view.attached();
+        return this.animateView(view, 'enter');
+      }
+    };
+
+    ViewSlot.prototype.insert = function insert(index, view) {
+      var children = this.children;
+      var length = children.length;
+
+      if (index === 0 && length === 0 || index >= length) {
+        return this.add(view);
+      }
+
+      view.insertNodesBefore(children[index].firstChild);
+      children.splice(index, 0, view);
+
+      if (this.isAttached) {
+        view.attached();
+        return this.animateView(view, 'enter');
+      }
+    };
+
+    ViewSlot.prototype.move = function move(sourceIndex, targetIndex) {
+      if (sourceIndex === targetIndex) {
+        return;
+      }
+
+      var children = this.children;
+      var view = children[sourceIndex];
+
+      view.removeNodes();
+      view.insertNodesBefore(children[targetIndex].firstChild);
+      children.splice(sourceIndex, 1);
+      children.splice(targetIndex, 0, view);
+    };
+
+    ViewSlot.prototype.remove = function remove(view, returnToCache, skipAnimation) {
+      return this.removeAt(this.children.indexOf(view), returnToCache, skipAnimation);
+    };
+
+    ViewSlot.prototype.removeMany = function removeMany(viewsToRemove, returnToCache, skipAnimation) {
+      var _this4 = this;
+
+      var children = this.children;
+      var ii = viewsToRemove.length;
+      var i = void 0;
+      var rmPromises = [];
+
+      viewsToRemove.forEach(function (child) {
+        if (skipAnimation) {
+          child.removeNodes();
+          return;
+        }
+
+        var animation = _this4.animateView(child, 'leave');
+        if (animation) {
+          rmPromises.push(animation.then(function () {
+            return child.removeNodes();
+          }));
+        } else {
+          child.removeNodes();
+        }
+      });
+
+      var removeAction = function removeAction() {
+        if (_this4.isAttached) {
+          for (i = 0; i < ii; ++i) {
+            viewsToRemove[i].detached();
+          }
+        }
+
+        if (returnToCache) {
+          for (i = 0; i < ii; ++i) {
+            viewsToRemove[i].returnToCache();
+          }
+        }
+
+        for (i = 0; i < ii; ++i) {
+          var index = children.indexOf(viewsToRemove[i]);
+          if (index >= 0) {
+            children.splice(index, 1);
+          }
+        }
+      };
+
+      if (rmPromises.length > 0) {
+        return Promise.all(rmPromises).then(function () {
+          return removeAction();
+        });
+      }
+
+      return removeAction();
+    };
+
+    ViewSlot.prototype.removeAt = function removeAt(index, returnToCache, skipAnimation) {
+      var _this5 = this;
+
+      var view = this.children[index];
+
+      var removeAction = function removeAction() {
+        index = _this5.children.indexOf(view);
+        view.removeNodes();
+        _this5.children.splice(index, 1);
+
+        if (_this5.isAttached) {
+          view.detached();
+        }
+
+        if (returnToCache) {
+          view.returnToCache();
+        }
+
+        return view;
+      };
+
+      if (!skipAnimation) {
+        var animation = this.animateView(view, 'leave');
+        if (animation) {
+          return animation.then(function () {
+            return removeAction();
+          });
+        }
+      }
+
+      return removeAction();
+    };
+
+    ViewSlot.prototype.removeAll = function removeAll(returnToCache, skipAnimation) {
+      var _this6 = this;
+
+      var children = this.children;
+      var ii = children.length;
+      var i = void 0;
+      var rmPromises = [];
+
+      children.forEach(function (child) {
+        if (skipAnimation) {
+          child.removeNodes();
+          return;
+        }
+
+        var animation = _this6.animateView(child, 'leave');
+        if (animation) {
+          rmPromises.push(animation.then(function () {
+            return child.removeNodes();
+          }));
+        } else {
+          child.removeNodes();
+        }
+      });
+
+      var removeAction = function removeAction() {
+        if (_this6.isAttached) {
+          for (i = 0; i < ii; ++i) {
+            children[i].detached();
+          }
+        }
+
+        if (returnToCache) {
+          for (i = 0; i < ii; ++i) {
+            children[i].returnToCache();
+          }
+        }
+
+        _this6.children = [];
+      };
+
+      if (rmPromises.length > 0) {
+        return Promise.all(rmPromises).then(function () {
+          return removeAction();
+        });
+      }
+
+      return removeAction();
+    };
+
+    ViewSlot.prototype.attached = function attached() {
+      var i = void 0;
+      var ii = void 0;
+      var children = void 0;
+      var child = void 0;
+
+      if (this.isAttached) {
+        return;
+      }
+
+      this.isAttached = true;
+
+      children = this.children;
+      for (i = 0, ii = children.length; i < ii; ++i) {
+        child = children[i];
+        child.attached();
+        this.animateView(child, 'enter');
+      }
+    };
+
+    ViewSlot.prototype.detached = function detached() {
+      var i = void 0;
+      var ii = void 0;
+      var children = void 0;
+
+      if (this.isAttached) {
+        this.isAttached = false;
+        children = this.children;
+        for (i = 0, ii = children.length; i < ii; ++i) {
+          children[i].detached();
+        }
+      }
+    };
+
+    ViewSlot.prototype.projectTo = function projectTo(slots) {
+      var _this7 = this;
+
+      this.projectToSlots = slots;
+      this.add = this._projectionAdd;
+      this.insert = this._projectionInsert;
+      this.move = this._projectionMove;
+      this.remove = this._projectionRemove;
+      this.removeAt = this._projectionRemoveAt;
+      this.removeMany = this._projectionRemoveMany;
+      this.removeAll = this._projectionRemoveAll;
+      this.children.forEach(function (view) {
+        return ShadowDOM.distributeView(view, slots, _this7);
+      });
+    };
+
+    ViewSlot.prototype._projectionAdd = function _projectionAdd(view) {
+      ShadowDOM.distributeView(view, this.projectToSlots, this);
+
+      this.children.push(view);
+
+      if (this.isAttached) {
+        view.attached();
+      }
+    };
+
+    ViewSlot.prototype._projectionInsert = function _projectionInsert(index, view) {
+      if (index === 0 && !this.children.length || index >= this.children.length) {
+        this.add(view);
+      } else {
+        ShadowDOM.distributeView(view, this.projectToSlots, this, index);
+
+        this.children.splice(index, 0, view);
+
+        if (this.isAttached) {
+          view.attached();
+        }
+      }
+    };
+
+    ViewSlot.prototype._projectionMove = function _projectionMove(sourceIndex, targetIndex) {
+      if (sourceIndex === targetIndex) {
+        return;
+      }
+
+      var children = this.children;
+      var view = children[sourceIndex];
+
+      ShadowDOM.undistributeView(view, this.projectToSlots, this);
+      ShadowDOM.distributeView(view, this.projectToSlots, this, targetIndex);
+
+      children.splice(sourceIndex, 1);
+      children.splice(targetIndex, 0, view);
+    };
+
+    ViewSlot.prototype._projectionRemove = function _projectionRemove(view, returnToCache) {
+      ShadowDOM.undistributeView(view, this.projectToSlots, this);
+      this.children.splice(this.children.indexOf(view), 1);
+
+      if (this.isAttached) {
+        view.detached();
+      }
+    };
+
+    ViewSlot.prototype._projectionRemoveAt = function _projectionRemoveAt(index, returnToCache) {
+      var view = this.children[index];
+
+      ShadowDOM.undistributeView(view, this.projectToSlots, this);
+      this.children.splice(index, 1);
+
+      if (this.isAttached) {
+        view.detached();
+      }
+    };
+
+    ViewSlot.prototype._projectionRemoveMany = function _projectionRemoveMany(viewsToRemove, returnToCache) {
+      var _this8 = this;
+
+      viewsToRemove.forEach(function (view) {
+        return _this8.remove(view, returnToCache);
+      });
+    };
+
+    ViewSlot.prototype._projectionRemoveAll = function _projectionRemoveAll(returnToCache) {
+      ShadowDOM.undistributeAll(this.projectToSlots, this);
+
+      var children = this.children;
+
+      if (this.isAttached) {
+        for (var i = 0, ii = children.length; i < ii; ++i) {
+          children[i].detached();
+        }
+      }
+
+      this.children = [];
+    };
+
+    return ViewSlot;
+  }();
+
+  var ProviderResolver = (0, _aureliaDependencyInjection.resolver)(_class15 = function () {
+    function ProviderResolver() {
+      
+    }
+
+    ProviderResolver.prototype.get = function get(container, key) {
+      var id = key.__providerId__;
+      return id in container ? container[id] : container[id] = container.invoke(key);
+    };
+
+    return ProviderResolver;
+  }()) || _class15;
+
+  var providerResolverInstance = new ProviderResolver();
+
+  function elementContainerGet(key) {
+    if (key === _aureliaPal.DOM.Element) {
+      return this.element;
+    }
+
+    if (key === BoundViewFactory) {
+      if (this.boundViewFactory) {
+        return this.boundViewFactory;
+      }
+
+      var factory = this.instruction.viewFactory;
+      var _partReplacements = this.partReplacements;
+
+      if (_partReplacements) {
+        factory = _partReplacements[factory.part] || factory;
+      }
+
+      this.boundViewFactory = new BoundViewFactory(this, factory, _partReplacements);
+      return this.boundViewFactory;
+    }
+
+    if (key === ViewSlot) {
+      if (this.viewSlot === undefined) {
+        this.viewSlot = new ViewSlot(this.element, this.instruction.anchorIsContainer);
+        this.element.isContentProjectionSource = this.instruction.lifting;
+        this.children.push(this.viewSlot);
+      }
+
+      return this.viewSlot;
+    }
+
+    if (key === ElementEvents) {
+      return this.elementEvents || (this.elementEvents = new ElementEvents(this.element));
+    }
+
+    if (key === CompositionTransaction) {
+      return this.compositionTransaction || (this.compositionTransaction = this.parent.get(key));
+    }
+
+    if (key === ViewResources) {
+      return this.viewResources;
+    }
+
+    if (key === TargetInstruction) {
+      return this.instruction;
+    }
+
+    return this.superGet(key);
+  }
+
+  function createElementContainer(parent, element, instruction, children, partReplacements, resources) {
+    var container = parent.createChild();
+    var providers = void 0;
+    var i = void 0;
+
+    container.element = element;
+    container.instruction = instruction;
+    container.children = children;
+    container.viewResources = resources;
+    container.partReplacements = partReplacements;
+
+    providers = instruction.providers;
+    i = providers.length;
+
+    while (i--) {
+      container._resolvers.set(providers[i], providerResolverInstance);
+    }
+
+    container.superGet = container.get;
+    container.get = elementContainerGet;
+
+    return container;
+  }
+
+  function makeElementIntoAnchor(element, elementInstruction) {
+    var anchor = _aureliaPal.DOM.createComment('anchor');
+
+    if (elementInstruction) {
+      var firstChild = element.firstChild;
+
+      if (firstChild && firstChild.tagName === 'AU-CONTENT') {
+        anchor.contentElement = firstChild;
+      }
+
+      anchor.hasAttribute = function (name) {
+        return element.hasAttribute(name);
+      };
+      anchor.getAttribute = function (name) {
+        return element.getAttribute(name);
+      };
+      anchor.setAttribute = function (name, value) {
+        element.setAttribute(name, value);
+      };
+    }
+
+    _aureliaPal.DOM.replaceNode(anchor, element);
+
+    return anchor;
+  }
+
+  function applyInstructions(containers, element, instruction, controllers, bindings, children, shadowSlots, partReplacements, resources) {
+    var behaviorInstructions = instruction.behaviorInstructions;
+    var expressions = instruction.expressions;
+    var elementContainer = void 0;
+    var i = void 0;
+    var ii = void 0;
+    var current = void 0;
+    var instance = void 0;
+
+    if (instruction.contentExpression) {
+      bindings.push(instruction.contentExpression.createBinding(element.nextSibling));
+      element.nextSibling.auInterpolationTarget = true;
+      element.parentNode.removeChild(element);
+      return;
+    }
+
+    if (instruction.shadowSlot) {
+      var commentAnchor = _aureliaPal.DOM.createComment('slot');
+      var slot = void 0;
+
+      if (instruction.slotDestination) {
+        slot = new PassThroughSlot(commentAnchor, instruction.slotName, instruction.slotDestination, instruction.slotFallbackFactory);
+      } else {
+        slot = new ShadowSlot(commentAnchor, instruction.slotName, instruction.slotFallbackFactory);
+      }
+
+      _aureliaPal.DOM.replaceNode(commentAnchor, element);
+      shadowSlots[instruction.slotName] = slot;
+      controllers.push(slot);
+      return;
+    }
+
+    if (behaviorInstructions.length) {
+      if (!instruction.anchorIsContainer) {
+        element = makeElementIntoAnchor(element, instruction.elementInstruction);
+      }
+
+      containers[instruction.injectorId] = elementContainer = createElementContainer(containers[instruction.parentInjectorId], element, instruction, children, partReplacements, resources);
+
+      for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
+        current = behaviorInstructions[i];
+        instance = current.type.create(elementContainer, current, element, bindings);
+        controllers.push(instance);
+      }
+    }
+
+    for (i = 0, ii = expressions.length; i < ii; ++i) {
+      bindings.push(expressions[i].createBinding(element));
+    }
+  }
+
+  function styleStringToObject(style, target) {
+    var attributes = style.split(';');
+    var firstIndexOfColon = void 0;
+    var i = void 0;
+    var current = void 0;
+    var key = void 0;
+    var value = void 0;
+
+    target = target || {};
+
+    for (i = 0; i < attributes.length; i++) {
+      current = attributes[i];
+      firstIndexOfColon = current.indexOf(':');
+      key = current.substring(0, firstIndexOfColon).trim();
+      value = current.substring(firstIndexOfColon + 1).trim();
+      target[key] = value;
+    }
+
+    return target;
+  }
+
+  function styleObjectToString(obj) {
+    var result = '';
+
+    for (var key in obj) {
+      result += key + ':' + obj[key] + ';';
+    }
+
+    return result;
+  }
+
+  function applySurrogateInstruction(container, element, instruction, controllers, bindings, children) {
+    var behaviorInstructions = instruction.behaviorInstructions;
+    var expressions = instruction.expressions;
+    var providers = instruction.providers;
+    var values = instruction.values;
+    var i = void 0;
+    var ii = void 0;
+    var current = void 0;
+    var instance = void 0;
+    var currentAttributeValue = void 0;
+
+    i = providers.length;
+    while (i--) {
+      container._resolvers.set(providers[i], providerResolverInstance);
+    }
+
+    for (var key in values) {
+      currentAttributeValue = element.getAttribute(key);
+
+      if (currentAttributeValue) {
+        if (key === 'class') {
+          element.setAttribute('class', currentAttributeValue + ' ' + values[key]);
+        } else if (key === 'style') {
+          var styleObject = styleStringToObject(values[key]);
+          styleStringToObject(currentAttributeValue, styleObject);
+          element.setAttribute('style', styleObjectToString(styleObject));
+        }
+      } else {
+          element.setAttribute(key, values[key]);
+        }
+    }
+
+    if (behaviorInstructions.length) {
+      for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
+        current = behaviorInstructions[i];
+        instance = current.type.create(container, current, element, bindings);
+
+        if (instance.contentView) {
+          children.push(instance.contentView);
+        }
+
+        controllers.push(instance);
+      }
+    }
+
+    for (i = 0, ii = expressions.length; i < ii; ++i) {
+      bindings.push(expressions[i].createBinding(element));
+    }
+  }
+
+  var BoundViewFactory = exports.BoundViewFactory = function () {
+    function BoundViewFactory(parentContainer, viewFactory, partReplacements) {
+      
+
+      this.parentContainer = parentContainer;
+      this.viewFactory = viewFactory;
+      this.factoryCreateInstruction = { partReplacements: partReplacements };
+    }
+
+    BoundViewFactory.prototype.create = function create() {
+      var view = this.viewFactory.create(this.parentContainer.createChild(), this.factoryCreateInstruction);
+      view._isUserControlled = true;
+      return view;
+    };
+
+    BoundViewFactory.prototype.setCacheSize = function setCacheSize(size, doNotOverrideIfAlreadySet) {
+      this.viewFactory.setCacheSize(size, doNotOverrideIfAlreadySet);
+    };
+
+    BoundViewFactory.prototype.getCachedView = function getCachedView() {
+      return this.viewFactory.getCachedView();
+    };
+
+    BoundViewFactory.prototype.returnViewToCache = function returnViewToCache(view) {
+      this.viewFactory.returnViewToCache(view);
+    };
+
+    _createClass(BoundViewFactory, [{
+      key: 'isCaching',
+      get: function get() {
+        return this.viewFactory.isCaching;
+      }
+    }]);
+
+    return BoundViewFactory;
+  }();
+
+  var ViewFactory = exports.ViewFactory = function () {
+    function ViewFactory(template, instructions, resources) {
+      
+
+      this.isCaching = false;
+
+      this.template = template;
+      this.instructions = instructions;
+      this.resources = resources;
+      this.cacheSize = -1;
+      this.cache = null;
+    }
+
+    ViewFactory.prototype.setCacheSize = function setCacheSize(size, doNotOverrideIfAlreadySet) {
+      if (size) {
+        if (size === '*') {
+          size = Number.MAX_VALUE;
+        } else if (typeof size === 'string') {
+          size = parseInt(size, 10);
+        }
+      }
+
+      if (this.cacheSize === -1 || !doNotOverrideIfAlreadySet) {
+        this.cacheSize = size;
+      }
+
+      if (this.cacheSize > 0) {
+        this.cache = [];
+      } else {
+        this.cache = null;
+      }
+
+      this.isCaching = this.cacheSize > 0;
+    };
+
+    ViewFactory.prototype.getCachedView = function getCachedView() {
+      return this.cache !== null ? this.cache.pop() || null : null;
+    };
+
+    ViewFactory.prototype.returnViewToCache = function returnViewToCache(view) {
+      if (view.isAttached) {
+        view.detached();
+      }
+
+      if (view.isBound) {
+        view.unbind();
+      }
+
+      if (this.cache !== null && this.cache.length < this.cacheSize) {
+        view.fromCache = true;
+        this.cache.push(view);
+      }
+    };
+
+    ViewFactory.prototype.create = function create(container, createInstruction, element) {
+      createInstruction = createInstruction || BehaviorInstruction.normal;
+
+      var cachedView = this.getCachedView();
+      if (cachedView !== null) {
+        return cachedView;
+      }
+
+      var fragment = createInstruction.enhance ? this.template : this.template.cloneNode(true);
+      var instructables = fragment.querySelectorAll('.au-target');
+      var instructions = this.instructions;
+      var resources = this.resources;
+      var controllers = [];
+      var bindings = [];
+      var children = [];
+      var shadowSlots = Object.create(null);
+      var containers = { root: container };
+      var partReplacements = createInstruction.partReplacements;
+      var i = void 0;
+      var ii = void 0;
+      var view = void 0;
+      var instructable = void 0;
+      var instruction = void 0;
+
+      this.resources._invokeHook('beforeCreate', this, container, fragment, createInstruction);
+
+      if (element && this.surrogateInstruction !== null) {
+        applySurrogateInstruction(container, element, this.surrogateInstruction, controllers, bindings, children);
+      }
+
+      if (createInstruction.enhance && fragment.hasAttribute('au-target-id')) {
+        instructable = fragment;
+        instruction = instructions[instructable.getAttribute('au-target-id')];
+        applyInstructions(containers, instructable, instruction, controllers, bindings, children, shadowSlots, partReplacements, resources);
+      }
+
+      for (i = 0, ii = instructables.length; i < ii; ++i) {
+        instructable = instructables[i];
+        instruction = instructions[instructable.getAttribute('au-target-id')];
+        applyInstructions(containers, instructable, instruction, controllers, bindings, children, shadowSlots, partReplacements, resources);
+      }
+
+      view = new View(container, this, fragment, controllers, bindings, children, shadowSlots);
+
+      if (!createInstruction.initiatedByBehavior) {
+        view.created();
+      }
+
+      this.resources._invokeHook('afterCreate', view);
+
+      return view;
+    };
+
+    return ViewFactory;
+  }();
+
+  var nextInjectorId = 0;
+  function getNextInjectorId() {
+    return ++nextInjectorId;
+  }
+
+  function configureProperties(instruction, resources) {
+    var type = instruction.type;
+    var attrName = instruction.attrName;
+    var attributes = instruction.attributes;
+    var property = void 0;
+    var key = void 0;
+    var value = void 0;
+
+    var knownAttribute = resources.mapAttribute(attrName);
+    if (knownAttribute && attrName in attributes && knownAttribute !== attrName) {
+      attributes[knownAttribute] = attributes[attrName];
+      delete attributes[attrName];
+    }
+
+    for (key in attributes) {
+      value = attributes[key];
+
+      if (value !== null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+        property = type.attributes[key];
+
+        if (property !== undefined) {
+          value.targetProperty = property.name;
+        } else {
+          value.targetProperty = key;
+        }
+      }
+    }
+  }
+
+  var lastAUTargetID = 0;
+  function getNextAUTargetID() {
+    return (++lastAUTargetID).toString();
+  }
+
+  function makeIntoInstructionTarget(element) {
+    var value = element.getAttribute('class');
+    var auTargetID = getNextAUTargetID();
+
+    element.setAttribute('class', value ? value + ' au-target' : 'au-target');
+    element.setAttribute('au-target-id', auTargetID);
+
+    return auTargetID;
+  }
+
+  function makeShadowSlot(compiler, resources, node, instructions, parentInjectorId) {
+    var auShadowSlot = _aureliaPal.DOM.createElement('au-shadow-slot');
+    _aureliaPal.DOM.replaceNode(auShadowSlot, node);
+
+    var auTargetID = makeIntoInstructionTarget(auShadowSlot);
+    var instruction = TargetInstruction.shadowSlot(parentInjectorId);
+
+    instruction.slotName = node.getAttribute('name') || ShadowDOM.defaultSlotKey;
+    instruction.slotDestination = node.getAttribute('slot');
+
+    if (node.innerHTML.trim()) {
+      var fragment = _aureliaPal.DOM.createDocumentFragment();
+      var _child3 = void 0;
+
+      while (_child3 = node.firstChild) {
+        fragment.appendChild(_child3);
+      }
+
+      instruction.slotFallbackFactory = compiler.compile(fragment, resources);
+    }
+
+    instructions[auTargetID] = instruction;
+
+    return auShadowSlot;
+  }
+
+  var ViewCompiler = exports.ViewCompiler = (_dec7 = (0, _aureliaDependencyInjection.inject)(BindingLanguage, ViewResources), _dec7(_class17 = function () {
+    function ViewCompiler(bindingLanguage, resources) {
+      
+
+      this.bindingLanguage = bindingLanguage;
+      this.resources = resources;
+    }
+
+    ViewCompiler.prototype.compile = function compile(source, resources, compileInstruction) {
+      resources = resources || this.resources;
+      compileInstruction = compileInstruction || ViewCompileInstruction.normal;
+      source = typeof source === 'string' ? _aureliaPal.DOM.createTemplateFromMarkup(source) : source;
+
+      var content = void 0;
+      var part = void 0;
+      var cacheSize = void 0;
+
+      if (source.content) {
+        part = source.getAttribute('part');
+        cacheSize = source.getAttribute('view-cache');
+        content = _aureliaPal.DOM.adoptNode(source.content);
+      } else {
+        content = source;
+      }
+
+      compileInstruction.targetShadowDOM = compileInstruction.targetShadowDOM && _aureliaPal.FEATURE.shadowDOM;
+      resources._invokeHook('beforeCompile', content, resources, compileInstruction);
+
+      var instructions = {};
+      this._compileNode(content, resources, instructions, source, 'root', !compileInstruction.targetShadowDOM);
+
+      var firstChild = content.firstChild;
+      if (firstChild && firstChild.nodeType === 1) {
+        var targetId = firstChild.getAttribute('au-target-id');
+        if (targetId) {
+          var ins = instructions[targetId];
+
+          if (ins.shadowSlot || ins.lifting || ins.elementInstruction && !ins.elementInstruction.anchorIsContainer) {
+            content.insertBefore(_aureliaPal.DOM.createComment('view'), firstChild);
+          }
+        }
+      }
+
+      var factory = new ViewFactory(content, instructions, resources);
+
+      factory.surrogateInstruction = compileInstruction.compileSurrogate ? this._compileSurrogate(source, resources) : null;
+      factory.part = part;
+
+      if (cacheSize) {
+        factory.setCacheSize(cacheSize);
+      }
+
+      resources._invokeHook('afterCompile', factory);
+
+      return factory;
+    };
+
+    ViewCompiler.prototype._compileNode = function _compileNode(node, resources, instructions, parentNode, parentInjectorId, targetLightDOM) {
+      switch (node.nodeType) {
+        case 1:
+          return this._compileElement(node, resources, instructions, parentNode, parentInjectorId, targetLightDOM);
+        case 3:
+          var expression = resources.getBindingLanguage(this.bindingLanguage).inspectTextContent(resources, node.wholeText);
+          if (expression) {
+            var marker = _aureliaPal.DOM.createElement('au-marker');
+            var auTargetID = makeIntoInstructionTarget(marker);
+            (node.parentNode || parentNode).insertBefore(marker, node);
+            node.textContent = ' ';
+            instructions[auTargetID] = TargetInstruction.contentExpression(expression);
+
+            while (node.nextSibling && node.nextSibling.nodeType === 3) {
+              (node.parentNode || parentNode).removeChild(node.nextSibling);
+            }
+          } else {
+            while (node.nextSibling && node.nextSibling.nodeType === 3) {
+              node = node.nextSibling;
+            }
+          }
+          return node.nextSibling;
+        case 11:
+          var currentChild = node.firstChild;
+          while (currentChild) {
+            currentChild = this._compileNode(currentChild, resources, instructions, node, parentInjectorId, targetLightDOM);
+          }
+          break;
+        default:
+          break;
+      }
+
+      return node.nextSibling;
+    };
+
+    ViewCompiler.prototype._compileSurrogate = function _compileSurrogate(node, resources) {
+      var tagName = node.tagName.toLowerCase();
+      var attributes = node.attributes;
+      var bindingLanguage = resources.getBindingLanguage(this.bindingLanguage);
+      var knownAttribute = void 0;
+      var property = void 0;
+      var instruction = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var attr = void 0;
+      var attrName = void 0;
+      var attrValue = void 0;
+      var info = void 0;
+      var type = void 0;
+      var expressions = [];
+      var expression = void 0;
+      var behaviorInstructions = [];
+      var values = {};
+      var hasValues = false;
+      var providers = [];
+
+      for (i = 0, ii = attributes.length; i < ii; ++i) {
+        attr = attributes[i];
+        attrName = attr.name;
+        attrValue = attr.value;
+
+        info = bindingLanguage.inspectAttribute(resources, tagName, attrName, attrValue);
+        type = resources.getAttribute(info.attrName);
+
+        if (type) {
+          knownAttribute = resources.mapAttribute(info.attrName);
+          if (knownAttribute) {
+            property = type.attributes[knownAttribute];
+
+            if (property) {
+              info.defaultBindingMode = property.defaultBindingMode;
+
+              if (!info.command && !info.expression) {
+                info.command = property.hasOptions ? 'options' : null;
+              }
+            }
+          }
+        }
+
+        instruction = bindingLanguage.createAttributeInstruction(resources, node, info, undefined, type);
+
+        if (instruction) {
+          if (instruction.alteredAttr) {
+            type = resources.getAttribute(instruction.attrName);
           }
 
-          function set(keyOrSymbol) {
-            where[keyOrSymbol] = arg[keyOrSymbol];
+          if (instruction.discrete) {
+            expressions.push(instruction);
+          } else {
+            if (type) {
+              instruction.type = type;
+              configureProperties(instruction, resources);
+
+              if (type.liftsContent) {
+                throw new Error('You cannot place a template controller on a surrogate element.');
+              } else {
+                behaviorInstructions.push(instruction);
+              }
+            } else {
+              expressions.push(instruction.attributes[instruction.attrName]);
+            }
+          }
+        } else {
+          if (type) {
+            instruction = BehaviorInstruction.attribute(attrName, type);
+            instruction.attributes[resources.mapAttribute(attrName)] = attrValue;
+
+            if (type.liftsContent) {
+              throw new Error('You cannot place a template controller on a surrogate element.');
+            } else {
+              behaviorInstructions.push(instruction);
+            }
+          } else if (attrName !== 'id' && attrName !== 'part' && attrName !== 'replace-part') {
+            hasValues = true;
+            values[attrName] = attrValue;
+          }
+        }
+      }
+
+      if (expressions.length || behaviorInstructions.length || hasValues) {
+        for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
+          instruction = behaviorInstructions[i];
+          instruction.type.compile(this, resources, node, instruction);
+          providers.push(instruction.type.target);
+        }
+
+        for (i = 0, ii = expressions.length; i < ii; ++i) {
+          expression = expressions[i];
+          if (expression.attrToRemove !== undefined) {
+            node.removeAttribute(expression.attrToRemove);
+          }
+        }
+
+        return TargetInstruction.surrogate(providers, behaviorInstructions, expressions, values);
+      }
+
+      return null;
+    };
+
+    ViewCompiler.prototype._compileElement = function _compileElement(node, resources, instructions, parentNode, parentInjectorId, targetLightDOM) {
+      var tagName = node.tagName.toLowerCase();
+      var attributes = node.attributes;
+      var expressions = [];
+      var expression = void 0;
+      var behaviorInstructions = [];
+      var providers = [];
+      var bindingLanguage = resources.getBindingLanguage(this.bindingLanguage);
+      var liftingInstruction = void 0;
+      var viewFactory = void 0;
+      var type = void 0;
+      var elementInstruction = void 0;
+      var elementProperty = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var attr = void 0;
+      var attrName = void 0;
+      var attrValue = void 0;
+      var instruction = void 0;
+      var info = void 0;
+      var property = void 0;
+      var knownAttribute = void 0;
+      var auTargetID = void 0;
+      var injectorId = void 0;
+
+      if (tagName === 'slot') {
+        if (targetLightDOM) {
+          node = makeShadowSlot(this, resources, node, instructions, parentInjectorId);
+        }
+        return node.nextSibling;
+      } else if (tagName === 'template') {
+        viewFactory = this.compile(node, resources);
+        viewFactory.part = node.getAttribute('part');
+      } else {
+        type = resources.getElement(node.getAttribute('as-element') || tagName);
+        if (type) {
+          elementInstruction = BehaviorInstruction.element(node, type);
+          type.processAttributes(this, resources, node, attributes, elementInstruction);
+          behaviorInstructions.push(elementInstruction);
+        }
+      }
+
+      for (i = 0, ii = attributes.length; i < ii; ++i) {
+        attr = attributes[i];
+        attrName = attr.name;
+        attrValue = attr.value;
+        info = bindingLanguage.inspectAttribute(resources, tagName, attrName, attrValue);
+
+        if (targetLightDOM && info.attrName === 'slot') {
+          info.attrName = attrName = 'au-slot';
+        }
+
+        type = resources.getAttribute(info.attrName);
+        elementProperty = null;
+
+        if (type) {
+          knownAttribute = resources.mapAttribute(info.attrName);
+          if (knownAttribute) {
+            property = type.attributes[knownAttribute];
+
+            if (property) {
+              info.defaultBindingMode = property.defaultBindingMode;
+
+              if (!info.command && !info.expression) {
+                info.command = property.hasOptions ? 'options' : null;
+              }
+            }
+          }
+        } else if (elementInstruction) {
+            elementProperty = elementInstruction.type.attributes[info.attrName];
+            if (elementProperty) {
+              info.defaultBindingMode = elementProperty.defaultBindingMode;
+            }
           }
 
-          for (var i = 1, ii = arguments.length; i < ii; ++i) {
-            var arg = arguments[i];
+        if (elementProperty) {
+          instruction = bindingLanguage.createAttributeInstruction(resources, node, info, elementInstruction);
+        } else {
+          instruction = bindingLanguage.createAttributeInstruction(resources, node, info, undefined, type);
+        }
 
-            if (arg === null || arg === undefined) {
-              continue;
+        if (instruction) {
+          if (instruction.alteredAttr) {
+            type = resources.getAttribute(instruction.attrName);
+          }
+
+          if (instruction.discrete) {
+            expressions.push(instruction);
+          } else {
+            if (type) {
+              instruction.type = type;
+              configureProperties(instruction, resources);
+
+              if (type.liftsContent) {
+                instruction.originalAttrName = attrName;
+                liftingInstruction = instruction;
+                break;
+              } else {
+                behaviorInstructions.push(instruction);
+              }
+            } else if (elementProperty) {
+              elementInstruction.attributes[info.attrName].targetProperty = elementProperty.name;
+            } else {
+              expressions.push(instruction.attributes[instruction.attrName]);
+            }
+          }
+        } else {
+          if (type) {
+            instruction = BehaviorInstruction.attribute(attrName, type);
+            instruction.attributes[resources.mapAttribute(attrName)] = attrValue;
+
+            if (type.liftsContent) {
+              instruction.originalAttrName = attrName;
+              liftingInstruction = instruction;
+              break;
+            } else {
+              behaviorInstructions.push(instruction);
+            }
+          } else if (elementProperty) {
+            elementInstruction.attributes[attrName] = attrValue;
+          }
+        }
+      }
+
+      if (liftingInstruction) {
+        liftingInstruction.viewFactory = viewFactory;
+        node = liftingInstruction.type.compile(this, resources, node, liftingInstruction, parentNode);
+        auTargetID = makeIntoInstructionTarget(node);
+        instructions[auTargetID] = TargetInstruction.lifting(parentInjectorId, liftingInstruction);
+      } else {
+        if (expressions.length || behaviorInstructions.length) {
+          injectorId = behaviorInstructions.length ? getNextInjectorId() : false;
+
+          for (i = 0, ii = behaviorInstructions.length; i < ii; ++i) {
+            instruction = behaviorInstructions[i];
+            instruction.type.compile(this, resources, node, instruction, parentNode);
+            providers.push(instruction.type.target);
+          }
+
+          for (i = 0, ii = expressions.length; i < ii; ++i) {
+            expression = expressions[i];
+            if (expression.attrToRemove !== undefined) {
+              node.removeAttribute(expression.attrToRemove);
+            }
+          }
+
+          auTargetID = makeIntoInstructionTarget(node);
+          instructions[auTargetID] = TargetInstruction.normal(injectorId, parentInjectorId, providers, behaviorInstructions, expressions, elementInstruction);
+        }
+
+        if (elementInstruction && elementInstruction.skipContentProcessing) {
+          return node.nextSibling;
+        }
+
+        var currentChild = node.firstChild;
+        while (currentChild) {
+          currentChild = this._compileNode(currentChild, resources, instructions, node, injectorId || parentInjectorId, targetLightDOM);
+        }
+      }
+
+      return node.nextSibling;
+    };
+
+    return ViewCompiler;
+  }()) || _class17);
+
+  var ResourceModule = exports.ResourceModule = function () {
+    function ResourceModule(moduleId) {
+      
+
+      this.id = moduleId;
+      this.moduleInstance = null;
+      this.mainResource = null;
+      this.resources = null;
+      this.viewStrategy = null;
+      this.isInitialized = false;
+      this.onLoaded = null;
+      this.loadContext = null;
+    }
+
+    ResourceModule.prototype.initialize = function initialize(container) {
+      var current = this.mainResource;
+      var resources = this.resources;
+      var vs = this.viewStrategy;
+
+      if (this.isInitialized) {
+        return;
+      }
+
+      this.isInitialized = true;
+
+      if (current !== undefined) {
+        current.metadata.viewStrategy = vs;
+        current.initialize(container);
+      }
+
+      for (var i = 0, ii = resources.length; i < ii; ++i) {
+        current = resources[i];
+        current.metadata.viewStrategy = vs;
+        current.initialize(container);
+      }
+    };
+
+    ResourceModule.prototype.register = function register(registry, name) {
+      var main = this.mainResource;
+      var resources = this.resources;
+
+      if (main !== undefined) {
+        main.register(registry, name);
+        name = null;
+      }
+
+      for (var i = 0, ii = resources.length; i < ii; ++i) {
+        resources[i].register(registry, name);
+        name = null;
+      }
+    };
+
+    ResourceModule.prototype.load = function load(container, loadContext) {
+      if (this.onLoaded !== null) {
+        return this.loadContext === loadContext ? Promise.resolve() : this.onLoaded;
+      }
+
+      var main = this.mainResource;
+      var resources = this.resources;
+      var loads = void 0;
+
+      if (main !== undefined) {
+        loads = new Array(resources.length + 1);
+        loads[0] = main.load(container, loadContext);
+        for (var i = 0, ii = resources.length; i < ii; ++i) {
+          loads[i + 1] = resources[i].load(container, loadContext);
+        }
+      } else {
+        loads = new Array(resources.length);
+        for (var _i = 0, _ii = resources.length; _i < _ii; ++_i) {
+          loads[_i] = resources[_i].load(container, loadContext);
+        }
+      }
+
+      this.loadContext = loadContext;
+      this.onLoaded = Promise.all(loads);
+      return this.onLoaded;
+    };
+
+    return ResourceModule;
+  }();
+
+  var ResourceDescription = exports.ResourceDescription = function () {
+    function ResourceDescription(key, exportedValue, resourceTypeMeta) {
+      
+
+      if (!resourceTypeMeta) {
+        resourceTypeMeta = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.resource, exportedValue);
+
+        if (!resourceTypeMeta) {
+          resourceTypeMeta = new HtmlBehaviorResource();
+          resourceTypeMeta.elementName = _hyphenate(key);
+          _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, resourceTypeMeta, exportedValue);
+        }
+      }
+
+      if (resourceTypeMeta instanceof HtmlBehaviorResource) {
+        if (resourceTypeMeta.elementName === undefined) {
+          resourceTypeMeta.elementName = _hyphenate(key);
+        } else if (resourceTypeMeta.attributeName === undefined) {
+          resourceTypeMeta.attributeName = _hyphenate(key);
+        } else if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+          HtmlBehaviorResource.convention(key, resourceTypeMeta);
+        }
+      } else if (!resourceTypeMeta.name) {
+        resourceTypeMeta.name = _hyphenate(key);
+      }
+
+      this.metadata = resourceTypeMeta;
+      this.value = exportedValue;
+    }
+
+    ResourceDescription.prototype.initialize = function initialize(container) {
+      this.metadata.initialize(container, this.value);
+    };
+
+    ResourceDescription.prototype.register = function register(registry, name) {
+      this.metadata.register(registry, name);
+    };
+
+    ResourceDescription.prototype.load = function load(container, loadContext) {
+      return this.metadata.load(container, this.value, loadContext);
+    };
+
+    return ResourceDescription;
+  }();
+
+  var ModuleAnalyzer = exports.ModuleAnalyzer = function () {
+    function ModuleAnalyzer() {
+      
+
+      this.cache = Object.create(null);
+    }
+
+    ModuleAnalyzer.prototype.getAnalysis = function getAnalysis(moduleId) {
+      return this.cache[moduleId];
+    };
+
+    ModuleAnalyzer.prototype.analyze = function analyze(moduleId, moduleInstance, mainResourceKey) {
+      var mainResource = void 0;
+      var fallbackValue = void 0;
+      var fallbackKey = void 0;
+      var resourceTypeMeta = void 0;
+      var key = void 0;
+      var exportedValue = void 0;
+      var resources = [];
+      var conventional = void 0;
+      var vs = void 0;
+      var resourceModule = void 0;
+
+      resourceModule = this.cache[moduleId];
+      if (resourceModule) {
+        return resourceModule;
+      }
+
+      resourceModule = new ResourceModule(moduleId);
+      this.cache[moduleId] = resourceModule;
+
+      if (typeof moduleInstance === 'function') {
+        moduleInstance = { 'default': moduleInstance };
+      }
+
+      if (mainResourceKey) {
+        mainResource = new ResourceDescription(mainResourceKey, moduleInstance[mainResourceKey]);
+      }
+
+      for (key in moduleInstance) {
+        exportedValue = moduleInstance[key];
+
+        if (key === mainResourceKey || typeof exportedValue !== 'function') {
+          continue;
+        }
+
+        resourceTypeMeta = _aureliaMetadata.metadata.get(_aureliaMetadata.metadata.resource, exportedValue);
+
+        if (resourceTypeMeta) {
+          if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+            HtmlBehaviorResource.convention(key, resourceTypeMeta);
+          }
+
+          if (resourceTypeMeta.attributeName === null && resourceTypeMeta.elementName === null) {
+            resourceTypeMeta.elementName = _hyphenate(key);
+          }
+
+          if (!mainResource && resourceTypeMeta instanceof HtmlBehaviorResource && resourceTypeMeta.elementName !== null) {
+            mainResource = new ResourceDescription(key, exportedValue, resourceTypeMeta);
+          } else {
+            resources.push(new ResourceDescription(key, exportedValue, resourceTypeMeta));
+          }
+        } else if (viewStrategy.decorates(exportedValue)) {
+          vs = exportedValue;
+        } else if (exportedValue instanceof _aureliaLoader.TemplateRegistryEntry) {
+          vs = new TemplateRegistryViewStrategy(moduleId, exportedValue);
+        } else {
+          if (conventional = HtmlBehaviorResource.convention(key)) {
+            if (conventional.elementName !== null && !mainResource) {
+              mainResource = new ResourceDescription(key, exportedValue, conventional);
+            } else {
+              resources.push(new ResourceDescription(key, exportedValue, conventional));
             }
 
-            O.keys(arg).concat(filterOS(arg)).forEach(set);
+            _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, conventional, exportedValue);
+          } else if (conventional = _aureliaBinding.ValueConverterResource.convention(key) || _aureliaBinding.BindingBehaviorResource.convention(key) || ViewEngineHooksResource.convention(key)) {
+            resources.push(new ResourceDescription(key, exportedValue, conventional));
+            _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, conventional, exportedValue);
+          } else if (!fallbackValue) {
+            fallbackValue = exportedValue;
+            fallbackKey = key;
+          }
+        }
+      }
+
+      if (!mainResource && fallbackValue) {
+        mainResource = new ResourceDescription(fallbackKey, fallbackValue);
+      }
+
+      resourceModule.moduleInstance = moduleInstance;
+      resourceModule.mainResource = mainResource;
+      resourceModule.resources = resources;
+      resourceModule.viewStrategy = vs;
+
+      return resourceModule;
+    };
+
+    return ModuleAnalyzer;
+  }();
+
+  var logger = LogManager.getLogger('templating');
+
+  function ensureRegistryEntry(loader, urlOrRegistryEntry) {
+    if (urlOrRegistryEntry instanceof _aureliaLoader.TemplateRegistryEntry) {
+      return Promise.resolve(urlOrRegistryEntry);
+    }
+
+    return loader.loadTemplate(urlOrRegistryEntry);
+  }
+
+  var ProxyViewFactory = function () {
+    function ProxyViewFactory(promise) {
+      var _this9 = this;
+
+      
+
+      promise.then(function (x) {
+        return _this9.viewFactory = x;
+      });
+    }
+
+    ProxyViewFactory.prototype.create = function create(container, bindingContext, createInstruction, element) {
+      return this.viewFactory.create(container, bindingContext, createInstruction, element);
+    };
+
+    ProxyViewFactory.prototype.setCacheSize = function setCacheSize(size, doNotOverrideIfAlreadySet) {
+      this.viewFactory.setCacheSize(size, doNotOverrideIfAlreadySet);
+    };
+
+    ProxyViewFactory.prototype.getCachedView = function getCachedView() {
+      return this.viewFactory.getCachedView();
+    };
+
+    ProxyViewFactory.prototype.returnViewToCache = function returnViewToCache(view) {
+      this.viewFactory.returnViewToCache(view);
+    };
+
+    _createClass(ProxyViewFactory, [{
+      key: 'isCaching',
+      get: function get() {
+        return this.viewFactory.isCaching;
+      }
+    }]);
+
+    return ProxyViewFactory;
+  }();
+
+  var ViewEngine = exports.ViewEngine = (_dec8 = (0, _aureliaDependencyInjection.inject)(_aureliaLoader.Loader, _aureliaDependencyInjection.Container, ViewCompiler, ModuleAnalyzer, ViewResources), _dec8(_class18 = (_temp4 = _class19 = function () {
+    function ViewEngine(loader, container, viewCompiler, moduleAnalyzer, appResources) {
+      
+
+      this.loader = loader;
+      this.container = container;
+      this.viewCompiler = viewCompiler;
+      this.moduleAnalyzer = moduleAnalyzer;
+      this.appResources = appResources;
+      this._pluginMap = {};
+
+      var auSlotBehavior = new HtmlBehaviorResource();
+      auSlotBehavior.attributeName = 'au-slot';
+      auSlotBehavior.initialize(container, SlotCustomAttribute);
+      auSlotBehavior.register(appResources);
+    }
+
+    ViewEngine.prototype.addResourcePlugin = function addResourcePlugin(extension, implementation) {
+      var name = extension.replace('.', '') + '-resource-plugin';
+      this._pluginMap[extension] = name;
+      this.loader.addPlugin(name, implementation);
+    };
+
+    ViewEngine.prototype.loadViewFactory = function loadViewFactory(urlOrRegistryEntry, compileInstruction, loadContext, target) {
+      var _this10 = this;
+
+      loadContext = loadContext || new ResourceLoadContext();
+
+      return ensureRegistryEntry(this.loader, urlOrRegistryEntry).then(function (registryEntry) {
+        if (registryEntry.onReady) {
+          if (!loadContext.hasDependency(urlOrRegistryEntry)) {
+            loadContext.addDependency(urlOrRegistryEntry);
+            return registryEntry.onReady;
           }
 
-          return where;
-        };
-      }()
-    });
-  })(Object);
+          if (registryEntry.template === null) {
+            return registryEntry.onReady;
+          }
 
-  (function (global) {
-    var i;
-
-    var defineProperty = Object.defineProperty,
-        is = function is(a, b) {
-      return a === b || a !== a && b !== b;
-    };
-
-    if (typeof WeakMap == 'undefined') {
-      global.WeakMap = createCollection({
-        'delete': sharedDelete,
-
-        clear: sharedClear,
-
-        get: sharedGet,
-
-        has: mapHas,
-
-        set: sharedSet
-      }, true);
-    }
-
-    if (typeof Map == 'undefined' || typeof new Map().values !== 'function' || !new Map().values().next) {
-      var _createCollection;
-
-      global.Map = createCollection((_createCollection = {
-        'delete': sharedDelete,
-
-        has: mapHas,
-
-        get: sharedGet,
-
-        set: sharedSet,
-
-        keys: sharedKeys,
-
-        values: sharedValues,
-
-        entries: mapEntries,
-
-        forEach: sharedForEach,
-
-        clear: sharedClear
-      }, _createCollection[Symbol.iterator] = mapEntries, _createCollection));
-    }
-
-    if (typeof Set == 'undefined' || typeof new Set().values !== 'function' || !new Set().values().next) {
-      var _createCollection2;
-
-      global.Set = createCollection((_createCollection2 = {
-        has: setHas,
-
-        add: sharedAdd,
-
-        'delete': sharedDelete,
-
-        clear: sharedClear,
-
-        keys: sharedValues,
-        values: sharedValues,
-
-        entries: setEntries,
-
-        forEach: sharedForEach
-      }, _createCollection2[Symbol.iterator] = sharedValues, _createCollection2));
-    }
-
-    if (typeof WeakSet == 'undefined') {
-      global.WeakSet = createCollection({
-        'delete': sharedDelete,
-
-        add: sharedAdd,
-
-        clear: sharedClear,
-
-        has: setHas
-      }, true);
-    }
-
-    function createCollection(proto, objectOnly) {
-      function Collection(a) {
-        if (!this || this.constructor !== Collection) return new Collection(a);
-        this._keys = [];
-        this._values = [];
-        this._itp = [];
-        this.objectOnly = objectOnly;
-
-        if (a) init.call(this, a);
-      }
-
-      if (!objectOnly) {
-        defineProperty(proto, 'size', {
-          get: sharedSize
-        });
-      }
-
-      proto.constructor = Collection;
-      Collection.prototype = proto;
-
-      return Collection;
-    }
-
-    function init(a) {
-      var i;
-
-      if (this.add) a.forEach(this.add, this);else a.forEach(function (a) {
-          this.set(a[0], a[1]);
-        }, this);
-    }
-
-    function sharedDelete(key) {
-      if (this.has(key)) {
-        this._keys.splice(i, 1);
-        this._values.splice(i, 1);
-
-        this._itp.forEach(function (p) {
-          if (i < p[0]) p[0]--;
-        });
-      }
-
-      return -1 < i;
-    };
-
-    function sharedGet(key) {
-      return this.has(key) ? this._values[i] : undefined;
-    }
-
-    function has(list, key) {
-      if (this.objectOnly && key !== Object(key)) throw new TypeError("Invalid value used as weak collection key");
-
-      if (key != key || key === 0) for (i = list.length; i-- && !is(list[i], key);) {} else i = list.indexOf(key);
-      return -1 < i;
-    }
-
-    function setHas(value) {
-      return has.call(this, this._values, value);
-    }
-
-    function mapHas(value) {
-      return has.call(this, this._keys, value);
-    }
-
-    function sharedSet(key, value) {
-      this.has(key) ? this._values[i] = value : this._values[this._keys.push(key) - 1] = value;
-      return this;
-    }
-
-    function sharedAdd(value) {
-      if (!this.has(value)) this._values.push(value);
-      return this;
-    }
-
-    function sharedClear() {
-      (this._keys || 0).length = this._values.length = 0;
-    }
-
-    function sharedKeys() {
-      return sharedIterator(this._itp, this._keys);
-    }
-
-    function sharedValues() {
-      return sharedIterator(this._itp, this._values);
-    }
-
-    function mapEntries() {
-      return sharedIterator(this._itp, this._keys, this._values);
-    }
-
-    function setEntries() {
-      return sharedIterator(this._itp, this._values, this._values);
-    }
-
-    function sharedIterator(itp, array, array2) {
-      var _ref;
-
-      var p = [0],
-          done = false;
-      itp.push(p);
-      return _ref = {}, _ref[Symbol.iterator] = function () {
-        return this;
-      }, _ref.next = function next() {
-        var v,
-            k = p[0];
-        if (!done && k < array.length) {
-          v = array2 ? [array[k], array2[k]] : array[k];
-          p[0]++;
-        } else {
-          done = true;
-          itp.splice(itp.indexOf(p), 1);
+          return Promise.resolve(new ProxyViewFactory(registryEntry.onReady));
         }
-        return { done: done, value: v };
-      }, _ref;
-    }
 
-    function sharedSize() {
-      return this._values.length;
-    }
+        loadContext.addDependency(urlOrRegistryEntry);
 
-    function sharedForEach(callback, context) {
-      var it = this.entries();
-      for (;;) {
-        var r = it.next();
-        if (r.done) break;
-        callback.call(context, r.value[1], r.value[0], this);
+        registryEntry.onReady = _this10.loadTemplateResources(registryEntry, compileInstruction, loadContext, target).then(function (resources) {
+          registryEntry.resources = resources;
+
+          if (registryEntry.template === null) {
+            return registryEntry.factory = null;
+          }
+
+          var viewFactory = _this10.viewCompiler.compile(registryEntry.template, resources, compileInstruction);
+          return registryEntry.factory = viewFactory;
+        });
+
+        return registryEntry.onReady;
+      });
+    };
+
+    ViewEngine.prototype.loadTemplateResources = function loadTemplateResources(registryEntry, compileInstruction, loadContext, target) {
+      var resources = new ViewResources(this.appResources, registryEntry.address);
+      var dependencies = registryEntry.dependencies;
+      var importIds = void 0;
+      var names = void 0;
+
+      compileInstruction = compileInstruction || ViewCompileInstruction.normal;
+
+      if (dependencies.length === 0 && !compileInstruction.associatedModuleId) {
+        return Promise.resolve(resources);
+      }
+
+      importIds = dependencies.map(function (x) {
+        return x.src;
+      });
+      names = dependencies.map(function (x) {
+        return x.name;
+      });
+      logger.debug('importing resources for ' + registryEntry.address, importIds);
+
+      if (target) {
+        var viewModelRequires = _aureliaMetadata.metadata.get(ViewEngine.viewModelRequireMetadataKey, target);
+        if (viewModelRequires) {
+          var templateImportCount = importIds.length;
+          for (var i = 0, ii = viewModelRequires.length; i < ii; ++i) {
+            var req = viewModelRequires[i];
+            var importId = typeof req === 'function' ? _aureliaMetadata.Origin.get(req).moduleId : (0, _aureliaPath.relativeToFile)(req.src || req, registryEntry.address);
+
+            if (importIds.indexOf(importId) === -1) {
+              importIds.push(importId);
+              names.push(req.as);
+            }
+          }
+          logger.debug('importing ViewModel resources for ' + compileInstruction.associatedModuleId, importIds.slice(templateImportCount));
+        }
+      }
+
+      return this.importViewResources(importIds, names, resources, compileInstruction, loadContext);
+    };
+
+    ViewEngine.prototype.importViewModelResource = function importViewModelResource(moduleImport, moduleMember) {
+      var _this11 = this;
+
+      return this.loader.loadModule(moduleImport).then(function (viewModelModule) {
+        var normalizedId = _aureliaMetadata.Origin.get(viewModelModule).moduleId;
+        var resourceModule = _this11.moduleAnalyzer.analyze(normalizedId, viewModelModule, moduleMember);
+
+        if (!resourceModule.mainResource) {
+          throw new Error('No view model found in module "' + moduleImport + '".');
+        }
+
+        resourceModule.initialize(_this11.container);
+
+        return resourceModule.mainResource;
+      });
+    };
+
+    ViewEngine.prototype.importViewResources = function importViewResources(moduleIds, names, resources, compileInstruction, loadContext) {
+      var _this12 = this;
+
+      loadContext = loadContext || new ResourceLoadContext();
+      compileInstruction = compileInstruction || ViewCompileInstruction.normal;
+
+      moduleIds = moduleIds.map(function (x) {
+        return _this12._applyLoaderPlugin(x);
+      });
+
+      return this.loader.loadAllModules(moduleIds).then(function (imports) {
+        var i = void 0;
+        var ii = void 0;
+        var analysis = void 0;
+        var normalizedId = void 0;
+        var current = void 0;
+        var associatedModule = void 0;
+        var container = _this12.container;
+        var moduleAnalyzer = _this12.moduleAnalyzer;
+        var allAnalysis = new Array(imports.length);
+
+        for (i = 0, ii = imports.length; i < ii; ++i) {
+          current = imports[i];
+          normalizedId = _aureliaMetadata.Origin.get(current).moduleId;
+
+          analysis = moduleAnalyzer.analyze(normalizedId, current);
+          analysis.initialize(container);
+          analysis.register(resources, names[i]);
+
+          allAnalysis[i] = analysis;
+        }
+
+        if (compileInstruction.associatedModuleId) {
+          associatedModule = moduleAnalyzer.getAnalysis(compileInstruction.associatedModuleId);
+
+          if (associatedModule) {
+            associatedModule.register(resources);
+          }
+        }
+
+        for (i = 0, ii = allAnalysis.length; i < ii; ++i) {
+          allAnalysis[i] = allAnalysis[i].load(container, loadContext);
+        }
+
+        return Promise.all(allAnalysis).then(function () {
+          return resources;
+        });
+      });
+    };
+
+    ViewEngine.prototype._applyLoaderPlugin = function _applyLoaderPlugin(id) {
+      var index = id.lastIndexOf('.');
+      if (index !== -1) {
+        var ext = id.substring(index);
+        var pluginName = this._pluginMap[ext];
+
+        if (pluginName === undefined) {
+          return id;
+        }
+
+        return this.loader.applyPluginToUrl(id, pluginName);
+      }
+
+      return id;
+    };
+
+    return ViewEngine;
+  }(), _class19.viewModelRequireMetadataKey = 'aurelia:view-model-require', _temp4)) || _class18);
+
+  var Controller = exports.Controller = function () {
+    function Controller(behavior, instruction, viewModel, container) {
+      
+
+      this.behavior = behavior;
+      this.instruction = instruction;
+      this.viewModel = viewModel;
+      this.isAttached = false;
+      this.view = null;
+      this.isBound = false;
+      this.scope = null;
+      this.container = container;
+      this.elementEvents = container.elementEvents || null;
+
+      var observerLookup = behavior.observerLocator.getOrCreateObserversLookup(viewModel);
+      var handlesBind = behavior.handlesBind;
+      var attributes = instruction.attributes;
+      var boundProperties = this.boundProperties = [];
+      var properties = behavior.properties;
+      var i = void 0;
+      var ii = void 0;
+
+      behavior._ensurePropertiesDefined(viewModel, observerLookup);
+
+      for (i = 0, ii = properties.length; i < ii; ++i) {
+        properties[i]._initialize(viewModel, observerLookup, attributes, handlesBind, boundProperties);
       }
     }
-  })(_aureliaPal.PLATFORM.global);
 
-  var emptyMetadata = Object.freeze({});
-  var metadataContainerKey = '__metadata__';
-  var bind = Function.prototype.bind;
+    Controller.prototype.created = function created(owningView) {
+      if (this.behavior.handlesCreated) {
+        this.viewModel.created(owningView, this.view);
+      }
+    };
 
-  if (typeof _aureliaPal.PLATFORM.global.Reflect === 'undefined') {
-    _aureliaPal.PLATFORM.global.Reflect = {};
+    Controller.prototype.automate = function automate(overrideContext, owningView) {
+      this.view.bindingContext = this.viewModel;
+      this.view.overrideContext = overrideContext || (0, _aureliaBinding.createOverrideContext)(this.viewModel);
+      this.view._isUserControlled = true;
+
+      if (this.behavior.handlesCreated) {
+        this.viewModel.created(owningView || null, this.view);
+      }
+
+      this.bind(this.view);
+    };
+
+    Controller.prototype.bind = function bind(scope) {
+      var skipSelfSubscriber = this.behavior.handlesBind;
+      var boundProperties = this.boundProperties;
+      var i = void 0;
+      var ii = void 0;
+      var x = void 0;
+      var observer = void 0;
+      var selfSubscriber = void 0;
+
+      if (this.isBound) {
+        if (this.scope === scope) {
+          return;
+        }
+
+        this.unbind();
+      }
+
+      this.isBound = true;
+      this.scope = scope;
+
+      for (i = 0, ii = boundProperties.length; i < ii; ++i) {
+        x = boundProperties[i];
+        observer = x.observer;
+        selfSubscriber = observer.selfSubscriber;
+        observer.publishing = false;
+
+        if (skipSelfSubscriber) {
+          observer.selfSubscriber = null;
+        }
+
+        x.binding.bind(scope);
+        observer.call();
+
+        observer.publishing = true;
+        observer.selfSubscriber = selfSubscriber;
+      }
+
+      var overrideContext = void 0;
+      if (this.view !== null) {
+        if (skipSelfSubscriber) {
+          this.view.viewModelScope = scope;
+        }
+
+        if (this.viewModel === scope.overrideContext.bindingContext) {
+          overrideContext = scope.overrideContext;
+        } else if (this.instruction.inheritBindingContext) {
+            overrideContext = (0, _aureliaBinding.createOverrideContext)(this.viewModel, scope.overrideContext);
+          } else {
+              overrideContext = (0, _aureliaBinding.createOverrideContext)(this.viewModel);
+              overrideContext.__parentOverrideContext = scope.overrideContext;
+            }
+
+        this.view.bind(this.viewModel, overrideContext);
+      } else if (skipSelfSubscriber) {
+        overrideContext = scope.overrideContext;
+
+        if (scope.overrideContext.__parentOverrideContext !== undefined && this.viewModel.viewFactory && this.viewModel.viewFactory.factoryCreateInstruction.partReplacements) {
+          overrideContext = Object.assign({}, scope.overrideContext);
+          overrideContext.parentOverrideContext = scope.overrideContext.__parentOverrideContext;
+        }
+        this.viewModel.bind(scope.bindingContext, overrideContext);
+      }
+    };
+
+    Controller.prototype.unbind = function unbind() {
+      if (this.isBound) {
+        var boundProperties = this.boundProperties;
+        var i = void 0;
+        var ii = void 0;
+
+        this.isBound = false;
+        this.scope = null;
+
+        if (this.view !== null) {
+          this.view.unbind();
+        }
+
+        if (this.behavior.handlesUnbind) {
+          this.viewModel.unbind();
+        }
+
+        if (this.elementEvents !== null) {
+          this.elementEvents.disposeAll();
+        }
+
+        for (i = 0, ii = boundProperties.length; i < ii; ++i) {
+          boundProperties[i].binding.unbind();
+        }
+      }
+    };
+
+    Controller.prototype.attached = function attached() {
+      if (this.isAttached) {
+        return;
+      }
+
+      this.isAttached = true;
+
+      if (this.behavior.handlesAttached) {
+        this.viewModel.attached();
+      }
+
+      if (this.view !== null) {
+        this.view.attached();
+      }
+    };
+
+    Controller.prototype.detached = function detached() {
+      if (this.isAttached) {
+        this.isAttached = false;
+
+        if (this.view !== null) {
+          this.view.detached();
+        }
+
+        if (this.behavior.handlesDetached) {
+          this.viewModel.detached();
+        }
+      }
+    };
+
+    return Controller;
+  }();
+
+  var BehaviorPropertyObserver = exports.BehaviorPropertyObserver = (_dec9 = (0, _aureliaBinding.subscriberCollection)(), _dec9(_class21 = function () {
+    function BehaviorPropertyObserver(taskQueue, obj, propertyName, selfSubscriber, initialValue) {
+      
+
+      this.taskQueue = taskQueue;
+      this.obj = obj;
+      this.propertyName = propertyName;
+      this.notqueued = true;
+      this.publishing = false;
+      this.selfSubscriber = selfSubscriber;
+      this.currentValue = this.oldValue = initialValue;
+    }
+
+    BehaviorPropertyObserver.prototype.getValue = function getValue() {
+      return this.currentValue;
+    };
+
+    BehaviorPropertyObserver.prototype.setValue = function setValue(newValue) {
+      var oldValue = this.currentValue;
+
+      if (oldValue !== newValue) {
+        this.oldValue = oldValue;
+        this.currentValue = newValue;
+
+        if (this.publishing && this.notqueued) {
+          if (this.taskQueue.flushing) {
+            this.call();
+          } else {
+            this.notqueued = false;
+            this.taskQueue.queueMicroTask(this);
+          }
+        }
+      }
+    };
+
+    BehaviorPropertyObserver.prototype.call = function call() {
+      var oldValue = this.oldValue;
+      var newValue = this.currentValue;
+
+      this.notqueued = true;
+
+      if (newValue === oldValue) {
+        return;
+      }
+
+      if (this.selfSubscriber) {
+        this.selfSubscriber(newValue, oldValue);
+      }
+
+      this.callSubscribers(newValue, oldValue);
+      this.oldValue = newValue;
+    };
+
+    BehaviorPropertyObserver.prototype.subscribe = function subscribe(context, callable) {
+      this.addSubscriber(context, callable);
+    };
+
+    BehaviorPropertyObserver.prototype.unsubscribe = function unsubscribe(context, callable) {
+      this.removeSubscriber(context, callable);
+    };
+
+    return BehaviorPropertyObserver;
+  }()) || _class21);
+
+
+  function getObserver(behavior, instance, name) {
+    var lookup = instance.__observers__;
+
+    if (lookup === undefined) {
+      if (!behavior.isInitialized) {
+        behavior.initialize(_aureliaDependencyInjection.Container.instance || new _aureliaDependencyInjection.Container(), instance.constructor);
+      }
+
+      lookup = behavior.observerLocator.getOrCreateObserversLookup(instance);
+      behavior._ensurePropertiesDefined(instance, lookup);
+    }
+
+    return lookup[name];
   }
 
-  if (typeof Reflect.getOwnMetadata !== 'function') {
-    Reflect.getOwnMetadata = function (metadataKey, target, targetKey) {
-      if (target.hasOwnProperty(metadataContainerKey)) {
-        return (target[metadataContainerKey][targetKey] || emptyMetadata)[metadataKey];
+  var BindableProperty = exports.BindableProperty = function () {
+    function BindableProperty(nameOrConfig) {
+      
+
+      if (typeof nameOrConfig === 'string') {
+        this.name = nameOrConfig;
+      } else {
+        Object.assign(this, nameOrConfig);
+      }
+
+      this.attribute = this.attribute || _hyphenate(this.name);
+      if (this.defaultBindingMode === null || this.defaultBindingMode === undefined) {
+        this.defaultBindingMode = _aureliaBinding.bindingMode.oneWay;
+      }
+      this.changeHandler = this.changeHandler || null;
+      this.owner = null;
+      this.descriptor = null;
+    }
+
+    BindableProperty.prototype.registerWith = function registerWith(target, behavior, descriptor) {
+      behavior.properties.push(this);
+      behavior.attributes[this.attribute] = this;
+      this.owner = behavior;
+
+      if (descriptor) {
+        this.descriptor = descriptor;
+        return this._configureDescriptor(behavior, descriptor);
+      }
+
+      return undefined;
+    };
+
+    BindableProperty.prototype._configureDescriptor = function _configureDescriptor(behavior, descriptor) {
+      var name = this.name;
+
+      descriptor.configurable = true;
+      descriptor.enumerable = true;
+
+      if ('initializer' in descriptor) {
+        this.defaultValue = descriptor.initializer;
+        delete descriptor.initializer;
+        delete descriptor.writable;
+      }
+
+      if ('value' in descriptor) {
+        this.defaultValue = descriptor.value;
+        delete descriptor.value;
+        delete descriptor.writable;
+      }
+
+      descriptor.get = function () {
+        return getObserver(behavior, this, name).getValue();
+      };
+
+      descriptor.set = function (value) {
+        getObserver(behavior, this, name).setValue(value);
+      };
+
+      descriptor.get.getObserver = function (obj) {
+        return getObserver(behavior, obj, name);
+      };
+
+      return descriptor;
+    };
+
+    BindableProperty.prototype.defineOn = function defineOn(target, behavior) {
+      var name = this.name;
+      var handlerName = void 0;
+
+      if (this.changeHandler === null) {
+        handlerName = name + 'Changed';
+        if (handlerName in target.prototype) {
+          this.changeHandler = handlerName;
+        }
+      }
+
+      if (this.descriptor === null) {
+        Object.defineProperty(target.prototype, name, this._configureDescriptor(behavior, {}));
+      }
+    };
+
+    BindableProperty.prototype.createObserver = function createObserver(viewModel) {
+      var selfSubscriber = null;
+      var defaultValue = this.defaultValue;
+      var changeHandlerName = this.changeHandler;
+      var name = this.name;
+      var initialValue = void 0;
+
+      if (this.hasOptions) {
+        return undefined;
+      }
+
+      if (changeHandlerName in viewModel) {
+        if ('propertyChanged' in viewModel) {
+          selfSubscriber = function selfSubscriber(newValue, oldValue) {
+            viewModel[changeHandlerName](newValue, oldValue);
+            viewModel.propertyChanged(name, newValue, oldValue);
+          };
+        } else {
+          selfSubscriber = function selfSubscriber(newValue, oldValue) {
+            return viewModel[changeHandlerName](newValue, oldValue);
+          };
+        }
+      } else if ('propertyChanged' in viewModel) {
+        selfSubscriber = function selfSubscriber(newValue, oldValue) {
+          return viewModel.propertyChanged(name, newValue, oldValue);
+        };
+      } else if (changeHandlerName !== null) {
+        throw new Error('Change handler ' + changeHandlerName + ' was specified but not declared on the class.');
+      }
+
+      if (defaultValue !== undefined) {
+        initialValue = typeof defaultValue === 'function' ? defaultValue.call(viewModel) : defaultValue;
+      }
+
+      return new BehaviorPropertyObserver(this.owner.taskQueue, viewModel, this.name, selfSubscriber, initialValue);
+    };
+
+    BindableProperty.prototype._initialize = function _initialize(viewModel, observerLookup, attributes, behaviorHandlesBind, boundProperties) {
+      var selfSubscriber = void 0;
+      var observer = void 0;
+      var attribute = void 0;
+      var defaultValue = this.defaultValue;
+
+      if (this.isDynamic) {
+        for (var key in attributes) {
+          this._createDynamicProperty(viewModel, observerLookup, behaviorHandlesBind, key, attributes[key], boundProperties);
+        }
+      } else if (!this.hasOptions) {
+        observer = observerLookup[this.name];
+
+        if (attributes !== null) {
+          selfSubscriber = observer.selfSubscriber;
+          attribute = attributes[this.attribute];
+
+          if (behaviorHandlesBind) {
+            observer.selfSubscriber = null;
+          }
+
+          if (typeof attribute === 'string') {
+            viewModel[this.name] = attribute;
+            observer.call();
+          } else if (attribute) {
+            boundProperties.push({ observer: observer, binding: attribute.createBinding(viewModel) });
+          } else if (defaultValue !== undefined) {
+            observer.call();
+          }
+
+          observer.selfSubscriber = selfSubscriber;
+        }
+
+        observer.publishing = true;
+      }
+    };
+
+    BindableProperty.prototype._createDynamicProperty = function _createDynamicProperty(viewModel, observerLookup, behaviorHandlesBind, name, attribute, boundProperties) {
+      var changeHandlerName = name + 'Changed';
+      var selfSubscriber = null;
+      var observer = void 0;
+      var info = void 0;
+
+      if (changeHandlerName in viewModel) {
+        if ('propertyChanged' in viewModel) {
+          selfSubscriber = function selfSubscriber(newValue, oldValue) {
+            viewModel[changeHandlerName](newValue, oldValue);
+            viewModel.propertyChanged(name, newValue, oldValue);
+          };
+        } else {
+          selfSubscriber = function selfSubscriber(newValue, oldValue) {
+            return viewModel[changeHandlerName](newValue, oldValue);
+          };
+        }
+      } else if ('propertyChanged' in viewModel) {
+        selfSubscriber = function selfSubscriber(newValue, oldValue) {
+          return viewModel.propertyChanged(name, newValue, oldValue);
+        };
+      }
+
+      observer = observerLookup[name] = new BehaviorPropertyObserver(this.owner.taskQueue, viewModel, name, selfSubscriber);
+
+      Object.defineProperty(viewModel, name, {
+        configurable: true,
+        enumerable: true,
+        get: observer.getValue.bind(observer),
+        set: observer.setValue.bind(observer)
+      });
+
+      if (behaviorHandlesBind) {
+        observer.selfSubscriber = null;
+      }
+
+      if (typeof attribute === 'string') {
+        viewModel[name] = attribute;
+        observer.call();
+      } else if (attribute) {
+        info = { observer: observer, binding: attribute.createBinding(viewModel) };
+        boundProperties.push(info);
+      }
+
+      observer.publishing = true;
+      observer.selfSubscriber = selfSubscriber;
+    };
+
+    return BindableProperty;
+  }();
+
+  var lastProviderId = 0;
+
+  function nextProviderId() {
+    return ++lastProviderId;
+  }
+
+  function doProcessContent() {
+    return true;
+  }
+  function doProcessAttributes() {}
+
+  var HtmlBehaviorResource = exports.HtmlBehaviorResource = function () {
+    function HtmlBehaviorResource() {
+      
+
+      this.elementName = null;
+      this.attributeName = null;
+      this.attributeDefaultBindingMode = undefined;
+      this.liftsContent = false;
+      this.targetShadowDOM = false;
+      this.shadowDOMOptions = null;
+      this.processAttributes = doProcessAttributes;
+      this.processContent = doProcessContent;
+      this.usesShadowDOM = false;
+      this.childBindings = null;
+      this.hasDynamicOptions = false;
+      this.containerless = false;
+      this.properties = [];
+      this.attributes = {};
+      this.isInitialized = false;
+    }
+
+    HtmlBehaviorResource.convention = function convention(name, existing) {
+      var behavior = void 0;
+
+      if (name.endsWith('CustomAttribute')) {
+        behavior = existing || new HtmlBehaviorResource();
+        behavior.attributeName = _hyphenate(name.substring(0, name.length - 15));
+      }
+
+      if (name.endsWith('CustomElement')) {
+        behavior = existing || new HtmlBehaviorResource();
+        behavior.elementName = _hyphenate(name.substring(0, name.length - 13));
+      }
+
+      return behavior;
+    };
+
+    HtmlBehaviorResource.prototype.addChildBinding = function addChildBinding(behavior) {
+      if (this.childBindings === null) {
+        this.childBindings = [];
+      }
+
+      this.childBindings.push(behavior);
+    };
+
+    HtmlBehaviorResource.prototype.initialize = function initialize(container, target) {
+      var proto = target.prototype;
+      var properties = this.properties;
+      var attributeName = this.attributeName;
+      var attributeDefaultBindingMode = this.attributeDefaultBindingMode;
+      var i = void 0;
+      var ii = void 0;
+      var current = void 0;
+
+      if (this.isInitialized) {
+        return;
+      }
+
+      this.isInitialized = true;
+      target.__providerId__ = nextProviderId();
+
+      this.observerLocator = container.get(_aureliaBinding.ObserverLocator);
+      this.taskQueue = container.get(_aureliaTaskQueue.TaskQueue);
+
+      this.target = target;
+      this.usesShadowDOM = this.targetShadowDOM && _aureliaPal.FEATURE.shadowDOM;
+      this.handlesCreated = 'created' in proto;
+      this.handlesBind = 'bind' in proto;
+      this.handlesUnbind = 'unbind' in proto;
+      this.handlesAttached = 'attached' in proto;
+      this.handlesDetached = 'detached' in proto;
+      this.htmlName = this.elementName || this.attributeName;
+
+      if (attributeName !== null) {
+        if (properties.length === 0) {
+          new BindableProperty({
+            name: 'value',
+            changeHandler: 'valueChanged' in proto ? 'valueChanged' : null,
+            attribute: attributeName,
+            defaultBindingMode: attributeDefaultBindingMode
+          }).registerWith(target, this);
+        }
+
+        current = properties[0];
+
+        if (properties.length === 1 && current.name === 'value') {
+          current.isDynamic = current.hasOptions = this.hasDynamicOptions;
+          current.defineOn(target, this);
+        } else {
+          for (i = 0, ii = properties.length; i < ii; ++i) {
+            properties[i].defineOn(target, this);
+          }
+
+          current = new BindableProperty({
+            name: 'value',
+            changeHandler: 'valueChanged' in proto ? 'valueChanged' : null,
+            attribute: attributeName,
+            defaultBindingMode: attributeDefaultBindingMode
+          });
+
+          current.hasOptions = true;
+          current.registerWith(target, this);
+        }
+      } else {
+        for (i = 0, ii = properties.length; i < ii; ++i) {
+          properties[i].defineOn(target, this);
+        }
+      }
+    };
+
+    HtmlBehaviorResource.prototype.register = function register(registry, name) {
+      if (this.attributeName !== null) {
+        registry.registerAttribute(name || this.attributeName, this, this.attributeName);
+      }
+
+      if (this.elementName !== null) {
+        registry.registerElement(name || this.elementName, this);
+      }
+    };
+
+    HtmlBehaviorResource.prototype.load = function load(container, target, loadContext, viewStrategy, transientView) {
+      var _this13 = this;
+
+      var options = void 0;
+
+      if (this.elementName !== null) {
+        viewStrategy = container.get(ViewLocator).getViewStrategy(viewStrategy || this.viewStrategy || target);
+        options = new ViewCompileInstruction(this.targetShadowDOM, true);
+
+        if (!viewStrategy.moduleId) {
+          viewStrategy.moduleId = _aureliaMetadata.Origin.get(target).moduleId;
+        }
+
+        return viewStrategy.loadViewFactory(container.get(ViewEngine), options, loadContext, target).then(function (viewFactory) {
+          if (!transientView || !_this13.viewFactory) {
+            _this13.viewFactory = viewFactory;
+          }
+
+          return viewFactory;
+        });
+      }
+
+      return Promise.resolve(this);
+    };
+
+    HtmlBehaviorResource.prototype.compile = function compile(compiler, resources, node, instruction, parentNode) {
+      if (this.liftsContent) {
+        if (!instruction.viewFactory) {
+          var template = _aureliaPal.DOM.createElement('template');
+          var fragment = _aureliaPal.DOM.createDocumentFragment();
+          var cacheSize = node.getAttribute('view-cache');
+          var part = node.getAttribute('part');
+
+          node.removeAttribute(instruction.originalAttrName);
+          _aureliaPal.DOM.replaceNode(template, node, parentNode);
+          fragment.appendChild(node);
+          instruction.viewFactory = compiler.compile(fragment, resources);
+
+          if (part) {
+            instruction.viewFactory.part = part;
+            node.removeAttribute('part');
+          }
+
+          if (cacheSize) {
+            instruction.viewFactory.setCacheSize(cacheSize);
+            node.removeAttribute('view-cache');
+          }
+
+          node = template;
+        }
+      } else if (this.elementName !== null) {
+        var _partReplacements2 = {};
+
+        if (this.processContent(compiler, resources, node, instruction) && node.hasChildNodes()) {
+          var currentChild = node.firstChild;
+          var contentElement = this.usesShadowDOM ? null : _aureliaPal.DOM.createElement('au-content');
+          var nextSibling = void 0;
+          var toReplace = void 0;
+
+          while (currentChild) {
+            nextSibling = currentChild.nextSibling;
+
+            if (currentChild.tagName === 'TEMPLATE' && (toReplace = currentChild.getAttribute('replace-part'))) {
+              _partReplacements2[toReplace] = compiler.compile(currentChild, resources);
+              _aureliaPal.DOM.removeNode(currentChild, parentNode);
+              instruction.partReplacements = _partReplacements2;
+            } else if (contentElement !== null) {
+              if (currentChild.nodeType === 3 && _isAllWhitespace(currentChild)) {
+                _aureliaPal.DOM.removeNode(currentChild, parentNode);
+              } else {
+                contentElement.appendChild(currentChild);
+              }
+            }
+
+            currentChild = nextSibling;
+          }
+
+          if (contentElement !== null && contentElement.hasChildNodes()) {
+            node.appendChild(contentElement);
+          }
+
+          instruction.skipContentProcessing = false;
+        } else {
+          instruction.skipContentProcessing = true;
+        }
+      }
+
+      return node;
+    };
+
+    HtmlBehaviorResource.prototype.create = function create(container, instruction, element, bindings) {
+      var viewHost = void 0;
+      var au = null;
+
+      instruction = instruction || BehaviorInstruction.normal;
+      element = element || null;
+      bindings = bindings || null;
+
+      if (this.elementName !== null && element) {
+        if (this.usesShadowDOM) {
+          viewHost = element.attachShadow(this.shadowDOMOptions);
+          container.registerInstance(_aureliaPal.DOM.boundary, viewHost);
+        } else {
+          viewHost = element;
+          if (this.targetShadowDOM) {
+            container.registerInstance(_aureliaPal.DOM.boundary, viewHost);
+          }
+        }
+      }
+
+      if (element !== null) {
+        element.au = au = element.au || {};
+      }
+
+      var viewModel = instruction.viewModel || container.get(this.target);
+      var controller = new Controller(this, instruction, viewModel, container);
+      var childBindings = this.childBindings;
+      var viewFactory = void 0;
+
+      if (this.liftsContent) {
+        au.controller = controller;
+      } else if (this.elementName !== null) {
+        viewFactory = instruction.viewFactory || this.viewFactory;
+        container.viewModel = viewModel;
+
+        if (viewFactory) {
+          controller.view = viewFactory.create(container, instruction, element);
+        }
+
+        if (element !== null) {
+          au.controller = controller;
+
+          if (controller.view) {
+            if (!this.usesShadowDOM && (element.childNodes.length === 1 || element.contentElement)) {
+              var contentElement = element.childNodes[0] || element.contentElement;
+              controller.view.contentView = { fragment: contentElement };
+              contentElement.parentNode && _aureliaPal.DOM.removeNode(contentElement);
+            }
+
+            if (instruction.anchorIsContainer) {
+              if (childBindings !== null) {
+                for (var i = 0, ii = childBindings.length; i < ii; ++i) {
+                  controller.view.addBinding(childBindings[i].create(element, viewModel, controller));
+                }
+              }
+
+              controller.view.appendNodesTo(viewHost);
+            } else {
+              controller.view.insertNodesBefore(viewHost);
+            }
+          } else if (childBindings !== null) {
+            for (var _i2 = 0, _ii2 = childBindings.length; _i2 < _ii2; ++_i2) {
+              bindings.push(childBindings[_i2].create(element, viewModel, controller));
+            }
+          }
+        } else if (controller.view) {
+          controller.view.controller = controller;
+
+          if (childBindings !== null) {
+            for (var _i3 = 0, _ii3 = childBindings.length; _i3 < _ii3; ++_i3) {
+              controller.view.addBinding(childBindings[_i3].create(instruction.host, viewModel, controller));
+            }
+          }
+        } else if (childBindings !== null) {
+          for (var _i4 = 0, _ii4 = childBindings.length; _i4 < _ii4; ++_i4) {
+            bindings.push(childBindings[_i4].create(instruction.host, viewModel, controller));
+          }
+        }
+      } else if (childBindings !== null) {
+        for (var _i5 = 0, _ii5 = childBindings.length; _i5 < _ii5; ++_i5) {
+          bindings.push(childBindings[_i5].create(element, viewModel, controller));
+        }
+      }
+
+      if (au !== null) {
+        au[this.htmlName] = controller;
+      }
+
+      if (instruction.initiatedByBehavior && viewFactory) {
+        controller.view.created();
+      }
+
+      return controller;
+    };
+
+    HtmlBehaviorResource.prototype._ensurePropertiesDefined = function _ensurePropertiesDefined(instance, lookup) {
+      var properties = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var observer = void 0;
+
+      if ('__propertiesDefined__' in lookup) {
+        return;
+      }
+
+      lookup.__propertiesDefined__ = true;
+      properties = this.properties;
+
+      for (i = 0, ii = properties.length; i < ii; ++i) {
+        observer = properties[i].createObserver(instance);
+
+        if (observer !== undefined) {
+          lookup[observer.propertyName] = observer;
+        }
+      }
+    };
+
+    return HtmlBehaviorResource;
+  }();
+
+  function createChildObserverDecorator(selectorOrConfig, all) {
+    return function (target, key, descriptor) {
+      var actualTarget = typeof key === 'string' ? target.constructor : target;
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, actualTarget);
+
+      if (typeof selectorOrConfig === 'string') {
+        selectorOrConfig = {
+          selector: selectorOrConfig,
+          name: key
+        };
+      }
+
+      if (descriptor) {
+        descriptor.writable = true;
+      }
+
+      selectorOrConfig.all = all;
+      r.addChildBinding(new ChildObserver(selectorOrConfig));
+    };
+  }
+
+  function children(selectorOrConfig) {
+    return createChildObserverDecorator(selectorOrConfig, true);
+  }
+
+  function child(selectorOrConfig) {
+    return createChildObserverDecorator(selectorOrConfig, false);
+  }
+
+  var ChildObserver = function () {
+    function ChildObserver(config) {
+      
+
+      this.name = config.name;
+      this.changeHandler = config.changeHandler || this.name + 'Changed';
+      this.selector = config.selector;
+      this.all = config.all;
+    }
+
+    ChildObserver.prototype.create = function create(viewHost, viewModel, controller) {
+      return new ChildObserverBinder(this.selector, viewHost, this.name, viewModel, controller, this.changeHandler, this.all);
+    };
+
+    return ChildObserver;
+  }();
+
+  var noMutations = [];
+
+  function trackMutation(groupedMutations, binder, record) {
+    var mutations = groupedMutations.get(binder);
+
+    if (!mutations) {
+      mutations = [];
+      groupedMutations.set(binder, mutations);
+    }
+
+    mutations.push(record);
+  }
+
+  function onChildChange(mutations, observer) {
+    var binders = observer.binders;
+    var bindersLength = binders.length;
+    var groupedMutations = new Map();
+
+    for (var i = 0, ii = mutations.length; i < ii; ++i) {
+      var record = mutations[i];
+      var added = record.addedNodes;
+      var removed = record.removedNodes;
+
+      for (var j = 0, jj = removed.length; j < jj; ++j) {
+        var node = removed[j];
+        if (node.nodeType === 1) {
+          for (var k = 0; k < bindersLength; ++k) {
+            var binder = binders[k];
+            if (binder.onRemove(node)) {
+              trackMutation(groupedMutations, binder, record);
+            }
+          }
+        }
+      }
+
+      for (var _j = 0, _jj = added.length; _j < _jj; ++_j) {
+        var _node = added[_j];
+        if (_node.nodeType === 1) {
+          for (var _k = 0; _k < bindersLength; ++_k) {
+            var _binder = binders[_k];
+            if (_binder.onAdd(_node)) {
+              trackMutation(groupedMutations, _binder, record);
+            }
+          }
+        }
+      }
+    }
+
+    groupedMutations.forEach(function (value, key) {
+      if (key.changeHandler !== null) {
+        key.viewModel[key.changeHandler](value);
+      }
+    });
+  }
+
+  var ChildObserverBinder = function () {
+    function ChildObserverBinder(selector, viewHost, property, viewModel, controller, changeHandler, all) {
+      
+
+      this.selector = selector;
+      this.viewHost = viewHost;
+      this.property = property;
+      this.viewModel = viewModel;
+      this.controller = controller;
+      this.changeHandler = changeHandler in viewModel ? changeHandler : null;
+      this.usesShadowDOM = controller.behavior.usesShadowDOM;
+      this.all = all;
+
+      if (!this.usesShadowDOM && controller.view && controller.view.contentView) {
+        this.contentView = controller.view.contentView;
+      } else {
+        this.contentView = null;
+      }
+    }
+
+    ChildObserverBinder.prototype.matches = function matches(element) {
+      if (element.matches(this.selector)) {
+        if (this.contentView === null) {
+          return true;
+        }
+
+        var contentView = this.contentView;
+        var assignedSlot = element.auAssignedSlot;
+
+        if (assignedSlot && assignedSlot.projectFromAnchors) {
+          var anchors = assignedSlot.projectFromAnchors;
+
+          for (var i = 0, ii = anchors.length; i < ii; ++i) {
+            if (anchors[i].auOwnerView === contentView) {
+              return true;
+            }
+          }
+
+          return false;
+        }
+
+        return element.auOwnerView === contentView;
+      }
+
+      return false;
+    };
+
+    ChildObserverBinder.prototype.bind = function bind(source) {
+      var viewHost = this.viewHost;
+      var viewModel = this.viewModel;
+      var observer = viewHost.__childObserver__;
+
+      if (!observer) {
+        observer = viewHost.__childObserver__ = _aureliaPal.DOM.createMutationObserver(onChildChange);
+
+        var options = {
+          childList: true,
+          subtree: !this.usesShadowDOM
+        };
+
+        observer.observe(viewHost, options);
+        observer.binders = [];
+      }
+
+      observer.binders.push(this);
+
+      if (this.usesShadowDOM) {
+        var current = viewHost.firstElementChild;
+
+        if (this.all) {
+          var items = viewModel[this.property];
+          if (!items) {
+            items = viewModel[this.property] = [];
+          } else {
+            items.length = 0;
+          }
+
+          while (current) {
+            if (this.matches(current)) {
+              items.push(current.au && current.au.controller ? current.au.controller.viewModel : current);
+            }
+
+            current = current.nextElementSibling;
+          }
+
+          if (this.changeHandler !== null) {
+            this.viewModel[this.changeHandler](noMutations);
+          }
+        } else {
+          while (current) {
+            if (this.matches(current)) {
+              var value = current.au && current.au.controller ? current.au.controller.viewModel : current;
+              this.viewModel[this.property] = value;
+
+              if (this.changeHandler !== null) {
+                this.viewModel[this.changeHandler](value);
+              }
+
+              break;
+            }
+
+            current = current.nextElementSibling;
+          }
+        }
+      }
+    };
+
+    ChildObserverBinder.prototype.onRemove = function onRemove(element) {
+      if (this.matches(element)) {
+        var value = element.au && element.au.controller ? element.au.controller.viewModel : element;
+
+        if (this.all) {
+          var items = this.viewModel[this.property] || (this.viewModel[this.property] = []);
+          var index = items.indexOf(value);
+
+          if (index !== -1) {
+            items.splice(index, 1);
+          }
+
+          return true;
+        }
+
+        return false;
+      }
+
+      return false;
+    };
+
+    ChildObserverBinder.prototype.onAdd = function onAdd(element) {
+      if (this.matches(element)) {
+        var value = element.au && element.au.controller ? element.au.controller.viewModel : element;
+
+        if (this.all) {
+          var items = this.viewModel[this.property] || (this.viewModel[this.property] = []);
+          var index = 0;
+          var prev = element.previousElementSibling;
+
+          while (prev) {
+            if (this.matches(prev)) {
+              index++;
+            }
+
+            prev = prev.previousElementSibling;
+          }
+
+          items.splice(index, 0, value);
+          return true;
+        }
+
+        this.viewModel[this.property] = value;
+
+        if (this.changeHandler !== null) {
+          this.viewModel[this.changeHandler](value);
+        }
+      }
+
+      return false;
+    };
+
+    ChildObserverBinder.prototype.unbind = function unbind() {
+      if (this.viewHost.__childObserver__) {
+        this.viewHost.__childObserver__.disconnect();
+        this.viewHost.__childObserver__ = null;
+      }
+    };
+
+    return ChildObserverBinder;
+  }();
+
+  function tryActivateViewModel(context) {
+    if (context.skipActivation || typeof context.viewModel.activate !== 'function') {
+      return Promise.resolve();
+    }
+
+    return context.viewModel.activate(context.model) || Promise.resolve();
+  }
+
+  var CompositionEngine = exports.CompositionEngine = (_dec10 = (0, _aureliaDependencyInjection.inject)(ViewEngine, ViewLocator), _dec10(_class22 = function () {
+    function CompositionEngine(viewEngine, viewLocator) {
+      
+
+      this.viewEngine = viewEngine;
+      this.viewLocator = viewLocator;
+    }
+
+    CompositionEngine.prototype._createControllerAndSwap = function _createControllerAndSwap(context) {
+      function swap(controller) {
+        return Promise.resolve(context.viewSlot.removeAll(true)).then(function () {
+          if (context.currentController) {
+            context.currentController.unbind();
+          }
+
+          context.viewSlot.add(controller.view);
+
+          if (context.compositionTransactionNotifier) {
+            context.compositionTransactionNotifier.done();
+          }
+
+          return controller;
+        });
+      }
+
+      return this.createController(context).then(function (controller) {
+        controller.automate(context.overrideContext, context.owningView);
+
+        if (context.compositionTransactionOwnershipToken) {
+          return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
+            return swap(controller);
+          });
+        }
+
+        return swap(controller);
+      });
+    };
+
+    CompositionEngine.prototype.createController = function createController(context) {
+      var _this14 = this;
+
+      var childContainer = void 0;
+      var viewModel = void 0;
+      var viewModelResource = void 0;
+      var m = void 0;
+
+      return this.ensureViewModel(context).then(tryActivateViewModel).then(function () {
+        childContainer = context.childContainer;
+        viewModel = context.viewModel;
+        viewModelResource = context.viewModelResource;
+        m = viewModelResource.metadata;
+
+        var viewStrategy = _this14.viewLocator.getViewStrategy(context.view || viewModel);
+
+        if (context.viewResources) {
+          viewStrategy.makeRelativeTo(context.viewResources.viewUrl);
+        }
+
+        return m.load(childContainer, viewModelResource.value, null, viewStrategy, true);
+      }).then(function (viewFactory) {
+        return m.create(childContainer, BehaviorInstruction.dynamic(context.host, viewModel, viewFactory));
+      });
+    };
+
+    CompositionEngine.prototype.ensureViewModel = function ensureViewModel(context) {
+      var childContainer = context.childContainer = context.childContainer || context.container.createChild();
+
+      if (typeof context.viewModel === 'string') {
+        context.viewModel = context.viewResources ? context.viewResources.relativeToView(context.viewModel) : context.viewModel;
+
+        return this.viewEngine.importViewModelResource(context.viewModel).then(function (viewModelResource) {
+          childContainer.autoRegister(viewModelResource.value);
+
+          if (context.host) {
+            childContainer.registerInstance(_aureliaPal.DOM.Element, context.host);
+          }
+
+          context.viewModel = childContainer.viewModel = childContainer.get(viewModelResource.value);
+          context.viewModelResource = viewModelResource;
+          return context;
+        });
+      }
+
+      var m = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, context.viewModel.constructor);
+      m.elementName = m.elementName || 'dynamic-element';
+      m.initialize(context.container || childContainer, context.viewModel.constructor);
+      context.viewModelResource = { metadata: m, value: context.viewModel.constructor };
+      childContainer.viewModel = context.viewModel;
+      return Promise.resolve(context);
+    };
+
+    CompositionEngine.prototype.compose = function compose(context) {
+      context.childContainer = context.childContainer || context.container.createChild();
+      context.view = this.viewLocator.getViewStrategy(context.view);
+
+      var transaction = context.childContainer.get(CompositionTransaction);
+      var compositionTransactionOwnershipToken = transaction.tryCapture();
+
+      if (compositionTransactionOwnershipToken) {
+        context.compositionTransactionOwnershipToken = compositionTransactionOwnershipToken;
+      } else {
+        context.compositionTransactionNotifier = transaction.enlist();
+      }
+
+      if (context.viewModel) {
+        return this._createControllerAndSwap(context);
+      } else if (context.view) {
+        if (context.viewResources) {
+          context.view.makeRelativeTo(context.viewResources.viewUrl);
+        }
+
+        return context.view.loadViewFactory(this.viewEngine, new ViewCompileInstruction()).then(function (viewFactory) {
+          var result = viewFactory.create(context.childContainer);
+          result.bind(context.bindingContext, context.overrideContext);
+
+          var work = function work() {
+            return Promise.resolve(context.viewSlot.removeAll(true)).then(function () {
+              context.viewSlot.add(result);
+
+              if (context.compositionTransactionNotifier) {
+                context.compositionTransactionNotifier.done();
+              }
+
+              return result;
+            });
+          };
+
+          if (context.compositionTransactionOwnershipToken) {
+            return context.compositionTransactionOwnershipToken.waitForCompositionComplete().then(work);
+          }
+
+          return work();
+        });
+      } else if (context.viewSlot) {
+        context.viewSlot.removeAll();
+
+        if (context.compositionTransactionNotifier) {
+          context.compositionTransactionNotifier.done();
+        }
+
+        return Promise.resolve(null);
+      }
+
+      return Promise.resolve(null);
+    };
+
+    return CompositionEngine;
+  }()) || _class22);
+
+  var ElementConfigResource = exports.ElementConfigResource = function () {
+    function ElementConfigResource() {
+      
+    }
+
+    ElementConfigResource.prototype.initialize = function initialize(container, target) {};
+
+    ElementConfigResource.prototype.register = function register(registry, name) {};
+
+    ElementConfigResource.prototype.load = function load(container, target) {
+      var config = new target();
+      var eventManager = container.get(_aureliaBinding.EventManager);
+      eventManager.registerElementConfig(config);
+    };
+
+    return ElementConfigResource;
+  }();
+
+  function validateBehaviorName(name, type) {
+    if (/[A-Z]/.test(name)) {
+      var newName = _hyphenate(name);
+      LogManager.getLogger('templating').warn('\'' + name + '\' is not a valid ' + type + ' name and has been converted to \'' + newName + '\'. Upper-case letters are not allowed because the DOM is not case-sensitive.');
+      return newName;
+    }
+    return name;
+  }
+
+  function resource(instance) {
+    return function (target) {
+      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, instance, target);
+    };
+  }
+
+  function behavior(override) {
+    return function (target) {
+      if (override instanceof HtmlBehaviorResource) {
+        _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, override, target);
+      } else {
+        var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, target);
+        Object.assign(r, override);
       }
     };
   }
 
-  if (typeof Reflect.defineMetadata !== 'function') {
-    Reflect.defineMetadata = function (metadataKey, metadataValue, target, targetKey) {
-      var metadataContainer = target.hasOwnProperty(metadataContainerKey) ? target[metadataContainerKey] : target[metadataContainerKey] = {};
-      var targetContainer = metadataContainer[targetKey] || (metadataContainer[targetKey] = {});
-      targetContainer[metadataKey] = metadataValue;
+  function customElement(name) {
+    return function (target) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, target);
+      r.elementName = validateBehaviorName(name, 'custom element');
     };
   }
 
-  if (typeof Reflect.metadata !== 'function') {
-    Reflect.metadata = function (metadataKey, metadataValue) {
-      return function (target, targetKey) {
-        Reflect.defineMetadata(metadataKey, metadataValue, target, targetKey);
+  function customAttribute(name, defaultBindingMode) {
+    return function (target) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, target);
+      r.attributeName = validateBehaviorName(name, 'custom attribute');
+      r.attributeDefaultBindingMode = defaultBindingMode;
+    };
+  }
+
+  function templateController(target) {
+    var deco = function deco(t) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
+      r.liftsContent = true;
+    };
+
+    return target ? deco(target) : deco;
+  }
+
+  function bindable(nameOrConfigOrTarget, key, descriptor) {
+    var deco = function deco(target, key2, descriptor2) {
+      var actualTarget = key2 ? target.constructor : target;
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, actualTarget);
+      var prop = void 0;
+
+      if (key2) {
+        nameOrConfigOrTarget = nameOrConfigOrTarget || {};
+        nameOrConfigOrTarget.name = key2;
+      }
+
+      prop = new BindableProperty(nameOrConfigOrTarget);
+      return prop.registerWith(actualTarget, r, descriptor2);
+    };
+
+    if (!nameOrConfigOrTarget) {
+      return deco;
+    }
+
+    if (key) {
+      var _target = nameOrConfigOrTarget;
+      nameOrConfigOrTarget = null;
+      return deco(_target, key, descriptor);
+    }
+
+    return deco;
+  }
+
+  function dynamicOptions(target) {
+    var deco = function deco(t) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
+      r.hasDynamicOptions = true;
+    };
+
+    return target ? deco(target) : deco;
+  }
+
+  var defaultShadowDOMOptions = { mode: 'open' };
+  function useShadowDOM(targetOrOptions) {
+    var options = typeof targetOrOptions === 'function' || !targetOrOptions ? defaultShadowDOMOptions : targetOrOptions;
+
+    var deco = function deco(t) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
+      r.targetShadowDOM = true;
+      r.shadowDOMOptions = options;
+    };
+
+    return typeof targetOrOptions === 'function' ? deco(targetOrOptions) : deco;
+  }
+
+  function processAttributes(processor) {
+    return function (t) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
+      r.processAttributes = function (compiler, resources, node, attributes, elementInstruction) {
+        try {
+          processor(compiler, resources, node, attributes, elementInstruction);
+        } catch (error) {
+          LogManager.getLogger('templating').error(error);
+        }
       };
     };
   }
 
-  if (typeof Reflect.defineProperty !== 'function') {
-    Reflect.defineProperty = function (target, propertyKey, descriptor) {
-      if ((typeof target === 'undefined' ? 'undefined' : _typeof(target)) === 'object' ? target === null : typeof target !== 'function') {
-        throw new TypeError('Reflect.defineProperty called on non-object');
-      }
-      try {
-        Object.defineProperty(target, propertyKey, descriptor);
-        return true;
-      } catch (e) {
-        return false;
-      }
-    };
+  function doNotProcessContent() {
+    return false;
   }
 
-  if (typeof Reflect.construct !== 'function') {
-    Reflect.construct = function (Target, args) {
-      if (args) {
-        switch (args.length) {
-          case 0:
-            return new Target();
-          case 1:
-            return new Target(args[0]);
-          case 2:
-            return new Target(args[0], args[1]);
-          case 3:
-            return new Target(args[0], args[1], args[2]);
-          case 4:
-            return new Target(args[0], args[1], args[2], args[3]);
+  function processContent(processor) {
+    return function (t) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
+      r.processContent = processor ? function (compiler, resources, node, instruction) {
+        try {
+          return processor(compiler, resources, node, instruction);
+        } catch (error) {
+          LogManager.getLogger('templating').error(error);
+          return false;
         }
+      } : doNotProcessContent;
+    };
+  }
+
+  function containerless(target) {
+    var deco = function deco(t) {
+      var r = _aureliaMetadata.metadata.getOrCreateOwn(_aureliaMetadata.metadata.resource, HtmlBehaviorResource, t);
+      r.containerless = true;
+    };
+
+    return target ? deco(target) : deco;
+  }
+
+  function useViewStrategy(strategy) {
+    return function (target) {
+      _aureliaMetadata.metadata.define(ViewLocator.viewStrategyMetadataKey, strategy, target);
+    };
+  }
+
+  function useView(path) {
+    return useViewStrategy(new RelativeViewStrategy(path));
+  }
+
+  function inlineView(markup, dependencies, dependencyBaseUrl) {
+    return useViewStrategy(new InlineViewStrategy(markup, dependencies, dependencyBaseUrl));
+  }
+
+  function noView(targetOrDependencies, dependencyBaseUrl) {
+    var target = void 0;
+    var dependencies = void 0;
+    if (typeof targetOrDependencies === 'function') {
+      target = targetOrDependencies;
+    } else {
+      dependencies = targetOrDependencies;
+      target = undefined;
+    }
+
+    var deco = function deco(t) {
+      _aureliaMetadata.metadata.define(ViewLocator.viewStrategyMetadataKey, new NoViewStrategy(dependencies, dependencyBaseUrl), t);
+    };
+
+    return target ? deco(target) : deco;
+  }
+
+  function elementConfig(target) {
+    var deco = function deco(t) {
+      _aureliaMetadata.metadata.define(_aureliaMetadata.metadata.resource, new ElementConfigResource(), t);
+    };
+
+    return target ? deco(target) : deco;
+  }
+
+  function viewResources() {
+    for (var _len = arguments.length, resources = Array(_len), _key = 0; _key < _len; _key++) {
+      resources[_key] = arguments[_key];
+    }
+
+    return function (target) {
+      _aureliaMetadata.metadata.define(ViewEngine.viewModelRequireMetadataKey, resources, target);
+    };
+  }
+
+  var TemplatingEngine = exports.TemplatingEngine = (_dec11 = (0, _aureliaDependencyInjection.inject)(_aureliaDependencyInjection.Container, ModuleAnalyzer, ViewCompiler, CompositionEngine), _dec11(_class23 = function () {
+    function TemplatingEngine(container, moduleAnalyzer, viewCompiler, compositionEngine) {
+      
+
+      this._container = container;
+      this._moduleAnalyzer = moduleAnalyzer;
+      this._viewCompiler = viewCompiler;
+      this._compositionEngine = compositionEngine;
+      container.registerInstance(Animator, Animator.instance = new Animator());
+    }
+
+    TemplatingEngine.prototype.configureAnimator = function configureAnimator(animator) {
+      this._container.unregister(Animator);
+      this._container.registerInstance(Animator, Animator.instance = animator);
+    };
+
+    TemplatingEngine.prototype.compose = function compose(context) {
+      return this._compositionEngine.compose(context);
+    };
+
+    TemplatingEngine.prototype.enhance = function enhance(instruction) {
+      if (instruction instanceof _aureliaPal.DOM.Element) {
+        instruction = { element: instruction };
       }
 
-      var a = [null];
-      a.push.apply(a, args);
-      return new (bind.apply(Target, a))();
-    };
-  }
+      var compilerInstructions = {};
+      var resources = instruction.resources || this._container.get(ViewResources);
 
-  if (typeof Reflect.ownKeys !== 'function') {
-    Reflect.ownKeys = function (o) {
-      return Object.getOwnPropertyNames(o).concat(Object.getOwnPropertySymbols(o));
+      this._viewCompiler._compileNode(instruction.element, resources, compilerInstructions, instruction.element.parentNode, 'root', true);
+
+      var factory = new ViewFactory(instruction.element, compilerInstructions, resources);
+      var container = instruction.container || this._container.createChild();
+      var view = factory.create(container, BehaviorInstruction.enhance());
+
+      view.bind(instruction.bindingContext || {}, instruction.overrideContext);
+
+      return view;
     };
-  }
+
+    return TemplatingEngine;
+  }()) || _class23);
 });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","text":"../node_modules\\text\\text","jquery":"../node_modules\\jquery\\dist\\jquery","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"bootstrap4","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"}],"stubModules":["text"],"shim":{"bootstrap4":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["helpers/Attribute","domain/Body","domain/Monster","domain/MonsterTemplate","domain/Items/Loot","domain/Items/Gold","domain/Items/Weapon","domain/AllItems","messages","helpers/GameLoop","app","helpers/Array","environment","main","domain/Player","factories/BodyFactory","domain/Stores/PlayerStore","helpers/Dice","helpers/Combat","components/battle-stack","domain/Stores/TemplateStore","components/main-menu","components/modal-content","components/monster-manager","components/player-inventory","components/player-overview","components/player-templates","components/progress-bar","components/template-bag","factories/ItemFactory","resources/index","components/loot/loot-stack","styles/styles","components/loot/gold-loot","components/loot/weapon-loot"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","text":"../node_modules\\text\\text","jquery":"../node_modules\\jquery\\dist\\jquery","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"bootstrap4","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"}],"stubModules":["text"],"shim":{"bootstrap4":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["helpers/Attribute","helpers/Dice","domain/Body","domain/Monster","domain/MonsterTemplate","domain/Items/Loot","domain/Items/Gold","domain/Items/Weapon","domain/AllItems","messages","helpers/GameLoop","app","helpers/Array","environment","main","domain/Player","factories/BodyFactory","domain/Stores/PlayerStore","helpers/Combat","components/battle-stack","domain/Stores/TemplateStore","components/main-menu","components/modal-content","components/monster-manager","components/player-inventory","components/player-overview","components/player-templates","components/progress-bar","components/template-bag","factories/ItemFactory","resources/index","components/loot/loot-stack","styles/styles","components/loot/gold-loot","components/loot/weapon-loot"]}})}
