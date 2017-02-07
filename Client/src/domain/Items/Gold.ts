@@ -1,4 +1,4 @@
-import {Loot} from "./Loot";
+import { Loot } from "./Loot";
 import { GoldTaken } from '../../messages';
 import { EventAggregator } from 'aurelia-event-aggregator';
 

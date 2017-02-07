@@ -1,6 +1,6 @@
 import { autoinject } from 'aurelia-framework';
 import MonsterTemplate from '../MonsterTemplate';
-import Monster from "../Monster";
+import * as Recipe from '../AllRecipies';
 import MonsterFactory from '../../factories/MonsterFactory';
 
 @autoinject
@@ -11,8 +11,8 @@ export default class TemplateStore
     
     constructor(private monsterFactory: MonsterFactory) {
         let defaultTemplate = new MonsterTemplate("Test Template");
-        defaultTemplate.addMonster(monsterFactory.buildMonster("Default Monster1"));
-        defaultTemplate.addMonster(monsterFactory.buildMonster("Default Monster2"));
+        defaultTemplate.addRecipe(new Recipe.KoboldRecipe());
+        defaultTemplate.addRecipe(new Recipe.KoboldRecipe());
 
         this.templates = [defaultTemplate];
     }

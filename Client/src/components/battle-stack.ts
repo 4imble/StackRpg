@@ -10,11 +10,10 @@ export class BattleStack {
     stack: Array<Monster> = [];
 
     constructor(private eventAggregator: EventAggregator, private monsterFactory: MonsterFactory, private combat: Combat) {
-        this.stack.push(monsterFactory.buildMonster("Grumble"), monsterFactory.buildMonster("Viqas' Expensive Bread"));
-
+        
         this.eventAggregator.subscribe(TemplateSpawned, (msg: TemplateSpawned) => {
-            msg.template.monsters.forEach(monster => {
-                this.stack.push(monsterFactory.cloneMonster(monster));
+            msg.template.recipes.forEach(recipe => {
+                this.stack.push(monsterFactory.buildMonster(recipe));
             });
         });
 

@@ -10,6 +10,8 @@ function onChange(path) {
 }
 
 function reload(done) {
+  console.log("\\\\\\//////");
+  console.log("\\\\\\//////");
   browserSync.reload();
   done();
 }

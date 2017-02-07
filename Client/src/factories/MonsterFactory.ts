@@ -1,21 +1,35 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Monster from '../domain/Monster';
+import PlayerStore from '../domain/Stores/PlayerStore';
+import * as Recipe from '../domain/AllRecipies';
 
 @autoinject
 export default class MonsterFactory {
-    constructor(private eventAggregator: EventAggregator) { }
+    constructor(private eventAggregator: EventAggregator, private playerStore: PlayerStore) { }
 
-    cloneMonster(monster: Monster){
-        return Object.assign(this.buildMonster(monster.name), monster);
+    buildMonster(recipe: Recipe.MonsterRecipe, level: number = this.playerStore.currentPlayer.level): Monster {
+        let monster = new Monster(this.eventAggregator, recipe.name);
+
+        monster.baseHealth = recipe.baseHealth;
+        monster.strength = recipe.baseStrength;
+        monster.toughness = recipe.baseToughness;
+        monster.dexterity = recipe.baseDexterity;
+
+        this.levelUp(monster, recipe, level);
+        
+        return monster;
     }
 
-    buildMonster(name: string): Monster {
-        let monster = new Monster(this.eventAggregator, name);
-        monster.strength = 9;
-        monster.toughness = 10;
-        monster.dexterity = 13;
-
-        return monster;
+    //Maybe this should be in monster?
+    levelUp(monster: Monster, recipe: Recipe.MonsterRecipe, levels: number)
+    {
+        for(var i = 0; i < levels; i++)
+        {
+            monster.baseHealth += recipe.healthPerLevel();
+            monster.strength += recipe.strengthPerLevel();
+            monster.toughness += recipe.toughnessPerLevel();
+            monster.dexterity += recipe.dexterityPerLevel();
+        }
     }
 }

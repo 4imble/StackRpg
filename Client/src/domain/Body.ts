@@ -6,6 +6,8 @@ abstract class Body {
     damageTaken: number = 0;
     experience: number = 0;
 
+    baseHealth: number = 10;
+
     strength: number = 10;
     toughness: number = 10;
     dexterity: number = 10;
@@ -19,10 +21,6 @@ abstract class Body {
         let root = 1 / power;
         let xpmod = 500;
         return Math.floor(Math.pow(this.experience / xpmod, root))+1
-    }
-
-    get baseHealth(): number {
-        return 10 * this.level;
     }
 
     get baseAttack(): number {

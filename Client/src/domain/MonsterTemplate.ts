@@ -1,18 +1,18 @@
-import Monster from "./Monster";
+import * as Recipe from '../domain/AllRecipies';
 
 export default class MonsterTemplate
 {
-    monsters: Array<Monster>;
+    recipes: Array<Recipe.MonsterRecipe>;
     
     constructor(public name: string){
-        this.monsters = [];
+        this.recipes = [];
     };
 
-    addMonster(newMonster: Monster){
-        this.monsters.push(newMonster);
+    addRecipe(newRecipe: Recipe.MonsterRecipe){
+        this.recipes.push(newRecipe);
     }
 
-    remove(existingMonster: Monster){
-        this.monsters.remove(existingMonster);
+    remove(existingRecipe: Recipe.MonsterRecipe){
+        this.recipes.remove(existingRecipe);
     }
 }
