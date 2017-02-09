@@ -8,7 +8,7 @@ import * as Recipe from '../domain/AllRecipies';
 export default class MonsterFactory {
     constructor(private eventAggregator: EventAggregator, private playerStore: PlayerStore) { }
 
-    buildMonster(recipe: Recipe.MonsterRecipe, level: number = this.playerStore.currentPlayer.level): Monster {
+    buildMonster(recipe: Recipe.MonsterRecipe): Monster {
         let monster = new Monster(this.eventAggregator, recipe.name);
 
         monster.baseHealth = recipe.baseHealth;
@@ -16,7 +16,7 @@ export default class MonsterFactory {
         monster.toughness = recipe.baseToughness;
         monster.dexterity = recipe.baseDexterity;
 
-        this.levelUp(monster, recipe, level);
+        this.levelUp(monster, recipe, recipe.level);
         
         return monster;
     }

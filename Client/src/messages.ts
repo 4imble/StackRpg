@@ -1,6 +1,7 @@
 import Monster from "./domain/monster";
 import MonsterTemplate from "./domain/MonsterTemplate";
 import * as Item from "./domain/AllItems";
+import * as Recipes from "./domain/AllRecipies";
 
 export class Heartbeat {
     constructor() { }
@@ -16,6 +17,10 @@ export class MonsterKilled {
 
 export class GoldTaken {
     constructor(public goldItem: Item.Gold) { }
+}
+
+export class RecipeTaken {
+    constructor(public recipe: Recipes.MonsterRecipe) { }
 }
 
 export class ItemTaken {

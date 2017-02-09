@@ -3,6 +3,8 @@ import { GoldTaken } from '../../messages';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 export class Gold extends Loot {
+    template:string = "gold";
+
     value: number;
 
     get displayName() {

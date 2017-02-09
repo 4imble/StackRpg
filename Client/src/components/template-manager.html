@@ -2,7 +2,7 @@
     <div style="width: 407px;">
         <div if.bind="templateStore.selectedTemplate == null">No template selected</div>
         <div class="clearfix" if.bind="templateStore.selectedTemplate" with.bind="templateStore.selectedTemplate">
-            <div repeat.for="recipe of recipes" class="monsterTemplateItem" click.delegate="$parent.remove(monster)">
+            <div repeat.for="recipe of recipes" class="monsterTemplateItem" click.delegate="$parent.remove(recipe)">
                 <div class="noselect">${recipe.name}</div>
             </div>
             <div repeat.for="i of (5 - recipes.length)" class="monsterTemplateItem empty"></div>

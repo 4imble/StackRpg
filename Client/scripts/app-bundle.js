@@ -126,7 +126,7 @@ define('domain/Monster',["require", "exports", "./Body", "../messages"], functio
     var Monster = (function (_super) {
         __extends(Monster, _super);
         function Monster() {
-            return _super.apply(this, arguments) || this;
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         Monster.prototype.takeDamage = function (damage) {
             this.damageTaken += damage;
@@ -173,18 +173,65 @@ define('domain/Recipies/KoboldRecipe',["require", "exports", "../Enums/Rarity", 
             this.toughnessPerLevel = function () { return Dice_1.default.binaryChance(10 + (_this.rarity * 10)); };
             this.dexterityPerLevel = function () { return Dice_1.default.binaryChance(13 + (_this.rarity * 10)); };
             this.rarity = Rarity_1.default.Common;
+            this.level = 1;
         }
         return KoboldRecipe;
     }());
     exports.KoboldRecipe = KoboldRecipe;
 });
 
-define('domain/AllRecipies',["require", "exports", "./Recipies/KoboldRecipe"], function (require, exports, KoboldRecipe_1) {
+define('domain/Recipies/WetPaperBagRecipe',["require", "exports", "../Enums/Rarity", "../../helpers/Dice"], function (require, exports, Rarity_1, Dice_1) {
+    "use strict";
+    var WetPaperBagRecipe = (function () {
+        function WetPaperBagRecipe() {
+            var _this = this;
+            this.name = "Wet Paper Bag";
+            this.baseHealth = 2;
+            this.baseStrength = 8;
+            this.baseToughness = 8;
+            this.baseDexterity = 8;
+            this.healthPerLevel = function () { return Dice_1.default.rollSides(4); };
+            this.strengthPerLevel = function () { return Dice_1.default.binaryChance(10 + (_this.rarity * 10)); };
+            this.toughnessPerLevel = function () { return Dice_1.default.binaryChance(10 + (_this.rarity * 10)); };
+            this.dexterityPerLevel = function () { return Dice_1.default.binaryChance(10 + (_this.rarity * 10)); };
+            this.rarity = Rarity_1.default.Common;
+            this.level = 1;
+        }
+        return WetPaperBagRecipe;
+    }());
+    exports.WetPaperBagRecipe = WetPaperBagRecipe;
+});
+
+define('domain/Recipies/DragonRecipe',["require", "exports", "../Enums/Rarity", "../../helpers/Dice"], function (require, exports, Rarity_1, Dice_1) {
+    "use strict";
+    var DragonRecipe = (function () {
+        function DragonRecipe() {
+            var _this = this;
+            this.name = "Dragon";
+            this.baseHealth = 20;
+            this.baseStrength = 16;
+            this.baseToughness = 20;
+            this.baseDexterity = 16;
+            this.healthPerLevel = function () { return Dice_1.default.rollSides(10); };
+            this.strengthPerLevel = function () { return Dice_1.default.binaryChance(9 + (_this.rarity * 12)); };
+            this.toughnessPerLevel = function () { return Dice_1.default.binaryChance(10 + (_this.rarity * 12)); };
+            this.dexterityPerLevel = function () { return Dice_1.default.binaryChance(13 + (_this.rarity * 12)); };
+            this.rarity = Rarity_1.default.Rare;
+            this.level = 1;
+        }
+        return DragonRecipe;
+    }());
+    exports.DragonRecipe = DragonRecipe;
+});
+
+define('domain/AllRecipies',["require", "exports", "./Recipies/KoboldRecipe", "./Recipies/WetPaperBagRecipe", "./Recipies/DragonRecipe"], function (require, exports, KoboldRecipe_1, WetPaperBagRecipe_1, DragonRecipe_1) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
     __export(KoboldRecipe_1);
+    __export(WetPaperBagRecipe_1);
+    __export(DragonRecipe_1);
 });
 
 define('domain/MonsterTemplate',["require", "exports"], function (require, exports) {
@@ -228,7 +275,9 @@ define('domain/Items/Gold',["require", "exports", "./Loot", "../../messages"], f
     var Gold = (function (_super) {
         __extends(Gold, _super);
         function Gold() {
-            return _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.template = "gold";
+            return _this;
         }
         Object.defineProperty(Gold.prototype, "displayName", {
             get: function () {
@@ -258,7 +307,9 @@ define('domain/Items/Weapon',["require", "exports", "./Loot", "../../messages"],
     var Weapon = (function (_super) {
         __extends(Weapon, _super);
         function Weapon() {
-            return _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.template = "weapon";
+            return _this;
         }
         Object.defineProperty(Weapon.prototype, "displayName", {
             get: function () {
@@ -278,7 +329,39 @@ define('domain/Items/Weapon',["require", "exports", "./Loot", "../../messages"],
     exports.Weapon = Weapon;
 });
 
-define('domain/AllItems',["require", "exports", "./Items/Loot", "./Items/Gold", "./Items/Weapon"], function (require, exports, Loot_1, Gold_1, Weapon_1) {
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+define('domain/Items/Recipe',["require", "exports", "./Loot", "../../messages"], function (require, exports, Loot_1, messages_1) {
+    "use strict";
+    var Recipe = (function (_super) {
+        __extends(Recipe, _super);
+        function Recipe() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.template = "recipe";
+            return _this;
+        }
+        Object.defineProperty(Recipe.prototype, "displayName", {
+            get: function () {
+                return this.recipe.name + " recipe (" + this.recipe.level + ")";
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Recipe.prototype.showToolTip = function () { };
+        ;
+        Recipe.prototype.take = function () { this.eventAggregator.publish(new messages_1.RecipeTaken(this.recipe)); };
+        ;
+        Recipe.prototype.use = function () { };
+        ;
+        return Recipe;
+    }(Loot_1.Loot));
+    exports.Recipe = Recipe;
+});
+
+define('domain/AllItems',["require", "exports", "./Items/Loot", "./Items/Gold", "./Items/Weapon", "./Items/Recipe"], function (require, exports, Loot_1, Gold_1, Weapon_1, Recipe_1) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -286,6 +369,7 @@ define('domain/AllItems',["require", "exports", "./Items/Loot", "./Items/Gold", 
     __export(Loot_1);
     __export(Gold_1);
     __export(Weapon_1);
+    __export(Recipe_1);
 });
 
 define('messages',["require", "exports"], function (require, exports) {
@@ -317,6 +401,13 @@ define('messages',["require", "exports"], function (require, exports) {
         return GoldTaken;
     }());
     exports.GoldTaken = GoldTaken;
+    var RecipeTaken = (function () {
+        function RecipeTaken(recipe) {
+            this.recipe = recipe;
+        }
+        return RecipeTaken;
+    }());
+    exports.RecipeTaken = RecipeTaken;
     var ItemTaken = (function () {
         function ItemTaken(item) {
             this.item = item;
@@ -447,50 +538,6 @@ define('main',["require", "exports", "./environment"], function (require, export
     exports.configure = configure;
 });
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-define('factories/MonsterFactory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Monster", "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Monster_1, PlayerStore_1) {
-    "use strict";
-    var MonsterFactory = (function () {
-        function MonsterFactory(eventAggregator, playerStore) {
-            this.eventAggregator = eventAggregator;
-            this.playerStore = playerStore;
-        }
-        MonsterFactory.prototype.buildMonster = function (recipe, level) {
-            if (level === void 0) { level = this.playerStore.currentPlayer.level; }
-            var monster = new Monster_1.default(this.eventAggregator, recipe.name);
-            monster.baseHealth = recipe.baseHealth;
-            monster.strength = recipe.baseStrength;
-            monster.toughness = recipe.baseToughness;
-            monster.dexterity = recipe.baseDexterity;
-            this.levelUp(monster, recipe, level);
-            return monster;
-        };
-        MonsterFactory.prototype.levelUp = function (monster, recipe, levels) {
-            for (var i = 0; i < levels; i++) {
-                monster.baseHealth += recipe.healthPerLevel();
-                monster.strength += recipe.strengthPerLevel();
-                monster.toughness += recipe.toughnessPerLevel();
-                monster.dexterity += recipe.dexterityPerLevel();
-            }
-        };
-        return MonsterFactory;
-    }());
-    MonsterFactory = __decorate([
-        aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
-    ], MonsterFactory);
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.default = MonsterFactory;
-});
-
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -501,7 +548,7 @@ define('domain/Player',["require", "exports", "./Body"], function (require, expo
     var Player = (function (_super) {
         __extends(Player, _super);
         function Player() {
-            var _this = _super.apply(this, arguments) || this;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this.gold = 0;
             return _this;
         }
@@ -578,6 +625,49 @@ define('domain/Stores/PlayerStore',["require", "exports", "aurelia-framework", "
     ], PlayerStore);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = PlayerStore;
+});
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('factories/MonsterFactory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/Monster", "../domain/Stores/PlayerStore"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Monster_1, PlayerStore_1) {
+    "use strict";
+    var MonsterFactory = (function () {
+        function MonsterFactory(eventAggregator, playerStore) {
+            this.eventAggregator = eventAggregator;
+            this.playerStore = playerStore;
+        }
+        MonsterFactory.prototype.buildMonster = function (recipe) {
+            var monster = new Monster_1.default(this.eventAggregator, recipe.name);
+            monster.baseHealth = recipe.baseHealth;
+            monster.strength = recipe.baseStrength;
+            monster.toughness = recipe.baseToughness;
+            monster.dexterity = recipe.baseDexterity;
+            this.levelUp(monster, recipe, recipe.level);
+            return monster;
+        };
+        MonsterFactory.prototype.levelUp = function (monster, recipe, levels) {
+            for (var i = 0; i < levels; i++) {
+                monster.baseHealth += recipe.healthPerLevel();
+                monster.strength += recipe.strengthPerLevel();
+                monster.toughness += recipe.toughnessPerLevel();
+                monster.dexterity += recipe.dexterityPerLevel();
+            }
+        };
+        return MonsterFactory;
+    }());
+    MonsterFactory = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
+    ], MonsterFactory);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = MonsterFactory;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -939,15 +1029,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/template-manager',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/AllRecipies", "../domain/Stores/TemplateStore", "../factories/MonsterFactory", "../domain/MonsterTemplate"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Recipe, TemplateStore_1, MonsterFactory_1, MonsterTemplate_1) {
+define('components/template-manager',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/AllRecipies", "../domain/Stores/TemplateStore", "../factories/MonsterFactory", "../domain/MonsterTemplate", "../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Recipe, TemplateStore_1, MonsterFactory_1, MonsterTemplate_1, messages_1) {
     "use strict";
     var TemplateManager = (function () {
         function TemplateManager(eventAggregator, templateStore, monsterFactory) {
+            var _this = this;
             this.eventAggregator = eventAggregator;
             this.templateStore = templateStore;
             this.monsterFactory = monsterFactory;
-            this.bag = [new Recipe.KoboldRecipe()];
+            this.bag = [new Recipe.KoboldRecipe(), new Recipe.WetPaperBagRecipe()];
             templateStore.templates.push(new MonsterTemplate_1.default("Template 1"));
+            this.eventAggregator.subscribe(messages_1.RecipeTaken, function (msg) {
+                _this.bag.push(msg.recipe);
+            });
         }
         TemplateManager.prototype.addRecipe = function (recipe) {
             this.templateStore.selectedTemplate.addRecipe(recipe);
@@ -973,30 +1067,37 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('factories/ItemFactory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/AllItems", "../helpers/Dice"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Item, Dice_1) {
+define('factories/ItemFactory',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../domain/AllItems", "../domain/AllRecipies", "../domain/Stores/PlayerStore", "../helpers/Dice"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, Item, Recipes, PlayerStore_1, Dice_1) {
     "use strict";
     var ItemFactory = (function () {
-        function ItemFactory(eventAggregator) {
+        function ItemFactory(eventAggregator, playerStore) {
             this.eventAggregator = eventAggregator;
+            this.playerStore = playerStore;
         }
         ItemFactory.prototype.buildGold = function () {
             var newGold = new Item.Gold(this.eventAggregator);
             newGold.value = Dice_1.default.d20();
-            newGold.template = "gold";
             return newGold;
         };
         ItemFactory.prototype.buildWeapon = function (name) {
             var newWeapon = new Item.Weapon(this.eventAggregator);
             newWeapon.name = name;
             newWeapon.damage = Dice_1.default.d20();
-            newWeapon.template = "weapon";
             return newWeapon;
+        };
+        ItemFactory.prototype.buildRecipe = function (level) {
+            if (level === void 0) { level = this.playerStore.currentPlayer.level + 1; }
+            var recipeLoot = new Item.Recipe(this.eventAggregator);
+            var newRecipe = new Recipes.DragonRecipe();
+            newRecipe.level = level;
+            recipeLoot.recipe = newRecipe;
+            return recipeLoot;
         };
         return ItemFactory;
     }());
     ItemFactory = __decorate([
         aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator])
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, PlayerStore_1.default])
     ], ItemFactory);
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.default = ItemFactory;
@@ -1018,17 +1119,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/loot/loot-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../../factories/ItemFactory", "../../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, ItemFactory_1, messages_1) {
+define('components/loot/loot-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../../factories/ItemFactory", "../../helpers/Dice", "../../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, ItemFactory_1, Dice_1, messages_1) {
     "use strict";
     var LootStack = (function () {
-        function LootStack(eventAggregator, itemFactory) {
+        function LootStack(eventAggregator, itemFactory, container) {
             var _this = this;
             this.eventAggregator = eventAggregator;
             this.itemFactory = itemFactory;
+            this.container = container;
             this.stack = [];
             this.eventAggregator.subscribe(messages_1.MonsterKilled, function () {
-                _this.stack.push(itemFactory.buildGold());
-                _this.stack.push(itemFactory.buildWeapon("Thunderfury, Blessed Blade of the Windseeker"));
+                if (Dice_1.default.binaryChance(40))
+                    _this.stack.push(itemFactory.buildGold());
+                if (Dice_1.default.binaryChance(10))
+                    _this.stack.push(itemFactory.buildWeapon("Thunderfury, Blessed Blade of the Windseeker"));
+                if (Dice_1.default.binaryChance(10))
+                    _this.stack.push(itemFactory.buildRecipe());
             });
         }
         LootStack.prototype.takeItem = function (lootItem) {
@@ -1039,23 +1145,24 @@ define('components/loot/loot-stack',["require", "exports", "aurelia-framework", 
     }());
     LootStack = __decorate([
         aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, ItemFactory_1.default])
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, ItemFactory_1.default, aurelia_framework_1.Container])
     ], LootStack);
     exports.LootStack = LootStack;
 });
 
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./components/battle-stack\"></require>\r\n\t<require from=\"./components/loot/loot-stack\"></require>\r\n\t<require from=\"./components/main-menu\"></require>\r\n\t<require from=\"./components/player-overview\"></require>\r\n\t<require from=\"./components/player-inventory\"></require>\r\n\t<require from=\"./components/player-templates\"></require>\r\n\t<require from=\"./components/template-bag\"></require>\r\n\t<require from=\"bootstrap4/css/bootstrap.css\"></require>\r\n\t<require from=\"./styles/styles.css\"></require>\r\n\r\n\t<div id=\"timer\">\r\n\t\tTimer: ${timer}\r\n\t</div>\r\n\t<main-menu></main-menu>\r\n\t<battle-stack></battle-stack>\r\n\t<player-overview></player-overview>\r\n\t<template-bag></template-bag>\r\n\t<loot-stack></loot-stack>\r\n\r\n\t<player-inventory></player-inventory>\r\n\t<player-templates></player-templates>\r\n</template>"; });
-define('text!styles/styles.css', ['module'], function(module) { module.exports = ".component {\n  display: block;\n  overflow: hidden;\n}\nbody {\n  margin: 0;\n}\nbattle-stack,\nloot-stack,\nmonster-bag {\n  display: block;\n  overflow: hidden;\n}\n#player-overview {\n  background-color: lightblue;\n}\n#timer {\n  position: fixed;\n  top: 10px;\n  right: 10px;\n  padding: 10px;\n  font-size: 12px;\n  font-weight: 700;\n  background: white;\n  border-radius: 4px;\n  z-index: 10000;\n}\n.page-host {\n  padding-top: 60px;\n}\n.bagItem {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: antiquewhite;\n}\n.bagItem:hover {\n  background-color: beige;\n  cursor: pointer;\n}\n.templateItem {\n  padding: 6px;\n  margin-top: 1px;\n  color: ghostwhite;\n  background-color: saddlebrown;\n}\n.templateMonster {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: coral;\n}\n.progressBarContainer {\n  width: 10px;\n  float: right;\n  height: 100%;\n  background: #c9d250;\n}\n.progressBarContainer .progressBar {\n  width: 10px;\n  height: 100%;\n  transition: height 1s;\n  background: red;\n}\n.battleStackItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.battleStackItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.monsterTemplateItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.monsterTemplateItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.inventoryItem {\n  background-color: darkslategray;\n  padding: 4px;\n  margin-top: 1px;\n  color: white;\n}\n.lootItem {\n  display: block;\n  overflow: hidden;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: gray;\n  color: whitesmoke;\n  font-weight: 600;\n  font-size: 14px;\n}\n.lootItem:hover {\n  background-color: cadetblue;\n  cursor: pointer;\n}\n.noselect {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.clearfix {\n  clear: both;\n  overflow: none;\n}\n.modal-window {\n  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  background-color: white;\n  position: fixed;\n  z-index: 99999;\n  border-radius: 5px;\n  padding: 22px;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  -webkit-transform: translate(-50%, -50%);\n  max-height: 70%;\n}\n.modal-window .close-button {\n  float: right;\n}\n.modal-window-overlay {\n  background-color: black;\n  -ms-filter: \"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)\";\n  background-color: rgba(0, 0, 0, 0.4);\n  position: fixed;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  z-index: 10000;\n}\n.template-controls {\n  float: right;\n}\n"; });
 define('text!components/battle-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./progress-bar\"></require>\r\n    \r\n    <div>\r\n        <div repeat.for=\"monster of stack\" class=\"battleStackItem\">\r\n            <progress-bar percent.bind=\"monster.currentHealthPercent\"></progress-bar>\r\n                <h4>${monster.name}</h4>\r\n                <i class=\"fa fa-heart\"></i> ${monster.currentHealth} (health) <br />\r\n                ${monster.strength} (str)<br />\r\n                ${monster.dexterity} (dex) <br />\r\n                ${monster.toughness} (tou)<br />\r\n        </div>\r\n        <div repeat.for=\"i of (5 - stack.length)\" class=\"battleStackItem empty\">\r\n        </div>\r\n    </div>\r\n</template>"; });
-define('text!components/main-menu.html', ['module'], function(module) { module.exports = "<template>\r\n    <nav class=\"navbar navbar-light bg-faded\">\r\n        <ul class=\"nav navbar-nav\">\r\n            <li class=\"nav-item\">\r\n                <button click.delegate=\"open('player-inventory')\" class=\"btn btn-block\">Inventory (${playerStore.inventory.length})</button>\r\n            </li>\r\n            <li class=\"nav-item\">\r\n                <button click.delegate=\"open('player-templates')\" class=\"btn btn-block\">Templates (${templateStore.templates.length})</button>\r\n            </li>\r\n        </ul>\r\n    </nav>\r\n</template>"; });
+define('text!styles/styles.css', ['module'], function(module) { module.exports = ".component {\n  display: block;\n  overflow: hidden;\n}\nbody {\n  margin: 0;\n}\nbattle-stack,\nloot-stack,\nmonster-bag {\n  display: block;\n  overflow: hidden;\n}\n#player-overview {\n  background-color: lightblue;\n}\n#timer {\n  position: fixed;\n  top: 10px;\n  right: 10px;\n  padding: 10px;\n  font-size: 12px;\n  font-weight: 700;\n  background: white;\n  border-radius: 4px;\n  z-index: 10000;\n}\n.page-host {\n  padding-top: 60px;\n}\n.bagItem {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: antiquewhite;\n}\n.bagItem:hover {\n  background-color: beige;\n  cursor: pointer;\n}\n.templateItem {\n  padding: 6px;\n  margin-top: 1px;\n  color: ghostwhite;\n  background-color: saddlebrown;\n}\n.templateMonster {\n  padding: 6px;\n  margin-top: 1px;\n  background-color: coral;\n}\n.progressBarContainer {\n  width: 10px;\n  float: right;\n  height: 100%;\n  background: #c9d250;\n}\n.progressBarContainer .progressBar {\n  width: 10px;\n  height: 100%;\n  transition: height 1s;\n  background: red;\n}\n.battleStackItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.battleStackItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.monsterTemplateItem {\n  height: 100px;\n  width: 80px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n}\n.monsterTemplateItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.battleStackEmptyItem {\n  height: 200px;\n  width: 160px;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: coral;\n  color: whitesmoke;\n  font-weight: 600;\n  float: left;\n  background-color: darkslategray;\n}\n.battleStackEmptyItem.empty {\n  background-color: #b1b1b1;\n  color: white;\n}\n.inventoryItem {\n  background-color: darkslategray;\n  padding: 4px;\n  margin-top: 1px;\n  color: white;\n}\n.lootItem {\n  display: block;\n  overflow: hidden;\n  padding: 6px;\n  margin-top: 1px;\n  margin-left: 1px;\n  background-color: gray;\n  color: whitesmoke;\n  font-weight: 600;\n  font-size: 14px;\n}\n.lootItem:hover {\n  background-color: cadetblue;\n  cursor: pointer;\n}\n.noselect {\n  -webkit-touch-callout: none;\n  -webkit-user-select: none;\n  -khtml-user-select: none;\n  -moz-user-select: none;\n  -ms-user-select: none;\n  user-select: none;\n}\n.clearfix {\n  clear: both;\n  overflow: none;\n}\n.modal-window {\n  font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;\n  background-color: white;\n  position: fixed;\n  z-index: 99999;\n  border-radius: 5px;\n  padding: 22px;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  -webkit-transform: translate(-50%, -50%);\n  max-height: 70%;\n}\n.modal-window .close-button {\n  float: right;\n}\n.modal-window-overlay {\n  background-color: black;\n  -ms-filter: \"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)\";\n  background-color: rgba(0, 0, 0, 0.4);\n  position: fixed;\n  left: 0;\n  right: 0;\n  top: 0;\n  bottom: 0;\n  z-index: 10000;\n}\n.template-controls {\n  float: right;\n}\n"; });
+define('text!components/main-menu.html', ['module'], function(module) { module.exports = "<template>\r\n    <nav class=\"navbar navbar-toggleable-md navbar-light bg-faded\">\r\n        <button class=\"navbar-toggler navbar-toggler-right\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarNavAltMarkup\"\r\n            aria-controls=\"navbarNavAltMarkup\" aria-expanded=\"false\" aria-label=\"Toggle navigation\">\r\n            <span class=\"navbar-toggler-icon\"></span>\r\n            </button>\r\n            <a class=\"navbar-brand\">StackRPG</a>\r\n            <div class=\"collapse navbar-collapse\" id=\"navbarNavAltMarkup\">\r\n                <div class=\"navbar-nav\">\r\n                    <a class=\"nav-item nav-link\" href=\"\" click.delegate=\"open('player-inventory')\" class=\"btn btn-block\">Inventory (${playerStore.inventory.length})</a>\r\n                    <a class=\"nav-item nav-link\" href=\"\" click.delegate=\"open('player-templates')\" class=\"btn btn-block\">Templates (${templateStore.templates.length})</a>\r\n                </div>\r\n            </div>\r\n    </nav>\r\n</template>"; });
 define('text!components/modal-content.html', ['module'], function(module) { module.exports = "<template>\r\n  <div show.bind=\"visibility\" class=\"modal-window\">\r\n    <div>\r\n      <button class=\"btn btn-danger btn-sm close-button\" click.delegate=\"close()\">close</button>\r\n    </div>\r\n    <slot></slot>\r\n  </div>\r\n  <div show.bind=\"visibility\" class=\"modal-window-overlay\" click.delegate=\"close()\"></div>\r\n</template>"; });
 define('text!components/player-inventory.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-inventory'\">\r\n        <h2>Inventory</h2>\r\n\r\n        <div repeat.for=\"item of playerInventory\" class=\"inventoryItem\">\r\n            ${item.name}\r\n        </div>\r\n        <div if.bind=\"!playerInventory.length\">\r\n            - empty -\r\n        </div>\r\n    </modal-content>\r\n</template>"; });
 define('text!components/player-overview.html', ['module'], function(module) { module.exports = "<template>\r\n    <div id=\"player-overview\">\r\n        <h2>\r\n            Player Overview\r\n        </h2>\r\n        <span>Name</span> : ${currentPlayer.name}\r\n        <br />\r\n        <span>Level</span> : ${currentPlayer.level} <span>Experience </span> : ${currentPlayer.experience}\r\n        <br />\r\n        <span>Gold</span> : ${currentPlayer.gold}\r\n        <br />\r\n        <span>Health</span> : ${currentPlayer.currentHealth} / ${currentPlayer.totalHealth}\r\n        <br />\r\n        <span>Strength</span> : ${currentPlayer.strength}\r\n        <br />\r\n        <span>Dexterity</span> : ${currentPlayer.dexterity}\r\n        <br />\r\n        <span>Toughness</span> : ${currentPlayer.toughness}\r\n    </div>\r\n</template>"; });
 define('text!components/player-templates.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./template-manager\"></require>\r\n    <require from=\"./modal-content\"></require>\r\n\r\n    <modal-content id.bind=\"'player-templates'\">\r\n        <h2>Templates</h2>\r\n        <template-manager></template-manager>\r\n    </modal-content>\r\n</template>"; });
 define('text!components/progress-bar.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"progressBarContainer\">\r\n        <div class=\"progressBar\" css=\"height: ${height}%;\"></div>\r\n    </div>\r\n</template>"; });
 define('text!components/template-bag.html', ['module'], function(module) { module.exports = "<template>\n    <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\n        <div class=\"noselect\">\n            ${template.name}\n            <div class=\"template-controls\">\n                <button class=\"btn btn-success btn-sm\" click.delegate=\"$parent.spawnTemplate(template)\"><i class=\"fa fa-level-up\"></i> Spawn</button>\n                <button class=\"btn btn-info btn-sm\" click.delegate=\"$parent.viewTemplate(template)\"><i class=\"fa fa-eye\"></i> View</button>\n            </div>\n            <div>\n                <span repeat.for=\"monster of template.monsters\" class=\"noselect tag tag-warning\">\n                    ${monster.name}\n                </span>\n            </div>\n        </div>\n    </div>\n</template>"; });
-define('text!components/template-manager.html', ['module'], function(module) { module.exports = "<template>\r\n    <div style=\"width: 407px;\">\r\n        <div if.bind=\"templateStore.selectedTemplate == null\">No template selected</div>\r\n        <div class=\"clearfix\" if.bind=\"templateStore.selectedTemplate\" with.bind=\"templateStore.selectedTemplate\">\r\n            <div repeat.for=\"recipe of recipes\" class=\"monsterTemplateItem\" click.delegate=\"$parent.remove(monster)\">\r\n                <div class=\"noselect\">${recipe.name}</div>\r\n            </div>\r\n            <div repeat.for=\"i of (5 - recipes.length)\" class=\"monsterTemplateItem empty\"></div>\r\n        </div>\r\n\r\n        <div class=\"bagItem\" if.bind=\"templateStore.selectedTemplate\" repeat.for=\"recipe of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.addRecipe(recipe)\">${recipe.name}</div>\r\n        </div>\r\n\r\n        <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.selectTemplate(template)\">${template.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
+define('text!components/template-manager.html', ['module'], function(module) { module.exports = "<template>\r\n    <div style=\"width: 407px;\">\r\n        <div if.bind=\"templateStore.selectedTemplate == null\">No template selected</div>\r\n        <div class=\"clearfix\" if.bind=\"templateStore.selectedTemplate\" with.bind=\"templateStore.selectedTemplate\">\r\n            <div repeat.for=\"recipe of recipes\" class=\"monsterTemplateItem\" click.delegate=\"$parent.remove(recipe)\">\r\n                <div class=\"noselect\">${recipe.name}</div>\r\n            </div>\r\n            <div repeat.for=\"i of (5 - recipes.length)\" class=\"monsterTemplateItem empty\"></div>\r\n        </div>\r\n\r\n        <div class=\"bagItem\" if.bind=\"templateStore.selectedTemplate\" repeat.for=\"recipe of bag\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.addRecipe(recipe)\">${recipe.name}</div>\r\n        </div>\r\n\r\n        <div class=\"templateItem\" repeat.for=\"template of templateStore.templates\">\r\n            <div class=\"noselect\" click.delegate=\"$parent.selectTemplate(template)\">${template.name}</div>\r\n        </div>\r\n    </div>\r\n</template>"; });
 define('text!components/loot/gold-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"gold-loot\">\r\n        <img src=\"src/images/gold_stack.png\" width=\"30px\" height=\"30px\" /> \r\n        ${lootItem.value} Gold\r\n    </div>\r\n</template>"; });
 define('text!components/loot/loot-stack.html', ['module'], function(module) { module.exports = "<template>\r\n    <compose \r\n      class=\"lootItem noselect\" \r\n      repeat.for=\"lootItem of stack\" \r\n      view=\"./${lootItem.template}-loot.html\"\r\n      click.delegate=\"$parent.takeItem(lootItem)\">\r\n    </compose>\r\n</template>"; });
+define('text!components/loot/recipe-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div class=\"recipe-loot\">\r\n        ${lootItem.displayName}\r\n    </div>\r\n</template>"; });
 define('text!components/loot/weapon-loot.html', ['module'], function(module) { module.exports = "<template>\r\n    <div>\r\n        ${lootItem.displayName}<br/> \r\n        Damage: ${lootItem.damage}\r\n    </div>\r\n</template>"; });
 //# sourceMappingURL=app-bundle.js.map

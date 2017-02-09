@@ -19,4 +19,5 @@ export class KoboldRecipe implements MonsterRecipe {
     dexterityPerLevel = () => Dice.binaryChance(13 + (this.rarity * 10));
 
     rarity: Rarity = Rarity.Common;
+    level: number = 1;
 }

@@ -3,6 +3,8 @@ import { ItemTaken } from '../../messages';
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 export class Weapon extends Loot {
+    template:string = "weapon";
+
     name: string;
     damage: number;
 

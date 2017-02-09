@@ -15,4 +15,5 @@ export interface MonsterRecipe
     dexterityPerLevel: () => number;
 
     rarity: Rarity;
+    level: number;
 }
