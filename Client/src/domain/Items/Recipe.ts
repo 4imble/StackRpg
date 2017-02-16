@@ -8,7 +8,7 @@ export class Recipe extends Loot {
     recipe: Recipes.MonsterRecipe;
 
     get displayName() {
-        return `${this.recipe.name} recipe (${this.recipe.level})`;
+        return `${this.recipe.name} recipe (Level: ${this.recipe.level})`;
     }
 
     showToolTip() { };

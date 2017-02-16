@@ -6,16 +6,15 @@ import { TemplateSpawned, ShowModalWindow } from '../messages';
 
 @inject(EventAggregator, TemplateStore)
 export class TemplateBag {
-    constructor(private eventAggregator: EventAggregator, private templateStore: TemplateStore){
+    constructor(private eventAggregator: EventAggregator, private templateStore: TemplateStore) {
 
     }
 
-    spawnTemplate(template: MonsterTemplate){
+    spawnTemplate(template: MonsterTemplate) {
         this.eventAggregator.publish(new TemplateSpawned(template));
     }
 
-    viewTemplate(template: MonsterTemplate)
-    {
+    viewTemplate(template: MonsterTemplate) {
         this.templateStore.selectedTemplate = template;
         this.eventAggregator.publish(new ShowModalWindow("player-templates"));
     }

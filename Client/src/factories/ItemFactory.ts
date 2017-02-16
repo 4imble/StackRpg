@@ -24,8 +24,9 @@ export default class ItemFactory {
     }
 
     buildRecipe(level:number = this.playerStore.currentPlayer.level + 1): Item.Recipe {
+        var AllRecipies = [new Recipes.DragonRecipe(), new Recipes.KoboldRecipe, new Recipes.WetPaperBagRecipe];
         let recipeLoot = new Item.Recipe(this.eventAggregator);
-        let newRecipe = new Recipes.DragonRecipe();
+        let newRecipe = AllRecipies[Dice.rollSides(AllRecipies.length)-1];
         
         newRecipe.level = level;
         recipeLoot.recipe = newRecipe;

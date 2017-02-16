@@ -12,6 +12,8 @@ export class LootStack {
     stack: Array<Item.Loot> = [];
     
     constructor(private eventAggregator: EventAggregator, private itemFactory: ItemFactory, private container: Container) {
+        
+        //This needs to call loot generator instead
         this.eventAggregator.subscribe(MonsterKilled, () => {
             if(Dice.binaryChance(40))
                 this.stack.push(itemFactory.buildGold()); 
