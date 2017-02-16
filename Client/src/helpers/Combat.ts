@@ -6,7 +6,7 @@ import Monster from '../Domain/Monster';
 import Body from '../Domain/Body';
 import Dice from "../helpers/Dice";
 import Attribute from "../helpers/Attribute";
-import { Heartbeat } from '../messages';
+import { Heartbeat, LoggedMessage } from '../messages';
 
 @autoinject
 export default class Combat {
@@ -40,16 +40,17 @@ export default class Combat {
     private calculateDamage(defender: Body, attacker: Body): number {
         let defenderDodge = defender.calculateDodgeRoll();
         let attackerHit = attacker.calculateAttackRoll();
-        console.log(`${defenderDodge} dodge vs ${attackerHit} attack`);
+        
+        this.eventAggregator.publish(new LoggedMessage(`${defenderDodge} dodge vs ${attackerHit} attack`));
         
         if(defenderDodge >= attackerHit)
             {
-                console.log(`${attacker.name} Misses`);
+                this.eventAggregator.publish(new LoggedMessage(`${attacker.name} Misses`));
                 return 0;
             }
 
         let attackerDamage = attacker.calculateDamageRoll();
-        console.log(`${attacker.name} Hits for ${attackerDamage}`);        
+        this.eventAggregator.publish(new LoggedMessage(`${attacker.name} Hits for ${attackerDamage}`));       
         return attackerDamage;
     }
 }

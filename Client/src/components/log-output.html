@@ -1,0 +1,14 @@
+<template>
+    <require from="./modal-content"></require>
+
+    <modal-content id.bind="'log-output'">
+        <h2>Logs</h2>
+
+        <div repeat.for="log of logs" class="logMessage">
+            ${log}
+        </div>
+        <div if.bind="!logs.length">
+            - empty -
+        </div>
+    </modal-content>
+</template>

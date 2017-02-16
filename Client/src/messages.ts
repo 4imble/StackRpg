@@ -34,3 +34,7 @@ export class ShowModalWindow {
 export class TemplateSpawned {
     constructor(public template: MonsterTemplate) { }
 }
+
+export class LoggedMessage {
+    constructor(public log: string) { }
+}
