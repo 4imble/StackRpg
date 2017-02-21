@@ -38,3 +38,7 @@ export class TemplateSpawned {
 export class LoggedMessage {
     constructor(public log: string) { }
 }
+
+export class ItemsDroppedFromMonster {
+    constructor(public items: Item.Loot[]) { }
+}

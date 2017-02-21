@@ -1,28 +1,25 @@
-import {autoinject, customElement, Container} from 'aurelia-framework';
+import {autoinject} from 'aurelia-framework';
 import {EventAggregator} from 'aurelia-event-aggregator';
 import * as Item from "../../domain/AllItems";
 import * as Recipes from "../../domain/AllRecipies";
 import * as MonsterRecipe from "../../domain/Recipies/MonsterRecipe";
 import ItemFactory from "../../factories/ItemFactory";
 import Dice from "../../helpers/Dice";
+import LootDropper from "../../helpers/LootDropper";
 import { MonsterKilled, GoldTaken } from '../../messages';
 
 @autoinject
 export class LootStack {
     stack: Array<Item.Loot> = [];
     
-    constructor(private eventAggregator: EventAggregator, private itemFactory: ItemFactory, private container: Container) {
+    constructor(private eventAggregator: EventAggregator, private lootDropper: LootDropper) {
         
-        //This needs to call loot generator instead
-        this.eventAggregator.subscribe(MonsterKilled, () => {
-            if(Dice.binaryChance(40))
-                this.stack.push(itemFactory.buildGold()); 
-            
-            if(Dice.binaryChance(10))
-                this.stack.push(itemFactory.buildWeapon("Thunderfury, Blessed Blade of the Windseeker"));
+        this.eventAggregator.subscribe(MonsterKilled, (msg: MonsterKilled) => {
+            var loots = lootDropper.generateLoot(msg.monster);
 
-            if(Dice.binaryChance(10))
-                this.stack.push(itemFactory.buildRecipe());
+            loots.forEach(loot => {
+                this.stack.push(loot);
+            });
         });
     }
     

@@ -436,6 +436,13 @@ define('messages',["require", "exports"], function (require, exports) {
         return LoggedMessage;
     }());
     exports.LoggedMessage = LoggedMessage;
+    var ItemsDroppedFromMonster = (function () {
+        function ItemsDroppedFromMonster(items) {
+            this.items = items;
+        }
+        return ItemsDroppedFromMonster;
+    }());
+    exports.ItemsDroppedFromMonster = ItemsDroppedFromMonster;
 });
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -1143,6 +1150,42 @@ define('factories/ItemFactory',["require", "exports", "aurelia-framework", "aure
     exports.default = ItemFactory;
 });
 
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+define('helpers/LootDropper',["require", "exports", "aurelia-framework", "../domain/Stores/PlayerStore", "../factories/ItemFactory", "../helpers/Dice"], function (require, exports, aurelia_framework_1, PlayerStore_1, ItemFactory_1, Dice_1) {
+    "use strict";
+    var LootDropper = (function () {
+        function LootDropper(itemFactory, playerStore) {
+            this.itemFactory = itemFactory;
+            this.playerStore = playerStore;
+        }
+        LootDropper.prototype.generateLoot = function (monster) {
+            var itemsToDrop = [];
+            if (Dice_1.default.binaryChance(40))
+                itemsToDrop.push(this.itemFactory.buildGold());
+            if (Dice_1.default.binaryChance(10))
+                itemsToDrop.push(this.itemFactory.buildWeapon("Thunderfury, Blessed Blade of the Windseeker"));
+            if (Dice_1.default.binaryChance(10))
+                itemsToDrop.push(this.itemFactory.buildRecipe());
+            return itemsToDrop;
+        };
+        return LootDropper;
+    }());
+    LootDropper = __decorate([
+        aurelia_framework_1.autoinject,
+        __metadata("design:paramtypes", [ItemFactory_1.default, PlayerStore_1.default])
+    ], LootDropper);
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.default = LootDropper;
+});
+
 define('resources/index',["require", "exports"], function (require, exports) {
     "use strict";
     function configure(config) {
@@ -1159,22 +1202,19 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-define('components/loot/loot-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../../factories/ItemFactory", "../../helpers/Dice", "../../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, ItemFactory_1, Dice_1, messages_1) {
+define('components/loot/loot-stack',["require", "exports", "aurelia-framework", "aurelia-event-aggregator", "../../helpers/LootDropper", "../../messages"], function (require, exports, aurelia_framework_1, aurelia_event_aggregator_1, LootDropper_1, messages_1) {
     "use strict";
     var LootStack = (function () {
-        function LootStack(eventAggregator, itemFactory, container) {
+        function LootStack(eventAggregator, lootDropper) {
             var _this = this;
             this.eventAggregator = eventAggregator;
-            this.itemFactory = itemFactory;
-            this.container = container;
+            this.lootDropper = lootDropper;
             this.stack = [];
-            this.eventAggregator.subscribe(messages_1.MonsterKilled, function () {
-                if (Dice_1.default.binaryChance(40))
-                    _this.stack.push(itemFactory.buildGold());
-                if (Dice_1.default.binaryChance(10))
-                    _this.stack.push(itemFactory.buildWeapon("Thunderfury, Blessed Blade of the Windseeker"));
-                if (Dice_1.default.binaryChance(10))
-                    _this.stack.push(itemFactory.buildRecipe());
+            this.eventAggregator.subscribe(messages_1.MonsterKilled, function (msg) {
+                var loots = lootDropper.generateLoot(msg.monster);
+                loots.forEach(function (loot) {
+                    _this.stack.push(loot);
+                });
             });
         }
         LootStack.prototype.takeItem = function (lootItem) {
@@ -1185,7 +1225,7 @@ define('components/loot/loot-stack',["require", "exports", "aurelia-framework", 
     }());
     LootStack = __decorate([
         aurelia_framework_1.autoinject,
-        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, ItemFactory_1.default, aurelia_framework_1.Container])
+        __metadata("design:paramtypes", [aurelia_event_aggregator_1.EventAggregator, LootDropper_1.default])
     ], LootStack);
     exports.LootStack = LootStack;
 });
