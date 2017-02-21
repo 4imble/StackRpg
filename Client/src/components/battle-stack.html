@@ -4,7 +4,7 @@
     <div>
         <div repeat.for="monster of stack" class="battleStackItem">
             <progress-bar percent.bind="monster.currentHealthPercent"></progress-bar>
-                <h4>${monster.name}</h4>
+                <h4>${monster.name} (${monster.level})</h4>
                 <i class="fa fa-heart"></i> ${monster.currentHealth} (health) <br />
                 ${monster.strength} (str)<br />
                 ${monster.dexterity} (dex) <br />

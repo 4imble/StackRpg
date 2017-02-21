@@ -11,25 +11,14 @@ export default class MonsterFactory {
     buildMonster(recipe: Recipe.MonsterRecipe): Monster {
         let monster = new Monster(this.eventAggregator, recipe.name);
 
+        monster.recipe = recipe;
         monster.baseHealth = recipe.baseHealth;
         monster.strength = recipe.baseStrength;
         monster.toughness = recipe.baseToughness;
         monster.dexterity = recipe.baseDexterity;
 
-        this.levelUp(monster, recipe, recipe.level);
+        monster.levelUp(recipe.level-1);
         
         return monster;
-    }
-
-    //Maybe this should be in monster?
-    levelUp(monster: Monster, recipe: Recipe.MonsterRecipe, levels: number)
-    {
-        for(var i = 0; i < levels; i++)
-        {
-            monster.baseHealth += recipe.healthPerLevel();
-            monster.strength += recipe.strengthPerLevel();
-            monster.toughness += recipe.toughnessPerLevel();
-            monster.dexterity += recipe.dexterityPerLevel();
-        }
     }
 }

@@ -1,5 +1,6 @@
 import Attribute from "../helpers/Attribute";
 import Dice from "../helpers/Dice";
+import Experience from "../helpers/Experience";
 import { EventAggregator } from 'aurelia-event-aggregator';
 
 abstract class Body {
@@ -17,10 +18,7 @@ abstract class Body {
     constructor(protected eventAggregator: EventAggregator, public name: string) {}
 
     get level(): number {
-        let power = 2.1;
-        let root = 1 / power;
-        let xpmod = 500;
-        return Math.floor(Math.pow(this.experience / xpmod, root))+1
+        return Experience.getLevel(this.experience);
     }
 
     get baseAttack(): number {
