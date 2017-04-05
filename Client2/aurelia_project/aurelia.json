@@ -1,18 +1,18 @@
 {
-  "name": "AUBase",
+  "name": "Client",
   "type": "project:application",
   "platform": {
     "id": "web",
     "displayName": "Web",
     "output": "scripts",
-    "index": "index.html",
-    "baseDir": "."
+    "index": "index.html"
   },
   "transpiler": {
     "id": "typescript",
     "displayName": "TypeScript",
     "fileExtension": ".ts",
     "dtsSource": [
+      "./typings/**/*.d.ts",
       "./custom_typings/**/*.d.ts"
     ],
     "source": "src/**/*.ts"
@@ -33,17 +33,13 @@
     "id": "vscode",
     "displayName": "Visual Studio Code"
   },
-  "unitTestRunner": {
-    "id": "none",
-    "displayName": "None"
-  },
   "paths": {
     "root": "src",
-    "resources": "resources",
-    "elements": "resources/elements",
-    "attributes": "resources/attributes",
-    "valueConverters": "resources/value-converters",
-    "bindingBehaviors": "resources/binding-behaviors"
+    "resources": "src/resources",
+    "elements": "src/resources/elements",
+    "attributes": "src/resources/attributes",
+    "valueConverters": "src/resources/value-converters",
+    "bindingBehaviors": "src/resources/binding-behaviors"
   },
   "build": {
     "targets": [
@@ -51,8 +47,7 @@
         "id": "web",
         "displayName": "Web",
         "output": "scripts",
-        "index": "index.html",
-        "baseDir": "."
+        "index": "index.html"
       }
     ],
     "loader": {
@@ -86,7 +81,6 @@
         "name": "vendor-bundle.js",
         "prepend": [
           "node_modules/bluebird/js/browser/bluebird.core.js",
-          "node_modules/aurelia-cli/lib/resources/scripts/configure-bluebird.js",
           "node_modules/tether/dist/js/tether.min.js",
           "node_modules/requirejs/require.js"
         ],

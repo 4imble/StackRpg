@@ -3775,13 +3775,6 @@ module.exports = ret;
 
 },{"./es5":10}]},{},[3])(3)
 });                    ;if (typeof window !== 'undefined' && window !== null) {                               window.P = window.Promise;                                                     } else if (typeof self !== 'undefined' && self !== null) {                             self.P = self.Promise;                                                         }
-//Configure Bluebird Promises.
-Promise.config({
-  warnings: {
-    wForgottenReturn: false
-  }
-});
-
 !function(t,e){"function"==typeof define&&define.amd?define(e):"object"==typeof exports?module.exports=e(require,exports,module):t.Tether=e()}(this,function(t,e,o){"use strict";function i(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function n(t){var e=t.getBoundingClientRect(),o={};for(var i in e)o[i]=e[i];if(t.ownerDocument!==document){var r=t.ownerDocument.defaultView.frameElement;if(r){var s=n(r);o.top+=s.top,o.bottom+=s.top,o.left+=s.left,o.right+=s.left}}return o}function r(t){var e=getComputedStyle(t)||{},o=e.position,i=[];if("fixed"===o)return[t];for(var n=t;(n=n.parentNode)&&n&&1===n.nodeType;){var r=void 0;try{r=getComputedStyle(n)}catch(s){}if("undefined"==typeof r||null===r)return i.push(n),i;var a=r,f=a.overflow,l=a.overflowX,h=a.overflowY;/(auto|scroll)/.test(f+h+l)&&("absolute"!==o||["relative","absolute","fixed"].indexOf(r.position)>=0)&&i.push(n)}return i.push(t.ownerDocument.body),t.ownerDocument!==document&&i.push(t.ownerDocument.defaultView),i}function s(){A&&document.body.removeChild(A),A=null}function a(t){var e=void 0;t===document?(e=document,t=document.documentElement):e=t.ownerDocument;var o=e.documentElement,i=n(t),r=P();return i.top-=r.top,i.left-=r.left,"undefined"==typeof i.width&&(i.width=document.body.scrollWidth-i.left-i.right),"undefined"==typeof i.height&&(i.height=document.body.scrollHeight-i.top-i.bottom),i.top=i.top-o.clientTop,i.left=i.left-o.clientLeft,i.right=e.body.clientWidth-i.width-i.left,i.bottom=e.body.clientHeight-i.height-i.top,i}function f(t){return t.offsetParent||document.documentElement}function l(){if(M)return M;var t=document.createElement("div");t.style.width="100%",t.style.height="200px";var e=document.createElement("div");h(e.style,{position:"absolute",top:0,left:0,pointerEvents:"none",visibility:"hidden",width:"200px",height:"150px",overflow:"hidden"}),e.appendChild(t),document.body.appendChild(e);var o=t.offsetWidth;e.style.overflow="scroll";var i=t.offsetWidth;o===i&&(i=e.clientWidth),document.body.removeChild(e);var n=o-i;return M={width:n,height:n}}function h(){var t=arguments.length<=0||void 0===arguments[0]?{}:arguments[0],e=[];return Array.prototype.push.apply(e,arguments),e.slice(1).forEach(function(e){if(e)for(var o in e)({}).hasOwnProperty.call(e,o)&&(t[o]=e[o])}),t}function d(t,e){if("undefined"!=typeof t.classList)e.split(" ").forEach(function(e){e.trim()&&t.classList.remove(e)});else{var o=new RegExp("(^| )"+e.split(" ").join("|")+"( |$)","gi"),i=c(t).replace(o," ");g(t,i)}}function p(t,e){if("undefined"!=typeof t.classList)e.split(" ").forEach(function(e){e.trim()&&t.classList.add(e)});else{d(t,e);var o=c(t)+(" "+e);g(t,o)}}function u(t,e){if("undefined"!=typeof t.classList)return t.classList.contains(e);var o=c(t);return new RegExp("(^| )"+e+"( |$)","gi").test(o)}function c(t){return t.className instanceof t.ownerDocument.defaultView.SVGAnimatedString?t.className.baseVal:t.className}function g(t,e){t.setAttribute("class",e)}function m(t,e,o){o.forEach(function(o){e.indexOf(o)===-1&&u(t,o)&&d(t,o)}),e.forEach(function(e){u(t,e)||p(t,e)})}function i(t,e){if(!(t instanceof e))throw new TypeError("Cannot call a class as a function")}function v(t,e){if("function"!=typeof e&&null!==e)throw new TypeError("Super expression must either be null or a function, not "+typeof e);t.prototype=Object.create(e&&e.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}}),e&&(Object.setPrototypeOf?Object.setPrototypeOf(t,e):t.__proto__=e)}function y(t,e){var o=arguments.length<=2||void 0===arguments[2]?1:arguments[2];return t+o>=e&&e>=t-o}function b(){return"undefined"!=typeof performance&&"undefined"!=typeof performance.now?performance.now():+new Date}function w(){for(var t={top:0,left:0},e=arguments.length,o=Array(e),i=0;i<e;i++)o[i]=arguments[i];return o.forEach(function(e){var o=e.top,i=e.left;"string"==typeof o&&(o=parseFloat(o,10)),"string"==typeof i&&(i=parseFloat(i,10)),t.top+=o,t.left+=i}),t}function C(t,e){return"string"==typeof t.left&&t.left.indexOf("%")!==-1&&(t.left=parseFloat(t.left,10)/100*e.width),"string"==typeof t.top&&t.top.indexOf("%")!==-1&&(t.top=parseFloat(t.top,10)/100*e.height),t}function O(t,e){return"scrollParent"===e?e=t.scrollParents[0]:"window"===e&&(e=[pageXOffset,pageYOffset,innerWidth+pageXOffset,innerHeight+pageYOffset]),e===document&&(e=e.documentElement),"undefined"!=typeof e.nodeType&&!function(){var t=e,o=a(e),i=o,n=getComputedStyle(e);if(e=[i.left,i.top,o.width+i.left,o.height+i.top],t.ownerDocument!==document){var r=t.ownerDocument.defaultView;e[0]+=r.pageXOffset,e[1]+=r.pageYOffset,e[2]+=r.pageXOffset,e[3]+=r.pageYOffset}G.forEach(function(t,o){t=t[0].toUpperCase()+t.substr(1),"Top"===t||"Left"===t?e[o]+=parseFloat(n["border"+t+"Width"]):e[o]-=parseFloat(n["border"+t+"Width"])})}(),e}var E=function(){function t(t,e){for(var o=0;o<e.length;o++){var i=e[o];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(t,i.key,i)}}return function(e,o,i){return o&&t(e.prototype,o),i&&t(e,i),e}}(),x=void 0;"undefined"==typeof x&&(x={modules:[]});var A=null,T=function(){var t=0;return function(){return++t}}(),S={},P=function(){var t=A;t&&document.body.contains(t)||(t=document.createElement("div"),t.setAttribute("data-tether-id",T()),h(t.style,{top:0,left:0,position:"absolute"}),document.body.appendChild(t),A=t);var e=t.getAttribute("data-tether-id");return"undefined"==typeof S[e]&&(S[e]=n(t),k(function(){delete S[e]})),S[e]},M=null,W=[],k=function(t){W.push(t)},_=function(){for(var t=void 0;t=W.pop();)t()},B=function(){function t(){i(this,t)}return E(t,[{key:"on",value:function(t,e,o){var i=!(arguments.length<=3||void 0===arguments[3])&&arguments[3];"undefined"==typeof this.bindings&&(this.bindings={}),"undefined"==typeof this.bindings[t]&&(this.bindings[t]=[]),this.bindings[t].push({handler:e,ctx:o,once:i})}},{key:"once",value:function(t,e,o){this.on(t,e,o,!0)}},{key:"off",value:function(t,e){if("undefined"!=typeof this.bindings&&"undefined"!=typeof this.bindings[t])if("undefined"==typeof e)delete this.bindings[t];else for(var o=0;o<this.bindings[t].length;)this.bindings[t][o].handler===e?this.bindings[t].splice(o,1):++o}},{key:"trigger",value:function(t){if("undefined"!=typeof this.bindings&&this.bindings[t]){for(var e=0,o=arguments.length,i=Array(o>1?o-1:0),n=1;n<o;n++)i[n-1]=arguments[n];for(;e<this.bindings[t].length;){var r=this.bindings[t][e],s=r.handler,a=r.ctx,f=r.once,l=a;"undefined"==typeof l&&(l=this),s.apply(l,i),f?this.bindings[t].splice(e,1):++e}}}}]),t}();x.Utils={getActualBoundingClientRect:n,getScrollParents:r,getBounds:a,getOffsetParent:f,extend:h,addClass:p,removeClass:d,hasClass:u,updateClasses:m,defer:k,flush:_,uniqueId:T,Evented:B,getScrollBarSize:l,removeUtilElements:s};var z=function(){function t(t,e){var o=[],i=!0,n=!1,r=void 0;try{for(var s,a=t[Symbol.iterator]();!(i=(s=a.next()).done)&&(o.push(s.value),!e||o.length!==e);i=!0);}catch(f){n=!0,r=f}finally{try{!i&&a["return"]&&a["return"]()}finally{if(n)throw r}}return o}return function(e,o){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return t(e,o);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),E=function(){function t(t,e){for(var o=0;o<e.length;o++){var i=e[o];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(t,i.key,i)}}return function(e,o,i){return o&&t(e.prototype,o),i&&t(e,i),e}}(),j=function(t,e,o){for(var i=!0;i;){var n=t,r=e,s=o;i=!1,null===n&&(n=Function.prototype);var a=Object.getOwnPropertyDescriptor(n,r);if(void 0!==a){if("value"in a)return a.value;var f=a.get;if(void 0===f)return;return f.call(s)}var l=Object.getPrototypeOf(n);if(null===l)return;t=l,e=r,o=s,i=!0,a=l=void 0}};if("undefined"==typeof x)throw new Error("You must include the utils.js file before tether.js");var Y=x.Utils,r=Y.getScrollParents,a=Y.getBounds,f=Y.getOffsetParent,h=Y.extend,p=Y.addClass,d=Y.removeClass,m=Y.updateClasses,k=Y.defer,_=Y.flush,l=Y.getScrollBarSize,s=Y.removeUtilElements,L=function(){if("undefined"==typeof document)return"";for(var t=document.createElement("div"),e=["transform","WebkitTransform","OTransform","MozTransform","msTransform"],o=0;o<e.length;++o){var i=e[o];if(void 0!==t.style[i])return i}}(),D=[],X=function(){D.forEach(function(t){t.position(!1)}),_()};!function(){var t=null,e=null,o=null,i=function n(){return"undefined"!=typeof e&&e>16?(e=Math.min(e-16,250),void(o=setTimeout(n,250))):void("undefined"!=typeof t&&b()-t<10||(null!=o&&(clearTimeout(o),o=null),t=b(),X(),e=b()-t))};"undefined"!=typeof window&&"undefined"!=typeof window.addEventListener&&["resize","scroll","touchmove"].forEach(function(t){window.addEventListener(t,i)})}();var F={center:"center",left:"right",right:"left"},H={middle:"middle",top:"bottom",bottom:"top"},N={top:0,left:0,middle:"50%",center:"50%",bottom:"100%",right:"100%"},U=function(t,e){var o=t.left,i=t.top;return"auto"===o&&(o=F[e.left]),"auto"===i&&(i=H[e.top]),{left:o,top:i}},V=function(t){var e=t.left,o=t.top;return"undefined"!=typeof N[t.left]&&(e=N[t.left]),"undefined"!=typeof N[t.top]&&(o=N[t.top]),{left:e,top:o}},R=function(t){var e=t.split(" "),o=z(e,2),i=o[0],n=o[1];return{top:i,left:n}},q=R,I=function(t){function e(t){var o=this;i(this,e),j(Object.getPrototypeOf(e.prototype),"constructor",this).call(this),this.position=this.position.bind(this),D.push(this),this.history=[],this.setOptions(t,!1),x.modules.forEach(function(t){"undefined"!=typeof t.initialize&&t.initialize.call(o)}),this.position()}return v(e,t),E(e,[{key:"getClass",value:function(){var t=arguments.length<=0||void 0===arguments[0]?"":arguments[0],e=this.options.classes;return"undefined"!=typeof e&&e[t]?this.options.classes[t]:this.options.classPrefix?this.options.classPrefix+"-"+t:t}},{key:"setOptions",value:function(t){var e=this,o=arguments.length<=1||void 0===arguments[1]||arguments[1],i={offset:"0 0",targetOffset:"0 0",targetAttachment:"auto auto",classPrefix:"tether"};this.options=h(i,t);var n=this.options,s=n.element,a=n.target,f=n.targetModifier;if(this.element=s,this.target=a,this.targetModifier=f,"viewport"===this.target?(this.target=document.body,this.targetModifier="visible"):"scroll-handle"===this.target&&(this.target=document.body,this.targetModifier="scroll-handle"),["element","target"].forEach(function(t){if("undefined"==typeof e[t])throw new Error("Tether Error: Both element and target must be defined");"undefined"!=typeof e[t].jquery?e[t]=e[t][0]:"string"==typeof e[t]&&(e[t]=document.querySelector(e[t]))}),p(this.element,this.getClass("element")),this.options.addTargetClasses!==!1&&p(this.target,this.getClass("target")),!this.options.attachment)throw new Error("Tether Error: You must provide an attachment");this.targetAttachment=q(this.options.targetAttachment),this.attachment=q(this.options.attachment),this.offset=R(this.options.offset),this.targetOffset=R(this.options.targetOffset),"undefined"!=typeof this.scrollParents&&this.disable(),"scroll-handle"===this.targetModifier?this.scrollParents=[this.target]:this.scrollParents=r(this.target),this.options.enabled!==!1&&this.enable(o)}},{key:"getTargetBounds",value:function(){if("undefined"==typeof this.targetModifier)return a(this.target);if("visible"===this.targetModifier){if(this.target===document.body)return{top:pageYOffset,left:pageXOffset,height:innerHeight,width:innerWidth};var t=a(this.target),e={height:t.height,width:t.width,top:t.top,left:t.left};return e.height=Math.min(e.height,t.height-(pageYOffset-t.top)),e.height=Math.min(e.height,t.height-(t.top+t.height-(pageYOffset+innerHeight))),e.height=Math.min(innerHeight,e.height),e.height-=2,e.width=Math.min(e.width,t.width-(pageXOffset-t.left)),e.width=Math.min(e.width,t.width-(t.left+t.width-(pageXOffset+innerWidth))),e.width=Math.min(innerWidth,e.width),e.width-=2,e.top<pageYOffset&&(e.top=pageYOffset),e.left<pageXOffset&&(e.left=pageXOffset),e}if("scroll-handle"===this.targetModifier){var t=void 0,o=this.target;o===document.body?(o=document.documentElement,t={left:pageXOffset,top:pageYOffset,height:innerHeight,width:innerWidth}):t=a(o);var i=getComputedStyle(o),n=o.scrollWidth>o.clientWidth||[i.overflow,i.overflowX].indexOf("scroll")>=0||this.target!==document.body,r=0;n&&(r=15);var s=t.height-parseFloat(i.borderTopWidth)-parseFloat(i.borderBottomWidth)-r,e={width:15,height:.975*s*(s/o.scrollHeight),left:t.left+t.width-parseFloat(i.borderLeftWidth)-15},f=0;s<408&&this.target===document.body&&(f=-11e-5*Math.pow(s,2)-.00727*s+22.58),this.target!==document.body&&(e.height=Math.max(e.height,24));var l=this.target.scrollTop/(o.scrollHeight-s);return e.top=l*(s-e.height-f)+t.top+parseFloat(i.borderTopWidth),this.target===document.body&&(e.height=Math.max(e.height,24)),e}}},{key:"clearCache",value:function(){this._cache={}}},{key:"cache",value:function(t,e){return"undefined"==typeof this._cache&&(this._cache={}),"undefined"==typeof this._cache[t]&&(this._cache[t]=e.call(this)),this._cache[t]}},{key:"enable",value:function(){var t=this,e=arguments.length<=0||void 0===arguments[0]||arguments[0];this.options.addTargetClasses!==!1&&p(this.target,this.getClass("enabled")),p(this.element,this.getClass("enabled")),this.enabled=!0,this.scrollParents.forEach(function(e){e!==t.target.ownerDocument&&e.addEventListener("scroll",t.position)}),e&&this.position()}},{key:"disable",value:function(){var t=this;d(this.target,this.getClass("enabled")),d(this.element,this.getClass("enabled")),this.enabled=!1,"undefined"!=typeof this.scrollParents&&this.scrollParents.forEach(function(e){e.removeEventListener("scroll",t.position)})}},{key:"destroy",value:function(){var t=this;this.disable(),D.forEach(function(e,o){e===t&&D.splice(o,1)}),0===D.length&&s()}},{key:"updateAttachClasses",value:function(t,e){var o=this;t=t||this.attachment,e=e||this.targetAttachment;var i=["left","top","bottom","right","middle","center"];"undefined"!=typeof this._addAttachClasses&&this._addAttachClasses.length&&this._addAttachClasses.splice(0,this._addAttachClasses.length),"undefined"==typeof this._addAttachClasses&&(this._addAttachClasses=[]);var n=this._addAttachClasses;t.top&&n.push(this.getClass("element-attached")+"-"+t.top),t.left&&n.push(this.getClass("element-attached")+"-"+t.left),e.top&&n.push(this.getClass("target-attached")+"-"+e.top),e.left&&n.push(this.getClass("target-attached")+"-"+e.left);var r=[];i.forEach(function(t){r.push(o.getClass("element-attached")+"-"+t),r.push(o.getClass("target-attached")+"-"+t)}),k(function(){"undefined"!=typeof o._addAttachClasses&&(m(o.element,o._addAttachClasses,r),o.options.addTargetClasses!==!1&&m(o.target,o._addAttachClasses,r),delete o._addAttachClasses)})}},{key:"position",value:function(){var t=this,e=arguments.length<=0||void 0===arguments[0]||arguments[0];if(this.enabled){this.clearCache();var o=U(this.targetAttachment,this.attachment);this.updateAttachClasses(this.attachment,o);var i=this.cache("element-bounds",function(){return a(t.element)}),n=i.width,r=i.height;if(0===n&&0===r&&"undefined"!=typeof this.lastSize){var s=this.lastSize;n=s.width,r=s.height}else this.lastSize={width:n,height:r};var h=this.cache("target-bounds",function(){return t.getTargetBounds()}),d=h,p=C(V(this.attachment),{width:n,height:r}),u=C(V(o),d),c=C(this.offset,{width:n,height:r}),g=C(this.targetOffset,d);p=w(p,c),u=w(u,g);for(var m=h.left+u.left-p.left,v=h.top+u.top-p.top,y=0;y<x.modules.length;++y){var b=x.modules[y],O=b.position.call(this,{left:m,top:v,targetAttachment:o,targetPos:h,elementPos:i,offset:p,targetOffset:u,manualOffset:c,manualTargetOffset:g,scrollbarSize:S,attachment:this.attachment});if(O===!1)return!1;"undefined"!=typeof O&&"object"==typeof O&&(v=O.top,m=O.left)}var E={page:{top:v,left:m},viewport:{top:v-pageYOffset,bottom:pageYOffset-v-r+innerHeight,left:m-pageXOffset,right:pageXOffset-m-n+innerWidth}},A=this.target.ownerDocument,T=A.defaultView,S=void 0;return T.innerHeight>A.documentElement.clientHeight&&(S=this.cache("scrollbar-size",l),E.viewport.bottom-=S.height),T.innerWidth>A.documentElement.clientWidth&&(S=this.cache("scrollbar-size",l),E.viewport.right-=S.width),["","static"].indexOf(A.body.style.position)!==-1&&["","static"].indexOf(A.body.parentElement.style.position)!==-1||(E.page.bottom=A.body.scrollHeight-v-r,E.page.right=A.body.scrollWidth-m-n),"undefined"!=typeof this.options.optimizations&&this.options.optimizations.moveElement!==!1&&"undefined"==typeof this.targetModifier&&!function(){var e=t.cache("target-offsetparent",function(){return f(t.target)}),o=t.cache("target-offsetparent-bounds",function(){return a(e)}),i=getComputedStyle(e),n=o,r={};if(["Top","Left","Bottom","Right"].forEach(function(t){r[t.toLowerCase()]=parseFloat(i["border"+t+"Width"])}),o.right=A.body.scrollWidth-o.left-n.width+r.right,o.bottom=A.body.scrollHeight-o.top-n.height+r.bottom,E.page.top>=o.top+r.top&&E.page.bottom>=o.bottom&&E.page.left>=o.left+r.left&&E.page.right>=o.right){var s=e.scrollTop,l=e.scrollLeft;E.offset={top:E.page.top-o.top+s-r.top,left:E.page.left-o.left+l-r.left}}}(),this.move(E),this.history.unshift(E),this.history.length>3&&this.history.pop(),e&&_(),!0}}},{key:"move",value:function(t){var e=this;if("undefined"!=typeof this.element.parentNode){var o={};for(var i in t){o[i]={};for(var n in t[i]){for(var r=!1,s=0;s<this.history.length;++s){var a=this.history[s];if("undefined"!=typeof a[i]&&!y(a[i][n],t[i][n])){r=!0;break}}r||(o[i][n]=!0)}}var l={top:"",left:"",right:"",bottom:""},d=function(t,o){var i="undefined"!=typeof e.options.optimizations,n=i?e.options.optimizations.gpu:null;if(n!==!1){var r=void 0,s=void 0;if(t.top?(l.top=0,r=o.top):(l.bottom=0,r=-o.bottom),t.left?(l.left=0,s=o.left):(l.right=0,s=-o.right),window.matchMedia){var a=window.matchMedia("only screen and (min-resolution: 1.3dppx)").matches||window.matchMedia("only screen and (-webkit-min-device-pixel-ratio: 1.3)").matches;a||(s=Math.round(s),r=Math.round(r))}l[L]="translateX("+s+"px) translateY("+r+"px)","msTransform"!==L&&(l[L]+=" translateZ(0)")}else t.top?l.top=o.top+"px":l.bottom=o.bottom+"px",t.left?l.left=o.left+"px":l.right=o.right+"px"},p=!1;if((o.page.top||o.page.bottom)&&(o.page.left||o.page.right)?(l.position="absolute",d(o.page,t.page)):(o.viewport.top||o.viewport.bottom)&&(o.viewport.left||o.viewport.right)?(l.position="fixed",d(o.viewport,t.viewport)):"undefined"!=typeof o.offset&&o.offset.top&&o.offset.left?!function(){l.position="absolute";var i=e.cache("target-offsetparent",function(){return f(e.target)});f(e.element)!==i&&k(function(){e.element.parentNode.removeChild(e.element),i.appendChild(e.element)}),d(o.offset,t.offset),p=!0}():(l.position="absolute",d({top:!0,left:!0},t.page)),!p)if(this.options.bodyElement)this.options.bodyElement.appendChild(this.element);else{for(var u=!0,c=this.element.parentNode;c&&1===c.nodeType&&"BODY"!==c.tagName;){if("static"!==getComputedStyle(c).position){u=!1;break}c=c.parentNode}u||(this.element.parentNode.removeChild(this.element),this.element.ownerDocument.body.appendChild(this.element))}var g={},m=!1;for(var n in l){var v=l[n],b=this.element.style[n];b!==v&&(m=!0,g[n]=v)}m&&k(function(){h(e.element.style,g),e.trigger("repositioned")})}}}]),e}(B);I.modules=[],x.position=X;var $=h(I,x),z=function(){function t(t,e){var o=[],i=!0,n=!1,r=void 0;try{for(var s,a=t[Symbol.iterator]();!(i=(s=a.next()).done)&&(o.push(s.value),!e||o.length!==e);i=!0);}catch(f){n=!0,r=f}finally{try{!i&&a["return"]&&a["return"]()}finally{if(n)throw r}}return o}return function(e,o){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return t(e,o);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}(),Y=x.Utils,a=Y.getBounds,h=Y.extend,m=Y.updateClasses,k=Y.defer,G=["left","top","right","bottom"];x.modules.push({position:function(t){var e=this,o=t.top,i=t.left,n=t.targetAttachment;if(!this.options.constraints)return!0;var r=this.cache("element-bounds",function(){return a(e.element)}),s=r.height,f=r.width;if(0===f&&0===s&&"undefined"!=typeof this.lastSize){var l=this.lastSize;f=l.width,s=l.height}var d=this.cache("target-bounds",function(){return e.getTargetBounds()}),p=d.height,u=d.width,c=[this.getClass("pinned"),this.getClass("out-of-bounds")];this.options.constraints.forEach(function(t){var e=t.outOfBoundsClass,o=t.pinnedClass;e&&c.push(e),o&&c.push(o)}),c.forEach(function(t){["left","top","right","bottom"].forEach(function(e){c.push(t+"-"+e)})});var g=[],v=h({},n),y=h({},this.attachment);return this.options.constraints.forEach(function(t){var r=t.to,a=t.attachment,l=t.pin;"undefined"==typeof a&&(a="");var h=void 0,d=void 0;if(a.indexOf(" ")>=0){var c=a.split(" "),m=z(c,2);d=m[0],h=m[1]}else h=d=a;var b=O(e,r);"target"!==d&&"both"!==d||(o<b[1]&&"top"===v.top&&(o+=p,v.top="bottom"),o+s>b[3]&&"bottom"===v.top&&(o-=p,v.top="top")),"together"===d&&("top"===v.top&&("bottom"===y.top&&o<b[1]?(o+=p,v.top="bottom",o+=s,y.top="top"):"top"===y.top&&o+s>b[3]&&o-(s-p)>=b[1]&&(o-=s-p,v.top="bottom",y.top="bottom")),"bottom"===v.top&&("top"===y.top&&o+s>b[3]?(o-=p,v.top="top",o-=s,y.top="bottom"):"bottom"===y.top&&o<b[1]&&o+(2*s-p)<=b[3]&&(o+=s-p,v.top="top",y.top="top")),"middle"===v.top&&(o+s>b[3]&&"top"===y.top?(o-=s,y.top="bottom"):o<b[1]&&"bottom"===y.top&&(o+=s,y.top="top"))),"target"!==h&&"both"!==h||(i<b[0]&&"left"===v.left&&(i+=u,v.left="right"),i+f>b[2]&&"right"===v.left&&(i-=u,v.left="left")),"together"===h&&(i<b[0]&&"left"===v.left?"right"===y.left?(i+=u,v.left="right",i+=f,y.left="left"):"left"===y.left&&(i+=u,v.left="right",i-=f,y.left="right"):i+f>b[2]&&"right"===v.left?"left"===y.left?(i-=u,v.left="left",i-=f,y.left="right"):"right"===y.left&&(i-=u,v.left="left",i+=f,y.left="left"):"center"===v.left&&(i+f>b[2]&&"left"===y.left?(i-=f,y.left="right"):i<b[0]&&"right"===y.left&&(i+=f,y.left="left"))),"element"!==d&&"both"!==d||(o<b[1]&&"bottom"===y.top&&(o+=s,y.top="top"),o+s>b[3]&&"top"===y.top&&(o-=s,y.top="bottom")),"element"!==h&&"both"!==h||(i<b[0]&&("right"===y.left?(i+=f,y.left="left"):"center"===y.left&&(i+=f/2,y.left="left")),i+f>b[2]&&("left"===y.left?(i-=f,y.left="right"):"center"===y.left&&(i-=f/2,y.left="right"))),"string"==typeof l?l=l.split(",").map(function(t){return t.trim()}):l===!0&&(l=["top","left","right","bottom"]),l=l||[];var w=[],C=[];o<b[1]&&(l.indexOf("top")>=0?(o=b[1],w.push("top")):C.push("top")),o+s>b[3]&&(l.indexOf("bottom")>=0?(o=b[3]-s,w.push("bottom")):C.push("bottom")),i<b[0]&&(l.indexOf("left")>=0?(i=b[0],w.push("left")):C.push("left")),i+f>b[2]&&(l.indexOf("right")>=0?(i=b[2]-f,w.push("right")):C.push("right")),w.length&&!function(){var t=void 0;t="undefined"!=typeof e.options.pinnedClass?e.options.pinnedClass:e.getClass("pinned"),g.push(t),w.forEach(function(e){g.push(t+"-"+e)})}(),C.length&&!function(){var t=void 0;t="undefined"!=typeof e.options.outOfBoundsClass?e.options.outOfBoundsClass:e.getClass("out-of-bounds"),g.push(t),C.forEach(function(e){g.push(t+"-"+e)})}(),(w.indexOf("left")>=0||w.indexOf("right")>=0)&&(y.left=v.left=!1),(w.indexOf("top")>=0||w.indexOf("bottom")>=0)&&(y.top=v.top=!1),v.top===n.top&&v.left===n.left&&y.top===e.attachment.top&&y.left===e.attachment.left||(e.updateAttachClasses(y,v),e.trigger("update",{attachment:y,targetAttachment:v}))}),k(function(){e.options.addTargetClasses!==!1&&m(e.target,g,c),m(e.element,g,c)}),{top:o,left:i}}});var Y=x.Utils,a=Y.getBounds,m=Y.updateClasses,k=Y.defer;x.modules.push({position:function(t){var e=this,o=t.top,i=t.left,n=this.cache("element-bounds",function(){return a(e.element)}),r=n.height,s=n.width,f=this.getTargetBounds(),l=o+r,h=i+s,d=[];o<=f.bottom&&l>=f.top&&["left","right"].forEach(function(t){var e=f[t];e!==i&&e!==h||d.push(t)}),i<=f.right&&h>=f.left&&["top","bottom"].forEach(function(t){var e=f[t];e!==o&&e!==l||d.push(t)});var p=[],u=[],c=["left","top","right","bottom"];return p.push(this.getClass("abutted")),c.forEach(function(t){p.push(e.getClass("abutted")+"-"+t)}),d.length&&u.push(this.getClass("abutted")),d.forEach(function(t){u.push(e.getClass("abutted")+"-"+t)}),k(function(){e.options.addTargetClasses!==!1&&m(e.target,u,p),m(e.element,u,p)}),!0}});var z=function(){function t(t,e){var o=[],i=!0,n=!1,r=void 0;try{for(var s,a=t[Symbol.iterator]();!(i=(s=a.next()).done)&&(o.push(s.value),!e||o.length!==e);i=!0);}catch(f){n=!0,r=f}finally{try{!i&&a["return"]&&a["return"]()}finally{if(n)throw r}}return o}return function(e,o){if(Array.isArray(e))return e;if(Symbol.iterator in Object(e))return t(e,o);throw new TypeError("Invalid attempt to destructure non-iterable instance")}}();return x.modules.push({position:function(t){var e=t.top,o=t.left;if(this.options.shift){var i=this.options.shift;"function"==typeof this.options.shift&&(i=this.options.shift.call(this,{top:e,left:o}));var n=void 0,r=void 0;if("string"==typeof i){i=i.split(" "),i[1]=i[1]||i[0];var s=i,a=z(s,2);n=a[0],r=a[1],n=parseFloat(n,10),r=parseFloat(r,10)}else n=i.top,r=i.left;return e+=n,o+=r,{top:e,left:o}}}}),$});
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.3.3 Copyright jQuery Foundation and other contributors.
@@ -5930,6 +5923,155 @@ var requirejs, require, define;
 }(this, (typeof setTimeout === 'undefined' ? undefined : setTimeout)));
 
 _aureliaConfigureModuleLoader();
+define('aurelia-bootstrapper',['exports', 'aurelia-pal', 'aurelia-pal-browser', 'aurelia-polyfills'], function (exports, _aureliaPal, _aureliaPalBrowser) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.bootstrap = bootstrap;
+
+
+  var bootstrapQueue = [];
+  var sharedLoader = null;
+  var Aurelia = null;
+
+  function onBootstrap(callback) {
+    return new Promise(function (resolve, reject) {
+      if (sharedLoader) {
+        resolve(callback(sharedLoader));
+      } else {
+        bootstrapQueue.push(function () {
+          try {
+            resolve(callback(sharedLoader));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+    });
+  }
+
+  function ready(global) {
+    return new Promise(function (resolve, reject) {
+      if (global.document.readyState === 'complete') {
+        resolve(global.document);
+      } else {
+        global.document.addEventListener('DOMContentLoaded', completed);
+        global.addEventListener('load', completed);
+      }
+
+      function completed() {
+        global.document.removeEventListener('DOMContentLoaded', completed);
+        global.removeEventListener('load', completed);
+        resolve(global.document);
+      }
+    });
+  }
+
+  function createLoader() {
+    if (_aureliaPal.PLATFORM.Loader) {
+      return Promise.resolve(new _aureliaPal.PLATFORM.Loader());
+    }
+
+    if (window.System && typeof window.System.import === 'function') {
+      return System.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
+        return System.normalize('aurelia-loader-default', bootstrapperName);
+      }).then(function (loaderName) {
+        return System.import(loaderName).then(function (m) {
+          return new m.DefaultLoader();
+        });
+      });
+    }
+
+    if (typeof window.require === 'function') {
+      return new Promise(function (resolve, reject) {
+        return require(['aurelia-loader-default'], function (m) {
+          return resolve(new m.DefaultLoader());
+        }, reject);
+      });
+    }
+
+    return Promise.reject('No PLATFORM.Loader is defined and there is neither a System API (ES6) or a Require API (AMD) globally available to load your app.');
+  }
+
+  function preparePlatform(loader) {
+    return loader.normalize('aurelia-bootstrapper').then(function (bootstrapperName) {
+      return loader.normalize('aurelia-framework', bootstrapperName).then(function (frameworkName) {
+        loader.map('aurelia-framework', frameworkName);
+
+        return Promise.all([loader.normalize('aurelia-dependency-injection', frameworkName).then(function (diName) {
+          return loader.map('aurelia-dependency-injection', diName);
+        }), loader.normalize('aurelia-router', bootstrapperName).then(function (routerName) {
+          return loader.map('aurelia-router', routerName);
+        }), loader.normalize('aurelia-logging-console', bootstrapperName).then(function (loggingConsoleName) {
+          return loader.map('aurelia-logging-console', loggingConsoleName);
+        })]).then(function () {
+          return loader.loadModule(frameworkName).then(function (m) {
+            return Aurelia = m.Aurelia;
+          });
+        });
+      });
+    });
+  }
+
+  function handleApp(loader, appHost) {
+    var moduleId = appHost.getAttribute('aurelia-app') || appHost.getAttribute('data-aurelia-app');
+    return config(loader, appHost, moduleId);
+  }
+
+  function config(loader, appHost, configModuleId) {
+    var aurelia = new Aurelia(loader);
+    aurelia.host = appHost;
+    aurelia.configModuleId = configModuleId || null;
+
+    if (configModuleId) {
+      return loader.loadModule(configModuleId).then(function (customConfig) {
+        if (!customConfig.configure) {
+          throw new Error("Cannot initialize module '" + configModuleId + "' without a configure function.");
+        }
+
+        customConfig.configure(aurelia);
+      });
+    }
+
+    aurelia.use.standardConfiguration().developmentLogging();
+
+    return aurelia.start().then(function () {
+      return aurelia.setRoot();
+    });
+  }
+
+  function run() {
+    return ready(window).then(function (doc) {
+      (0, _aureliaPalBrowser.initialize)();
+
+      var appHost = doc.querySelectorAll('[aurelia-app],[data-aurelia-app]');
+      return createLoader().then(function (loader) {
+        return preparePlatform(loader).then(function () {
+          for (var i = 0, ii = appHost.length; i < ii; ++i) {
+            handleApp(loader, appHost[i]).catch(console.error.bind(console));
+          }
+
+          sharedLoader = loader;
+          for (var _i = 0, _ii = bootstrapQueue.length; _i < _ii; ++_i) {
+            bootstrapQueue[_i]();
+          }
+          bootstrapQueue = null;
+        });
+      });
+    });
+  }
+
+  function bootstrap(configure) {
+    return onBootstrap(function (loader) {
+      var aurelia = new Aurelia(loader);
+      return configure(aurelia);
+    });
+  }
+
+  run();
+});
 define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-task-queue', 'aurelia-metadata'], function (exports, _aureliaLogging, _aureliaPal, _aureliaTaskQueue, _aureliaMetadata) {
   'use strict';
 
@@ -11440,174 +11582,553 @@ define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-
     return deco(targetOrConfig, key, descriptor);
   }
 });
-define('aurelia-bootstrapper',['module', 'exports', 'aurelia-pal', 'aurelia-polyfills'], function (module, exports, _aureliaPal) {
+define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.starting = undefined;
-  exports.bootstrap = bootstrap;
-
-
-  var bootstrapPromises = [];
-  var startResolve = void 0;
-
-  var startPromise = new Promise(function (resolve) {
-    return startResolve = resolve;
+  exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
+  Object.keys(_aureliaDependencyInjection).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaDependencyInjection[key];
+      }
+    });
   });
-  var host = _aureliaPal.PLATFORM.global;
-  var isNodeLike = typeof process !== 'undefined' && !process.browser;
-
-  function ready() {
-    if (!host.document || host.document.readyState === 'complete') {
-      return Promise.resolve();
-    }
-
-    return new Promise(function (resolve) {
-      host.document.addEventListener('DOMContentLoaded', completed);
-      host.addEventListener('load', completed);
-
-      function completed() {
-        host.document.removeEventListener('DOMContentLoaded', completed);
-        host.removeEventListener('load', completed);
-        resolve();
+  Object.keys(_aureliaBinding).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaBinding[key];
       }
     });
-  }
-
-  function createLoader() {
-    if (_aureliaPal.PLATFORM.Loader) {
-      return Promise.resolve(new _aureliaPal.PLATFORM.Loader());
-    }
-
-    if (typeof AURELIA_WEBPACK_2_0 === 'undefined') {
-      if (typeof __webpack_require__ !== 'undefined') {
-        var m = __webpack_require__(require.resolve('aurelia-loader-webpack'));
-        return Promise.resolve(new m.WebpackLoader());
+  });
+  Object.keys(_aureliaMetadata).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaMetadata[key];
       }
-
-      if (host.System && typeof host.System.config === 'function') {
-        return host.System.normalize('aurelia-bootstrapper').then(function (bsn) {
-          return host.System.normalize('aurelia-loader-default', bsn);
-        }).then(function (loaderName) {
-          return host.System.import(loaderName).then(function (m) {
-            return new m.DefaultLoader();
-          });
-        });
+    });
+  });
+  Object.keys(_aureliaTemplating).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaTemplating[key];
       }
-
-      if (typeof host.require === 'function' && typeof host.require.version === 'string') {
-        return new Promise(function (resolve, reject) {
-          return host.require(['aurelia-loader-default'], function (m) {
-            return resolve(new m.DefaultLoader());
-          }, reject);
-        });
+    });
+  });
+  Object.keys(_aureliaLoader).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaLoader[key];
       }
-
-      if (isNodeLike && typeof module !== 'undefined' && typeof module.require !== 'undefined') {
-        var _m = module.require('aurelia-loader-nodejs');
-        return Promise.resolve(new _m.NodeJsLoader());
+    });
+  });
+  Object.keys(_aureliaTaskQueue).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaTaskQueue[key];
       }
-    }
+    });
+  });
+  Object.keys(_aureliaPath).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaPath[key];
+      }
+    });
+  });
+  Object.keys(_aureliaPal).forEach(function (key) {
+    if (key === "default" || key === "__esModule") return;
+    Object.defineProperty(exports, key, {
+      enumerable: true,
+      get: function () {
+        return _aureliaPal[key];
+      }
+    });
+  });
 
-    return Promise.reject('No PLATFORM.Loader is defined and there is neither a System API (ES6) or a Require API (AMD) globally available to load your app.');
-  }
+  var TheLogManager = _interopRequireWildcard(_aureliaLogging);
 
-  function initializePal(loader) {
-    var type = void 0;
-
-    var isRenderer = isNodeLike && (process.type === 'renderer' || process.versions['node-webkit']);
-
-    if (isNodeLike && !isRenderer) {
-      type = 'nodejs';
-    } else if (typeof window !== 'undefined') {
-      type = 'browser';
-    } else if (typeof self !== 'undefined') {
-      type = 'worker';
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
     } else {
-      throw new Error('Could not determine platform implementation to load.');
-    }
+      var newObj = {};
 
-    return loader.loadModule('aurelia-pal-' + type).then(function (palModule) {
-      return type === 'nodejs' && !_aureliaPal.isInitialized && palModule.globalize() || palModule.initialize();
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  function preventActionlessFormSubmit() {
+    _aureliaPal.DOM.addEventListener('submit', function (evt) {
+      var target = evt.target;
+      var action = target.action;
+
+      if (target.tagName.toLowerCase() === 'form' && !action) {
+        evt.preventDefault();
+      }
     });
   }
 
-  function preparePlatform(loader) {
-    var map = function map(moduleId, relativeTo) {
-      return loader.normalize(moduleId, relativeTo).then(function (normalized) {
-        loader.map(moduleId, normalized);
-        return normalized;
+  var Aurelia = exports.Aurelia = function () {
+    function Aurelia(loader, container, resources) {
+      
+
+      this.loader = loader || new _aureliaPal.PLATFORM.Loader();
+      this.container = container || new _aureliaDependencyInjection.Container().makeGlobal();
+      this.resources = resources || new _aureliaTemplating.ViewResources();
+      this.use = new FrameworkConfiguration(this);
+      this.logger = TheLogManager.getLogger('aurelia');
+      this.hostConfigured = false;
+      this.host = null;
+
+      this.use.instance(Aurelia, this);
+      this.use.instance(_aureliaLoader.Loader, this.loader);
+      this.use.instance(_aureliaTemplating.ViewResources, this.resources);
+    }
+
+    Aurelia.prototype.start = function start() {
+      var _this = this;
+
+      if (this._started) {
+        return this._started;
+      }
+
+      this.logger.info('Aurelia Starting');
+      return this._started = this.use.apply().then(function () {
+        preventActionlessFormSubmit();
+
+        if (!_this.container.hasResolver(_aureliaTemplating.BindingLanguage)) {
+          var message = 'You must configure Aurelia with a BindingLanguage implementation.';
+          _this.logger.error(message);
+          throw new Error(message);
+        }
+
+        _this.logger.info('Aurelia Started');
+        var evt = _aureliaPal.DOM.createCustomEvent('aurelia-started', { bubbles: true, cancelable: true });
+        _aureliaPal.DOM.dispatchEvent(evt);
+        return _this;
       });
     };
 
-    return initializePal(loader).then(function () {
-      return loader.normalize('aurelia-bootstrapper');
-    }).then(function (bootstrapperName) {
-      var frameworkPromise = map(_aureliaPal.PLATFORM.moduleName('aurelia-framework', { exports: ['Aurelia'] }), bootstrapperName);
+    Aurelia.prototype.enhance = function enhance() {
+      var _this2 = this;
 
-      return Promise.all([frameworkPromise, frameworkPromise.then(function (frameworkName) {
-        return map('aurelia-dependency-injection', frameworkName);
-      }), map('aurelia-router', bootstrapperName), map('aurelia-logging-console', bootstrapperName)]);
-    }).then(function (_ref) {
-      var frameworkName = _ref[0];
-      return loader.loadModule(frameworkName);
-    }).then(function (fx) {
-      return startResolve(function () {
-        return new fx.Aurelia(loader);
+      var bindingContext = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+      this._configureHost(applicationHost || _aureliaPal.DOM.querySelectorAll('body')[0]);
+
+      return new Promise(function (resolve) {
+        var engine = _this2.container.get(_aureliaTemplating.TemplatingEngine);
+        _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
+        _this2.root.attached();
+        _this2._onAureliaComposed();
+        resolve(_this2);
       });
-    });
+    };
+
+    Aurelia.prototype.setRoot = function setRoot() {
+      var _this3 = this;
+
+      var root = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
+      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+      var instruction = {};
+
+      if (this.root && this.root.viewModel && this.root.viewModel.router) {
+        this.root.viewModel.router.deactivate();
+        this.root.viewModel.router.reset();
+      }
+
+      this._configureHost(applicationHost);
+
+      var engine = this.container.get(_aureliaTemplating.TemplatingEngine);
+      var transaction = this.container.get(_aureliaTemplating.CompositionTransaction);
+      delete transaction.initialComposition;
+
+      if (!root) {
+        if (this.configModuleId) {
+          root = (0, _aureliaPath.relativeToFile)('./app', this.configModuleId);
+        } else {
+          root = 'app';
+        }
+      }
+
+      instruction.viewModel = root;
+      instruction.container = instruction.childContainer = this.container;
+      instruction.viewSlot = this.hostSlot;
+      instruction.host = this.host;
+
+      return engine.compose(instruction).then(function (r) {
+        _this3.root = r;
+        instruction.viewSlot.attached();
+        _this3._onAureliaComposed();
+        return _this3;
+      });
+    };
+
+    Aurelia.prototype._configureHost = function _configureHost(applicationHost) {
+      if (this.hostConfigured) {
+        return;
+      }
+      applicationHost = applicationHost || this.host;
+
+      if (!applicationHost || typeof applicationHost === 'string') {
+        this.host = _aureliaPal.DOM.getElementById(applicationHost || 'applicationHost');
+      } else {
+        this.host = applicationHost;
+      }
+
+      if (!this.host) {
+        throw new Error('No applicationHost was specified.');
+      }
+
+      this.hostConfigured = true;
+      this.host.aurelia = this;
+      this.hostSlot = new _aureliaTemplating.ViewSlot(this.host, true);
+      this.hostSlot.transformChildNodesIntoView();
+      this.container.registerInstance(_aureliaPal.DOM.boundary, this.host);
+    };
+
+    Aurelia.prototype._onAureliaComposed = function _onAureliaComposed() {
+      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-composed', { bubbles: true, cancelable: true });
+      setTimeout(function () {
+        return _aureliaPal.DOM.dispatchEvent(evt);
+      }, 1);
+    };
+
+    return Aurelia;
+  }();
+
+  var logger = TheLogManager.getLogger('aurelia');
+  var extPattern = /\.[^/.]+$/;
+
+  function runTasks(config, tasks) {
+    var current = void 0;
+    var next = function next() {
+      current = tasks.shift();
+      if (current) {
+        return Promise.resolve(current(config)).then(next);
+      }
+
+      return Promise.resolve();
+    };
+
+    return next();
   }
 
-  function config(appHost, configModuleId, aurelia) {
-    aurelia.host = appHost;
-    aurelia.configModuleId = configModuleId || null;
+  function loadPlugin(config, loader, info) {
+    logger.debug('Loading plugin ' + info.moduleId + '.');
+    config.resourcesRelativeTo = info.resourcesRelativeTo;
 
-    if (configModuleId) {
-      return aurelia.loader.loadModule(configModuleId).then(function (customConfig) {
-        if (!customConfig.configure) {
-          throw new Error('Cannot initialize module \'' + configModuleId + '\' without a configure function.');
-        }
+    var id = info.moduleId;
 
-        return customConfig.configure(aurelia);
+    if (info.resourcesRelativeTo.length > 1) {
+      return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
+        return _loadPlugin(normalizedId);
       });
     }
 
-    aurelia.use.standardConfiguration().developmentLogging();
+    return _loadPlugin(id);
 
-    return aurelia.start().then(function () {
-      return aurelia.setRoot();
-    });
+    function _loadPlugin(moduleId) {
+      return loader.loadModule(moduleId).then(function (m) {
+        if ('configure' in m) {
+          return Promise.resolve(m.configure(config, info.config || {})).then(function () {
+            config.resourcesRelativeTo = null;
+            logger.debug('Configured plugin ' + info.moduleId + '.');
+          });
+        }
+
+        config.resourcesRelativeTo = null;
+        logger.debug('Loaded plugin ' + info.moduleId + '.');
+      });
+    }
   }
 
-  function run() {
-    return ready().then(createLoader).then(preparePlatform).then(function () {
-      var appHosts = host.document.querySelectorAll('[aurelia-app],[data-aurelia-app]');
-      for (var i = 0, ii = appHosts.length; i < ii; ++i) {
-        var appHost = appHosts[i];
-        var moduleId = appHost.getAttribute('aurelia-app') || appHost.getAttribute('data-aurelia-app');
-        bootstrap(config.bind(null, appHost, moduleId));
+  function loadResources(aurelia, resourcesToLoad, appResources) {
+    var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
+
+    return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
+      return _normalize(resourcesToLoad[n]);
+    })).then(function (loads) {
+      var names = [];
+      var importIds = [];
+
+      loads.forEach(function (l) {
+        names.push(undefined);
+        importIds.push(l.importId);
+      });
+
+      return viewEngine.importViewResources(importIds, names, appResources);
+    });
+
+    function _normalize(load) {
+      var moduleId = load.moduleId;
+      var ext = getExt(moduleId);
+
+      if (isOtherResource(moduleId)) {
+        moduleId = removeExt(moduleId);
       }
 
-      var toConsole = console.error.bind(console);
-      var bootstraps = bootstrapPromises.map(function (p) {
-        return p.catch(toConsole);
+      return aurelia.loader.normalize(moduleId, load.relativeTo).then(function (normalized) {
+        return {
+          name: load.moduleId,
+          importId: isOtherResource(load.moduleId) ? addOriginalExt(normalized, ext) : normalized
+        };
       });
-      bootstrapPromises = null;
-      return Promise.all(bootstraps);
-    });
+    }
+
+    function isOtherResource(name) {
+      var ext = getExt(name);
+      if (!ext) return false;
+      if (ext === '') return false;
+      if (ext === '.js' || ext === '.ts') return false;
+      return true;
+    }
+
+    function removeExt(name) {
+      return name.replace(extPattern, '');
+    }
+
+    function addOriginalExt(normalized, ext) {
+      return removeExt(normalized) + '.' + ext;
+    }
   }
 
-  function bootstrap(configure) {
-    var p = startPromise.then(function (factory) {
-      return configure(factory());
-    });
-    if (bootstrapPromises) bootstrapPromises.push(p);
-    return p;
+  function getExt(name) {
+    var match = name.match(extPattern);
+    if (match && match.length > 0) {
+      return match[0].split('.')[1];
+    }
   }
 
-  var starting = exports.starting = run();
+  function assertProcessed(plugins) {
+    if (plugins.processed) {
+      throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
+    }
+  }
+
+  var FrameworkConfiguration = function () {
+    function FrameworkConfiguration(aurelia) {
+      var _this4 = this;
+
+      
+
+      this.aurelia = aurelia;
+      this.container = aurelia.container;
+      this.info = [];
+      this.processed = false;
+      this.preTasks = [];
+      this.postTasks = [];
+      this.resourcesToLoad = {};
+      this.preTask(function () {
+        return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
+          return _this4.bootstrapperName = name;
+        });
+      });
+      this.postTask(function () {
+        return loadResources(aurelia, _this4.resourcesToLoad, aurelia.resources);
+      });
+    }
+
+    FrameworkConfiguration.prototype.instance = function instance(type, _instance) {
+      this.container.registerInstance(type, _instance);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.singleton = function singleton(type, implementation) {
+      this.container.registerSingleton(type, implementation);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.transient = function transient(type, implementation) {
+      this.container.registerTransient(type, implementation);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.preTask = function preTask(task) {
+      assertProcessed(this);
+      this.preTasks.push(task);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.postTask = function postTask(task) {
+      assertProcessed(this);
+      this.postTasks.push(task);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.feature = function feature(plugin) {
+      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      var hasIndex = /\/index$/i.test(plugin);
+      var moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
+      var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
+      return this.plugin({ moduleId: moduleId, resourcesRelativeTo: [root, ''], config: config });
+    };
+
+    FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
+      assertProcessed(this);
+
+      var toAdd = Array.isArray(resources) ? resources : arguments;
+      var resource = void 0;
+      var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
+
+      for (var i = 0, ii = toAdd.length; i < ii; ++i) {
+        resource = toAdd[i];
+        if (typeof resource !== 'string') {
+          throw new Error('Invalid resource path [' + resource + ']. Resources must be specified as relative module IDs.');
+        }
+
+        var parent = resourcesRelativeTo[0];
+        var grandParent = resourcesRelativeTo[1];
+        var name = resource;
+
+        if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
+          name = (0, _aureliaPath.join)(parent, resource);
+        }
+
+        this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
+      }
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.globalName = function globalName(resourcePath, newName) {
+      assertProcessed(this);
+      this.resourcesToLoad[resourcePath] = { moduleId: newName, relativeTo: '' };
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.plugin = function plugin(_plugin, config) {
+      assertProcessed(this);
+
+      if (typeof _plugin === 'string') {
+        return this.plugin({ moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: config || {} });
+      }
+
+      this.info.push(_plugin);
+      return this;
+    };
+
+    FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
+      var _this5 = this;
+
+      var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
+      this.plugin(plugin);
+
+      this.preTask(function () {
+        var relativeTo = [name, _this5.bootstrapperName];
+        plugin.moduleId = name;
+        plugin.resourcesRelativeTo = relativeTo;
+        return Promise.resolve();
+      });
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.defaultBindingLanguage = function defaultBindingLanguage() {
+      return this._addNormalizedPlugin('aurelia-templating-binding');
+    };
+
+    FrameworkConfiguration.prototype.router = function router() {
+      return this._addNormalizedPlugin('aurelia-templating-router');
+    };
+
+    FrameworkConfiguration.prototype.history = function history() {
+      return this._addNormalizedPlugin('aurelia-history-browser');
+    };
+
+    FrameworkConfiguration.prototype.defaultResources = function defaultResources() {
+      return this._addNormalizedPlugin('aurelia-templating-resources');
+    };
+
+    FrameworkConfiguration.prototype.eventAggregator = function eventAggregator() {
+      return this._addNormalizedPlugin('aurelia-event-aggregator');
+    };
+
+    FrameworkConfiguration.prototype.basicConfiguration = function basicConfiguration() {
+      return this.defaultBindingLanguage().defaultResources().eventAggregator();
+    };
+
+    FrameworkConfiguration.prototype.standardConfiguration = function standardConfiguration() {
+      return this.basicConfiguration().history().router();
+    };
+
+    FrameworkConfiguration.prototype.developmentLogging = function developmentLogging() {
+      var _this6 = this;
+
+      this.preTask(function () {
+        return _this6.aurelia.loader.normalize('aurelia-logging-console', _this6.bootstrapperName).then(function (name) {
+          return _this6.aurelia.loader.loadModule(name).then(function (m) {
+            TheLogManager.addAppender(new m.ConsoleAppender());
+            TheLogManager.setLevel(TheLogManager.logLevel.debug);
+          });
+        });
+      });
+
+      return this;
+    };
+
+    FrameworkConfiguration.prototype.apply = function apply() {
+      var _this7 = this;
+
+      if (this.processed) {
+        return Promise.resolve();
+      }
+
+      return runTasks(this, this.preTasks).then(function () {
+        var loader = _this7.aurelia.loader;
+        var info = _this7.info;
+        var current = void 0;
+
+        var next = function next() {
+          current = info.shift();
+          if (current) {
+            return loadPlugin(_this7, loader, current).then(next);
+          }
+
+          _this7.processed = true;
+          return Promise.resolve();
+        };
+
+        return next().then(function () {
+          return runTasks(_this7, _this7.postTasks);
+        });
+      });
+    };
+
+    return FrameworkConfiguration;
+  }();
+
+  exports.FrameworkConfiguration = FrameworkConfiguration;
+  var LogManager = exports.LogManager = TheLogManager;
 });
 define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaMetadata, _aureliaPal) {
   'use strict';
@@ -12368,718 +12889,6 @@ define('aurelia-dependency-injection',['exports', 'aurelia-metadata', 'aurelia-p
     };
   }
 });
-define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.EventAggregator = undefined;
-  exports.includeEventsIn = includeEventsIn;
-  exports.configure = configure;
-
-  var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  
-
-  var logger = LogManager.getLogger('event-aggregator');
-
-  var Handler = function () {
-    function Handler(messageType, callback) {
-      
-
-      this.messageType = messageType;
-      this.callback = callback;
-    }
-
-    Handler.prototype.handle = function handle(message) {
-      if (message instanceof this.messageType) {
-        this.callback.call(null, message);
-      }
-    };
-
-    return Handler;
-  }();
-
-  function invokeCallback(callback, data, event) {
-    try {
-      callback(data, event);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  function invokeHandler(handler, data) {
-    try {
-      handler.handle(data);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-
-  var EventAggregator = exports.EventAggregator = function () {
-    function EventAggregator() {
-      
-
-      this.eventLookup = {};
-      this.messageHandlers = [];
-    }
-
-    EventAggregator.prototype.publish = function publish(event, data) {
-      var subscribers = void 0;
-      var i = void 0;
-
-      if (!event) {
-        throw new Error('Event was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        subscribers = this.eventLookup[event];
-        if (subscribers) {
-          subscribers = subscribers.slice();
-          i = subscribers.length;
-
-          while (i--) {
-            invokeCallback(subscribers[i], data, event);
-          }
-        }
-      } else {
-        subscribers = this.messageHandlers.slice();
-        i = subscribers.length;
-
-        while (i--) {
-          invokeHandler(subscribers[i], event);
-        }
-      }
-    };
-
-    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
-      var handler = void 0;
-      var subscribers = void 0;
-
-      if (!event) {
-        throw new Error('Event channel/type was invalid.');
-      }
-
-      if (typeof event === 'string') {
-        handler = callback;
-        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
-      } else {
-        handler = new Handler(event, callback);
-        subscribers = this.messageHandlers;
-      }
-
-      subscribers.push(handler);
-
-      return {
-        dispose: function dispose() {
-          var idx = subscribers.indexOf(handler);
-          if (idx !== -1) {
-            subscribers.splice(idx, 1);
-          }
-        }
-      };
-    };
-
-    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
-      var sub = this.subscribe(event, function (a, b) {
-        sub.dispose();
-        return callback(a, b);
-      });
-
-      return sub;
-    };
-
-    return EventAggregator;
-  }();
-
-  function includeEventsIn(obj) {
-    var ea = new EventAggregator();
-
-    obj.subscribeOnce = function (event, callback) {
-      return ea.subscribeOnce(event, callback);
-    };
-
-    obj.subscribe = function (event, callback) {
-      return ea.subscribe(event, callback);
-    };
-
-    obj.publish = function (event, data) {
-      ea.publish(event, data);
-    };
-
-    return ea;
-  }
-
-  function configure(config) {
-    config.instance(EventAggregator, includeEventsIn(config.aurelia));
-  }
-});
-define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.LogManager = exports.FrameworkConfiguration = exports.Aurelia = undefined;
-  Object.keys(_aureliaDependencyInjection).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaDependencyInjection[key];
-      }
-    });
-  });
-  Object.keys(_aureliaBinding).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaBinding[key];
-      }
-    });
-  });
-  Object.keys(_aureliaMetadata).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaMetadata[key];
-      }
-    });
-  });
-  Object.keys(_aureliaTemplating).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaTemplating[key];
-      }
-    });
-  });
-  Object.keys(_aureliaLoader).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaLoader[key];
-      }
-    });
-  });
-  Object.keys(_aureliaTaskQueue).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaTaskQueue[key];
-      }
-    });
-  });
-  Object.keys(_aureliaPath).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaPath[key];
-      }
-    });
-  });
-  Object.keys(_aureliaPal).forEach(function (key) {
-    if (key === "default" || key === "__esModule") return;
-    Object.defineProperty(exports, key, {
-      enumerable: true,
-      get: function () {
-        return _aureliaPal[key];
-      }
-    });
-  });
-
-  var TheLogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  
-
-  function preventActionlessFormSubmit() {
-    _aureliaPal.DOM.addEventListener('submit', function (evt) {
-      var target = evt.target;
-      var action = target.action;
-
-      if (target.tagName.toLowerCase() === 'form' && !action) {
-        evt.preventDefault();
-      }
-    });
-  }
-
-  var Aurelia = exports.Aurelia = function () {
-    function Aurelia(loader, container, resources) {
-      
-
-      this.loader = loader || new _aureliaPal.PLATFORM.Loader();
-      this.container = container || new _aureliaDependencyInjection.Container().makeGlobal();
-      this.resources = resources || new _aureliaTemplating.ViewResources();
-      this.use = new FrameworkConfiguration(this);
-      this.logger = TheLogManager.getLogger('aurelia');
-      this.hostConfigured = false;
-      this.host = null;
-
-      this.use.instance(Aurelia, this);
-      this.use.instance(_aureliaLoader.Loader, this.loader);
-      this.use.instance(_aureliaTemplating.ViewResources, this.resources);
-    }
-
-    Aurelia.prototype.start = function start() {
-      var _this = this;
-
-      if (this._started) {
-        return this._started;
-      }
-
-      this.logger.info('Aurelia Starting');
-      return this._started = this.use.apply().then(function () {
-        preventActionlessFormSubmit();
-
-        if (!_this.container.hasResolver(_aureliaTemplating.BindingLanguage)) {
-          var message = 'You must configure Aurelia with a BindingLanguage implementation.';
-          _this.logger.error(message);
-          throw new Error(message);
-        }
-
-        _this.logger.info('Aurelia Started');
-        var evt = _aureliaPal.DOM.createCustomEvent('aurelia-started', { bubbles: true, cancelable: true });
-        _aureliaPal.DOM.dispatchEvent(evt);
-        return _this;
-      });
-    };
-
-    Aurelia.prototype.enhance = function enhance() {
-      var _this2 = this;
-
-      var bindingContext = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-      this._configureHost(applicationHost || _aureliaPal.DOM.querySelectorAll('body')[0]);
-
-      return new Promise(function (resolve) {
-        var engine = _this2.container.get(_aureliaTemplating.TemplatingEngine);
-        _this2.root = engine.enhance({ container: _this2.container, element: _this2.host, resources: _this2.resources, bindingContext: bindingContext });
-        _this2.root.attached();
-        _this2._onAureliaComposed();
-        resolve(_this2);
-      });
-    };
-
-    Aurelia.prototype.setRoot = function setRoot() {
-      var _this3 = this;
-
-      var root = arguments.length <= 0 || arguments[0] === undefined ? null : arguments[0];
-      var applicationHost = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-      var instruction = {};
-
-      if (this.root && this.root.viewModel && this.root.viewModel.router) {
-        this.root.viewModel.router.deactivate();
-        this.root.viewModel.router.reset();
-      }
-
-      this._configureHost(applicationHost);
-
-      var engine = this.container.get(_aureliaTemplating.TemplatingEngine);
-      var transaction = this.container.get(_aureliaTemplating.CompositionTransaction);
-      delete transaction.initialComposition;
-
-      if (!root) {
-        if (this.configModuleId) {
-          root = (0, _aureliaPath.relativeToFile)('./app', this.configModuleId);
-        } else {
-          root = 'app';
-        }
-      }
-
-      instruction.viewModel = root;
-      instruction.container = instruction.childContainer = this.container;
-      instruction.viewSlot = this.hostSlot;
-      instruction.host = this.host;
-
-      return engine.compose(instruction).then(function (r) {
-        _this3.root = r;
-        instruction.viewSlot.attached();
-        _this3._onAureliaComposed();
-        return _this3;
-      });
-    };
-
-    Aurelia.prototype._configureHost = function _configureHost(applicationHost) {
-      if (this.hostConfigured) {
-        return;
-      }
-      applicationHost = applicationHost || this.host;
-
-      if (!applicationHost || typeof applicationHost === 'string') {
-        this.host = _aureliaPal.DOM.getElementById(applicationHost || 'applicationHost');
-      } else {
-        this.host = applicationHost;
-      }
-
-      if (!this.host) {
-        throw new Error('No applicationHost was specified.');
-      }
-
-      this.hostConfigured = true;
-      this.host.aurelia = this;
-      this.hostSlot = new _aureliaTemplating.ViewSlot(this.host, true);
-      this.hostSlot.transformChildNodesIntoView();
-      this.container.registerInstance(_aureliaPal.DOM.boundary, this.host);
-    };
-
-    Aurelia.prototype._onAureliaComposed = function _onAureliaComposed() {
-      var evt = _aureliaPal.DOM.createCustomEvent('aurelia-composed', { bubbles: true, cancelable: true });
-      setTimeout(function () {
-        return _aureliaPal.DOM.dispatchEvent(evt);
-      }, 1);
-    };
-
-    return Aurelia;
-  }();
-
-  var logger = TheLogManager.getLogger('aurelia');
-  var extPattern = /\.[^/.]+$/;
-
-  function runTasks(config, tasks) {
-    var current = void 0;
-    var next = function next() {
-      current = tasks.shift();
-      if (current) {
-        return Promise.resolve(current(config)).then(next);
-      }
-
-      return Promise.resolve();
-    };
-
-    return next();
-  }
-
-  function loadPlugin(config, loader, info) {
-    logger.debug('Loading plugin ' + info.moduleId + '.');
-    config.resourcesRelativeTo = info.resourcesRelativeTo;
-
-    var id = info.moduleId;
-
-    if (info.resourcesRelativeTo.length > 1) {
-      return loader.normalize(info.moduleId, info.resourcesRelativeTo[1]).then(function (normalizedId) {
-        return _loadPlugin(normalizedId);
-      });
-    }
-
-    return _loadPlugin(id);
-
-    function _loadPlugin(moduleId) {
-      return loader.loadModule(moduleId).then(function (m) {
-        if ('configure' in m) {
-          return Promise.resolve(m.configure(config, info.config || {})).then(function () {
-            config.resourcesRelativeTo = null;
-            logger.debug('Configured plugin ' + info.moduleId + '.');
-          });
-        }
-
-        config.resourcesRelativeTo = null;
-        logger.debug('Loaded plugin ' + info.moduleId + '.');
-      });
-    }
-  }
-
-  function loadResources(aurelia, resourcesToLoad, appResources) {
-    var viewEngine = aurelia.container.get(_aureliaTemplating.ViewEngine);
-
-    return Promise.all(Object.keys(resourcesToLoad).map(function (n) {
-      return _normalize(resourcesToLoad[n]);
-    })).then(function (loads) {
-      var names = [];
-      var importIds = [];
-
-      loads.forEach(function (l) {
-        names.push(undefined);
-        importIds.push(l.importId);
-      });
-
-      return viewEngine.importViewResources(importIds, names, appResources);
-    });
-
-    function _normalize(load) {
-      var moduleId = load.moduleId;
-      var ext = getExt(moduleId);
-
-      if (isOtherResource(moduleId)) {
-        moduleId = removeExt(moduleId);
-      }
-
-      return aurelia.loader.normalize(moduleId, load.relativeTo).then(function (normalized) {
-        return {
-          name: load.moduleId,
-          importId: isOtherResource(load.moduleId) ? addOriginalExt(normalized, ext) : normalized
-        };
-      });
-    }
-
-    function isOtherResource(name) {
-      var ext = getExt(name);
-      if (!ext) return false;
-      if (ext === '') return false;
-      if (ext === '.js' || ext === '.ts') return false;
-      return true;
-    }
-
-    function removeExt(name) {
-      return name.replace(extPattern, '');
-    }
-
-    function addOriginalExt(normalized, ext) {
-      return removeExt(normalized) + '.' + ext;
-    }
-  }
-
-  function getExt(name) {
-    var match = name.match(extPattern);
-    if (match && match.length > 0) {
-      return match[0].split('.')[1];
-    }
-  }
-
-  function assertProcessed(plugins) {
-    if (plugins.processed) {
-      throw new Error('This config instance has already been applied. To load more plugins or global resources, create a new FrameworkConfiguration instance.');
-    }
-  }
-
-  var FrameworkConfiguration = function () {
-    function FrameworkConfiguration(aurelia) {
-      var _this4 = this;
-
-      
-
-      this.aurelia = aurelia;
-      this.container = aurelia.container;
-      this.info = [];
-      this.processed = false;
-      this.preTasks = [];
-      this.postTasks = [];
-      this.resourcesToLoad = {};
-      this.preTask(function () {
-        return aurelia.loader.normalize('aurelia-bootstrapper').then(function (name) {
-          return _this4.bootstrapperName = name;
-        });
-      });
-      this.postTask(function () {
-        return loadResources(aurelia, _this4.resourcesToLoad, aurelia.resources);
-      });
-    }
-
-    FrameworkConfiguration.prototype.instance = function instance(type, _instance) {
-      this.container.registerInstance(type, _instance);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.singleton = function singleton(type, implementation) {
-      this.container.registerSingleton(type, implementation);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.transient = function transient(type, implementation) {
-      this.container.registerTransient(type, implementation);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.preTask = function preTask(task) {
-      assertProcessed(this);
-      this.preTasks.push(task);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.postTask = function postTask(task) {
-      assertProcessed(this);
-      this.postTasks.push(task);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.feature = function feature(plugin) {
-      var config = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      var hasIndex = /\/index$/i.test(plugin);
-      var moduleId = hasIndex || getExt(plugin) ? plugin : plugin + '/index';
-      var root = hasIndex ? plugin.substr(0, plugin.length - 6) : plugin;
-      return this.plugin({ moduleId: moduleId, resourcesRelativeTo: [root, ''], config: config });
-    };
-
-    FrameworkConfiguration.prototype.globalResources = function globalResources(resources) {
-      assertProcessed(this);
-
-      var toAdd = Array.isArray(resources) ? resources : arguments;
-      var resource = void 0;
-      var resourcesRelativeTo = this.resourcesRelativeTo || ['', ''];
-
-      for (var i = 0, ii = toAdd.length; i < ii; ++i) {
-        resource = toAdd[i];
-        if (typeof resource !== 'string') {
-          throw new Error('Invalid resource path [' + resource + ']. Resources must be specified as relative module IDs.');
-        }
-
-        var parent = resourcesRelativeTo[0];
-        var grandParent = resourcesRelativeTo[1];
-        var name = resource;
-
-        if ((resource.startsWith('./') || resource.startsWith('../')) && parent !== '') {
-          name = (0, _aureliaPath.join)(parent, resource);
-        }
-
-        this.resourcesToLoad[name] = { moduleId: name, relativeTo: grandParent };
-      }
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.globalName = function globalName(resourcePath, newName) {
-      assertProcessed(this);
-      this.resourcesToLoad[resourcePath] = { moduleId: newName, relativeTo: '' };
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.plugin = function plugin(_plugin, config) {
-      assertProcessed(this);
-
-      if (typeof _plugin === 'string') {
-        return this.plugin({ moduleId: _plugin, resourcesRelativeTo: [_plugin, ''], config: config || {} });
-      }
-
-      this.info.push(_plugin);
-      return this;
-    };
-
-    FrameworkConfiguration.prototype._addNormalizedPlugin = function _addNormalizedPlugin(name, config) {
-      var _this5 = this;
-
-      var plugin = { moduleId: name, resourcesRelativeTo: [name, ''], config: config || {} };
-      this.plugin(plugin);
-
-      this.preTask(function () {
-        var relativeTo = [name, _this5.bootstrapperName];
-        plugin.moduleId = name;
-        plugin.resourcesRelativeTo = relativeTo;
-        return Promise.resolve();
-      });
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.defaultBindingLanguage = function defaultBindingLanguage() {
-      return this._addNormalizedPlugin('aurelia-templating-binding');
-    };
-
-    FrameworkConfiguration.prototype.router = function router() {
-      return this._addNormalizedPlugin('aurelia-templating-router');
-    };
-
-    FrameworkConfiguration.prototype.history = function history() {
-      return this._addNormalizedPlugin('aurelia-history-browser');
-    };
-
-    FrameworkConfiguration.prototype.defaultResources = function defaultResources() {
-      return this._addNormalizedPlugin('aurelia-templating-resources');
-    };
-
-    FrameworkConfiguration.prototype.eventAggregator = function eventAggregator() {
-      return this._addNormalizedPlugin('aurelia-event-aggregator');
-    };
-
-    FrameworkConfiguration.prototype.basicConfiguration = function basicConfiguration() {
-      return this.defaultBindingLanguage().defaultResources().eventAggregator();
-    };
-
-    FrameworkConfiguration.prototype.standardConfiguration = function standardConfiguration() {
-      return this.basicConfiguration().history().router();
-    };
-
-    FrameworkConfiguration.prototype.developmentLogging = function developmentLogging() {
-      var _this6 = this;
-
-      this.preTask(function () {
-        return _this6.aurelia.loader.normalize('aurelia-logging-console', _this6.bootstrapperName).then(function (name) {
-          return _this6.aurelia.loader.loadModule(name).then(function (m) {
-            TheLogManager.addAppender(new m.ConsoleAppender());
-            TheLogManager.setLevel(TheLogManager.logLevel.debug);
-          });
-        });
-      });
-
-      return this;
-    };
-
-    FrameworkConfiguration.prototype.apply = function apply() {
-      var _this7 = this;
-
-      if (this.processed) {
-        return Promise.resolve();
-      }
-
-      return runTasks(this, this.preTasks).then(function () {
-        var loader = _this7.aurelia.loader;
-        var info = _this7.info;
-        var current = void 0;
-
-        var next = function next() {
-          current = info.shift();
-          if (current) {
-            return loadPlugin(_this7, loader, current).then(next);
-          }
-
-          _this7.processed = true;
-          return Promise.resolve();
-        };
-
-        return next().then(function () {
-          return runTasks(_this7, _this7.postTasks);
-        });
-      });
-    };
-
-    return FrameworkConfiguration;
-  }();
-
-  exports.FrameworkConfiguration = FrameworkConfiguration;
-  var LogManager = exports.LogManager = TheLogManager;
-});
 define('aurelia-history',['exports'], function (exports) {
   'use strict';
 
@@ -13449,6 +13258,228 @@ define('aurelia-history-browser',['exports', 'aurelia-pal', 'aurelia-history'], 
 
   function createOrigin(protocol, hostname, port) {
     return protocol + '//' + hostname + (port ? ':' + port : '');
+  }
+});
+define('aurelia-logging-console',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ConsoleAppender = undefined;
+
+  
+
+  var ConsoleAppender = exports.ConsoleAppender = function () {
+    function ConsoleAppender() {
+      
+    }
+
+    ConsoleAppender.prototype.debug = function debug(logger) {
+      var _console;
+
+      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+        rest[_key - 1] = arguments[_key];
+      }
+
+      (_console = console).debug.apply(_console, ['DEBUG [' + logger.id + ']'].concat(rest));
+    };
+
+    ConsoleAppender.prototype.info = function info(logger) {
+      var _console2;
+
+      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        rest[_key2 - 1] = arguments[_key2];
+      }
+
+      (_console2 = console).info.apply(_console2, ['INFO [' + logger.id + ']'].concat(rest));
+    };
+
+    ConsoleAppender.prototype.warn = function warn(logger) {
+      var _console3;
+
+      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+        rest[_key3 - 1] = arguments[_key3];
+      }
+
+      (_console3 = console).warn.apply(_console3, ['WARN [' + logger.id + ']'].concat(rest));
+    };
+
+    ConsoleAppender.prototype.error = function error(logger) {
+      var _console4;
+
+      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+        rest[_key4 - 1] = arguments[_key4];
+      }
+
+      (_console4 = console).error.apply(_console4, ['ERROR [' + logger.id + ']'].concat(rest));
+    };
+
+    return ConsoleAppender;
+  }();
+});
+define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.EventAggregator = undefined;
+  exports.includeEventsIn = includeEventsIn;
+  exports.configure = configure;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var logger = LogManager.getLogger('event-aggregator');
+
+  var Handler = function () {
+    function Handler(messageType, callback) {
+      
+
+      this.messageType = messageType;
+      this.callback = callback;
+    }
+
+    Handler.prototype.handle = function handle(message) {
+      if (message instanceof this.messageType) {
+        this.callback.call(null, message);
+      }
+    };
+
+    return Handler;
+  }();
+
+  function invokeCallback(callback, data, event) {
+    try {
+      callback(data, event);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  function invokeHandler(handler, data) {
+    try {
+      handler.handle(data);
+    } catch (e) {
+      logger.error(e);
+    }
+  }
+
+  var EventAggregator = exports.EventAggregator = function () {
+    function EventAggregator() {
+      
+
+      this.eventLookup = {};
+      this.messageHandlers = [];
+    }
+
+    EventAggregator.prototype.publish = function publish(event, data) {
+      var subscribers = void 0;
+      var i = void 0;
+
+      if (!event) {
+        throw new Error('Event was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        subscribers = this.eventLookup[event];
+        if (subscribers) {
+          subscribers = subscribers.slice();
+          i = subscribers.length;
+
+          while (i--) {
+            invokeCallback(subscribers[i], data, event);
+          }
+        }
+      } else {
+        subscribers = this.messageHandlers.slice();
+        i = subscribers.length;
+
+        while (i--) {
+          invokeHandler(subscribers[i], event);
+        }
+      }
+    };
+
+    EventAggregator.prototype.subscribe = function subscribe(event, callback) {
+      var handler = void 0;
+      var subscribers = void 0;
+
+      if (!event) {
+        throw new Error('Event channel/type was invalid.');
+      }
+
+      if (typeof event === 'string') {
+        handler = callback;
+        subscribers = this.eventLookup[event] || (this.eventLookup[event] = []);
+      } else {
+        handler = new Handler(event, callback);
+        subscribers = this.messageHandlers;
+      }
+
+      subscribers.push(handler);
+
+      return {
+        dispose: function dispose() {
+          var idx = subscribers.indexOf(handler);
+          if (idx !== -1) {
+            subscribers.splice(idx, 1);
+          }
+        }
+      };
+    };
+
+    EventAggregator.prototype.subscribeOnce = function subscribeOnce(event, callback) {
+      var sub = this.subscribe(event, function (a, b) {
+        sub.dispose();
+        return callback(a, b);
+      });
+
+      return sub;
+    };
+
+    return EventAggregator;
+  }();
+
+  function includeEventsIn(obj) {
+    var ea = new EventAggregator();
+
+    obj.subscribeOnce = function (event, callback) {
+      return ea.subscribeOnce(event, callback);
+    };
+
+    obj.subscribe = function (event, callback) {
+      return ea.subscribe(event, callback);
+    };
+
+    obj.publish = function (event, data) {
+      ea.publish(event, data);
+    };
+
+    return ea;
+  }
+
+  function configure(config) {
+    config.instance(EventAggregator, includeEventsIn(config.aurelia));
   }
 });
 define('aurelia-loader',['exports', 'aurelia-path', 'aurelia-metadata'], function (exports, _aureliaPath, _aureliaMetadata) {
@@ -13888,175 +13919,6 @@ define('aurelia-loader-default',['exports', 'aurelia-loader', 'aurelia-pal', 'au
     };
   }
 });
-define('aurelia-logging',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getLogger = getLogger;
-  exports.addAppender = addAppender;
-  exports.removeAppender = removeAppender;
-  exports.setLevel = setLevel;
-  exports.getLevel = getLevel;
-
-  
-
-  var logLevel = exports.logLevel = {
-    none: 0,
-    error: 1,
-    warn: 2,
-    info: 3,
-    debug: 4
-  };
-
-  var loggers = {};
-  var appenders = [];
-  var globalDefaultLevel = logLevel.none;
-
-  function appendArgs() {
-    return [this].concat(Array.prototype.slice.call(arguments));
-  }
-
-  function logFactory(level) {
-    var threshold = logLevel[level];
-    return function () {
-      if (this.level < threshold) {
-        return;
-      }
-
-      var args = appendArgs.apply(this, arguments);
-      var i = appenders.length;
-      while (i--) {
-        var _appenders$i;
-
-        (_appenders$i = appenders[i])[level].apply(_appenders$i, args);
-      }
-    };
-  }
-
-  function connectLoggers() {
-    var proto = Logger.prototype;
-    proto.debug = logFactory('debug');
-    proto.info = logFactory('info');
-    proto.warn = logFactory('warn');
-    proto.error = logFactory('error');
-  }
-
-  function getLogger(id) {
-    return loggers[id] || new Logger(id);
-  }
-
-  function addAppender(appender) {
-    if (appenders.push(appender) === 1) {
-      connectLoggers();
-    }
-  }
-
-  function removeAppender(appender) {
-    appenders = appenders.filter(function (a) {
-      return a !== appender;
-    });
-  }
-
-  function setLevel(level) {
-    globalDefaultLevel = level;
-    for (var key in loggers) {
-      loggers[key].setLevel(level);
-    }
-  }
-
-  function getLevel() {
-    return globalDefaultLevel;
-  }
-
-  var Logger = exports.Logger = function () {
-    function Logger(id) {
-      
-
-      var cached = loggers[id];
-      if (cached) {
-        return cached;
-      }
-
-      loggers[id] = this;
-      this.id = id;
-      this.level = globalDefaultLevel;
-    }
-
-    Logger.prototype.debug = function debug(message) {};
-
-    Logger.prototype.info = function info(message) {};
-
-    Logger.prototype.warn = function warn(message) {};
-
-    Logger.prototype.error = function error(message) {};
-
-    Logger.prototype.setLevel = function setLevel(level) {
-      this.level = level;
-    };
-
-    return Logger;
-  }();
-});
-define('aurelia-logging-console',['exports', 'aurelia-logging'], function (exports, _aureliaLogging) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ConsoleAppender = undefined;
-
-  
-
-  var ConsoleAppender = exports.ConsoleAppender = function () {
-    function ConsoleAppender() {
-      
-    }
-
-    ConsoleAppender.prototype.debug = function debug(logger) {
-      var _console;
-
-      for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        rest[_key - 1] = arguments[_key];
-      }
-
-      (_console = console).debug.apply(_console, ['DEBUG [' + logger.id + ']'].concat(rest));
-    };
-
-    ConsoleAppender.prototype.info = function info(logger) {
-      var _console2;
-
-      for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-        rest[_key2 - 1] = arguments[_key2];
-      }
-
-      (_console2 = console).info.apply(_console2, ['INFO [' + logger.id + ']'].concat(rest));
-    };
-
-    ConsoleAppender.prototype.warn = function warn(logger) {
-      var _console3;
-
-      for (var _len3 = arguments.length, rest = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-        rest[_key3 - 1] = arguments[_key3];
-      }
-
-      (_console3 = console).warn.apply(_console3, ['WARN [' + logger.id + ']'].concat(rest));
-    };
-
-    ConsoleAppender.prototype.error = function error(logger) {
-      var _console4;
-
-      for (var _len4 = arguments.length, rest = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-        rest[_key4 - 1] = arguments[_key4];
-      }
-
-      (_console4 = console).error.apply(_console4, ['ERROR [' + logger.id + ']'].concat(rest));
-    };
-
-    return ConsoleAppender;
-  }();
-});
 define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
 
@@ -14443,6 +14305,221 @@ define('aurelia-pal',['exports'], function (exports) {
     exports.isInitialized = isInitialized = false;
   }
 });
+define('aurelia-path',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.relativeToFile = relativeToFile;
+  exports.join = join;
+  exports.buildQueryString = buildQueryString;
+  exports.parseQueryString = parseQueryString;
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  function trimDots(ary) {
+    for (var i = 0; i < ary.length; ++i) {
+      var part = ary[i];
+      if (part === '.') {
+        ary.splice(i, 1);
+        i -= 1;
+      } else if (part === '..') {
+        if (i === 0 || i === 1 && ary[2] === '..' || ary[i - 1] === '..') {
+          continue;
+        } else if (i > 0) {
+          ary.splice(i - 1, 2);
+          i -= 2;
+        }
+      }
+    }
+  }
+
+  function relativeToFile(name, file) {
+    var fileParts = file && file.split('/');
+    var nameParts = name.trim().split('/');
+
+    if (nameParts[0].charAt(0) === '.' && fileParts) {
+      var normalizedBaseParts = fileParts.slice(0, fileParts.length - 1);
+      nameParts.unshift.apply(nameParts, normalizedBaseParts);
+    }
+
+    trimDots(nameParts);
+
+    return nameParts.join('/');
+  }
+
+  function join(path1, path2) {
+    if (!path1) {
+      return path2;
+    }
+
+    if (!path2) {
+      return path1;
+    }
+
+    var schemeMatch = path1.match(/^([^/]*?:)\//);
+    var scheme = schemeMatch && schemeMatch.length > 0 ? schemeMatch[1] : '';
+    path1 = path1.substr(scheme.length);
+
+    var urlPrefix = void 0;
+    if (path1.indexOf('///') === 0 && scheme === 'file:') {
+      urlPrefix = '///';
+    } else if (path1.indexOf('//') === 0) {
+      urlPrefix = '//';
+    } else if (path1.indexOf('/') === 0) {
+      urlPrefix = '/';
+    } else {
+      urlPrefix = '';
+    }
+
+    var trailingSlash = path2.slice(-1) === '/' ? '/' : '';
+
+    var url1 = path1.split('/');
+    var url2 = path2.split('/');
+    var url3 = [];
+
+    for (var i = 0, ii = url1.length; i < ii; ++i) {
+      if (url1[i] === '..') {
+        url3.pop();
+      } else if (url1[i] === '.' || url1[i] === '') {
+        continue;
+      } else {
+        url3.push(url1[i]);
+      }
+    }
+
+    for (var _i = 0, _ii = url2.length; _i < _ii; ++_i) {
+      if (url2[_i] === '..') {
+        url3.pop();
+      } else if (url2[_i] === '.' || url2[_i] === '') {
+        continue;
+      } else {
+        url3.push(url2[_i]);
+      }
+    }
+
+    return scheme + urlPrefix + url3.join('/') + trailingSlash;
+  }
+
+  var encode = encodeURIComponent;
+  var encodeKey = function encodeKey(k) {
+    return encode(k).replace('%24', '$');
+  };
+
+  function buildParam(key, value, traditional) {
+    var result = [];
+    if (value === null || value === undefined) {
+      return result;
+    }
+    if (Array.isArray(value)) {
+      for (var i = 0, l = value.length; i < l; i++) {
+        if (traditional) {
+          result.push(encodeKey(key) + '=' + encode(value[i]));
+        } else {
+          var arrayKey = key + '[' + (_typeof(value[i]) === 'object' && value[i] !== null ? i : '') + ']';
+          result = result.concat(buildParam(arrayKey, value[i]));
+        }
+      }
+    } else if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && !traditional) {
+      for (var propertyName in value) {
+        result = result.concat(buildParam(key + '[' + propertyName + ']', value[propertyName]));
+      }
+    } else {
+      result.push(encodeKey(key) + '=' + encode(value));
+    }
+    return result;
+  }
+
+  function buildQueryString(params, traditional) {
+    var pairs = [];
+    var keys = Object.keys(params || {}).sort();
+    for (var i = 0, len = keys.length; i < len; i++) {
+      var key = keys[i];
+      pairs = pairs.concat(buildParam(key, params[key], traditional));
+    }
+
+    if (pairs.length === 0) {
+      return '';
+    }
+
+    return pairs.join('&');
+  }
+
+  function processScalarParam(existedParam, value) {
+    if (Array.isArray(existedParam)) {
+      existedParam.push(value);
+      return existedParam;
+    }
+    if (existedParam !== undefined) {
+      return [existedParam, value];
+    }
+
+    return value;
+  }
+
+  function parseComplexParam(queryParams, keys, value) {
+    var currentParams = queryParams;
+    var keysLastIndex = keys.length - 1;
+    for (var j = 0; j <= keysLastIndex; j++) {
+      var key = keys[j] === '' ? currentParams.length : keys[j];
+      if (j < keysLastIndex) {
+        var prevValue = !currentParams[key] || _typeof(currentParams[key]) === 'object' ? currentParams[key] : [currentParams[key]];
+        currentParams = currentParams[key] = prevValue || (isNaN(keys[j + 1]) ? {} : []);
+      } else {
+        currentParams = currentParams[key] = value;
+      }
+    }
+  }
+
+  function parseQueryString(queryString) {
+    var queryParams = {};
+    if (!queryString || typeof queryString !== 'string') {
+      return queryParams;
+    }
+
+    var query = queryString;
+    if (query.charAt(0) === '?') {
+      query = query.substr(1);
+    }
+
+    var pairs = query.replace(/\+/g, ' ').split('&');
+    for (var i = 0; i < pairs.length; i++) {
+      var pair = pairs[i].split('=');
+      var key = decodeURIComponent(pair[0]);
+      if (!key) {
+        continue;
+      }
+
+      var keys = key.split('][');
+      var keysLastIndex = keys.length - 1;
+
+      if (/\[/.test(keys[0]) && /\]$/.test(keys[keysLastIndex])) {
+        keys[keysLastIndex] = keys[keysLastIndex].replace(/\]$/, '');
+        keys = keys.shift().split('[').concat(keys);
+        keysLastIndex = keys.length - 1;
+      } else {
+        keysLastIndex = 0;
+      }
+
+      if (pair.length >= 2) {
+        var value = pair[1] ? decodeURIComponent(pair[1]) : '';
+        if (keysLastIndex) {
+          parseComplexParam(queryParams, keys, value);
+        } else {
+          queryParams[key] = processScalarParam(queryParams[key], value);
+        }
+      } else {
+        queryParams[key] = true;
+      }
+    }
+    return queryParams;
+  }
+});
 define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
 
@@ -14477,7 +14554,7 @@ define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aur
   if (typeof FEATURE_NO_IE === 'undefined') {
     var test = function test() {};
 
-    if (test.name === undefined) {
+    if (!test.name) {
       Object.defineProperty(Function.prototype, 'name', {
         get: function get() {
           var name = this.toString().match(/^\s*function\s*(\S*)\s*\(/)[1];
@@ -14925,220 +15002,116 @@ define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aur
     });
   }
 });
-define('aurelia-path',['exports'], function (exports) {
+define('aurelia-logging',['exports'], function (exports) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.relativeToFile = relativeToFile;
-  exports.join = join;
-  exports.buildQueryString = buildQueryString;
-  exports.parseQueryString = parseQueryString;
+  exports.getLogger = getLogger;
+  exports.addAppender = addAppender;
+  exports.removeAppender = removeAppender;
+  exports.setLevel = setLevel;
+  exports.getLevel = getLevel;
 
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  
+
+  var logLevel = exports.logLevel = {
+    none: 0,
+    error: 1,
+    warn: 2,
+    info: 3,
+    debug: 4
   };
 
-  function trimDots(ary) {
-    for (var i = 0; i < ary.length; ++i) {
-      var part = ary[i];
-      if (part === '.') {
-        ary.splice(i, 1);
-        i -= 1;
-      } else if (part === '..') {
-        if (i === 0 || i === 1 && ary[2] === '..' || ary[i - 1] === '..') {
-          continue;
-        } else if (i > 0) {
-          ary.splice(i - 1, 2);
-          i -= 2;
-        }
+  var loggers = {};
+  var appenders = [];
+  var globalDefaultLevel = logLevel.none;
+
+  function appendArgs() {
+    return [this].concat(Array.prototype.slice.call(arguments));
+  }
+
+  function logFactory(level) {
+    var threshold = logLevel[level];
+    return function () {
+      if (this.level < threshold) {
+        return;
       }
+
+      var args = appendArgs.apply(this, arguments);
+      var i = appenders.length;
+      while (i--) {
+        var _appenders$i;
+
+        (_appenders$i = appenders[i])[level].apply(_appenders$i, args);
+      }
+    };
+  }
+
+  function connectLoggers() {
+    var proto = Logger.prototype;
+    proto.debug = logFactory('debug');
+    proto.info = logFactory('info');
+    proto.warn = logFactory('warn');
+    proto.error = logFactory('error');
+  }
+
+  function getLogger(id) {
+    return loggers[id] || new Logger(id);
+  }
+
+  function addAppender(appender) {
+    if (appenders.push(appender) === 1) {
+      connectLoggers();
     }
   }
 
-  function relativeToFile(name, file) {
-    var fileParts = file && file.split('/');
-    var nameParts = name.trim().split('/');
-
-    if (nameParts[0].charAt(0) === '.' && fileParts) {
-      var normalizedBaseParts = fileParts.slice(0, fileParts.length - 1);
-      nameParts.unshift.apply(nameParts, normalizedBaseParts);
-    }
-
-    trimDots(nameParts);
-
-    return nameParts.join('/');
+  function removeAppender(appender) {
+    appenders = appenders.filter(function (a) {
+      return a !== appender;
+    });
   }
 
-  function join(path1, path2) {
-    if (!path1) {
-      return path2;
-    }
-
-    if (!path2) {
-      return path1;
-    }
-
-    var schemeMatch = path1.match(/^([^/]*?:)\//);
-    var scheme = schemeMatch && schemeMatch.length > 0 ? schemeMatch[1] : '';
-    path1 = path1.substr(scheme.length);
-
-    var urlPrefix = void 0;
-    if (path1.indexOf('///') === 0 && scheme === 'file:') {
-      urlPrefix = '///';
-    } else if (path1.indexOf('//') === 0) {
-      urlPrefix = '//';
-    } else if (path1.indexOf('/') === 0) {
-      urlPrefix = '/';
-    } else {
-      urlPrefix = '';
-    }
-
-    var trailingSlash = path2.slice(-1) === '/' ? '/' : '';
-
-    var url1 = path1.split('/');
-    var url2 = path2.split('/');
-    var url3 = [];
-
-    for (var i = 0, ii = url1.length; i < ii; ++i) {
-      if (url1[i] === '..') {
-        url3.pop();
-      } else if (url1[i] === '.' || url1[i] === '') {
-        continue;
-      } else {
-        url3.push(url1[i]);
-      }
-    }
-
-    for (var _i = 0, _ii = url2.length; _i < _ii; ++_i) {
-      if (url2[_i] === '..') {
-        url3.pop();
-      } else if (url2[_i] === '.' || url2[_i] === '') {
-        continue;
-      } else {
-        url3.push(url2[_i]);
-      }
-    }
-
-    return scheme + urlPrefix + url3.join('/') + trailingSlash;
-  }
-
-  var encode = encodeURIComponent;
-  var encodeKey = function encodeKey(k) {
-    return encode(k).replace('%24', '$');
-  };
-
-  function buildParam(key, value, traditional) {
-    var result = [];
-    if (value === null || value === undefined) {
-      return result;
-    }
-    if (Array.isArray(value)) {
-      for (var i = 0, l = value.length; i < l; i++) {
-        if (traditional) {
-          result.push(encodeKey(key) + '=' + encode(value[i]));
-        } else {
-          var arrayKey = key + '[' + (_typeof(value[i]) === 'object' && value[i] !== null ? i : '') + ']';
-          result = result.concat(buildParam(arrayKey, value[i]));
-        }
-      }
-    } else if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && !traditional) {
-      for (var propertyName in value) {
-        result = result.concat(buildParam(key + '[' + propertyName + ']', value[propertyName]));
-      }
-    } else {
-      result.push(encodeKey(key) + '=' + encode(value));
-    }
-    return result;
-  }
-
-  function buildQueryString(params, traditional) {
-    var pairs = [];
-    var keys = Object.keys(params || {}).sort();
-    for (var i = 0, len = keys.length; i < len; i++) {
-      var key = keys[i];
-      pairs = pairs.concat(buildParam(key, params[key], traditional));
-    }
-
-    if (pairs.length === 0) {
-      return '';
-    }
-
-    return pairs.join('&');
-  }
-
-  function processScalarParam(existedParam, value) {
-    if (Array.isArray(existedParam)) {
-      existedParam.push(value);
-      return existedParam;
-    }
-    if (existedParam !== undefined) {
-      return [existedParam, value];
-    }
-
-    return value;
-  }
-
-  function parseComplexParam(queryParams, keys, value) {
-    var currentParams = queryParams;
-    var keysLastIndex = keys.length - 1;
-    for (var j = 0; j <= keysLastIndex; j++) {
-      var key = keys[j] === '' ? currentParams.length : keys[j];
-      if (j < keysLastIndex) {
-        var prevValue = !currentParams[key] || _typeof(currentParams[key]) === 'object' ? currentParams[key] : [currentParams[key]];
-        currentParams = currentParams[key] = prevValue || (isNaN(keys[j + 1]) ? {} : []);
-      } else {
-        currentParams = currentParams[key] = value;
-      }
+  function setLevel(level) {
+    globalDefaultLevel = level;
+    for (var key in loggers) {
+      loggers[key].setLevel(level);
     }
   }
 
-  function parseQueryString(queryString) {
-    var queryParams = {};
-    if (!queryString || typeof queryString !== 'string') {
-      return queryParams;
-    }
-
-    var query = queryString;
-    if (query.charAt(0) === '?') {
-      query = query.substr(1);
-    }
-
-    var pairs = query.replace(/\+/g, ' ').split('&');
-    for (var i = 0; i < pairs.length; i++) {
-      var pair = pairs[i].split('=');
-      var key = decodeURIComponent(pair[0]);
-      if (!key) {
-        continue;
-      }
-
-      var keys = key.split('][');
-      var keysLastIndex = keys.length - 1;
-
-      if (/\[/.test(keys[0]) && /\]$/.test(keys[keysLastIndex])) {
-        keys[keysLastIndex] = keys[keysLastIndex].replace(/\]$/, '');
-        keys = keys.shift().split('[').concat(keys);
-        keysLastIndex = keys.length - 1;
-      } else {
-        keysLastIndex = 0;
-      }
-
-      if (pair.length >= 2) {
-        var value = pair[1] ? decodeURIComponent(pair[1]) : '';
-        if (keysLastIndex) {
-          parseComplexParam(queryParams, keys, value);
-        } else {
-          queryParams[key] = processScalarParam(queryParams[key], value);
-        }
-      } else {
-        queryParams[key] = true;
-      }
-    }
-    return queryParams;
+  function getLevel() {
+    return globalDefaultLevel;
   }
+
+  var Logger = exports.Logger = function () {
+    function Logger(id) {
+      
+
+      var cached = loggers[id];
+      if (cached) {
+        return cached;
+      }
+
+      loggers[id] = this;
+      this.id = id;
+      this.level = globalDefaultLevel;
+    }
+
+    Logger.prototype.debug = function debug(message) {};
+
+    Logger.prototype.info = function info(message) {};
+
+    Logger.prototype.warn = function warn(message) {};
+
+    Logger.prototype.error = function error(message) {};
+
+    Logger.prototype.setLevel = function setLevel(level) {
+      this.level = level;
+    };
+
+    return Logger;
+  }();
 });
 define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
   'use strict';
@@ -15976,2615 +15949,6 @@ define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
         };
       }
     })();
-  }
-});
-define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
-
-  
-
-  var State = exports.State = function () {
-    function State(charSpec) {
-      
-
-      this.charSpec = charSpec;
-      this.nextStates = [];
-    }
-
-    State.prototype.get = function get(charSpec) {
-      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var child = _ref;
-
-        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
-
-        if (isEqual) {
-          return child;
-        }
-      }
-
-      return undefined;
-    };
-
-    State.prototype.put = function put(charSpec) {
-      var state = this.get(charSpec);
-
-      if (state) {
-        return state;
-      }
-
-      state = new State(charSpec);
-
-      this.nextStates.push(state);
-
-      if (charSpec.repeat) {
-        state.nextStates.push(state);
-      }
-
-      return state;
-    };
-
-    State.prototype.match = function match(ch) {
-      var nextStates = this.nextStates;
-      var results = [];
-
-      for (var i = 0, l = nextStates.length; i < l; i++) {
-        var child = nextStates[i];
-        var charSpec = child.charSpec;
-
-        if (charSpec.validChars !== undefined) {
-          if (charSpec.validChars.indexOf(ch) !== -1) {
-            results.push(child);
-          }
-        } else if (charSpec.invalidChars !== undefined) {
-          if (charSpec.invalidChars.indexOf(ch) === -1) {
-            results.push(child);
-          }
-        }
-      }
-
-      return results;
-    };
-
-    return State;
-  }();
-
-  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
-
-  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
-
-  var StaticSegment = exports.StaticSegment = function () {
-    function StaticSegment(string, caseSensitive) {
-      
-
-      this.string = string;
-      this.caseSensitive = caseSensitive;
-    }
-
-    StaticSegment.prototype.eachChar = function eachChar(callback) {
-      var s = this.string;
-      for (var i = 0, ii = s.length; i < ii; ++i) {
-        var ch = s[i];
-        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
-      }
-    };
-
-    StaticSegment.prototype.regex = function regex() {
-      return this.string.replace(escapeRegex, '\\$1');
-    };
-
-    StaticSegment.prototype.generate = function generate() {
-      return this.string;
-    };
-
-    return StaticSegment;
-  }();
-
-  var DynamicSegment = exports.DynamicSegment = function () {
-    function DynamicSegment(name, optional) {
-      
-
-      this.name = name;
-      this.optional = optional;
-    }
-
-    DynamicSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '/', repeat: true });
-    };
-
-    DynamicSegment.prototype.regex = function regex() {
-      return this.optional ? '([^/]+)?' : '([^/]+)';
-    };
-
-    DynamicSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return DynamicSegment;
-  }();
-
-  var StarSegment = exports.StarSegment = function () {
-    function StarSegment(name) {
-      
-
-      this.name = name;
-    }
-
-    StarSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '', repeat: true });
-    };
-
-    StarSegment.prototype.regex = function regex() {
-      return '(.+)';
-    };
-
-    StarSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return StarSegment;
-  }();
-
-  var EpsilonSegment = exports.EpsilonSegment = function () {
-    function EpsilonSegment() {
-      
-    }
-
-    EpsilonSegment.prototype.eachChar = function eachChar() {};
-
-    EpsilonSegment.prototype.regex = function regex() {
-      return '';
-    };
-
-    EpsilonSegment.prototype.generate = function generate() {
-      return '';
-    };
-
-    return EpsilonSegment;
-  }();
-
-  var RouteRecognizer = exports.RouteRecognizer = function () {
-    function RouteRecognizer() {
-      
-
-      this.rootState = new State();
-      this.names = {};
-    }
-
-    RouteRecognizer.prototype.add = function add(route) {
-      var _this = this;
-
-      if (Array.isArray(route)) {
-        route.forEach(function (r) {
-          return _this.add(r);
-        });
-        return undefined;
-      }
-
-      var currentState = this.rootState;
-      var regex = '^';
-      var types = { statics: 0, dynamics: 0, stars: 0 };
-      var names = [];
-      var routeName = route.handler.name;
-      var isEmpty = true;
-      var isAllOptional = true;
-      var segments = parse(route.path, names, types, route.caseSensitive);
-
-      for (var i = 0, ii = segments.length; i < ii; i++) {
-        var segment = segments[i];
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        isEmpty = false;
-        isAllOptional = isAllOptional && segment.optional;
-
-        currentState = addSegment(currentState, segment);
-        regex += segment.optional ? '/?' : '/';
-        regex += segment.regex();
-      }
-
-      if (isAllOptional) {
-        if (isEmpty) {
-          currentState = currentState.put({ validChars: '/' });
-          regex += '/';
-        } else {
-          var finalState = this.rootState.put({ validChars: '/' });
-          currentState.epsilon = [finalState];
-          currentState = finalState;
-        }
-      }
-
-      var handlers = [{ handler: route.handler, names: names }];
-
-      if (routeName) {
-        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
-        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
-          this.names[routeNames[_i2]] = {
-            segments: segments,
-            handlers: handlers
-          };
-        }
-      }
-
-      currentState.handlers = handlers;
-      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
-      currentState.types = types;
-
-      return currentState;
-    };
-
-    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      return [].concat(route.handlers);
-    };
-
-    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
-      return !!this.names[name];
-    };
-
-    RouteRecognizer.prototype.generate = function generate(name, params) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      var handler = route.handlers[0].handler;
-      if (handler.generationUsesHref) {
-        return handler.href;
-      }
-
-      var routeParams = Object.assign({}, params);
-      var segments = route.segments;
-      var consumed = {};
-      var output = '';
-
-      for (var i = 0, l = segments.length; i < l; i++) {
-        var segment = segments[i];
-
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        var segmentValue = segment.generate(routeParams, consumed);
-        if (segmentValue === null || segmentValue === undefined) {
-          if (!segment.optional) {
-            throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
-          }
-        } else {
-          output += '/';
-          output += segmentValue;
-        }
-      }
-
-      if (output.charAt(0) !== '/') {
-        output = '/' + output;
-      }
-
-      for (var param in consumed) {
-        delete routeParams[param];
-      }
-
-      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
-      output += queryString ? '?' + queryString : '';
-
-      return output;
-    };
-
-    RouteRecognizer.prototype.recognize = function recognize(path) {
-      var states = [this.rootState];
-      var queryParams = {};
-      var isSlashDropped = false;
-      var normalizedPath = path;
-
-      var queryStart = normalizedPath.indexOf('?');
-      if (queryStart !== -1) {
-        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
-        normalizedPath = normalizedPath.substr(0, queryStart);
-        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
-      }
-
-      normalizedPath = decodeURI(normalizedPath);
-
-      if (normalizedPath.charAt(0) !== '/') {
-        normalizedPath = '/' + normalizedPath;
-      }
-
-      var pathLen = normalizedPath.length;
-      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
-        normalizedPath = normalizedPath.substr(0, pathLen - 1);
-        isSlashDropped = true;
-      }
-
-      for (var i = 0, l = normalizedPath.length; i < l; i++) {
-        states = recognizeChar(states, normalizedPath.charAt(i));
-        if (!states.length) {
-          break;
-        }
-      }
-
-      var solutions = [];
-      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
-        if (states[_i3].handlers) {
-          solutions.push(states[_i3]);
-        }
-      }
-
-      states = sortSolutions(solutions);
-
-      var state = solutions[0];
-      if (state && state.handlers) {
-        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
-          normalizedPath = normalizedPath + '/';
-        }
-
-        return findHandler(state, normalizedPath, queryParams);
-      }
-
-      return undefined;
-    };
-
-    return RouteRecognizer;
-  }();
-
-  var RecognizeResults = function RecognizeResults(queryParams) {
-    
-
-    this.splice = Array.prototype.splice;
-    this.slice = Array.prototype.slice;
-    this.push = Array.prototype.push;
-    this.length = 0;
-    this.queryParams = queryParams || {};
-  };
-
-  function parse(route, names, types, caseSensitive) {
-    var normalizedRoute = route;
-    if (route.charAt(0) === '/') {
-      normalizedRoute = route.substr(1);
-    }
-
-    var results = [];
-
-    var splitRoute = normalizedRoute.split('/');
-    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
-      var segment = splitRoute[i];
-
-      var match = segment.match(/^:([^?]+)(\?)?$/);
-      if (match) {
-        var _match = match;
-        var _name = _match[1];
-        var optional = _match[2];
-
-        if (_name.indexOf('=') !== -1) {
-          throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
-        }
-        results.push(new DynamicSegment(_name, !!optional));
-        names.push(_name);
-        types.dynamics++;
-        continue;
-      }
-
-      match = segment.match(/^\*(.+)$/);
-      if (match) {
-        results.push(new StarSegment(match[1]));
-        names.push(match[1]);
-        types.stars++;
-      } else if (segment === '') {
-        results.push(new EpsilonSegment());
-      } else {
-        results.push(new StaticSegment(segment, caseSensitive));
-        types.statics++;
-      }
-    }
-
-    return results;
-  }
-
-  function sortSolutions(states) {
-    return states.sort(function (a, b) {
-      if (a.types.stars !== b.types.stars) {
-        return a.types.stars - b.types.stars;
-      }
-
-      if (a.types.stars) {
-        if (a.types.statics !== b.types.statics) {
-          return b.types.statics - a.types.statics;
-        }
-        if (a.types.dynamics !== b.types.dynamics) {
-          return b.types.dynamics - a.types.dynamics;
-        }
-      }
-
-      if (a.types.dynamics !== b.types.dynamics) {
-        return a.types.dynamics - b.types.dynamics;
-      }
-
-      if (a.types.statics !== b.types.statics) {
-        return b.types.statics - a.types.statics;
-      }
-
-      return 0;
-    });
-  }
-
-  function recognizeChar(states, ch) {
-    var nextStates = [];
-
-    for (var i = 0, l = states.length; i < l; i++) {
-      var state = states[i];
-      nextStates.push.apply(nextStates, state.match(ch));
-    }
-
-    var skippableStates = nextStates.filter(function (s) {
-      return s.epsilon;
-    });
-
-    var _loop = function _loop() {
-      var newStates = [];
-      skippableStates.forEach(function (s) {
-        nextStates.push.apply(nextStates, s.epsilon);
-        newStates.push.apply(newStates, s.epsilon);
-      });
-      skippableStates = newStates.filter(function (s) {
-        return s.epsilon;
-      });
-    };
-
-    while (skippableStates.length > 0) {
-      _loop();
-    }
-
-    return nextStates;
-  }
-
-  function findHandler(state, path, queryParams) {
-    var handlers = state.handlers;
-    var regex = state.regex;
-    var captures = path.match(regex);
-    var currentCapture = 1;
-    var result = new RecognizeResults(queryParams);
-
-    for (var i = 0, l = handlers.length; i < l; i++) {
-      var _handler = handlers[i];
-      var _names = _handler.names;
-      var _params = {};
-
-      for (var j = 0, m = _names.length; j < m; j++) {
-        _params[_names[j]] = captures[currentCapture++];
-      }
-
-      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
-    }
-
-    return result;
-  }
-
-  function addSegment(currentState, segment) {
-    var state = currentState.put({ validChars: '/' });
-    segment.eachChar(function (ch) {
-      state = state.put(ch);
-    });
-
-    if (segment.optional) {
-      currentState.epsilon = currentState.epsilon || [];
-      currentState.epsilon.push(state);
-    }
-
-    return state;
-  }
-});
-define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _aureliaLogging, _aureliaRouteRecognizer, _aureliaDependencyInjection, _aureliaHistory, _aureliaEventAggregator) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.AppRouter = exports.PipelineProvider = exports.LoadRouteStep = exports.RouteLoader = exports.ActivateNextStep = exports.DeactivatePreviousStep = exports.CanActivateNextStep = exports.CanDeactivatePreviousStep = exports.Router = exports.BuildNavigationPlanStep = exports.activationStrategy = exports.RouterConfiguration = exports.RedirectToRoute = exports.Redirect = exports.NavModel = exports.NavigationInstruction = exports.CommitChangesStep = exports.Pipeline = exports.pipelineStatus = undefined;
-  exports._normalizeAbsolutePath = _normalizeAbsolutePath;
-  exports._createRootedPath = _createRootedPath;
-  exports._resolveUrl = _resolveUrl;
-  exports.isNavigationCommand = isNavigationCommand;
-  exports._buildNavigationPlan = _buildNavigationPlan;
-
-  var LogManager = _interopRequireWildcard(_aureliaLogging);
-
-  function _interopRequireWildcard(obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj.default = obj;
-      return newObj;
-    }
-  }
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  var _createClass = function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  }();
-
-  
-
-  function _normalizeAbsolutePath(path, hasPushState) {
-    var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
-
-    if (!hasPushState && path[0] !== '#') {
-      path = '#' + path;
-    }
-
-    if (hasPushState && absolute) {
-      path = path.substring(1, path.length);
-    }
-
-    return path;
-  }
-
-  function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
-    if (isAbsoluteUrl.test(fragment)) {
-      return fragment;
-    }
-
-    var path = '';
-
-    if (baseUrl.length && baseUrl[0] !== '/') {
-      path += '/';
-    }
-
-    path += baseUrl;
-
-    if ((!path.length || path[path.length - 1] !== '/') && fragment[0] !== '/') {
-      path += '/';
-    }
-
-    if (path.length && path[path.length - 1] === '/' && fragment[0] === '/') {
-      path = path.substring(0, path.length - 1);
-    }
-
-    return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
-  }
-
-  function _resolveUrl(fragment, baseUrl, hasPushState) {
-    if (isRootedPath.test(fragment)) {
-      return _normalizeAbsolutePath(fragment, hasPushState);
-    }
-
-    return _createRootedPath(fragment, baseUrl, hasPushState);
-  }
-
-  var isRootedPath = /^#?\//;
-  var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
-  var pipelineStatus = exports.pipelineStatus = {
-    completed: 'completed',
-    canceled: 'canceled',
-    rejected: 'rejected',
-    running: 'running'
-  };
-
-  var Pipeline = exports.Pipeline = function () {
-    function Pipeline() {
-      
-
-      this.steps = [];
-    }
-
-    Pipeline.prototype.addStep = function addStep(step) {
-      var run = void 0;
-
-      if (typeof step === 'function') {
-        run = step;
-      } else if (typeof step.getSteps === 'function') {
-        var steps = step.getSteps();
-        for (var i = 0, l = steps.length; i < l; i++) {
-          this.addStep(steps[i]);
-        }
-
-        return this;
-      } else {
-        run = step.run.bind(step);
-      }
-
-      this.steps.push(run);
-
-      return this;
-    };
-
-    Pipeline.prototype.run = function run(instruction) {
-      var index = -1;
-      var steps = this.steps;
-
-      function next() {
-        index++;
-
-        if (index < steps.length) {
-          var currentStep = steps[index];
-
-          try {
-            return currentStep(instruction, next);
-          } catch (e) {
-            return next.reject(e);
-          }
-        } else {
-          return next.complete();
-        }
-      }
-
-      next.complete = createCompletionHandler(next, pipelineStatus.completed);
-      next.cancel = createCompletionHandler(next, pipelineStatus.canceled);
-      next.reject = createCompletionHandler(next, pipelineStatus.rejected);
-
-      return next();
-    };
-
-    return Pipeline;
-  }();
-
-  function createCompletionHandler(next, status) {
-    return function (output) {
-      return Promise.resolve({ status: status, output: output, completed: status === pipelineStatus.completed });
-    };
-  }
-
-  var CommitChangesStep = exports.CommitChangesStep = function () {
-    function CommitChangesStep() {
-      
-    }
-
-    CommitChangesStep.prototype.run = function run(navigationInstruction, next) {
-      return navigationInstruction._commitChanges(true).then(function () {
-        navigationInstruction._updateTitle();
-        return next();
-      });
-    };
-
-    return CommitChangesStep;
-  }();
-
-  var NavigationInstruction = exports.NavigationInstruction = function () {
-    function NavigationInstruction(init) {
-      
-
-      this.plan = null;
-      this.options = {};
-
-      Object.assign(this, init);
-
-      this.params = this.params || {};
-      this.viewPortInstructions = {};
-
-      var ancestorParams = [];
-      var current = this;
-      do {
-        var currentParams = Object.assign({}, current.params);
-        if (current.config && current.config.hasChildRouter) {
-          delete currentParams[current.getWildCardName()];
-        }
-
-        ancestorParams.unshift(currentParams);
-        current = current.parentInstruction;
-      } while (current);
-
-      var allParams = Object.assign.apply(Object, [{}, this.queryParams].concat(ancestorParams));
-      this.lifecycleArgs = [allParams, this.config, this];
-    }
-
-    NavigationInstruction.prototype.getAllInstructions = function getAllInstructions() {
-      var instructions = [this];
-      for (var key in this.viewPortInstructions) {
-        var childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
-        if (childInstruction) {
-          instructions.push.apply(instructions, childInstruction.getAllInstructions());
-        }
-      }
-
-      return instructions;
-    };
-
-    NavigationInstruction.prototype.getAllPreviousInstructions = function getAllPreviousInstructions() {
-      return this.getAllInstructions().map(function (c) {
-        return c.previousInstruction;
-      }).filter(function (c) {
-        return c;
-      });
-    };
-
-    NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
-      var config = Object.assign({}, this.lifecycleArgs[1], { currentViewPort: viewPortName });
-      var viewportInstruction = this.viewPortInstructions[viewPortName] = {
-        name: viewPortName,
-        strategy: strategy,
-        moduleId: moduleId,
-        component: component,
-        childRouter: component.childRouter,
-        lifecycleArgs: [].concat(this.lifecycleArgs[0], config, this.lifecycleArgs[2])
-      };
-
-      return viewportInstruction;
-    };
-
-    NavigationInstruction.prototype.getWildCardName = function getWildCardName() {
-      var wildcardIndex = this.config.route.lastIndexOf('*');
-      return this.config.route.substr(wildcardIndex + 1);
-    };
-
-    NavigationInstruction.prototype.getWildcardPath = function getWildcardPath() {
-      var wildcardName = this.getWildCardName();
-      var path = this.params[wildcardName] || '';
-
-      if (this.queryString) {
-        path += '?' + this.queryString;
-      }
-
-      return path;
-    };
-
-    NavigationInstruction.prototype.getBaseUrl = function getBaseUrl() {
-      var _this = this;
-
-      var fragment = this.fragment;
-
-      if (fragment === '') {
-        var nonEmptyRoute = this.router.routes.find(function (route) {
-          return route.name === _this.config.name && route.route !== '';
-        });
-        if (nonEmptyRoute) {
-          fragment = nonEmptyRoute.route;
-        }
-      }
-
-      if (!this.params) {
-        return fragment;
-      }
-
-      var wildcardName = this.getWildCardName();
-      var path = this.params[wildcardName] || '';
-
-      if (!path) {
-        return fragment;
-      }
-
-      path = encodeURI(path);
-      return fragment.substr(0, fragment.lastIndexOf(path));
-    };
-
-    NavigationInstruction.prototype._commitChanges = function _commitChanges(waitToSwap) {
-      var _this2 = this;
-
-      var router = this.router;
-      router.currentInstruction = this;
-
-      if (this.previousInstruction) {
-        this.previousInstruction.config.navModel.isActive = false;
-      }
-
-      this.config.navModel.isActive = true;
-
-      router._refreshBaseUrl();
-      router.refreshNavigation();
-
-      var loads = [];
-      var delaySwaps = [];
-
-      var _loop = function _loop(viewPortName) {
-        var viewPortInstruction = _this2.viewPortInstructions[viewPortName];
-        var viewPort = router.viewPorts[viewPortName];
-
-        if (!viewPort) {
-          throw new Error('There was no router-view found in the view for ' + viewPortInstruction.moduleId + '.');
-        }
-
-        if (viewPortInstruction.strategy === activationStrategy.replace) {
-          if (waitToSwap) {
-            delaySwaps.push({ viewPort: viewPort, viewPortInstruction: viewPortInstruction });
-          }
-
-          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(function (x) {
-            if (viewPortInstruction.childNavigationInstruction) {
-              return viewPortInstruction.childNavigationInstruction._commitChanges();
-            }
-
-            return undefined;
-          }));
-        } else {
-          if (viewPortInstruction.childNavigationInstruction) {
-            loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
-          }
-        }
-      };
-
-      for (var viewPortName in this.viewPortInstructions) {
-        _loop(viewPortName);
-      }
-
-      return Promise.all(loads).then(function () {
-        delaySwaps.forEach(function (x) {
-          return x.viewPort.swap(x.viewPortInstruction);
-        });
-        return null;
-      }).then(function () {
-        return prune(_this2);
-      });
-    };
-
-    NavigationInstruction.prototype._updateTitle = function _updateTitle() {
-      var title = this._buildTitle();
-      if (title) {
-        this.router.history.setTitle(title);
-      }
-    };
-
-    NavigationInstruction.prototype._buildTitle = function _buildTitle() {
-      var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
-
-      var title = '';
-      var childTitles = [];
-
-      if (this.config.navModel.title) {
-        title = this.router.transformTitle(this.config.navModel.title);
-      }
-
-      for (var viewPortName in this.viewPortInstructions) {
-        var _viewPortInstruction = this.viewPortInstructions[viewPortName];
-
-        if (_viewPortInstruction.childNavigationInstruction) {
-          var childTitle = _viewPortInstruction.childNavigationInstruction._buildTitle(separator);
-          if (childTitle) {
-            childTitles.push(childTitle);
-          }
-        }
-      }
-
-      if (childTitles.length) {
-        title = childTitles.join(separator) + (title ? separator : '') + title;
-      }
-
-      if (this.router.title) {
-        title += (title ? separator : '') + this.router.transformTitle(this.router.title);
-      }
-
-      return title;
-    };
-
-    return NavigationInstruction;
-  }();
-
-  function prune(instruction) {
-    instruction.previousInstruction = null;
-    instruction.plan = null;
-  }
-
-  var NavModel = exports.NavModel = function () {
-    function NavModel(router, relativeHref) {
-      
-
-      this.isActive = false;
-      this.title = null;
-      this.href = null;
-      this.relativeHref = null;
-      this.settings = {};
-      this.config = null;
-
-      this.router = router;
-      this.relativeHref = relativeHref;
-    }
-
-    NavModel.prototype.setTitle = function setTitle(title) {
-      this.title = title;
-
-      if (this.isActive) {
-        this.router.updateTitle();
-      }
-    };
-
-    return NavModel;
-  }();
-
-  function isNavigationCommand(obj) {
-    return obj && typeof obj.navigate === 'function';
-  }
-
-  var Redirect = exports.Redirect = function () {
-    function Redirect(url) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-      
-
-      this.url = url;
-      this.options = Object.assign({ trigger: true, replace: true }, options);
-      this.shouldContinueProcessing = false;
-    }
-
-    Redirect.prototype.setRouter = function setRouter(router) {
-      this.router = router;
-    };
-
-    Redirect.prototype.navigate = function navigate(appRouter) {
-      var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
-      navigatingRouter.navigate(this.url, this.options);
-    };
-
-    return Redirect;
-  }();
-
-  var RedirectToRoute = exports.RedirectToRoute = function () {
-    function RedirectToRoute(route) {
-      var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-      
-
-      this.route = route;
-      this.params = params;
-      this.options = Object.assign({ trigger: true, replace: true }, options);
-      this.shouldContinueProcessing = false;
-    }
-
-    RedirectToRoute.prototype.setRouter = function setRouter(router) {
-      this.router = router;
-    };
-
-    RedirectToRoute.prototype.navigate = function navigate(appRouter) {
-      var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
-      navigatingRouter.navigateToRoute(this.route, this.params, this.options);
-    };
-
-    return RedirectToRoute;
-  }();
-
-  var RouterConfiguration = exports.RouterConfiguration = function () {
-    function RouterConfiguration() {
-      
-
-      this.instructions = [];
-      this.options = {};
-      this.pipelineSteps = [];
-    }
-
-    RouterConfiguration.prototype.addPipelineStep = function addPipelineStep(name, step) {
-      this.pipelineSteps.push({ name: name, step: step });
-      return this;
-    };
-
-    RouterConfiguration.prototype.addAuthorizeStep = function addAuthorizeStep(step) {
-      return this.addPipelineStep('authorize', step);
-    };
-
-    RouterConfiguration.prototype.addPreActivateStep = function addPreActivateStep(step) {
-      return this.addPipelineStep('preActivate', step);
-    };
-
-    RouterConfiguration.prototype.addPreRenderStep = function addPreRenderStep(step) {
-      return this.addPipelineStep('preRender', step);
-    };
-
-    RouterConfiguration.prototype.addPostRenderStep = function addPostRenderStep(step) {
-      return this.addPipelineStep('postRender', step);
-    };
-
-    RouterConfiguration.prototype.fallbackRoute = function fallbackRoute(fragment) {
-      this._fallbackRoute = fragment;
-      return this;
-    };
-
-    RouterConfiguration.prototype.map = function map(route) {
-      if (Array.isArray(route)) {
-        route.forEach(this.map.bind(this));
-        return this;
-      }
-
-      return this.mapRoute(route);
-    };
-
-    RouterConfiguration.prototype.mapRoute = function mapRoute(config) {
-      this.instructions.push(function (router) {
-        var routeConfigs = [];
-
-        if (Array.isArray(config.route)) {
-          for (var i = 0, ii = config.route.length; i < ii; ++i) {
-            var current = Object.assign({}, config);
-            current.route = config.route[i];
-            routeConfigs.push(current);
-          }
-        } else {
-          routeConfigs.push(Object.assign({}, config));
-        }
-
-        var navModel = void 0;
-        for (var _i = 0, _ii = routeConfigs.length; _i < _ii; ++_i) {
-          var _routeConfig = routeConfigs[_i];
-          _routeConfig.settings = _routeConfig.settings || {};
-          if (!navModel) {
-            navModel = router.createNavModel(_routeConfig);
-          }
-
-          router.addRoute(_routeConfig, navModel);
-        }
-      });
-
-      return this;
-    };
-
-    RouterConfiguration.prototype.mapUnknownRoutes = function mapUnknownRoutes(config) {
-      this.unknownRouteConfig = config;
-      return this;
-    };
-
-    RouterConfiguration.prototype.exportToRouter = function exportToRouter(router) {
-      var instructions = this.instructions;
-      for (var i = 0, ii = instructions.length; i < ii; ++i) {
-        instructions[i](router);
-      }
-
-      if (this.title) {
-        router.title = this.title;
-      }
-
-      if (this.unknownRouteConfig) {
-        router.handleUnknownRoutes(this.unknownRouteConfig);
-      }
-
-      if (this._fallbackRoute) {
-        router.fallbackRoute = this._fallbackRoute;
-      }
-
-      router.options = this.options;
-
-      var pipelineSteps = this.pipelineSteps;
-      if (pipelineSteps.length) {
-        if (!router.isRoot) {
-          throw new Error('Pipeline steps can only be added to the root router');
-        }
-
-        var pipelineProvider = router.pipelineProvider;
-        for (var _i2 = 0, _ii2 = pipelineSteps.length; _i2 < _ii2; ++_i2) {
-          var _pipelineSteps$_i = pipelineSteps[_i2];
-          var _name = _pipelineSteps$_i.name;
-          var step = _pipelineSteps$_i.step;
-
-          pipelineProvider.addStep(_name, step);
-        }
-      }
-    };
-
-    return RouterConfiguration;
-  }();
-
-  var activationStrategy = exports.activationStrategy = {
-    noChange: 'no-change',
-    invokeLifecycle: 'invoke-lifecycle',
-    replace: 'replace'
-  };
-
-  var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = function () {
-    function BuildNavigationPlanStep() {
-      
-    }
-
-    BuildNavigationPlanStep.prototype.run = function run(navigationInstruction, next) {
-      return _buildNavigationPlan(navigationInstruction).then(function (plan) {
-        navigationInstruction.plan = plan;
-        return next();
-      }).catch(next.cancel);
-    };
-
-    return BuildNavigationPlanStep;
-  }();
-
-  function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
-    var prev = instruction.previousInstruction;
-    var config = instruction.config;
-    var plan = {};
-
-    if ('redirect' in config) {
-      var redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
-      if (instruction.queryString) {
-        redirectLocation += '?' + instruction.queryString;
-      }
-
-      return Promise.reject(new Redirect(redirectLocation));
-    }
-
-    if (prev) {
-      var newParams = hasDifferentParameterValues(prev, instruction);
-      var pending = [];
-
-      var _loop2 = function _loop2(viewPortName) {
-        var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
-        var nextViewPortConfig = config.viewPorts[viewPortName];
-
-        if (!nextViewPortConfig) throw new Error('Invalid Route Config: Configuration for viewPort "' + viewPortName + '" was not found for route: "' + instruction.config.route + '."');
-
-        var viewPortPlan = plan[viewPortName] = {
-          name: viewPortName,
-          config: nextViewPortConfig,
-          prevComponent: prevViewPortInstruction.component,
-          prevModuleId: prevViewPortInstruction.moduleId
-        };
-
-        if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
-          viewPortPlan.strategy = activationStrategy.replace;
-        } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
-          var _prevViewPortInstruct;
-
-          viewPortPlan.strategy = (_prevViewPortInstruct = prevViewPortInstruction.component.viewModel).determineActivationStrategy.apply(_prevViewPortInstruct, instruction.lifecycleArgs);
-        } else if (config.activationStrategy) {
-          viewPortPlan.strategy = config.activationStrategy;
-        } else if (newParams || forceLifecycleMinimum) {
-          viewPortPlan.strategy = activationStrategy.invokeLifecycle;
-        } else {
-          viewPortPlan.strategy = activationStrategy.noChange;
-        }
-
-        if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
-          var path = instruction.getWildcardPath();
-          var task = prevViewPortInstruction.childRouter._createNavigationInstruction(path, instruction).then(function (childInstruction) {
-            viewPortPlan.childNavigationInstruction = childInstruction;
-
-            return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
-              childInstruction.plan = childPlan;
-            });
-          });
-
-          pending.push(task);
-        }
-      };
-
-      for (var viewPortName in prev.viewPortInstructions) {
-        _loop2(viewPortName);
-      }
-
-      return Promise.all(pending).then(function () {
-        return plan;
-      });
-    }
-
-    for (var _viewPortName in config.viewPorts) {
-      plan[_viewPortName] = {
-        name: _viewPortName,
-        strategy: activationStrategy.replace,
-        config: instruction.config.viewPorts[_viewPortName]
-      };
-    }
-
-    return Promise.resolve(plan);
-  }
-
-  function hasDifferentParameterValues(prev, next) {
-    var prevParams = prev.params;
-    var nextParams = next.params;
-    var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
-
-    for (var key in nextParams) {
-      if (key === nextWildCardName) {
-        continue;
-      }
-
-      if (prevParams[key] !== nextParams[key]) {
-        return true;
-      }
-    }
-
-    for (var _key in prevParams) {
-      if (_key === nextWildCardName) {
-        continue;
-      }
-
-      if (prevParams[_key] !== nextParams[_key]) {
-        return true;
-      }
-    }
-
-    if (!next.options.compareQueryParams) {
-      return false;
-    }
-
-    var prevQueryParams = prev.queryParams;
-    var nextQueryParams = next.queryParams;
-    for (var _key2 in nextQueryParams) {
-      if (prevQueryParams[_key2] !== nextQueryParams[_key2]) {
-        return true;
-      }
-    }
-
-    for (var _key3 in prevQueryParams) {
-      if (prevQueryParams[_key3] !== nextQueryParams[_key3]) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  function getInstructionBaseUrl(instruction) {
-    var instructionBaseUrlParts = [];
-    instruction = instruction.parentInstruction;
-
-    while (instruction) {
-      instructionBaseUrlParts.unshift(instruction.getBaseUrl());
-      instruction = instruction.parentInstruction;
-    }
-
-    instructionBaseUrlParts.unshift('/');
-    return instructionBaseUrlParts.join('');
-  }
-
-  var Router = exports.Router = function () {
-    function Router(container, history) {
-      var _this3 = this;
-
-      
-
-      this.parent = null;
-      this.options = {};
-
-      this.transformTitle = function (title) {
-        if (_this3.parent) {
-          return _this3.parent.transformTitle(title);
-        }
-        return title;
-      };
-
-      this.container = container;
-      this.history = history;
-      this.reset();
-    }
-
-    Router.prototype.reset = function reset() {
-      var _this4 = this;
-
-      this.viewPorts = {};
-      this.routes = [];
-      this.baseUrl = '';
-      this.isConfigured = false;
-      this.isNavigating = false;
-      this.isExplicitNavigation = false;
-      this.isExplicitNavigationBack = false;
-      this.navigation = [];
-      this.currentInstruction = null;
-      this._fallbackOrder = 100;
-      this._recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
-      this._childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
-      this._configuredPromise = new Promise(function (resolve) {
-        _this4._resolveConfiguredPromise = resolve;
-      });
-    };
-
-    Router.prototype.registerViewPort = function registerViewPort(viewPort, name) {
-      name = name || 'default';
-      this.viewPorts[name] = viewPort;
-    };
-
-    Router.prototype.ensureConfigured = function ensureConfigured() {
-      return this._configuredPromise;
-    };
-
-    Router.prototype.configure = function configure(callbackOrConfig) {
-      var _this5 = this;
-
-      this.isConfigured = true;
-
-      var result = callbackOrConfig;
-      var config = void 0;
-      if (typeof callbackOrConfig === 'function') {
-        config = new RouterConfiguration();
-        result = callbackOrConfig(config);
-      }
-
-      return Promise.resolve(result).then(function (c) {
-        if (c && c.exportToRouter) {
-          config = c;
-        }
-
-        config.exportToRouter(_this5);
-        _this5.isConfigured = true;
-        _this5._resolveConfiguredPromise();
-      });
-    };
-
-    Router.prototype.navigate = function navigate(fragment, options) {
-      if (!this.isConfigured && this.parent) {
-        return this.parent.navigate(fragment, options);
-      }
-
-      this.isExplicitNavigation = true;
-      return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
-    };
-
-    Router.prototype.navigateToRoute = function navigateToRoute(route, params, options) {
-      var path = this.generate(route, params);
-      return this.navigate(path, options);
-    };
-
-    Router.prototype.navigateBack = function navigateBack() {
-      this.isExplicitNavigationBack = true;
-      this.history.navigateBack();
-    };
-
-    Router.prototype.createChild = function createChild(container) {
-      var childRouter = new Router(container || this.container.createChild(), this.history);
-      childRouter.parent = this;
-      return childRouter;
-    };
-
-    Router.prototype.generate = function generate(name, params) {
-      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
-
-      var hasRoute = this._recognizer.hasRoute(name);
-      if ((!this.isConfigured || !hasRoute) && this.parent) {
-        return this.parent.generate(name, params);
-      }
-
-      if (!hasRoute) {
-        throw new Error('A route with name \'' + name + '\' could not be found. Check that `name: \'' + name + '\'` was specified in the route\'s config.');
-      }
-
-      var path = this._recognizer.generate(name, params);
-      var rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
-      return options.absolute ? '' + this.history.getAbsoluteRoot() + rootedPath : rootedPath;
-    };
-
-    Router.prototype.createNavModel = function createNavModel(config) {
-      var navModel = new NavModel(this, 'href' in config ? config.href : config.route);
-      navModel.title = config.title;
-      navModel.order = config.nav;
-      navModel.href = config.href;
-      navModel.settings = config.settings;
-      navModel.config = config;
-
-      return navModel;
-    };
-
-    Router.prototype.addRoute = function addRoute(config, navModel) {
-      validateRouteConfig(config, this.routes);
-
-      if (!('viewPorts' in config) && !config.navigationStrategy) {
-        config.viewPorts = {
-          'default': {
-            moduleId: config.moduleId,
-            view: config.view
-          }
-        };
-      }
-
-      if (!navModel) {
-        navModel = this.createNavModel(config);
-      }
-
-      this.routes.push(config);
-
-      var path = config.route;
-      if (path.charAt(0) === '/') {
-        path = path.substr(1);
-      }
-      var caseSensitive = config.caseSensitive === true;
-      var state = this._recognizer.add({ path: path, handler: config, caseSensitive: caseSensitive });
-
-      if (path) {
-        var _settings = config.settings;
-        delete config.settings;
-        var withChild = JSON.parse(JSON.stringify(config));
-        config.settings = _settings;
-        withChild.route = path + '/*childRoute';
-        withChild.hasChildRouter = true;
-        this._childRecognizer.add({
-          path: withChild.route,
-          handler: withChild,
-          caseSensitive: caseSensitive
-        });
-
-        withChild.navModel = navModel;
-        withChild.settings = config.settings;
-        withChild.navigationStrategy = config.navigationStrategy;
-      }
-
-      config.navModel = navModel;
-
-      if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
-        if (!navModel.href && navModel.href !== '' && (state.types.dynamics || state.types.stars)) {
-          throw new Error('Invalid route config for "' + config.route + '" : dynamic routes must specify an "href:" to be included in the navigation model.');
-        }
-
-        if (typeof navModel.order !== 'number') {
-          navModel.order = ++this._fallbackOrder;
-        }
-
-        this.navigation.push(navModel);
-        this.navigation = this.navigation.sort(function (a, b) {
-          return a.order - b.order;
-        });
-      }
-    };
-
-    Router.prototype.hasRoute = function hasRoute(name) {
-      return !!(this._recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
-    };
-
-    Router.prototype.hasOwnRoute = function hasOwnRoute(name) {
-      return this._recognizer.hasRoute(name);
-    };
-
-    Router.prototype.handleUnknownRoutes = function handleUnknownRoutes(config) {
-      var _this6 = this;
-
-      if (!config) {
-        throw new Error('Invalid unknown route handler');
-      }
-
-      this.catchAllHandler = function (instruction) {
-        return _this6._createRouteConfig(config, instruction).then(function (c) {
-          instruction.config = c;
-          return instruction;
-        });
-      };
-    };
-
-    Router.prototype.updateTitle = function updateTitle() {
-      if (this.parent) {
-        return this.parent.updateTitle();
-      }
-
-      if (this.currentInstruction) {
-        this.currentInstruction._updateTitle();
-      }
-      return undefined;
-    };
-
-    Router.prototype.refreshNavigation = function refreshNavigation() {
-      var nav = this.navigation;
-
-      for (var i = 0, length = nav.length; i < length; i++) {
-        var current = nav[i];
-        if (!current.config.href) {
-          current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
-        } else {
-          current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
-        }
-      }
-    };
-
-    Router.prototype._refreshBaseUrl = function _refreshBaseUrl() {
-      if (this.parent) {
-        var baseUrl = this.parent.currentInstruction.getBaseUrl();
-        this.baseUrl = this.parent.baseUrl + baseUrl;
-      }
-    };
-
-    Router.prototype._createNavigationInstruction = function _createNavigationInstruction() {
-      var url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-      var parentInstruction = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
-
-      var fragment = url;
-      var queryString = '';
-
-      var queryIndex = url.indexOf('?');
-      if (queryIndex !== -1) {
-        fragment = url.substr(0, queryIndex);
-        queryString = url.substr(queryIndex + 1);
-      }
-
-      var results = this._recognizer.recognize(url);
-      if (!results || !results.length) {
-        results = this._childRecognizer.recognize(url);
-      }
-
-      var instructionInit = {
-        fragment: fragment,
-        queryString: queryString,
-        config: null,
-        parentInstruction: parentInstruction,
-        previousInstruction: this.currentInstruction,
-        router: this,
-        options: {
-          compareQueryParams: this.options.compareQueryParams
-        }
-      };
-
-      if (results && results.length) {
-        var first = results[0];
-        var _instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
-          params: first.params,
-          queryParams: first.queryParams || results.queryParams,
-          config: first.config || first.handler
-        }));
-
-        if (typeof first.handler === 'function') {
-          return evaluateNavigationStrategy(_instruction, first.handler, first);
-        } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
-          return evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
-        }
-
-        return Promise.resolve(_instruction);
-      } else if (this.catchAllHandler) {
-        var _instruction2 = new NavigationInstruction(Object.assign({}, instructionInit, {
-          params: { path: fragment },
-          queryParams: results && results.queryParams,
-          config: null }));
-
-        return evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
-      }
-
-      return Promise.reject(new Error('Route not found: ' + url));
-    };
-
-    Router.prototype._createRouteConfig = function _createRouteConfig(config, instruction) {
-      var _this7 = this;
-
-      return Promise.resolve(config).then(function (c) {
-        if (typeof c === 'string') {
-          return { moduleId: c };
-        } else if (typeof c === 'function') {
-          return c(instruction);
-        }
-
-        return c;
-      }).then(function (c) {
-        return typeof c === 'string' ? { moduleId: c } : c;
-      }).then(function (c) {
-        c.route = instruction.params.path;
-        validateRouteConfig(c, _this7.routes);
-
-        if (!c.navModel) {
-          c.navModel = _this7.createNavModel(c);
-        }
-
-        return c;
-      });
-    };
-
-    _createClass(Router, [{
-      key: 'isRoot',
-      get: function get() {
-        return !this.parent;
-      }
-    }]);
-
-    return Router;
-  }();
-
-  function validateRouteConfig(config, routes) {
-    if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') {
-      throw new Error('Invalid Route Config');
-    }
-
-    if (typeof config.route !== 'string') {
-      var _name2 = config.name || '(no name)';
-      throw new Error('Invalid Route Config for "' + _name2 + '": You must specify a "route:" pattern.');
-    }
-
-    if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
-      throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
-    }
-  }
-
-  function evaluateNavigationStrategy(instruction, evaluator, context) {
-    return Promise.resolve(evaluator.call(context, instruction)).then(function () {
-      if (!('viewPorts' in instruction.config)) {
-        instruction.config.viewPorts = {
-          'default': {
-            moduleId: instruction.config.moduleId
-          }
-        };
-      }
-
-      return instruction;
-    });
-  }
-
-  var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = function () {
-    function CanDeactivatePreviousStep() {
-      
-    }
-
-    CanDeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
-      return processDeactivatable(navigationInstruction.plan, 'canDeactivate', next);
-    };
-
-    return CanDeactivatePreviousStep;
-  }();
-
-  var CanActivateNextStep = exports.CanActivateNextStep = function () {
-    function CanActivateNextStep() {
-      
-    }
-
-    CanActivateNextStep.prototype.run = function run(navigationInstruction, next) {
-      return processActivatable(navigationInstruction, 'canActivate', next);
-    };
-
-    return CanActivateNextStep;
-  }();
-
-  var DeactivatePreviousStep = exports.DeactivatePreviousStep = function () {
-    function DeactivatePreviousStep() {
-      
-    }
-
-    DeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
-      return processDeactivatable(navigationInstruction.plan, 'deactivate', next, true);
-    };
-
-    return DeactivatePreviousStep;
-  }();
-
-  var ActivateNextStep = exports.ActivateNextStep = function () {
-    function ActivateNextStep() {
-      
-    }
-
-    ActivateNextStep.prototype.run = function run(navigationInstruction, next) {
-      return processActivatable(navigationInstruction, 'activate', next, true);
-    };
-
-    return ActivateNextStep;
-  }();
-
-  function processDeactivatable(plan, callbackName, next, ignoreResult) {
-    var infos = findDeactivatable(plan, callbackName);
-    var i = infos.length;
-
-    function inspect(val) {
-      if (ignoreResult || shouldContinue(val)) {
-        return iterate();
-      }
-
-      return next.cancel(val);
-    }
-
-    function iterate() {
-      if (i--) {
-        try {
-          var viewModel = infos[i];
-          var _result = viewModel[callbackName]();
-          return processPotential(_result, inspect, next.cancel);
-        } catch (error) {
-          return next.cancel(error);
-        }
-      }
-
-      return next();
-    }
-
-    return iterate();
-  }
-
-  function findDeactivatable(plan, callbackName) {
-    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
-
-    for (var viewPortName in plan) {
-      var _viewPortPlan = plan[viewPortName];
-      var prevComponent = _viewPortPlan.prevComponent;
-
-      if ((_viewPortPlan.strategy === activationStrategy.invokeLifecycle || _viewPortPlan.strategy === activationStrategy.replace) && prevComponent) {
-        var viewModel = prevComponent.viewModel;
-
-        if (callbackName in viewModel) {
-          list.push(viewModel);
-        }
-      }
-
-      if (_viewPortPlan.childNavigationInstruction) {
-        findDeactivatable(_viewPortPlan.childNavigationInstruction.plan, callbackName, list);
-      } else if (prevComponent) {
-        addPreviousDeactivatable(prevComponent, callbackName, list);
-      }
-    }
-
-    return list;
-  }
-
-  function addPreviousDeactivatable(component, callbackName, list) {
-    var childRouter = component.childRouter;
-
-    if (childRouter && childRouter.currentInstruction) {
-      var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
-
-      for (var viewPortName in viewPortInstructions) {
-        var _viewPortInstruction2 = viewPortInstructions[viewPortName];
-        var prevComponent = _viewPortInstruction2.component;
-        var prevViewModel = prevComponent.viewModel;
-
-        if (callbackName in prevViewModel) {
-          list.push(prevViewModel);
-        }
-
-        addPreviousDeactivatable(prevComponent, callbackName, list);
-      }
-    }
-  }
-
-  function processActivatable(navigationInstruction, callbackName, next, ignoreResult) {
-    var infos = findActivatable(navigationInstruction, callbackName);
-    var length = infos.length;
-    var i = -1;
-
-    function inspect(val, router) {
-      if (ignoreResult || shouldContinue(val, router)) {
-        return iterate();
-      }
-
-      return next.cancel(val);
-    }
-
-    function iterate() {
-      i++;
-
-      if (i < length) {
-        try {
-          var _ret3 = function () {
-            var _current$viewModel;
-
-            var current = infos[i];
-            var result = (_current$viewModel = current.viewModel)[callbackName].apply(_current$viewModel, current.lifecycleArgs);
-            return {
-              v: processPotential(result, function (val) {
-                return inspect(val, current.router);
-              }, next.cancel)
-            };
-          }();
-
-          if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
-        } catch (error) {
-          return next.cancel(error);
-        }
-      }
-
-      return next();
-    }
-
-    return iterate();
-  }
-
-  function findActivatable(navigationInstruction, callbackName) {
-    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
-    var router = arguments[3];
-
-    var plan = navigationInstruction.plan;
-
-    Object.keys(plan).filter(function (viewPortName) {
-      var viewPortPlan = plan[viewPortName];
-      var viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
-      var viewModel = viewPortInstruction.component.viewModel;
-
-      if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in viewModel) {
-        list.push({
-          viewModel: viewModel,
-          lifecycleArgs: viewPortInstruction.lifecycleArgs,
-          router: router
-        });
-      }
-
-      if (viewPortPlan.childNavigationInstruction) {
-        findActivatable(viewPortPlan.childNavigationInstruction, callbackName, list, viewPortInstruction.component.childRouter || router);
-      }
-    });
-
-    return list;
-  }
-
-  function shouldContinue(output, router) {
-    if (output instanceof Error) {
-      return false;
-    }
-
-    if (isNavigationCommand(output)) {
-      if (typeof output.setRouter === 'function') {
-        output.setRouter(router);
-      }
-
-      return !!output.shouldContinueProcessing;
-    }
-
-    if (output === undefined) {
-      return true;
-    }
-
-    return output;
-  }
-
-  var SafeSubscription = function () {
-    function SafeSubscription(subscriptionFunc) {
-      
-
-      this._subscribed = true;
-      this._subscription = subscriptionFunc(this);
-
-      if (!this._subscribed) this.unsubscribe();
-    }
-
-    SafeSubscription.prototype.unsubscribe = function unsubscribe() {
-      if (this._subscribed && this._subscription) this._subscription.unsubscribe();
-
-      this._subscribed = false;
-    };
-
-    _createClass(SafeSubscription, [{
-      key: 'subscribed',
-      get: function get() {
-        return this._subscribed;
-      }
-    }]);
-
-    return SafeSubscription;
-  }();
-
-  function processPotential(obj, resolve, reject) {
-    if (obj && typeof obj.then === 'function') {
-      return Promise.resolve(obj).then(resolve).catch(reject);
-    }
-
-    if (obj && typeof obj.subscribe === 'function') {
-      var _ret4 = function () {
-        var obs = obj;
-        return {
-          v: new SafeSubscription(function (sub) {
-            return obs.subscribe({
-              next: function next() {
-                if (sub.subscribed) {
-                  sub.unsubscribe();
-                  resolve(obj);
-                }
-              },
-              error: function error(_error) {
-                if (sub.subscribed) {
-                  sub.unsubscribe();
-                  reject(_error);
-                }
-              },
-              complete: function complete() {
-                if (sub.subscribed) {
-                  sub.unsubscribe();
-                  resolve(obj);
-                }
-              }
-            });
-          })
-        };
-      }();
-
-      if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
-    }
-
-    try {
-      return resolve(obj);
-    } catch (error) {
-      return reject(error);
-    }
-  }
-
-  var RouteLoader = exports.RouteLoader = function () {
-    function RouteLoader() {
-      
-    }
-
-    RouteLoader.prototype.loadRoute = function loadRoute(router, config, navigationInstruction) {
-      throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
-    };
-
-    return RouteLoader;
-  }();
-
-  var LoadRouteStep = exports.LoadRouteStep = function () {
-    LoadRouteStep.inject = function inject() {
-      return [RouteLoader];
-    };
-
-    function LoadRouteStep(routeLoader) {
-      
-
-      this.routeLoader = routeLoader;
-    }
-
-    LoadRouteStep.prototype.run = function run(navigationInstruction, next) {
-      return loadNewRoute(this.routeLoader, navigationInstruction).then(next).catch(next.cancel);
-    };
-
-    return LoadRouteStep;
-  }();
-
-  function loadNewRoute(routeLoader, navigationInstruction) {
-    var toLoad = determineWhatToLoad(navigationInstruction);
-    var loadPromises = toLoad.map(function (current) {
-      return loadRoute(routeLoader, current.navigationInstruction, current.viewPortPlan);
-    });
-
-    return Promise.all(loadPromises);
-  }
-
-  function determineWhatToLoad(navigationInstruction) {
-    var toLoad = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
-
-    var plan = navigationInstruction.plan;
-
-    for (var viewPortName in plan) {
-      var _viewPortPlan2 = plan[viewPortName];
-
-      if (_viewPortPlan2.strategy === activationStrategy.replace) {
-        toLoad.push({ viewPortPlan: _viewPortPlan2, navigationInstruction: navigationInstruction });
-
-        if (_viewPortPlan2.childNavigationInstruction) {
-          determineWhatToLoad(_viewPortPlan2.childNavigationInstruction, toLoad);
-        }
-      } else {
-        var _viewPortInstruction3 = navigationInstruction.addViewPortInstruction(viewPortName, _viewPortPlan2.strategy, _viewPortPlan2.prevModuleId, _viewPortPlan2.prevComponent);
-
-        if (_viewPortPlan2.childNavigationInstruction) {
-          _viewPortInstruction3.childNavigationInstruction = _viewPortPlan2.childNavigationInstruction;
-          determineWhatToLoad(_viewPortPlan2.childNavigationInstruction, toLoad);
-        }
-      }
-    }
-
-    return toLoad;
-  }
-
-  function loadRoute(routeLoader, navigationInstruction, viewPortPlan) {
-    var moduleId = viewPortPlan.config.moduleId;
-
-    return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then(function (component) {
-      var viewPortInstruction = navigationInstruction.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
-
-      var childRouter = component.childRouter;
-      if (childRouter) {
-        var path = navigationInstruction.getWildcardPath();
-
-        return childRouter._createNavigationInstruction(path, navigationInstruction).then(function (childInstruction) {
-          viewPortPlan.childNavigationInstruction = childInstruction;
-
-          return _buildNavigationPlan(childInstruction).then(function (childPlan) {
-            childInstruction.plan = childPlan;
-            viewPortInstruction.childNavigationInstruction = childInstruction;
-
-            return loadNewRoute(routeLoader, childInstruction);
-          });
-        });
-      }
-
-      return undefined;
-    });
-  }
-
-  function loadComponent(routeLoader, navigationInstruction, config) {
-    var router = navigationInstruction.router;
-    var lifecycleArgs = navigationInstruction.lifecycleArgs;
-
-    return routeLoader.loadRoute(router, config, navigationInstruction).then(function (component) {
-      var viewModel = component.viewModel;
-      var childContainer = component.childContainer;
-
-      component.router = router;
-      component.config = config;
-
-      if ('configureRouter' in viewModel) {
-        var _ret5 = function () {
-          var childRouter = childContainer.getChildRouter();
-          component.childRouter = childRouter;
-
-          return {
-            v: childRouter.configure(function (c) {
-              return viewModel.configureRouter.apply(viewModel, [c, childRouter].concat(lifecycleArgs));
-            }).then(function () {
-              return component;
-            })
-          };
-        }();
-
-        if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
-      }
-
-      return component;
-    });
-  }
-
-  var PipelineSlot = function () {
-    function PipelineSlot(container, name, alias) {
-      
-
-      this.steps = [];
-
-      this.container = container;
-      this.slotName = name;
-      this.slotAlias = alias;
-    }
-
-    PipelineSlot.prototype.getSteps = function getSteps() {
-      var _this8 = this;
-
-      return this.steps.map(function (x) {
-        return _this8.container.get(x);
-      });
-    };
-
-    return PipelineSlot;
-  }();
-
-  var PipelineProvider = exports.PipelineProvider = function () {
-    PipelineProvider.inject = function inject() {
-      return [_aureliaDependencyInjection.Container];
-    };
-
-    function PipelineProvider(container) {
-      
-
-      this.container = container;
-      this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, this._createPipelineSlot('authorize'), CanActivateNextStep, this._createPipelineSlot('preActivate', 'modelbind'), DeactivatePreviousStep, ActivateNextStep, this._createPipelineSlot('preRender', 'precommit'), CommitChangesStep, this._createPipelineSlot('postRender', 'postcomplete')];
-    }
-
-    PipelineProvider.prototype.createPipeline = function createPipeline() {
-      var _this9 = this;
-
-      var pipeline = new Pipeline();
-      this.steps.forEach(function (step) {
-        return pipeline.addStep(_this9.container.get(step));
-      });
-      return pipeline;
-    };
-
-    PipelineProvider.prototype._findStep = function _findStep(name) {
-      return this.steps.find(function (x) {
-        return x.slotName === name || x.slotAlias === name;
-      });
-    };
-
-    PipelineProvider.prototype.addStep = function addStep(name, step) {
-      var found = this._findStep(name);
-      if (found) {
-        if (!found.steps.includes(step)) {
-          found.steps.push(step);
-        }
-      } else {
-        throw new Error('Invalid pipeline slot name: ' + name + '.');
-      }
-    };
-
-    PipelineProvider.prototype.removeStep = function removeStep(name, step) {
-      var slot = this._findStep(name);
-      if (slot) {
-        slot.steps.splice(slot.steps.indexOf(step), 1);
-      }
-    };
-
-    PipelineProvider.prototype._clearSteps = function _clearSteps() {
-      var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
-
-      var slot = this._findStep(name);
-      if (slot) {
-        slot.steps = [];
-      }
-    };
-
-    PipelineProvider.prototype.reset = function reset() {
-      this._clearSteps('authorize');
-      this._clearSteps('preActivate');
-      this._clearSteps('preRender');
-      this._clearSteps('postRender');
-    };
-
-    PipelineProvider.prototype._createPipelineSlot = function _createPipelineSlot(name, alias) {
-      return new PipelineSlot(this.container, name, alias);
-    };
-
-    return PipelineProvider;
-  }();
-
-  var logger = LogManager.getLogger('app-router');
-
-  var AppRouter = exports.AppRouter = function (_Router) {
-    _inherits(AppRouter, _Router);
-
-    AppRouter.inject = function inject() {
-      return [_aureliaDependencyInjection.Container, _aureliaHistory.History, PipelineProvider, _aureliaEventAggregator.EventAggregator];
-    };
-
-    function AppRouter(container, history, pipelineProvider, events) {
-      
-
-      var _this10 = _possibleConstructorReturn(this, _Router.call(this, container, history));
-
-      _this10.pipelineProvider = pipelineProvider;
-      _this10.events = events;
-      return _this10;
-    }
-
-    AppRouter.prototype.reset = function reset() {
-      _Router.prototype.reset.call(this);
-      this.maxInstructionCount = 10;
-      if (!this._queue) {
-        this._queue = [];
-      } else {
-        this._queue.length = 0;
-      }
-    };
-
-    AppRouter.prototype.loadUrl = function loadUrl(url) {
-      var _this11 = this;
-
-      return this._createNavigationInstruction(url).then(function (instruction) {
-        return _this11._queueInstruction(instruction);
-      }).catch(function (error) {
-        logger.error(error);
-        restorePreviousLocation(_this11);
-      });
-    };
-
-    AppRouter.prototype.registerViewPort = function registerViewPort(viewPort, name) {
-      var _this12 = this;
-
-      _Router.prototype.registerViewPort.call(this, viewPort, name);
-
-      if (!this.isActive) {
-        var _ret6 = function () {
-          var viewModel = _this12._findViewModel(viewPort);
-          if ('configureRouter' in viewModel) {
-            if (!_this12.isConfigured) {
-              var _ret7 = function () {
-                var resolveConfiguredPromise = _this12._resolveConfiguredPromise;
-                _this12._resolveConfiguredPromise = function () {};
-                return {
-                  v: {
-                    v: _this12.configure(function (config) {
-                      return viewModel.configureRouter(config, _this12);
-                    }).then(function () {
-                      _this12.activate();
-                      resolveConfiguredPromise();
-                    })
-                  }
-                };
-              }();
-
-              if ((typeof _ret7 === 'undefined' ? 'undefined' : _typeof(_ret7)) === "object") return _ret7.v;
-            }
-          } else {
-            _this12.activate();
-          }
-        }();
-
-        if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
-      } else {
-        this._dequeueInstruction();
-      }
-
-      return Promise.resolve();
-    };
-
-    AppRouter.prototype.activate = function activate(options) {
-      if (this.isActive) {
-        return;
-      }
-
-      this.isActive = true;
-      this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
-      this.history.activate(this.options);
-      this._dequeueInstruction();
-    };
-
-    AppRouter.prototype.deactivate = function deactivate() {
-      this.isActive = false;
-      this.history.deactivate();
-    };
-
-    AppRouter.prototype._queueInstruction = function _queueInstruction(instruction) {
-      var _this13 = this;
-
-      return new Promise(function (resolve) {
-        instruction.resolve = resolve;
-        _this13._queue.unshift(instruction);
-        _this13._dequeueInstruction();
-      });
-    };
-
-    AppRouter.prototype._dequeueInstruction = function _dequeueInstruction() {
-      var _this14 = this;
-
-      var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-
-      return Promise.resolve().then(function () {
-        if (_this14.isNavigating && !instructionCount) {
-          return undefined;
-        }
-
-        var instruction = _this14._queue.shift();
-        _this14._queue.length = 0;
-
-        if (!instruction) {
-          return undefined;
-        }
-
-        _this14.isNavigating = true;
-        instruction.previousInstruction = _this14.currentInstruction;
-
-        if (!instructionCount) {
-          _this14.events.publish('router:navigation:processing', { instruction: instruction });
-        } else if (instructionCount === _this14.maxInstructionCount - 1) {
-          logger.error(instructionCount + 1 + ' navigation instructions have been attempted without success. Restoring last known good location.');
-          restorePreviousLocation(_this14);
-          return _this14._dequeueInstruction(instructionCount + 1);
-        } else if (instructionCount > _this14.maxInstructionCount) {
-          throw new Error('Maximum navigation attempts exceeded. Giving up.');
-        }
-
-        var pipeline = _this14.pipelineProvider.createPipeline();
-
-        return pipeline.run(instruction).then(function (result) {
-          return processResult(instruction, result, instructionCount, _this14);
-        }).catch(function (error) {
-          return { output: error instanceof Error ? error : new Error(error) };
-        }).then(function (result) {
-          return resolveInstruction(instruction, result, !!instructionCount, _this14);
-        });
-      });
-    };
-
-    AppRouter.prototype._findViewModel = function _findViewModel(viewPort) {
-      if (this.container.viewModel) {
-        return this.container.viewModel;
-      }
-
-      if (viewPort.container) {
-        var container = viewPort.container;
-
-        while (container) {
-          if (container.viewModel) {
-            this.container.viewModel = container.viewModel;
-            return container.viewModel;
-          }
-
-          container = container.parent;
-        }
-      }
-
-      return undefined;
-    };
-
-    return AppRouter;
-  }(Router);
-
-  function processResult(instruction, result, instructionCount, router) {
-    if (!(result && 'completed' in result && 'output' in result)) {
-      result = result || {};
-      result.output = new Error('Expected router pipeline to return a navigation result, but got [' + JSON.stringify(result) + '] instead.');
-    }
-
-    var finalResult = null;
-    if (isNavigationCommand(result.output)) {
-      result.output.navigate(router);
-    } else {
-      finalResult = result;
-
-      if (!result.completed) {
-        if (result.output instanceof Error) {
-          logger.error(result.output);
-        }
-
-        restorePreviousLocation(router);
-      }
-    }
-
-    return router._dequeueInstruction(instructionCount + 1).then(function (innerResult) {
-      return finalResult || innerResult || result;
-    });
-  }
-
-  function resolveInstruction(instruction, result, isInnerInstruction, router) {
-    instruction.resolve(result);
-
-    var eventArgs = { instruction: instruction, result: result };
-    if (!isInnerInstruction) {
-      router.isNavigating = false;
-      router.isExplicitNavigation = false;
-      router.isExplicitNavigationBack = false;
-
-      var eventName = void 0;
-
-      if (result.output instanceof Error) {
-        eventName = 'error';
-      } else if (!result.completed) {
-        eventName = 'canceled';
-      } else {
-        var _queryString = instruction.queryString ? '?' + instruction.queryString : '';
-        router.history.previousLocation = instruction.fragment + _queryString;
-        eventName = 'success';
-      }
-
-      router.events.publish('router:navigation:' + eventName, eventArgs);
-      router.events.publish('router:navigation:complete', eventArgs);
-    } else {
-      router.events.publish('router:navigation:child:complete', eventArgs);
-    }
-
-    return result;
-  }
-
-  function restorePreviousLocation(router) {
-    var previousLocation = router.history.previousLocation;
-    if (previousLocation) {
-      router.navigate(router.history.previousLocation, { trigger: false, replace: true });
-    } else if (router.fallbackRoute) {
-      router.navigate(router.fallbackRoute, { trigger: true, replace: true });
-    } else {
-      logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
-    }
-  }
-});
-define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.TaskQueue = undefined;
-
-  
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  var hasSetImmediate = typeof setImmediate === 'function';
-  var stackSeparator = '\nEnqueued in TaskQueue by:\n';
-  var microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
-
-  function makeRequestFlushFromMutationObserver(flush) {
-    var toggle = 1;
-    var observer = _aureliaPal.DOM.createMutationObserver(flush);
-    var node = _aureliaPal.DOM.createTextNode('');
-    observer.observe(node, { characterData: true });
-    return function requestFlush() {
-      toggle = -toggle;
-      node.data = toggle;
-    };
-  }
-
-  function makeRequestFlushFromTimer(flush) {
-    return function requestFlush() {
-      var timeoutHandle = setTimeout(handleFlushTimer, 0);
-
-      var intervalHandle = setInterval(handleFlushTimer, 50);
-      function handleFlushTimer() {
-        clearTimeout(timeoutHandle);
-        clearInterval(intervalHandle);
-        flush();
-      }
-    };
-  }
-
-  function onError(error, task, longStacks) {
-    if (longStacks && task.stack && (typeof error === 'undefined' ? 'undefined' : _typeof(error)) === 'object' && error !== null) {
-      error.stack = filterFlushStack(error.stack) + task.stack;
-    }
-
-    if ('onError' in task) {
-      task.onError(error);
-    } else if (hasSetImmediate) {
-      setImmediate(function () {
-        throw error;
-      });
-    } else {
-      setTimeout(function () {
-        throw error;
-      }, 0);
-    }
-  }
-
-  var TaskQueue = exports.TaskQueue = function () {
-    function TaskQueue() {
-      var _this = this;
-
-      
-
-      this.flushing = false;
-      this.longStacks = false;
-
-      this.microTaskQueue = [];
-      this.microTaskQueueCapacity = 1024;
-      this.taskQueue = [];
-
-      if (_aureliaPal.FEATURE.mutationObserver) {
-        this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
-          return _this.flushMicroTaskQueue();
-        });
-      } else {
-        this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
-          return _this.flushMicroTaskQueue();
-        });
-      }
-
-      this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
-        return _this.flushTaskQueue();
-      });
-    }
-
-    TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
-      if (this.microTaskQueue.length < 1) {
-        this.requestFlushMicroTaskQueue();
-      }
-
-      if (this.longStacks) {
-        task.stack = this.prepareQueueStack(microStackSeparator);
-      }
-      this.microTaskQueue.push(task);
-    };
-
-    TaskQueue.prototype.queueTask = function queueTask(task) {
-      if (this.taskQueue.length < 1) {
-        this.requestFlushTaskQueue();
-      }
-
-      if (this.longStacks) {
-        task.stack = this.prepareQueueStack(stackSeparator);
-      }
-      this.taskQueue.push(task);
-    };
-
-    TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
-      var queue = this.taskQueue;
-      var index = 0;
-      var task = void 0;
-
-      this.taskQueue = [];
-
-      try {
-        this.flushing = true;
-        while (index < queue.length) {
-          task = queue[index];
-          if (this.longStacks) {
-            this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-          }
-          task.call();
-          index++;
-        }
-      } catch (error) {
-        onError(error, task, this.longStacks);
-      } finally {
-        this.flushing = false;
-      }
-    };
-
-    TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
-      var queue = this.microTaskQueue;
-      var capacity = this.microTaskQueueCapacity;
-      var index = 0;
-      var task = void 0;
-
-      try {
-        this.flushing = true;
-        while (index < queue.length) {
-          task = queue[index];
-          if (this.longStacks) {
-            this.stack = typeof task.stack === 'string' ? task.stack : undefined;
-          }
-          task.call();
-          index++;
-
-          if (index > capacity) {
-            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
-              queue[scan] = queue[scan + index];
-            }
-
-            queue.length -= index;
-            index = 0;
-          }
-        }
-      } catch (error) {
-        onError(error, task, this.longStacks);
-      } finally {
-        this.flushing = false;
-      }
-
-      queue.length = 0;
-    };
-
-    TaskQueue.prototype.prepareQueueStack = function prepareQueueStack(separator) {
-      var stack = separator + filterQueueStack(captureStack());
-      if (typeof this.stack === 'string') {
-        stack = filterFlushStack(stack) + this.stack;
-      }
-      return stack;
-    };
-
-    return TaskQueue;
-  }();
-
-  function captureStack() {
-    var error = new Error();
-
-    if (error.stack) {
-      return error.stack;
-    }
-
-    try {
-      throw error;
-    } catch (e) {
-      return e.stack;
-    }
-  }
-
-  function filterQueueStack(stack) {
-    return stack.replace(/^[\s\S]*?\bqueue(Micro)?Task\b[^\n]*\n/, '');
-  }
-
-  function filterFlushStack(stack) {
-    var index = stack.lastIndexOf('flushMicroTaskQueue');
-    if (index < 0) {
-      index = stack.lastIndexOf('flushTaskQueue');
-      if (index < 0) {
-        return stack;
-      }
-    }
-    index = stack.lastIndexOf('\n', index);
-    return index < 0 ? stack : stack.substr(0, index);
   }
 });
 define('aurelia-templating',['exports', 'aurelia-logging', 'aurelia-metadata', 'aurelia-pal', 'aurelia-path', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-task-queue'], function (exports, _aureliaLogging, _aureliaMetadata, _aureliaPal, _aureliaPath, _aureliaLoader, _aureliaDependencyInjection, _aureliaBinding, _aureliaTaskQueue) {
@@ -23453,2706 +20817,745 @@ define('aurelia-templating',['exports', 'aurelia-logging', 'aurelia-metadata', '
     return TemplatingEngine;
   }()) || _class18);
 });
-define('aurelia-templating-resources/compose',['exports', 'aurelia-dependency-injection', 'aurelia-task-queue', 'aurelia-templating', 'aurelia-pal'], function (exports, _aureliaDependencyInjection, _aureliaTaskQueue, _aureliaTemplating, _aureliaPal) {
+define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.Compose = undefined;
-
-  function _initDefineProp(target, property, descriptor, context) {
-    if (!descriptor) return;
-    Object.defineProperty(target, property, {
-      enumerable: descriptor.enumerable,
-      configurable: descriptor.configurable,
-      writable: descriptor.writable,
-      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-    });
-  }
+  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
 
   
 
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-    var desc = {};
-    Object['ke' + 'ys'](descriptor).forEach(function (key) {
-      desc[key] = descriptor[key];
-    });
-    desc.enumerable = !!desc.enumerable;
-    desc.configurable = !!desc.configurable;
-
-    if ('value' in desc || desc.initializer) {
-      desc.writable = true;
-    }
-
-    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-      return decorator(target, property, desc) || desc;
-    }, desc);
-
-    if (context && desc.initializer !== void 0) {
-      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-      desc.initializer = undefined;
-    }
-
-    if (desc.initializer === void 0) {
-      Object['define' + 'Property'](target, property, desc);
-      desc = null;
-    }
-
-    return desc;
-  }
-
-  function _initializerWarningHelper(descriptor, context) {
-    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-  }
-
-  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
-
-  var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('compose'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.CompositionEngine, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaTaskQueue.TaskQueue), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
-    function Compose(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
+  var State = exports.State = function () {
+    function State(charSpec) {
       
 
-      _initDefineProp(this, 'model', _descriptor, this);
-
-      _initDefineProp(this, 'view', _descriptor2, this);
-
-      _initDefineProp(this, 'viewModel', _descriptor3, this);
-
-      _initDefineProp(this, 'swapOrder', _descriptor4, this);
-
-      this.element = element;
-      this.container = container;
-      this.compositionEngine = compositionEngine;
-      this.viewSlot = viewSlot;
-      this.viewResources = viewResources;
-      this.taskQueue = taskQueue;
-      this.currentController = null;
-      this.currentViewModel = null;
+      this.charSpec = charSpec;
+      this.nextStates = [];
     }
 
-    Compose.prototype.created = function created(owningView) {
-      this.owningView = owningView;
-    };
+    State.prototype.get = function get(charSpec) {
+      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
 
-    Compose.prototype.bind = function bind(bindingContext, overrideContext) {
-      this.bindingContext = bindingContext;
-      this.overrideContext = overrideContext;
-      processInstruction(this, createInstruction(this, {
-        view: this.view,
-        viewModel: this.viewModel,
-        model: this.model
-      }));
-    };
-
-    Compose.prototype.unbind = function unbind(bindingContext, overrideContext) {
-      this.bindingContext = null;
-      this.overrideContext = null;
-      var returnToCache = true;
-      var skipAnimation = true;
-      this.viewSlot.removeAll(returnToCache, skipAnimation);
-    };
-
-    Compose.prototype.modelChanged = function modelChanged(newValue, oldValue) {
-      var _this = this;
-
-      if (this.currentInstruction) {
-        this.currentInstruction.model = newValue;
-        return;
-      }
-
-      this.taskQueue.queueMicroTask(function () {
-        if (_this.currentInstruction) {
-          _this.currentInstruction.model = newValue;
-          return;
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++];
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value;
         }
 
-        var vm = _this.currentViewModel;
+        var child = _ref;
 
-        if (vm && typeof vm.activate === 'function') {
-          vm.activate(newValue);
-        }
-      });
-    };
+        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
 
-    Compose.prototype.viewChanged = function viewChanged(newValue, oldValue) {
-      var _this2 = this;
-
-      var instruction = createInstruction(this, {
-        view: newValue,
-        viewModel: this.currentViewModel || this.viewModel,
-        model: this.model
-      });
-
-      if (this.currentInstruction) {
-        this.currentInstruction = instruction;
-        return;
-      }
-
-      this.currentInstruction = instruction;
-      this.taskQueue.queueMicroTask(function () {
-        return processInstruction(_this2, _this2.currentInstruction);
-      });
-    };
-
-    Compose.prototype.viewModelChanged = function viewModelChanged(newValue, oldValue) {
-      var _this3 = this;
-
-      var instruction = createInstruction(this, {
-        viewModel: newValue,
-        view: this.view,
-        model: this.model
-      });
-
-      if (this.currentInstruction) {
-        this.currentInstruction = instruction;
-        return;
-      }
-
-      this.currentInstruction = instruction;
-      this.taskQueue.queueMicroTask(function () {
-        return processInstruction(_this3, _this3.currentInstruction);
-      });
-    };
-
-    return Compose;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'model', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'view', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'viewModel', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  })), _class2)) || _class) || _class) || _class);
-
-
-  function createInstruction(composer, instruction) {
-    return Object.assign(instruction, {
-      bindingContext: composer.bindingContext,
-      overrideContext: composer.overrideContext,
-      owningView: composer.owningView,
-      container: composer.container,
-      viewSlot: composer.viewSlot,
-      viewResources: composer.viewResources,
-      currentController: composer.currentController,
-      host: composer.element,
-      swapOrder: composer.swapOrder
-    });
-  }
-
-  function processInstruction(composer, instruction) {
-    composer.currentInstruction = null;
-    composer.compositionEngine.compose(instruction).then(function (controller) {
-      composer.currentController = controller;
-      composer.currentViewModel = controller ? controller.viewModel : null;
-    });
-  }
-});
-define('aurelia-templating-resources/if',['exports', 'aurelia-templating', 'aurelia-dependency-injection'], function (exports, _aureliaTemplating, _aureliaDependencyInjection) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.If = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var If = exports.If = (_dec = (0, _aureliaTemplating.customAttribute)('if'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
-    function If(viewFactory, viewSlot) {
-      
-
-      this.viewFactory = viewFactory;
-      this.viewSlot = viewSlot;
-      this.showing = false;
-      this.view = null;
-      this.bindingContext = null;
-      this.overrideContext = null;
-    }
-
-    If.prototype.bind = function bind(bindingContext, overrideContext) {
-      this.bindingContext = bindingContext;
-      this.overrideContext = overrideContext;
-      this.valueChanged(this.value);
-    };
-
-    If.prototype.valueChanged = function valueChanged(newValue) {
-      var _this = this;
-
-      if (this.__queuedChanges) {
-        this.__queuedChanges.push(newValue);
-        return;
-      }
-
-      var maybePromise = this._runValueChanged(newValue);
-      if (maybePromise instanceof Promise) {
-        (function () {
-          var queuedChanges = _this.__queuedChanges = [];
-
-          var runQueuedChanges = function runQueuedChanges() {
-            if (!queuedChanges.length) {
-              _this.__queuedChanges = undefined;
-              return;
-            }
-
-            var nextPromise = _this._runValueChanged(queuedChanges.shift()) || Promise.resolve();
-            nextPromise.then(runQueuedChanges);
-          };
-
-          maybePromise.then(runQueuedChanges);
-        })();
-      }
-    };
-
-    If.prototype._runValueChanged = function _runValueChanged(newValue) {
-      var _this2 = this;
-
-      if (!newValue) {
-        var viewOrPromise = void 0;
-        if (this.view !== null && this.showing) {
-          viewOrPromise = this.viewSlot.remove(this.view);
-          if (viewOrPromise instanceof Promise) {
-            viewOrPromise.then(function () {
-              return _this2.view.unbind();
-            });
-          } else {
-            this.view.unbind();
-          }
-        }
-
-        this.showing = false;
-        return viewOrPromise;
-      }
-
-      if (this.view === null) {
-        this.view = this.viewFactory.create();
-      }
-
-      if (!this.view.isBound) {
-        this.view.bind(this.bindingContext, this.overrideContext);
-      }
-
-      if (!this.showing) {
-        this.showing = true;
-        return this.viewSlot.add(this.view);
-      }
-
-      return undefined;
-    };
-
-    If.prototype.unbind = function unbind() {
-      if (this.view === null) {
-        return;
-      }
-
-      this.view.unbind();
-
-      if (!this.viewFactory.isCaching) {
-        return;
-      }
-
-      if (this.showing) {
-        this.showing = false;
-        this.viewSlot.remove(this.view, true, true);
-      }
-      this.view.returnToCache();
-      this.view = null;
-    };
-
-    return If;
-  }()) || _class) || _class) || _class);
-});
-define('aurelia-templating-resources/with',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-binding'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.With = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var With = exports.With = (_dec = (0, _aureliaTemplating.customAttribute)('with'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
-    function With(viewFactory, viewSlot) {
-      
-
-      this.viewFactory = viewFactory;
-      this.viewSlot = viewSlot;
-      this.parentOverrideContext = null;
-      this.view = null;
-    }
-
-    With.prototype.bind = function bind(bindingContext, overrideContext) {
-      this.parentOverrideContext = overrideContext;
-      this.valueChanged(this.value);
-    };
-
-    With.prototype.valueChanged = function valueChanged(newValue) {
-      var overrideContext = (0, _aureliaBinding.createOverrideContext)(newValue, this.parentOverrideContext);
-      if (!this.view) {
-        this.view = this.viewFactory.create();
-        this.view.bind(newValue, overrideContext);
-        this.viewSlot.add(this.view);
-      } else {
-        this.view.bind(newValue, overrideContext);
-      }
-    };
-
-    With.prototype.unbind = function unbind() {
-      this.parentOverrideContext = null;
-
-      if (this.view) {
-        this.view.unbind();
-      }
-    };
-
-    return With;
-  }()) || _class) || _class) || _class);
-});
-define('aurelia-templating-resources/repeat',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-templating', './repeat-strategy-locator', './repeat-utilities', './analyze-view-factory', './abstract-repeater'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaTemplating, _repeatStrategyLocator, _repeatUtilities, _analyzeViewFactory, _abstractRepeater) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Repeat = undefined;
-
-  function _initDefineProp(target, property, descriptor, context) {
-    if (!descriptor) return;
-    Object.defineProperty(target, property, {
-      enumerable: descriptor.enumerable,
-      configurable: descriptor.configurable,
-      writable: descriptor.writable,
-      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-    });
-  }
-
-  
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-    var desc = {};
-    Object['ke' + 'ys'](descriptor).forEach(function (key) {
-      desc[key] = descriptor[key];
-    });
-    desc.enumerable = !!desc.enumerable;
-    desc.configurable = !!desc.configurable;
-
-    if ('value' in desc || desc.initializer) {
-      desc.writable = true;
-    }
-
-    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-      return decorator(target, property, desc) || desc;
-    }, desc);
-
-    if (context && desc.initializer !== void 0) {
-      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-      desc.initializer = undefined;
-    }
-
-    if (desc.initializer === void 0) {
-      Object['define' + 'Property'](target, property, desc);
-      desc = null;
-    }
-
-    return desc;
-  }
-
-  function _initializerWarningHelper(descriptor, context) {
-    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-  }
-
-  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
-
-  var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('repeat'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.TargetInstruction, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaBinding.ObserverLocator, _repeatStrategyLocator.RepeatStrategyLocator), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = (_class2 = function (_AbstractRepeater) {
-    _inherits(Repeat, _AbstractRepeater);
-
-    function Repeat(viewFactory, instruction, viewSlot, viewResources, observerLocator, strategyLocator) {
-      
-
-      var _this = _possibleConstructorReturn(this, _AbstractRepeater.call(this, {
-        local: 'item',
-        viewsRequireLifecycle: (0, _analyzeViewFactory.viewsRequireLifecycle)(viewFactory)
-      }));
-
-      _initDefineProp(_this, 'items', _descriptor, _this);
-
-      _initDefineProp(_this, 'local', _descriptor2, _this);
-
-      _initDefineProp(_this, 'key', _descriptor3, _this);
-
-      _initDefineProp(_this, 'value', _descriptor4, _this);
-
-      _this.viewFactory = viewFactory;
-      _this.instruction = instruction;
-      _this.viewSlot = viewSlot;
-      _this.lookupFunctions = viewResources.lookupFunctions;
-      _this.observerLocator = observerLocator;
-      _this.key = 'key';
-      _this.value = 'value';
-      _this.strategyLocator = strategyLocator;
-      _this.ignoreMutation = false;
-      _this.sourceExpression = (0, _repeatUtilities.getItemsSourceExpression)(_this.instruction, 'repeat.for');
-      _this.isOneTime = (0, _repeatUtilities.isOneTime)(_this.sourceExpression);
-      _this.viewsRequireLifecycle = (0, _analyzeViewFactory.viewsRequireLifecycle)(viewFactory);
-      return _this;
-    }
-
-    Repeat.prototype.call = function call(context, changes) {
-      this[context](this.items, changes);
-    };
-
-    Repeat.prototype.bind = function bind(bindingContext, overrideContext) {
-      this.scope = { bindingContext: bindingContext, overrideContext: overrideContext };
-      this.matcherBinding = this._captureAndRemoveMatcherBinding();
-      this.itemsChanged();
-    };
-
-    Repeat.prototype.unbind = function unbind() {
-      this.scope = null;
-      this.items = null;
-      this.matcherBinding = null;
-      this.viewSlot.removeAll(true);
-      this._unsubscribeCollection();
-    };
-
-    Repeat.prototype._unsubscribeCollection = function _unsubscribeCollection() {
-      if (this.collectionObserver) {
-        this.collectionObserver.unsubscribe(this.callContext, this);
-        this.collectionObserver = null;
-        this.callContext = null;
-      }
-    };
-
-    Repeat.prototype.itemsChanged = function itemsChanged() {
-      this._unsubscribeCollection();
-
-      if (!this.scope) {
-        return;
-      }
-
-      var items = this.items;
-      this.strategy = this.strategyLocator.getStrategy(items);
-      if (!this.strategy) {
-        throw new Error('Value for \'' + this.sourceExpression + '\' is non-repeatable');
-      }
-
-      if (!this.isOneTime && !this._observeInnerCollection()) {
-        this._observeCollection();
-      }
-      this.strategy.instanceChanged(this, items);
-    };
-
-    Repeat.prototype._getInnerCollection = function _getInnerCollection() {
-      var expression = (0, _repeatUtilities.unwrapExpression)(this.sourceExpression);
-      if (!expression) {
-        return null;
-      }
-      return expression.evaluate(this.scope, null);
-    };
-
-    Repeat.prototype.handleCollectionMutated = function handleCollectionMutated(collection, changes) {
-      if (!this.collectionObserver) {
-        return;
-      }
-      this.strategy.instanceMutated(this, collection, changes);
-    };
-
-    Repeat.prototype.handleInnerCollectionMutated = function handleInnerCollectionMutated(collection, changes) {
-      var _this2 = this;
-
-      if (!this.collectionObserver) {
-        return;
-      }
-
-      if (this.ignoreMutation) {
-        return;
-      }
-      this.ignoreMutation = true;
-      var newItems = this.sourceExpression.evaluate(this.scope, this.lookupFunctions);
-      this.observerLocator.taskQueue.queueMicroTask(function () {
-        return _this2.ignoreMutation = false;
-      });
-
-      if (newItems === this.items) {
-        this.itemsChanged();
-      } else {
-        this.items = newItems;
-      }
-    };
-
-    Repeat.prototype._observeInnerCollection = function _observeInnerCollection() {
-      var items = this._getInnerCollection();
-      var strategy = this.strategyLocator.getStrategy(items);
-      if (!strategy) {
-        return false;
-      }
-      this.collectionObserver = strategy.getCollectionObserver(this.observerLocator, items);
-      if (!this.collectionObserver) {
-        return false;
-      }
-      this.callContext = 'handleInnerCollectionMutated';
-      this.collectionObserver.subscribe(this.callContext, this);
-      return true;
-    };
-
-    Repeat.prototype._observeCollection = function _observeCollection() {
-      var items = this.items;
-      this.collectionObserver = this.strategy.getCollectionObserver(this.observerLocator, items);
-      if (this.collectionObserver) {
-        this.callContext = 'handleCollectionMutated';
-        this.collectionObserver.subscribe(this.callContext, this);
-      }
-    };
-
-    Repeat.prototype._captureAndRemoveMatcherBinding = function _captureAndRemoveMatcherBinding() {
-      if (this.viewFactory.viewFactory) {
-        var instructions = this.viewFactory.viewFactory.instructions;
-        var instructionIds = Object.keys(instructions);
-        for (var i = 0; i < instructionIds.length; i++) {
-          var expressions = instructions[instructionIds[i]].expressions;
-          if (expressions) {
-            for (var ii = 0; i < expressions.length; i++) {
-              if (expressions[ii].targetProperty === 'matcher') {
-                var matcherBinding = expressions[ii];
-                expressions.splice(ii, 1);
-                return matcherBinding;
-              }
-            }
-          }
+        if (isEqual) {
+          return child;
         }
       }
 
       return undefined;
     };
 
-    Repeat.prototype.viewCount = function viewCount() {
-      return this.viewSlot.children.length;
-    };
+    State.prototype.put = function put(charSpec) {
+      var state = this.get(charSpec);
 
-    Repeat.prototype.views = function views() {
-      return this.viewSlot.children;
-    };
-
-    Repeat.prototype.view = function view(index) {
-      return this.viewSlot.children[index];
-    };
-
-    Repeat.prototype.matcher = function matcher() {
-      return this.matcherBinding ? this.matcherBinding.sourceExpression.evaluate(this.scope, this.matcherBinding.lookupFunctions) : null;
-    };
-
-    Repeat.prototype.addView = function addView(bindingContext, overrideContext) {
-      var view = this.viewFactory.create();
-      view.bind(bindingContext, overrideContext);
-      this.viewSlot.add(view);
-    };
-
-    Repeat.prototype.insertView = function insertView(index, bindingContext, overrideContext) {
-      var view = this.viewFactory.create();
-      view.bind(bindingContext, overrideContext);
-      this.viewSlot.insert(index, view);
-    };
-
-    Repeat.prototype.moveView = function moveView(sourceIndex, targetIndex) {
-      this.viewSlot.move(sourceIndex, targetIndex);
-    };
-
-    Repeat.prototype.removeAllViews = function removeAllViews(returnToCache, skipAnimation) {
-      return this.viewSlot.removeAll(returnToCache, skipAnimation);
-    };
-
-    Repeat.prototype.removeViews = function removeViews(viewsToRemove, returnToCache, skipAnimation) {
-      return this.viewSlot.removeMany(viewsToRemove, returnToCache, skipAnimation);
-    };
-
-    Repeat.prototype.removeView = function removeView(index, returnToCache, skipAnimation) {
-      return this.viewSlot.removeAt(index, returnToCache, skipAnimation);
-    };
-
-    Repeat.prototype.updateBindings = function updateBindings(view) {
-      var j = view.bindings.length;
-      while (j--) {
-        (0, _repeatUtilities.updateOneTimeBinding)(view.bindings[j]);
+      if (state) {
+        return state;
       }
-      j = view.controllers.length;
-      while (j--) {
-        var k = view.controllers[j].boundProperties.length;
-        while (k--) {
-          var binding = view.controllers[j].boundProperties[k].binding;
-          (0, _repeatUtilities.updateOneTimeBinding)(binding);
-        }
+
+      state = new State(charSpec);
+
+      this.nextStates.push(state);
+
+      if (charSpec.repeat) {
+        state.nextStates.push(state);
       }
+
+      return state;
     };
 
-    return Repeat;
-  }(_abstractRepeater.AbstractRepeater), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'items', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'local', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'key', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'value', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  })), _class2)) || _class) || _class) || _class);
-});
-define('aurelia-templating-resources/repeat-strategy-locator',['exports', './null-repeat-strategy', './array-repeat-strategy', './map-repeat-strategy', './set-repeat-strategy', './number-repeat-strategy'], function (exports, _nullRepeatStrategy, _arrayRepeatStrategy, _mapRepeatStrategy, _setRepeatStrategy, _numberRepeatStrategy) {
-  'use strict';
+    State.prototype.match = function match(ch) {
+      var nextStates = this.nextStates;
+      var results = [];
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.RepeatStrategyLocator = undefined;
+      for (var i = 0, l = nextStates.length; i < l; i++) {
+        var child = nextStates[i];
+        var charSpec = child.charSpec;
 
-  
-
-  var RepeatStrategyLocator = exports.RepeatStrategyLocator = function () {
-    function RepeatStrategyLocator() {
-      
-
-      this.matchers = [];
-      this.strategies = [];
-
-      this.addStrategy(function (items) {
-        return items === null || items === undefined;
-      }, new _nullRepeatStrategy.NullRepeatStrategy());
-      this.addStrategy(function (items) {
-        return items instanceof Array;
-      }, new _arrayRepeatStrategy.ArrayRepeatStrategy());
-      this.addStrategy(function (items) {
-        return items instanceof Map;
-      }, new _mapRepeatStrategy.MapRepeatStrategy());
-      this.addStrategy(function (items) {
-        return items instanceof Set;
-      }, new _setRepeatStrategy.SetRepeatStrategy());
-      this.addStrategy(function (items) {
-        return typeof items === 'number';
-      }, new _numberRepeatStrategy.NumberRepeatStrategy());
-    }
-
-    RepeatStrategyLocator.prototype.addStrategy = function addStrategy(matcher, strategy) {
-      this.matchers.push(matcher);
-      this.strategies.push(strategy);
-    };
-
-    RepeatStrategyLocator.prototype.getStrategy = function getStrategy(items) {
-      var matchers = this.matchers;
-
-      for (var i = 0, ii = matchers.length; i < ii; ++i) {
-        if (matchers[i](items)) {
-          return this.strategies[i];
+        if (charSpec.validChars !== undefined) {
+          if (charSpec.validChars.indexOf(ch) !== -1) {
+            results.push(child);
+          }
+        } else if (charSpec.invalidChars !== undefined) {
+          if (charSpec.invalidChars.indexOf(ch) === -1) {
+            results.push(child);
+          }
         }
       }
 
-      return null;
+      return results;
     };
 
-    return RepeatStrategyLocator;
+    return State;
   }();
-});
-define('aurelia-templating-resources/null-repeat-strategy',["exports"], function (exports) {
-  "use strict";
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
+  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
 
-  
+  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
 
-  var NullRepeatStrategy = exports.NullRepeatStrategy = function () {
-    function NullRepeatStrategy() {
+  var StaticSegment = exports.StaticSegment = function () {
+    function StaticSegment(string, caseSensitive) {
+      
+
+      this.string = string;
+      this.caseSensitive = caseSensitive;
+    }
+
+    StaticSegment.prototype.eachChar = function eachChar(callback) {
+      var s = this.string;
+      for (var i = 0, ii = s.length; i < ii; ++i) {
+        var ch = s[i];
+        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
+      }
+    };
+
+    StaticSegment.prototype.regex = function regex() {
+      return this.string.replace(escapeRegex, '\\$1');
+    };
+
+    StaticSegment.prototype.generate = function generate() {
+      return this.string;
+    };
+
+    return StaticSegment;
+  }();
+
+  var DynamicSegment = exports.DynamicSegment = function () {
+    function DynamicSegment(name, optional) {
+      
+
+      this.name = name;
+      this.optional = optional;
+    }
+
+    DynamicSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '/', repeat: true });
+    };
+
+    DynamicSegment.prototype.regex = function regex() {
+      return this.optional ? '([^/]+)?' : '([^/]+)';
+    };
+
+    DynamicSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return DynamicSegment;
+  }();
+
+  var StarSegment = exports.StarSegment = function () {
+    function StarSegment(name) {
+      
+
+      this.name = name;
+    }
+
+    StarSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '', repeat: true });
+    };
+
+    StarSegment.prototype.regex = function regex() {
+      return '(.+)';
+    };
+
+    StarSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return StarSegment;
+  }();
+
+  var EpsilonSegment = exports.EpsilonSegment = function () {
+    function EpsilonSegment() {
       
     }
 
-    NullRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
-      repeat.removeAllViews(true);
+    EpsilonSegment.prototype.eachChar = function eachChar() {};
+
+    EpsilonSegment.prototype.regex = function regex() {
+      return '';
     };
 
-    NullRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {};
+    EpsilonSegment.prototype.generate = function generate() {
+      return '';
+    };
 
-    return NullRepeatStrategy;
+    return EpsilonSegment;
   }();
-});
-define('aurelia-templating-resources/array-repeat-strategy',['exports', './repeat-utilities', 'aurelia-binding'], function (exports, _repeatUtilities, _aureliaBinding) {
-  'use strict';
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ArrayRepeatStrategy = undefined;
-
-  
-
-  var ArrayRepeatStrategy = exports.ArrayRepeatStrategy = function () {
-    function ArrayRepeatStrategy() {
+  var RouteRecognizer = exports.RouteRecognizer = function () {
+    function RouteRecognizer() {
       
+
+      this.rootState = new State();
+      this.names = {};
     }
 
-    ArrayRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
-      return observerLocator.getArrayObserver(items);
-    };
-
-    ArrayRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+    RouteRecognizer.prototype.add = function add(route) {
       var _this = this;
 
-      var itemsLength = items.length;
-
-      if (!items || itemsLength === 0) {
-        repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-        return;
+      if (Array.isArray(route)) {
+        route.forEach(function (r) {
+          return _this.add(r);
+        });
+        return undefined;
       }
 
-      var children = repeat.views();
-      var viewsLength = children.length;
+      var currentState = this.rootState;
+      var regex = '^';
+      var types = { statics: 0, dynamics: 0, stars: 0 };
+      var names = [];
+      var routeName = route.handler.name;
+      var isEmpty = true;
+      var isAllOptional = true;
+      var segments = parse(route.path, names, types, route.caseSensitive);
 
-      if (viewsLength === 0) {
-        this._standardProcessInstanceChanged(repeat, items);
-        return;
-      }
-
-      if (repeat.viewsRequireLifecycle) {
-        (function () {
-          var childrenSnapshot = children.slice(0);
-          var itemNameInBindingContext = repeat.local;
-          var matcher = repeat.matcher();
-
-          var itemsPreviouslyInViews = [];
-          var viewsToRemove = [];
-
-          for (var index = 0; index < viewsLength; index++) {
-            var view = childrenSnapshot[index];
-            var oldItem = view.bindingContext[itemNameInBindingContext];
-
-            if ((0, _repeatUtilities.indexOf)(items, oldItem, matcher) === -1) {
-              viewsToRemove.push(view);
-            } else {
-              itemsPreviouslyInViews.push(oldItem);
-            }
-          }
-
-          var updateViews = void 0;
-          var removePromise = void 0;
-
-          if (itemsPreviouslyInViews.length > 0) {
-            removePromise = repeat.removeViews(viewsToRemove, true, !repeat.viewsRequireLifecycle);
-            updateViews = function updateViews() {
-              for (var _index = 0; _index < itemsLength; _index++) {
-                var item = items[_index];
-                var indexOfView = (0, _repeatUtilities.indexOf)(itemsPreviouslyInViews, item, matcher, _index);
-                var _view = void 0;
-
-                if (indexOfView === -1) {
-                  var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_index], _index, itemsLength);
-                  repeat.insertView(_index, overrideContext.bindingContext, overrideContext);
-
-                  itemsPreviouslyInViews.splice(_index, 0, undefined);
-                } else if (indexOfView === _index) {
-                  _view = children[indexOfView];
-                  itemsPreviouslyInViews[indexOfView] = undefined;
-                } else {
-                  _view = children[indexOfView];
-                  repeat.moveView(indexOfView, _index);
-                  itemsPreviouslyInViews.splice(indexOfView, 1);
-                  itemsPreviouslyInViews.splice(_index, 0, undefined);
-                }
-
-                if (_view) {
-                  (0, _repeatUtilities.updateOverrideContext)(_view.overrideContext, _index, itemsLength);
-                }
-              }
-
-              _this._inPlaceProcessItems(repeat, items);
-            };
-          } else {
-            removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-            updateViews = function updateViews() {
-              return _this._standardProcessInstanceChanged(repeat, items);
-            };
-          }
-
-          if (removePromise instanceof Promise) {
-            removePromise.then(updateViews);
-          } else {
-            updateViews();
-          }
-        })();
-      } else {
-        this._inPlaceProcessItems(repeat, items);
-      }
-    };
-
-    ArrayRepeatStrategy.prototype._standardProcessInstanceChanged = function _standardProcessInstanceChanged(repeat, items) {
-      for (var i = 0, ii = items.length; i < ii; i++) {
-        var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[i], i, ii);
-        repeat.addView(overrideContext.bindingContext, overrideContext);
-      }
-    };
-
-    ArrayRepeatStrategy.prototype._inPlaceProcessItems = function _inPlaceProcessItems(repeat, items) {
-      var itemsLength = items.length;
-      var viewsLength = repeat.viewCount();
-
-      while (viewsLength > itemsLength) {
-        viewsLength--;
-        repeat.removeView(viewsLength, true, !repeat.viewsRequireLifecycle);
-      }
-
-      var local = repeat.local;
-
-      for (var i = 0; i < viewsLength; i++) {
-        var view = repeat.view(i);
-        var last = i === itemsLength - 1;
-        var middle = i !== 0 && !last;
-
-        if (view.bindingContext[local] === items[i] && view.overrideContext.$middle === middle && view.overrideContext.$last === last) {
+      for (var i = 0, ii = segments.length; i < ii; i++) {
+        var segment = segments[i];
+        if (segment instanceof EpsilonSegment) {
           continue;
         }
 
-        view.bindingContext[local] = items[i];
-        view.overrideContext.$middle = middle;
-        view.overrideContext.$last = last;
-        repeat.updateBindings(view);
+        isEmpty = false;
+        isAllOptional = isAllOptional && segment.optional;
+
+        currentState = addSegment(currentState, segment);
+        regex += segment.optional ? '/?' : '/';
+        regex += segment.regex();
       }
 
-      for (var _i = viewsLength; _i < itemsLength; _i++) {
-        var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_i], _i, itemsLength);
-        repeat.addView(overrideContext.bindingContext, overrideContext);
-      }
-    };
-
-    ArrayRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, array, splices) {
-      var _this2 = this;
-
-      if (repeat.__queuedSplices) {
-        for (var i = 0, ii = splices.length; i < ii; ++i) {
-          var _splices$i = splices[i],
-              index = _splices$i.index,
-              removed = _splices$i.removed,
-              addedCount = _splices$i.addedCount;
-
-          (0, _aureliaBinding.mergeSplice)(repeat.__queuedSplices, index, removed, addedCount);
+      if (isAllOptional) {
+        if (isEmpty) {
+          currentState = currentState.put({ validChars: '/' });
+          regex += '/';
+        } else {
+          var finalState = this.rootState.put({ validChars: '/' });
+          currentState.epsilon = [finalState];
+          currentState = finalState;
         }
-
-        repeat.__array = array.slice(0);
-        return;
       }
 
-      var maybePromise = this._runSplices(repeat, array.slice(0), splices);
-      if (maybePromise instanceof Promise) {
-        (function () {
-          var queuedSplices = repeat.__queuedSplices = [];
+      var handlers = [{ handler: route.handler, names: names }];
 
-          var runQueuedSplices = function runQueuedSplices() {
-            if (!queuedSplices.length) {
-              repeat.__queuedSplices = undefined;
-              repeat.__array = undefined;
-              return;
-            }
-
-            var nextPromise = _this2._runSplices(repeat, repeat.__array, queuedSplices) || Promise.resolve();
-            queuedSplices = repeat.__queuedSplices = [];
-            nextPromise.then(runQueuedSplices);
+      if (routeName) {
+        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
+        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
+          this.names[routeNames[_i2]] = {
+            segments: segments,
+            handlers: handlers
           };
-
-          maybePromise.then(runQueuedSplices);
-        })();
+        }
       }
+
+      currentState.handlers = handlers;
+      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
+      currentState.types = types;
+
+      return currentState;
     };
 
-    ArrayRepeatStrategy.prototype._runSplices = function _runSplices(repeat, array, splices) {
-      var _this3 = this;
+    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
 
-      var removeDelta = 0;
-      var rmPromises = [];
+      return [].concat(route.handlers);
+    };
 
-      for (var i = 0, ii = splices.length; i < ii; ++i) {
-        var splice = splices[i];
-        var removed = splice.removed;
+    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
+      return !!this.names[name];
+    };
 
-        for (var j = 0, jj = removed.length; j < jj; ++j) {
-          var viewOrPromise = repeat.removeView(splice.index + removeDelta + rmPromises.length, true);
-          if (viewOrPromise instanceof Promise) {
-            rmPromises.push(viewOrPromise);
+    RouteRecognizer.prototype.generate = function generate(name, params) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      var handler = route.handlers[0].handler;
+      if (handler.generationUsesHref) {
+        return handler.href;
+      }
+
+      var routeParams = Object.assign({}, params);
+      var segments = route.segments;
+      var consumed = {};
+      var output = '';
+
+      for (var i = 0, l = segments.length; i < l; i++) {
+        var segment = segments[i];
+
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        var segmentValue = segment.generate(routeParams, consumed);
+        if (segmentValue === null || segmentValue === undefined) {
+          if (!segment.optional) {
+            throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
           }
-        }
-        removeDelta -= splice.addedCount;
-      }
-
-      if (rmPromises.length > 0) {
-        return Promise.all(rmPromises).then(function () {
-          var spliceIndexLow = _this3._handleAddedSplices(repeat, array, splices);
-          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), spliceIndexLow);
-        });
-      }
-
-      var spliceIndexLow = this._handleAddedSplices(repeat, array, splices);
-      (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), spliceIndexLow);
-
-      return undefined;
-    };
-
-    ArrayRepeatStrategy.prototype._handleAddedSplices = function _handleAddedSplices(repeat, array, splices) {
-      var spliceIndex = void 0;
-      var spliceIndexLow = void 0;
-      var arrayLength = array.length;
-      for (var i = 0, ii = splices.length; i < ii; ++i) {
-        var splice = splices[i];
-        var addIndex = spliceIndex = splice.index;
-        var end = splice.index + splice.addedCount;
-
-        if (typeof spliceIndexLow === 'undefined' || spliceIndexLow === null || spliceIndexLow > splice.index) {
-          spliceIndexLow = spliceIndex;
-        }
-
-        for (; addIndex < end; ++addIndex) {
-          var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, array[addIndex], addIndex, arrayLength);
-          repeat.insertView(addIndex, overrideContext.bindingContext, overrideContext);
+        } else {
+          output += '/';
+          output += segmentValue;
         }
       }
 
-      return spliceIndexLow;
-    };
-
-    return ArrayRepeatStrategy;
-  }();
-});
-define('aurelia-templating-resources/repeat-utilities',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.updateOverrideContexts = updateOverrideContexts;
-  exports.createFullOverrideContext = createFullOverrideContext;
-  exports.updateOverrideContext = updateOverrideContext;
-  exports.getItemsSourceExpression = getItemsSourceExpression;
-  exports.unwrapExpression = unwrapExpression;
-  exports.isOneTime = isOneTime;
-  exports.updateOneTimeBinding = updateOneTimeBinding;
-  exports.indexOf = indexOf;
-
-
-  var oneTime = _aureliaBinding.bindingMode.oneTime;
-
-  function updateOverrideContexts(views, startIndex) {
-    var length = views.length;
-
-    if (startIndex > 0) {
-      startIndex = startIndex - 1;
-    }
-
-    for (; startIndex < length; ++startIndex) {
-      updateOverrideContext(views[startIndex].overrideContext, startIndex, length);
-    }
-  }
-
-  function createFullOverrideContext(repeat, data, index, length, key) {
-    var bindingContext = {};
-    var overrideContext = (0, _aureliaBinding.createOverrideContext)(bindingContext, repeat.scope.overrideContext);
-
-    if (typeof key !== 'undefined') {
-      bindingContext[repeat.key] = key;
-      bindingContext[repeat.value] = data;
-    } else {
-      bindingContext[repeat.local] = data;
-    }
-    updateOverrideContext(overrideContext, index, length);
-    return overrideContext;
-  }
-
-  function updateOverrideContext(overrideContext, index, length) {
-    var first = index === 0;
-    var last = index === length - 1;
-    var even = index % 2 === 0;
-
-    overrideContext.$index = index;
-    overrideContext.$first = first;
-    overrideContext.$last = last;
-    overrideContext.$middle = !(first || last);
-    overrideContext.$odd = !even;
-    overrideContext.$even = even;
-  }
-
-  function getItemsSourceExpression(instruction, attrName) {
-    return instruction.behaviorInstructions.filter(function (bi) {
-      return bi.originalAttrName === attrName;
-    })[0].attributes.items.sourceExpression;
-  }
-
-  function unwrapExpression(expression) {
-    var unwrapped = false;
-    while (expression instanceof _aureliaBinding.BindingBehavior) {
-      expression = expression.expression;
-    }
-    while (expression instanceof _aureliaBinding.ValueConverter) {
-      expression = expression.expression;
-      unwrapped = true;
-    }
-    return unwrapped ? expression : null;
-  }
-
-  function isOneTime(expression) {
-    while (expression instanceof _aureliaBinding.BindingBehavior) {
-      if (expression.name === 'oneTime') {
-        return true;
+      if (output.charAt(0) !== '/') {
+        output = '/' + output;
       }
-      expression = expression.expression;
-    }
-    return false;
-  }
 
-  function updateOneTimeBinding(binding) {
-    if (binding.call && binding.mode === oneTime) {
-      binding.call(_aureliaBinding.sourceContext);
-    } else if (binding.updateOneTimeBindings) {
-      binding.updateOneTimeBindings();
-    }
-  }
-
-  function indexOf(array, item, matcher, startIndex) {
-    if (!matcher) {
-      return array.indexOf(item);
-    }
-    var length = array.length;
-    for (var index = startIndex || 0; index < length; index++) {
-      if (matcher(array[index], item)) {
-        return index;
+      for (var param in consumed) {
+        delete routeParams[param];
       }
-    }
-    return -1;
-  }
-});
-define('aurelia-templating-resources/map-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
-  'use strict';
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.MapRepeatStrategy = undefined;
+      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
+      output += queryString ? '?' + queryString : '';
 
-  
-
-  var MapRepeatStrategy = exports.MapRepeatStrategy = function () {
-    function MapRepeatStrategy() {
-      
-    }
-
-    MapRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
-      return observerLocator.getMapObserver(items);
+      return output;
     };
 
-    MapRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
-      var _this = this;
+    RouteRecognizer.prototype.recognize = function recognize(path) {
+      var states = [this.rootState];
+      var queryParams = {};
+      var isSlashDropped = false;
+      var normalizedPath = path;
 
-      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-      if (removePromise instanceof Promise) {
-        removePromise.then(function () {
-          return _this._standardProcessItems(repeat, items);
-        });
-        return;
+      var queryStart = normalizedPath.indexOf('?');
+      if (queryStart !== -1) {
+        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
+        normalizedPath = normalizedPath.substr(0, queryStart);
+        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
       }
-      this._standardProcessItems(repeat, items);
-    };
 
-    MapRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, items) {
-      var index = 0;
-      var overrideContext = void 0;
+      normalizedPath = decodeURI(normalizedPath);
 
-      items.forEach(function (value, key) {
-        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, index, items.size, key);
-        repeat.addView(overrideContext.bindingContext, overrideContext);
-        ++index;
-      });
-    };
+      if (normalizedPath.charAt(0) !== '/') {
+        normalizedPath = '/' + normalizedPath;
+      }
 
-    MapRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, map, records) {
-      var key = void 0;
-      var i = void 0;
-      var ii = void 0;
-      var overrideContext = void 0;
-      var removeIndex = void 0;
-      var record = void 0;
-      var rmPromises = [];
-      var viewOrPromise = void 0;
+      var pathLen = normalizedPath.length;
+      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
+        normalizedPath = normalizedPath.substr(0, pathLen - 1);
+        isSlashDropped = true;
+      }
 
-      for (i = 0, ii = records.length; i < ii; ++i) {
-        record = records[i];
-        key = record.key;
-        switch (record.type) {
-          case 'update':
-            removeIndex = this._getViewIndexByKey(repeat, key);
-            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
-            if (viewOrPromise instanceof Promise) {
-              rmPromises.push(viewOrPromise);
-            }
-            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), removeIndex, map.size, key);
-            repeat.insertView(removeIndex, overrideContext.bindingContext, overrideContext);
-            break;
-          case 'add':
-            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), map.size - 1, map.size, key);
-            repeat.insertView(map.size - 1, overrideContext.bindingContext, overrideContext);
-            break;
-          case 'delete':
-            if (record.oldValue === undefined) {
-              return;
-            }
-            removeIndex = this._getViewIndexByKey(repeat, key);
-            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
-            if (viewOrPromise instanceof Promise) {
-              rmPromises.push(viewOrPromise);
-            }
-            break;
-          case 'clear':
-            repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-            break;
-          default:
-            continue;
+      for (var i = 0, l = normalizedPath.length; i < l; i++) {
+        states = recognizeChar(states, normalizedPath.charAt(i));
+        if (!states.length) {
+          break;
         }
       }
 
-      if (rmPromises.length > 0) {
-        Promise.all(rmPromises).then(function () {
-          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
-        });
-      } else {
-        (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
-      }
-    };
-
-    MapRepeatStrategy.prototype._getViewIndexByKey = function _getViewIndexByKey(repeat, key) {
-      var i = void 0;
-      var ii = void 0;
-      var child = void 0;
-
-      for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
-        child = repeat.view(i);
-        if (child.bindingContext[repeat.key] === key) {
-          return i;
+      var solutions = [];
+      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
+        if (states[_i3].handlers) {
+          solutions.push(states[_i3]);
         }
+      }
+
+      states = sortSolutions(solutions);
+
+      var state = solutions[0];
+      if (state && state.handlers) {
+        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
+          normalizedPath = normalizedPath + '/';
+        }
+
+        return findHandler(state, normalizedPath, queryParams);
       }
 
       return undefined;
     };
 
-    return MapRepeatStrategy;
-  }();
-});
-define('aurelia-templating-resources/set-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.SetRepeatStrategy = undefined;
-
-  
-
-  var SetRepeatStrategy = exports.SetRepeatStrategy = function () {
-    function SetRepeatStrategy() {
-      
-    }
-
-    SetRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
-      return observerLocator.getSetObserver(items);
-    };
-
-    SetRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
-      var _this = this;
-
-      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-      if (removePromise instanceof Promise) {
-        removePromise.then(function () {
-          return _this._standardProcessItems(repeat, items);
-        });
-        return;
-      }
-      this._standardProcessItems(repeat, items);
-    };
-
-    SetRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, items) {
-      var index = 0;
-      var overrideContext = void 0;
-
-      items.forEach(function (value) {
-        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, index, items.size);
-        repeat.addView(overrideContext.bindingContext, overrideContext);
-        ++index;
-      });
-    };
-
-    SetRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, set, records) {
-      var value = void 0;
-      var i = void 0;
-      var ii = void 0;
-      var overrideContext = void 0;
-      var removeIndex = void 0;
-      var record = void 0;
-      var rmPromises = [];
-      var viewOrPromise = void 0;
-
-      for (i = 0, ii = records.length; i < ii; ++i) {
-        record = records[i];
-        value = record.value;
-        switch (record.type) {
-          case 'add':
-            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, set.size - 1, set.size);
-            repeat.insertView(set.size - 1, overrideContext.bindingContext, overrideContext);
-            break;
-          case 'delete':
-            removeIndex = this._getViewIndexByValue(repeat, value);
-            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
-            if (viewOrPromise instanceof Promise) {
-              rmPromises.push(viewOrPromise);
-            }
-            break;
-          case 'clear':
-            repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-            break;
-          default:
-            continue;
-        }
-      }
-
-      if (rmPromises.length > 0) {
-        Promise.all(rmPromises).then(function () {
-          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
-        });
-      } else {
-        (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
-      }
-    };
-
-    SetRepeatStrategy.prototype._getViewIndexByValue = function _getViewIndexByValue(repeat, value) {
-      var i = void 0;
-      var ii = void 0;
-      var child = void 0;
-
-      for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
-        child = repeat.view(i);
-        if (child.bindingContext[repeat.local] === value) {
-          return i;
-        }
-      }
-
-      return undefined;
-    };
-
-    return SetRepeatStrategy;
-  }();
-});
-define('aurelia-templating-resources/number-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.NumberRepeatStrategy = undefined;
-
-  
-
-  var NumberRepeatStrategy = exports.NumberRepeatStrategy = function () {
-    function NumberRepeatStrategy() {
-      
-    }
-
-    NumberRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver() {
-      return null;
-    };
-
-    NumberRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, value) {
-      var _this = this;
-
-      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
-      if (removePromise instanceof Promise) {
-        removePromise.then(function () {
-          return _this._standardProcessItems(repeat, value);
-        });
-        return;
-      }
-      this._standardProcessItems(repeat, value);
-    };
-
-    NumberRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, value) {
-      var childrenLength = repeat.viewCount();
-      var i = void 0;
-      var ii = void 0;
-      var overrideContext = void 0;
-      var viewsToRemove = void 0;
-
-      value = Math.floor(value);
-      viewsToRemove = childrenLength - value;
-
-      if (viewsToRemove > 0) {
-        if (viewsToRemove > childrenLength) {
-          viewsToRemove = childrenLength;
-        }
-
-        for (i = 0, ii = viewsToRemove; i < ii; ++i) {
-          repeat.removeView(childrenLength - (i + 1), true, !repeat.viewsRequireLifecycle);
-        }
-
-        return;
-      }
-
-      for (i = childrenLength, ii = value; i < ii; ++i) {
-        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, i, i, ii);
-        repeat.addView(overrideContext.bindingContext, overrideContext);
-      }
-
-      (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
-    };
-
-    return NumberRepeatStrategy;
-  }();
-});
-define('aurelia-templating-resources/analyze-view-factory',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.viewsRequireLifecycle = viewsRequireLifecycle;
-  var lifecycleOptionalBehaviors = exports.lifecycleOptionalBehaviors = ['focus', 'if', 'repeat', 'show', 'with'];
-
-  function behaviorRequiresLifecycle(instruction) {
-    var t = instruction.type;
-    var name = t.elementName !== null ? t.elementName : t.attributeName;
-    return lifecycleOptionalBehaviors.indexOf(name) === -1 && (t.handlesAttached || t.handlesBind || t.handlesCreated || t.handlesDetached || t.handlesUnbind) || t.viewFactory && viewsRequireLifecycle(t.viewFactory) || instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
-  }
-
-  function targetRequiresLifecycle(instruction) {
-    var behaviors = instruction.behaviorInstructions;
-    if (behaviors) {
-      var i = behaviors.length;
-      while (i--) {
-        if (behaviorRequiresLifecycle(behaviors[i])) {
-          return true;
-        }
-      }
-    }
-
-    return instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
-  }
-
-  function viewsRequireLifecycle(viewFactory) {
-    if ('_viewsRequireLifecycle' in viewFactory) {
-      return viewFactory._viewsRequireLifecycle;
-    }
-
-    viewFactory._viewsRequireLifecycle = false;
-
-    if (viewFactory.viewFactory) {
-      viewFactory._viewsRequireLifecycle = viewsRequireLifecycle(viewFactory.viewFactory);
-      return viewFactory._viewsRequireLifecycle;
-    }
-
-    if (viewFactory.template.querySelector('.au-animate')) {
-      viewFactory._viewsRequireLifecycle = true;
-      return true;
-    }
-
-    for (var id in viewFactory.instructions) {
-      if (targetRequiresLifecycle(viewFactory.instructions[id])) {
-        viewFactory._viewsRequireLifecycle = true;
-        return true;
-      }
-    }
-
-    viewFactory._viewsRequireLifecycle = false;
-    return false;
-  }
-});
-define('aurelia-templating-resources/abstract-repeater',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  var AbstractRepeater = exports.AbstractRepeater = function () {
-    function AbstractRepeater(options) {
-      
-
-      Object.assign(this, {
-        local: 'items',
-        viewsRequireLifecycle: true
-      }, options);
-    }
-
-    AbstractRepeater.prototype.viewCount = function viewCount() {
-      throw new Error('subclass must implement `viewCount`');
-    };
-
-    AbstractRepeater.prototype.views = function views() {
-      throw new Error('subclass must implement `views`');
-    };
-
-    AbstractRepeater.prototype.view = function view(index) {
-      throw new Error('subclass must implement `view`');
-    };
-
-    AbstractRepeater.prototype.matcher = function matcher() {
-      throw new Error('subclass must implement `matcher`');
-    };
-
-    AbstractRepeater.prototype.addView = function addView(bindingContext, overrideContext) {
-      throw new Error('subclass must implement `addView`');
-    };
-
-    AbstractRepeater.prototype.insertView = function insertView(index, bindingContext, overrideContext) {
-      throw new Error('subclass must implement `insertView`');
-    };
-
-    AbstractRepeater.prototype.moveView = function moveView(sourceIndex, targetIndex) {
-      throw new Error('subclass must implement `moveView`');
-    };
-
-    AbstractRepeater.prototype.removeAllViews = function removeAllViews(returnToCache, skipAnimation) {
-      throw new Error('subclass must implement `removeAllViews`');
-    };
-
-    AbstractRepeater.prototype.removeViews = function removeViews(viewsToRemove, returnToCache, skipAnimation) {
-      throw new Error('subclass must implement `removeView`');
-    };
-
-    AbstractRepeater.prototype.removeView = function removeView(index, returnToCache, skipAnimation) {
-      throw new Error('subclass must implement `removeView`');
-    };
-
-    AbstractRepeater.prototype.updateBindings = function updateBindings(view) {
-      throw new Error('subclass must implement `updateBindings`');
-    };
-
-    return AbstractRepeater;
-  }();
-});
-define('aurelia-templating-resources/show',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-pal', './aurelia-hide-style'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaPal, _aureliaHideStyle) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Show = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var Show = exports.Show = (_dec = (0, _aureliaTemplating.customAttribute)('show'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
-    function Show(element, animator, domBoundary) {
-      
-
-      this.element = element;
-      this.animator = animator;
-      this.domBoundary = domBoundary;
-    }
-
-    Show.prototype.created = function created() {
-      (0, _aureliaHideStyle.injectAureliaHideStyleAtBoundary)(this.domBoundary);
-    };
-
-    Show.prototype.valueChanged = function valueChanged(newValue) {
-      if (newValue) {
-        this.animator.removeClass(this.element, _aureliaHideStyle.aureliaHideClassName);
-      } else {
-        this.animator.addClass(this.element, _aureliaHideStyle.aureliaHideClassName);
-      }
-    };
-
-    Show.prototype.bind = function bind(bindingContext) {
-      this.valueChanged(this.value);
-    };
-
-    return Show;
-  }()) || _class) || _class);
-});
-define('aurelia-templating-resources/aurelia-hide-style',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.aureliaHideClassName = undefined;
-  exports.injectAureliaHideStyleAtHead = injectAureliaHideStyleAtHead;
-  exports.injectAureliaHideStyleAtBoundary = injectAureliaHideStyleAtBoundary;
-  var aureliaHideClassName = exports.aureliaHideClassName = 'aurelia-hide';
-
-  var aureliaHideClass = '.' + aureliaHideClassName + ' { display:none !important; }';
-
-  function injectAureliaHideStyleAtHead() {
-    _aureliaPal.DOM.injectStyles(aureliaHideClass);
-  }
-
-  function injectAureliaHideStyleAtBoundary(domBoundary) {
-    if (_aureliaPal.FEATURE.shadowDOM && domBoundary && !domBoundary.hasAureliaHideStyle) {
-      domBoundary.hasAureliaHideStyle = true;
-      _aureliaPal.DOM.injectStyles(aureliaHideClass, domBoundary);
-    }
-  }
-});
-define('aurelia-templating-resources/hide',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-pal', './aurelia-hide-style'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaPal, _aureliaHideStyle) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Hide = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var Hide = exports.Hide = (_dec = (0, _aureliaTemplating.customAttribute)('hide'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
-    function Hide(element, animator, domBoundary) {
-      
-
-      this.element = element;
-      this.animator = animator;
-      this.domBoundary = domBoundary;
-    }
-
-    Hide.prototype.created = function created() {
-      (0, _aureliaHideStyle.injectAureliaHideStyleAtBoundary)(this.domBoundary);
-    };
-
-    Hide.prototype.valueChanged = function valueChanged(newValue) {
-      if (newValue) {
-        this.animator.addClass(this.element, _aureliaHideStyle.aureliaHideClassName);
-      } else {
-        this.animator.removeClass(this.element, _aureliaHideStyle.aureliaHideClassName);
-      }
-    };
-
-    Hide.prototype.bind = function bind(bindingContext) {
-      this.valueChanged(this.value);
-    };
-
-    return Hide;
-  }()) || _class) || _class);
-});
-define('aurelia-templating-resources/sanitize-html',['exports', 'aurelia-binding', 'aurelia-dependency-injection', './html-sanitizer'], function (exports, _aureliaBinding, _aureliaDependencyInjection, _htmlSanitizer) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.SanitizeHTMLValueConverter = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var SanitizeHTMLValueConverter = exports.SanitizeHTMLValueConverter = (_dec = (0, _aureliaBinding.valueConverter)('sanitizeHTML'), _dec2 = (0, _aureliaDependencyInjection.inject)(_htmlSanitizer.HTMLSanitizer), _dec(_class = _dec2(_class = function () {
-    function SanitizeHTMLValueConverter(sanitizer) {
-      
-
-      this.sanitizer = sanitizer;
-    }
-
-    SanitizeHTMLValueConverter.prototype.toView = function toView(untrustedMarkup) {
-      if (untrustedMarkup === null || untrustedMarkup === undefined) {
-        return null;
-      }
-
-      return this.sanitizer.sanitize(untrustedMarkup);
-    };
-
-    return SanitizeHTMLValueConverter;
-  }()) || _class) || _class);
-});
-define('aurelia-templating-resources/html-sanitizer',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
-
-  var HTMLSanitizer = exports.HTMLSanitizer = function () {
-    function HTMLSanitizer() {
-      
-    }
-
-    HTMLSanitizer.prototype.sanitize = function sanitize(input) {
-      return input.replace(SCRIPT_REGEX, '');
-    };
-
-    return HTMLSanitizer;
-  }();
-});
-define('aurelia-templating-resources/replaceable',['exports', 'aurelia-dependency-injection', 'aurelia-templating'], function (exports, _aureliaDependencyInjection, _aureliaTemplating) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Replaceable = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var Replaceable = exports.Replaceable = (_dec = (0, _aureliaTemplating.customAttribute)('replaceable'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
-    function Replaceable(viewFactory, viewSlot) {
-      
-
-      this.viewFactory = viewFactory;
-      this.viewSlot = viewSlot;
-      this.view = null;
-    }
-
-    Replaceable.prototype.bind = function bind(bindingContext, overrideContext) {
-      if (this.view === null) {
-        this.view = this.viewFactory.create();
-        this.viewSlot.add(this.view);
-      }
-
-      this.view.bind(bindingContext, overrideContext);
-    };
-
-    Replaceable.prototype.unbind = function unbind() {
-      this.view.unbind();
-    };
-
-    return Replaceable;
-  }()) || _class) || _class) || _class);
-});
-define('aurelia-templating-resources/focus',['exports', 'aurelia-templating', 'aurelia-binding', 'aurelia-dependency-injection', 'aurelia-task-queue', 'aurelia-pal'], function (exports, _aureliaTemplating, _aureliaBinding, _aureliaDependencyInjection, _aureliaTaskQueue, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.Focus = undefined;
-
-  
-
-  var _dec, _dec2, _class;
-
-  var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('focus', _aureliaBinding.bindingMode.twoWay), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTaskQueue.TaskQueue), _dec(_class = _dec2(_class = function () {
-    function Focus(element, taskQueue) {
-      var _this = this;
-
-      
-
-      this.element = element;
-      this.taskQueue = taskQueue;
-      this.isAttached = false;
-      this.needsApply = false;
-
-      this.focusListener = function (e) {
-        _this.value = true;
-      };
-      this.blurListener = function (e) {
-        if (_aureliaPal.DOM.activeElement !== _this.element) {
-          _this.value = false;
-        }
-      };
-    }
-
-    Focus.prototype.valueChanged = function valueChanged(newValue) {
-      if (this.isAttached) {
-        this._apply();
-      } else {
-        this.needsApply = true;
-      }
-    };
-
-    Focus.prototype._apply = function _apply() {
-      var _this2 = this;
-
-      if (this.value) {
-        this.taskQueue.queueMicroTask(function () {
-          if (_this2.value) {
-            _this2.element.focus();
-          }
-        });
-      } else {
-        this.element.blur();
-      }
-    };
-
-    Focus.prototype.attached = function attached() {
-      this.isAttached = true;
-      if (this.needsApply) {
-        this.needsApply = false;
-        this._apply();
-      }
-      this.element.addEventListener('focus', this.focusListener);
-      this.element.addEventListener('blur', this.blurListener);
-    };
-
-    Focus.prototype.detached = function detached() {
-      this.isAttached = false;
-      this.element.removeEventListener('focus', this.focusListener);
-      this.element.removeEventListener('blur', this.blurListener);
-    };
-
-    return Focus;
-  }()) || _class) || _class);
-});
-define('aurelia-templating-resources/css-resource',['exports', 'aurelia-templating', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-path', 'aurelia-pal'], function (exports, _aureliaTemplating, _aureliaLoader, _aureliaDependencyInjection, _aureliaPath, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports._createCSSResource = _createCSSResource;
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  
-
-  var cssUrlMatcher = /url\((?!['"]data)([^)]+)\)/gi;
-
-  function fixupCSSUrls(address, css) {
-    if (typeof css !== 'string') {
-      throw new Error('Failed loading required CSS file: ' + address);
-    }
-    return css.replace(cssUrlMatcher, function (match, p1) {
-      var quote = p1.charAt(0);
-      if (quote === '\'' || quote === '"') {
-        p1 = p1.substr(1, p1.length - 2);
-      }
-      return 'url(\'' + (0, _aureliaPath.relativeToFile)(p1, address) + '\')';
-    });
-  }
-
-  var CSSResource = function () {
-    function CSSResource(address) {
-      
-
-      this.address = address;
-      this._scoped = null;
-      this._global = false;
-      this._alreadyGloballyInjected = false;
-    }
-
-    CSSResource.prototype.initialize = function initialize(container, target) {
-      this._scoped = new target(this);
-    };
-
-    CSSResource.prototype.register = function register(registry, name) {
-      if (name === 'scoped') {
-        registry.registerViewEngineHooks(this._scoped);
-      } else {
-        this._global = true;
-      }
-    };
-
-    CSSResource.prototype.load = function load(container) {
-      var _this = this;
-
-      return container.get(_aureliaLoader.Loader).loadText(this.address).catch(function (err) {
-        return null;
-      }).then(function (text) {
-        text = fixupCSSUrls(_this.address, text);
-        _this._scoped.css = text;
-        if (_this._global) {
-          _this._alreadyGloballyInjected = true;
-          _aureliaPal.DOM.injectStyles(text);
-        }
-      });
-    };
-
-    return CSSResource;
+    return RouteRecognizer;
   }();
 
-  var CSSViewEngineHooks = function () {
-    function CSSViewEngineHooks(owner) {
-      
+  var RecognizeResults = function RecognizeResults(queryParams) {
+    
 
-      this.owner = owner;
-      this.css = null;
-    }
-
-    CSSViewEngineHooks.prototype.beforeCompile = function beforeCompile(content, resources, instruction) {
-      if (instruction.targetShadowDOM) {
-        _aureliaPal.DOM.injectStyles(this.css, content, true);
-      } else if (_aureliaPal.FEATURE.scopedCSS) {
-        var styleNode = _aureliaPal.DOM.injectStyles(this.css, content, true);
-        styleNode.setAttribute('scoped', 'scoped');
-      } else if (!this.owner._alreadyGloballyInjected) {
-        _aureliaPal.DOM.injectStyles(this.css);
-        this.owner._alreadyGloballyInjected = true;
-      }
-    };
-
-    return CSSViewEngineHooks;
-  }();
-
-  function _createCSSResource(address) {
-    var _dec, _class;
-
-    var ViewCSS = (_dec = (0, _aureliaTemplating.resource)(new CSSResource(address)), _dec(_class = function (_CSSViewEngineHooks) {
-      _inherits(ViewCSS, _CSSViewEngineHooks);
-
-      function ViewCSS() {
-        
-
-        return _possibleConstructorReturn(this, _CSSViewEngineHooks.apply(this, arguments));
-      }
-
-      return ViewCSS;
-    }(CSSViewEngineHooks)) || _class);
-
-    return ViewCSS;
-  }
-});
-define('aurelia-templating-resources/attr-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.AttrBindingBehavior = undefined;
-
-  
-
-  var AttrBindingBehavior = exports.AttrBindingBehavior = function () {
-    function AttrBindingBehavior() {
-      
-    }
-
-    AttrBindingBehavior.prototype.bind = function bind(binding, source) {
-      binding.targetObserver = new _aureliaBinding.DataAttributeObserver(binding.target, binding.targetProperty);
-    };
-
-    AttrBindingBehavior.prototype.unbind = function unbind(binding, source) {};
-
-    return AttrBindingBehavior;
-  }();
-});
-define('aurelia-templating-resources/binding-mode-behaviors',['exports', 'aurelia-binding', 'aurelia-metadata'], function (exports, _aureliaBinding, _aureliaMetadata) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = undefined;
-
-  
-
-  var _dec, _class, _dec2, _class2, _dec3, _class3;
-
-  var modeBindingBehavior = {
-    bind: function bind(binding, source, lookupFunctions) {
-      binding.originalMode = binding.mode;
-      binding.mode = this.mode;
-    },
-    unbind: function unbind(binding, source) {
-      binding.mode = binding.originalMode;
-      binding.originalMode = null;
-    }
+    this.splice = Array.prototype.splice;
+    this.slice = Array.prototype.slice;
+    this.push = Array.prototype.push;
+    this.length = 0;
+    this.queryParams = queryParams || {};
   };
 
-  var OneTimeBindingBehavior = exports.OneTimeBindingBehavior = (_dec = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec(_class = function OneTimeBindingBehavior() {
-    
-
-    this.mode = _aureliaBinding.bindingMode.oneTime;
-  }) || _class);
-  var OneWayBindingBehavior = exports.OneWayBindingBehavior = (_dec2 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec2(_class2 = function OneWayBindingBehavior() {
-    
-
-    this.mode = _aureliaBinding.bindingMode.oneWay;
-  }) || _class2);
-  var TwoWayBindingBehavior = exports.TwoWayBindingBehavior = (_dec3 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec3(_class3 = function TwoWayBindingBehavior() {
-    
-
-    this.mode = _aureliaBinding.bindingMode.twoWay;
-  }) || _class3);
-});
-define('aurelia-templating-resources/throttle-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.ThrottleBindingBehavior = undefined;
-
-  
-
-  function throttle(newValue) {
-    var _this = this;
-
-    var state = this.throttleState;
-    var elapsed = +new Date() - state.last;
-    if (elapsed >= state.delay) {
-      clearTimeout(state.timeoutId);
-      state.timeoutId = null;
-      state.last = +new Date();
-      this.throttledMethod(newValue);
-      return;
-    }
-    state.newValue = newValue;
-    if (state.timeoutId === null) {
-      state.timeoutId = setTimeout(function () {
-        state.timeoutId = null;
-        state.last = +new Date();
-        _this.throttledMethod(state.newValue);
-      }, state.delay - elapsed);
-    }
-  }
-
-  var ThrottleBindingBehavior = exports.ThrottleBindingBehavior = function () {
-    function ThrottleBindingBehavior() {
-      
+  function parse(route, names, types, caseSensitive) {
+    var normalizedRoute = route;
+    if (route.charAt(0) === '/') {
+      normalizedRoute = route.substr(1);
     }
 
-    ThrottleBindingBehavior.prototype.bind = function bind(binding, source) {
-      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+    var results = [];
 
-      var methodToThrottle = 'updateTarget';
-      if (binding.callSource) {
-        methodToThrottle = 'callSource';
-      } else if (binding.updateSource && binding.mode === _aureliaBinding.bindingMode.twoWay) {
-        methodToThrottle = 'updateSource';
-      }
+    var splitRoute = normalizedRoute.split('/');
+    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
+      var segment = splitRoute[i];
 
-      binding.throttledMethod = binding[methodToThrottle];
-      binding.throttledMethod.originalName = methodToThrottle;
+      var match = segment.match(/^:([^?]+)(\?)?$/);
+      if (match) {
+        var _match = match;
+        var _name = _match[1];
+        var optional = _match[2];
 
-      binding[methodToThrottle] = throttle;
-
-      binding.throttleState = {
-        delay: delay,
-        last: 0,
-        timeoutId: null
-      };
-    };
-
-    ThrottleBindingBehavior.prototype.unbind = function unbind(binding, source) {
-      var methodToRestore = binding.throttledMethod.originalName;
-      binding[methodToRestore] = binding.throttledMethod;
-      binding.throttledMethod = null;
-      clearTimeout(binding.throttleState.timeoutId);
-      binding.throttleState = null;
-    };
-
-    return ThrottleBindingBehavior;
-  }();
-});
-define('aurelia-templating-resources/debounce-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.DebounceBindingBehavior = undefined;
-
-  
-
-  function debounce(newValue) {
-    var _this = this;
-
-    var state = this.debounceState;
-    if (state.immediate) {
-      state.immediate = false;
-      this.debouncedMethod(newValue);
-      return;
-    }
-    clearTimeout(state.timeoutId);
-    state.timeoutId = setTimeout(function () {
-      return _this.debouncedMethod(newValue);
-    }, state.delay);
-  }
-
-  var DebounceBindingBehavior = exports.DebounceBindingBehavior = function () {
-    function DebounceBindingBehavior() {
-      
-    }
-
-    DebounceBindingBehavior.prototype.bind = function bind(binding, source) {
-      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
-
-      var methodToDebounce = 'updateTarget';
-      if (binding.callSource) {
-        methodToDebounce = 'callSource';
-      } else if (binding.updateSource && binding.mode === _aureliaBinding.bindingMode.twoWay) {
-        methodToDebounce = 'updateSource';
-      }
-
-      binding.debouncedMethod = binding[methodToDebounce];
-      binding.debouncedMethod.originalName = methodToDebounce;
-
-      binding[methodToDebounce] = debounce;
-
-      binding.debounceState = {
-        delay: delay,
-        timeoutId: null,
-        immediate: methodToDebounce === 'updateTarget' };
-    };
-
-    DebounceBindingBehavior.prototype.unbind = function unbind(binding, source) {
-      var methodToRestore = binding.debouncedMethod.originalName;
-      binding[methodToRestore] = binding.debouncedMethod;
-      binding.debouncedMethod = null;
-      clearTimeout(binding.debounceState.timeoutId);
-      binding.debounceState = null;
-    };
-
-    return DebounceBindingBehavior;
-  }();
-});
-define('aurelia-templating-resources/self-binding-behavior',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-
-  
-
-  function findOriginalEventTarget(event) {
-    return event.path && event.path[0] || event.deepPath && event.deepPath[0] || event.target;
-  }
-
-  function handleSelfEvent(event) {
-    var target = findOriginalEventTarget(event);
-    if (this.target !== target) return;
-    this.selfEventCallSource(event);
-  }
-
-  var SelfBindingBehavior = exports.SelfBindingBehavior = function () {
-    function SelfBindingBehavior() {
-      
-    }
-
-    SelfBindingBehavior.prototype.bind = function bind(binding, source) {
-      if (!binding.callSource || !binding.targetEvent) throw new Error('Self binding behavior only supports event.');
-      binding.selfEventCallSource = binding.callSource;
-      binding.callSource = handleSelfEvent;
-    };
-
-    SelfBindingBehavior.prototype.unbind = function unbind(binding, source) {
-      binding.callSource = binding.selfEventCallSource;
-      binding.selfEventCallSource = null;
-    };
-
-    return SelfBindingBehavior;
-  }();
-});
-define('aurelia-templating-resources/signal-binding-behavior',['exports', './binding-signaler'], function (exports, _bindingSignaler) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.SignalBindingBehavior = undefined;
-
-  
-
-  var SignalBindingBehavior = exports.SignalBindingBehavior = function () {
-    SignalBindingBehavior.inject = function inject() {
-      return [_bindingSignaler.BindingSignaler];
-    };
-
-    function SignalBindingBehavior(bindingSignaler) {
-      
-
-      this.signals = bindingSignaler.signals;
-    }
-
-    SignalBindingBehavior.prototype.bind = function bind(binding, source) {
-      if (!binding.updateTarget) {
-        throw new Error('Only property bindings and string interpolation bindings can be signaled.  Trigger, delegate and call bindings cannot be signaled.');
-      }
-      if (arguments.length === 3) {
-        var name = arguments[2];
-        var bindings = this.signals[name] || (this.signals[name] = []);
-        bindings.push(binding);
-        binding.signalName = name;
-      } else if (arguments.length > 3) {
-        var names = Array.prototype.slice.call(arguments, 2);
-        var i = names.length;
-        while (i--) {
-          var _name = names[i];
-          var _bindings = this.signals[_name] || (this.signals[_name] = []);
-          _bindings.push(binding);
+        if (_name.indexOf('=') !== -1) {
+          throw new Error('Parameter ' + _name + ' in route ' + route + ' has a default value, which is not supported.');
         }
-        binding.signalName = names;
-      } else {
-        throw new Error('Signal name is required.');
+        results.push(new DynamicSegment(_name, !!optional));
+        names.push(_name);
+        types.dynamics++;
+        continue;
       }
-    };
 
-    SignalBindingBehavior.prototype.unbind = function unbind(binding, source) {
-      var name = binding.signalName;
-      binding.signalName = null;
-      if (Array.isArray(name)) {
-        var names = name;
-        var i = names.length;
-        while (i--) {
-          var n = names[i];
-          var bindings = this.signals[n];
-          bindings.splice(bindings.indexOf(binding), 1);
+      match = segment.match(/^\*(.+)$/);
+      if (match) {
+        results.push(new StarSegment(match[1]));
+        names.push(match[1]);
+        types.stars++;
+      } else if (segment === '') {
+        results.push(new EpsilonSegment());
+      } else {
+        results.push(new StaticSegment(segment, caseSensitive));
+        types.statics++;
+      }
+    }
+
+    return results;
+  }
+
+  function sortSolutions(states) {
+    return states.sort(function (a, b) {
+      if (a.types.stars !== b.types.stars) {
+        return a.types.stars - b.types.stars;
+      }
+
+      if (a.types.stars) {
+        if (a.types.statics !== b.types.statics) {
+          return b.types.statics - a.types.statics;
         }
-      } else {
-        var _bindings2 = this.signals[name];
-        _bindings2.splice(_bindings2.indexOf(binding), 1);
-      }
-    };
-
-    return SignalBindingBehavior;
-  }();
-});
-define('aurelia-templating-resources/binding-signaler',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.BindingSignaler = undefined;
-
-  
-
-  var BindingSignaler = exports.BindingSignaler = function () {
-    function BindingSignaler() {
-      
-
-      this.signals = {};
-    }
-
-    BindingSignaler.prototype.signal = function signal(name) {
-      var bindings = this.signals[name];
-      if (!bindings) {
-        return;
-      }
-      var i = bindings.length;
-      while (i--) {
-        bindings[i].call(_aureliaBinding.sourceContext);
-      }
-    };
-
-    return BindingSignaler;
-  }();
-});
-define('aurelia-templating-resources/update-trigger-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.UpdateTriggerBindingBehavior = undefined;
-
-  
-
-  var _class, _temp;
-
-  var eventNamesRequired = 'The updateTrigger binding behavior requires at least one event name argument: eg <input value.bind="firstName & updateTrigger:\'blur\'">';
-  var notApplicableMessage = 'The updateTrigger binding behavior can only be applied to two-way bindings on input/select elements.';
-
-  var UpdateTriggerBindingBehavior = exports.UpdateTriggerBindingBehavior = (_temp = _class = function () {
-    function UpdateTriggerBindingBehavior(eventManager) {
-      
-
-      this.eventManager = eventManager;
-    }
-
-    UpdateTriggerBindingBehavior.prototype.bind = function bind(binding, source) {
-      for (var _len = arguments.length, events = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-        events[_key - 2] = arguments[_key];
+        if (a.types.dynamics !== b.types.dynamics) {
+          return b.types.dynamics - a.types.dynamics;
+        }
       }
 
-      if (events.length === 0) {
-        throw new Error(eventNamesRequired);
-      }
-      if (binding.mode !== _aureliaBinding.bindingMode.twoWay) {
-        throw new Error(notApplicableMessage);
+      if (a.types.dynamics !== b.types.dynamics) {
+        return a.types.dynamics - b.types.dynamics;
       }
 
-      var targetObserver = binding.observerLocator.getObserver(binding.target, binding.targetProperty);
-      if (!targetObserver.handler) {
-        throw new Error(notApplicableMessage);
-      }
-      binding.targetObserver = targetObserver;
-
-      targetObserver.originalHandler = binding.targetObserver.handler;
-
-      var handler = this.eventManager.createElementHandler(events);
-      targetObserver.handler = handler;
-    };
-
-    UpdateTriggerBindingBehavior.prototype.unbind = function unbind(binding, source) {
-      binding.targetObserver.handler = binding.targetObserver.originalHandler;
-      binding.targetObserver.originalHandler = null;
-    };
-
-    return UpdateTriggerBindingBehavior;
-  }(), _class.inject = [_aureliaBinding.EventManager], _temp);
-});
-define('aurelia-templating-resources/html-resource-plugin',['exports', 'aurelia-templating', './dynamic-element'], function (exports, _aureliaTemplating, _dynamicElement) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.getElementName = getElementName;
-  exports.configure = configure;
-  function getElementName(address) {
-    return (/([^\/^\?]+)\.html/i.exec(address)[1].toLowerCase()
-    );
-  }
-
-  function configure(config) {
-    var viewEngine = config.container.get(_aureliaTemplating.ViewEngine);
-    var loader = config.aurelia.loader;
-
-    viewEngine.addResourcePlugin('.html', {
-      'fetch': function fetch(address) {
-        return loader.loadTemplate(address).then(function (registryEntry) {
-          var _ref;
-
-          var bindable = registryEntry.template.getAttribute('bindable');
-          var elementName = getElementName(address);
-
-          if (bindable) {
-            bindable = bindable.split(',').map(function (x) {
-              return x.trim();
-            });
-            registryEntry.template.removeAttribute('bindable');
-          } else {
-            bindable = [];
-          }
-
-          return _ref = {}, _ref[elementName] = (0, _dynamicElement._createDynamicElement)(elementName, address, bindable), _ref;
-        });
-      }
-    });
-  }
-});
-define('aurelia-templating-resources/dynamic-element',['exports', 'aurelia-templating'], function (exports, _aureliaTemplating) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports._createDynamicElement = _createDynamicElement;
-
-  
-
-  function _createDynamicElement(name, viewUrl, bindableNames) {
-    var _dec, _dec2, _class;
-
-    var DynamicElement = (_dec = (0, _aureliaTemplating.customElement)(name), _dec2 = (0, _aureliaTemplating.useView)(viewUrl), _dec(_class = _dec2(_class = function () {
-      function DynamicElement() {
-        
+      if (a.types.statics !== b.types.statics) {
+        return b.types.statics - a.types.statics;
       }
 
-      DynamicElement.prototype.bind = function bind(bindingContext) {
-        this.$parent = bindingContext;
-      };
-
-      return DynamicElement;
-    }()) || _class) || _class);
-
-    for (var i = 0, ii = bindableNames.length; i < ii; ++i) {
-      (0, _aureliaTemplating.bindable)(bindableNames[i])(DynamicElement);
-    }
-    return DynamicElement;
-  }
-});
-define('aurelia-templating-router/route-loader',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-router', 'aurelia-path', 'aurelia-metadata', './router-view'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaRouter, _aureliaPath, _aureliaMetadata, _routerView) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.TemplatingRouteLoader = undefined;
-
-  
-
-  function _possibleConstructorReturn(self, call) {
-    if (!self) {
-      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-    }
-
-    return call && (typeof call === "object" || typeof call === "function") ? call : self;
-  }
-
-  function _inherits(subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  }
-
-  var _dec, _class;
-
-  var TemplatingRouteLoader = exports.TemplatingRouteLoader = (_dec = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.CompositionEngine), _dec(_class = function (_RouteLoader) {
-    _inherits(TemplatingRouteLoader, _RouteLoader);
-
-    function TemplatingRouteLoader(compositionEngine) {
-      
-
-      var _this = _possibleConstructorReturn(this, _RouteLoader.call(this));
-
-      _this.compositionEngine = compositionEngine;
-      return _this;
-    }
-
-    TemplatingRouteLoader.prototype.loadRoute = function loadRoute(router, config) {
-      var childContainer = router.container.createChild();
-
-      var viewModel = /\.html/.test(config.moduleId) ? createDynamicClass(config.moduleId) : (0, _aureliaPath.relativeToFile)(config.moduleId, _aureliaMetadata.Origin.get(router.container.viewModel.constructor).moduleId);
-
-      var instruction = {
-        viewModel: viewModel,
-        childContainer: childContainer,
-        view: config.view || config.viewStrategy,
-        router: router
-      };
-
-      childContainer.registerSingleton(_routerView.RouterViewLocator);
-
-      childContainer.getChildRouter = function () {
-        var childRouter = void 0;
-
-        childContainer.registerHandler(_aureliaRouter.Router, function (c) {
-          return childRouter || (childRouter = router.createChild(childContainer));
-        });
-
-        return childContainer.get(_aureliaRouter.Router);
-      };
-
-      return this.compositionEngine.ensureViewModel(instruction);
-    };
-
-    return TemplatingRouteLoader;
-  }(_aureliaRouter.RouteLoader)) || _class);
-
-
-  function createDynamicClass(moduleId) {
-    var _dec2, _dec3, _class2;
-
-    var name = /([^\/^\?]+)\.html/i.exec(moduleId)[1];
-
-    var DynamicClass = (_dec2 = (0, _aureliaTemplating.customElement)(name), _dec3 = (0, _aureliaTemplating.useView)(moduleId), _dec2(_class2 = _dec3(_class2 = function () {
-      function DynamicClass() {
-        
-      }
-
-      DynamicClass.prototype.bind = function bind(bindingContext) {
-        this.$parent = bindingContext;
-      };
-
-      return DynamicClass;
-    }()) || _class2) || _class2);
-
-
-    return DynamicClass;
-  }
-});
-define('aurelia-templating-router/router-view',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-templating', 'aurelia-router', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaTemplating, _aureliaRouter, _aureliaMetadata, _aureliaPal) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.RouterViewLocator = exports.RouterView = undefined;
-
-  function _initDefineProp(target, property, descriptor, context) {
-    if (!descriptor) return;
-    Object.defineProperty(target, property, {
-      enumerable: descriptor.enumerable,
-      configurable: descriptor.configurable,
-      writable: descriptor.writable,
-      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+      return 0;
     });
   }
 
+  function recognizeChar(states, ch) {
+    var nextStates = [];
+
+    for (var i = 0, l = states.length; i < l; i++) {
+      var state = states[i];
+      nextStates.push.apply(nextStates, state.match(ch));
+    }
+
+    var skippableStates = nextStates.filter(function (s) {
+      return s.epsilon;
+    });
+
+    var _loop = function _loop() {
+      var newStates = [];
+      skippableStates.forEach(function (s) {
+        nextStates.push.apply(nextStates, s.epsilon);
+        newStates.push.apply(newStates, s.epsilon);
+      });
+      skippableStates = newStates.filter(function (s) {
+        return s.epsilon;
+      });
+    };
+
+    while (skippableStates.length > 0) {
+      _loop();
+    }
+
+    return nextStates;
+  }
+
+  function findHandler(state, path, queryParams) {
+    var handlers = state.handlers;
+    var regex = state.regex;
+    var captures = path.match(regex);
+    var currentCapture = 1;
+    var result = new RecognizeResults(queryParams);
+
+    for (var i = 0, l = handlers.length; i < l; i++) {
+      var _handler = handlers[i];
+      var _names = _handler.names;
+      var _params = {};
+
+      for (var j = 0, m = _names.length; j < m; j++) {
+        _params[_names[j]] = captures[currentCapture++];
+      }
+
+      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
+    }
+
+    return result;
+  }
+
+  function addSegment(currentState, segment) {
+    var state = currentState.put({ validChars: '/' });
+    segment.eachChar(function (ch) {
+      state = state.put(ch);
+    });
+
+    if (segment.optional) {
+      currentState.epsilon = currentState.epsilon || [];
+      currentState.epsilon.push(state);
+    }
+
+    return state;
+  }
+});
+define('aurelia-task-queue',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TaskQueue = undefined;
+
   
 
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-    var desc = {};
-    Object['ke' + 'ys'](descriptor).forEach(function (key) {
-      desc[key] = descriptor[key];
-    });
-    desc.enumerable = !!desc.enumerable;
-    desc.configurable = !!desc.configurable;
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
 
-    if ('value' in desc || desc.initializer) {
-      desc.writable = true;
-    }
+  var hasSetImmediate = typeof setImmediate === 'function';
+  var stackSeparator = '\nEnqueued in TaskQueue by:\n';
+  var microStackSeparator = '\nEnqueued in MicroTaskQueue by:\n';
 
-    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-      return decorator(target, property, desc) || desc;
-    }, desc);
-
-    if (context && desc.initializer !== void 0) {
-      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-      desc.initializer = undefined;
-    }
-
-    if (desc.initializer === void 0) {
-      Object['define' + 'Property'](target, property, desc);
-      desc = null;
-    }
-
-    return desc;
+  function makeRequestFlushFromMutationObserver(flush) {
+    var toggle = 1;
+    var observer = _aureliaPal.DOM.createMutationObserver(flush);
+    var node = _aureliaPal.DOM.createTextNode('');
+    observer.observe(node, { characterData: true });
+    return function requestFlush() {
+      toggle = -toggle;
+      node.data = toggle;
+    };
   }
 
-  function _initializerWarningHelper(descriptor, context) {
-    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-  }
+  function makeRequestFlushFromTimer(flush) {
+    return function requestFlush() {
+      var timeoutHandle = setTimeout(handleFlushTimer, 0);
 
-  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
-
-  var RouterView = exports.RouterView = (_dec = (0, _aureliaTemplating.customElement)('router-view'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.ViewSlot, _aureliaRouter.Router, _aureliaTemplating.ViewLocator, _aureliaTemplating.CompositionTransaction, _aureliaTemplating.CompositionEngine), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
-    function RouterView(element, container, viewSlot, router, viewLocator, compositionTransaction, compositionEngine) {
-      
-
-      _initDefineProp(this, 'swapOrder', _descriptor, this);
-
-      _initDefineProp(this, 'layoutView', _descriptor2, this);
-
-      _initDefineProp(this, 'layoutViewModel', _descriptor3, this);
-
-      _initDefineProp(this, 'layoutModel', _descriptor4, this);
-
-      this.element = element;
-      this.container = container;
-      this.viewSlot = viewSlot;
-      this.router = router;
-      this.viewLocator = viewLocator;
-      this.compositionTransaction = compositionTransaction;
-      this.compositionEngine = compositionEngine;
-      this.router.registerViewPort(this, this.element.getAttribute('name'));
-
-      if (!('initialComposition' in compositionTransaction)) {
-        compositionTransaction.initialComposition = true;
-        this.compositionTransactionNotifier = compositionTransaction.enlist();
+      var intervalHandle = setInterval(handleFlushTimer, 50);
+      function handleFlushTimer() {
+        clearTimeout(timeoutHandle);
+        clearInterval(intervalHandle);
+        flush();
       }
+    };
+  }
+
+  function onError(error, task, longStacks) {
+    if (longStacks && task.stack && (typeof error === 'undefined' ? 'undefined' : _typeof(error)) === 'object' && error !== null) {
+      error.stack = filterFlushStack(error.stack) + task.stack;
     }
 
-    RouterView.prototype.created = function created(owningView) {
-      this.owningView = owningView;
-    };
+    if ('onError' in task) {
+      task.onError(error);
+    } else if (hasSetImmediate) {
+      setImmediate(function () {
+        throw error;
+      });
+    } else {
+      setTimeout(function () {
+        throw error;
+      }, 0);
+    }
+  }
 
-    RouterView.prototype.bind = function bind(bindingContext, overrideContext) {
-      this.container.viewModel = bindingContext;
-      this.overrideContext = overrideContext;
-    };
-
-    RouterView.prototype.process = function process(viewPortInstruction, waitToSwap) {
+  var TaskQueue = exports.TaskQueue = function () {
+    function TaskQueue() {
       var _this = this;
 
-      var component = viewPortInstruction.component;
-      var childContainer = component.childContainer;
-      var viewModel = component.viewModel;
-      var viewModelResource = component.viewModelResource;
-      var metadata = viewModelResource.metadata;
-      var config = component.router.currentInstruction.config;
-      var viewPort = config.viewPorts ? config.viewPorts[viewPortInstruction.name] : {};
-
-      childContainer.get(RouterViewLocator)._notify(this);
-
-      var layoutInstruction = {
-        viewModel: viewPort.layoutViewModel || config.layoutViewModel || this.layoutViewModel,
-        view: viewPort.layoutView || config.layoutView || this.layoutView,
-        model: viewPort.layoutModel || config.layoutModel || this.layoutModel,
-        router: viewPortInstruction.component.router,
-        childContainer: childContainer,
-        viewSlot: this.viewSlot
-      };
-
-      var viewStrategy = this.viewLocator.getViewStrategy(component.view || viewModel);
-      if (viewStrategy && component.view) {
-        viewStrategy.makeRelativeTo(_aureliaMetadata.Origin.get(component.router.container.viewModel.constructor).moduleId);
-      }
-
-      return metadata.load(childContainer, viewModelResource.value, null, viewStrategy, true).then(function (viewFactory) {
-        if (!_this.compositionTransactionNotifier) {
-          _this.compositionTransactionOwnershipToken = _this.compositionTransaction.tryCapture();
-        }
-
-        if (layoutInstruction.viewModel || layoutInstruction.view) {
-          viewPortInstruction.layoutInstruction = layoutInstruction;
-        }
-
-        viewPortInstruction.controller = metadata.create(childContainer, _aureliaTemplating.BehaviorInstruction.dynamic(_this.element, viewModel, viewFactory));
-
-        if (waitToSwap) {
-          return;
-        }
-
-        _this.swap(viewPortInstruction);
-      });
-    };
-
-    RouterView.prototype.swap = function swap(viewPortInstruction) {
-      var _this2 = this;
-
-      var layoutInstruction = viewPortInstruction.layoutInstruction;
-      var previousView = this.view;
-
-      var work = function work() {
-        var swapStrategy = _aureliaTemplating.SwapStrategies[_this2.swapOrder] || _aureliaTemplating.SwapStrategies.after;
-        var viewSlot = _this2.viewSlot;
-
-        swapStrategy(viewSlot, previousView, function () {
-          return Promise.resolve(viewSlot.add(_this2.view));
-        }).then(function () {
-          _this2._notify();
-        });
-      };
-
-      var ready = function ready(owningView) {
-        viewPortInstruction.controller.automate(_this2.overrideContext, owningView);
-        if (_this2.compositionTransactionOwnershipToken) {
-          return _this2.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
-            _this2.compositionTransactionOwnershipToken = null;
-            return work();
-          });
-        }
-
-        return work();
-      };
-
-      if (layoutInstruction) {
-        if (!layoutInstruction.viewModel) {
-          layoutInstruction.viewModel = {};
-        }
-
-        return this.compositionEngine.createController(layoutInstruction).then(function (controller) {
-          _aureliaTemplating.ShadowDOM.distributeView(viewPortInstruction.controller.view, controller.slots || controller.view.slots);
-          controller.automate((0, _aureliaBinding.createOverrideContext)(layoutInstruction.viewModel), _this2.owningView);
-          controller.view.children.push(viewPortInstruction.controller.view);
-          return controller.view || controller;
-        }).then(function (newView) {
-          _this2.view = newView;
-          return ready(newView);
-        });
-      }
-
-      this.view = viewPortInstruction.controller.view;
-
-      return ready(this.owningView);
-    };
-
-    RouterView.prototype._notify = function _notify() {
-      if (this.compositionTransactionNotifier) {
-        this.compositionTransactionNotifier.done();
-        this.compositionTransactionNotifier = null;
-      }
-    };
-
-    return RouterView;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'layoutView', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'layoutViewModel', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'layoutModel', [_aureliaTemplating.bindable], {
-    enumerable: true,
-    initializer: null
-  })), _class2)) || _class) || _class) || _class);
-
-  var RouterViewLocator = exports.RouterViewLocator = function () {
-    function RouterViewLocator() {
-      var _this3 = this;
-
       
 
-      this.promise = new Promise(function (resolve) {
-        return _this3.resolve = resolve;
+      this.flushing = false;
+      this.longStacks = false;
+
+      this.microTaskQueue = [];
+      this.microTaskQueueCapacity = 1024;
+      this.taskQueue = [];
+
+      if (_aureliaPal.FEATURE.mutationObserver) {
+        this.requestFlushMicroTaskQueue = makeRequestFlushFromMutationObserver(function () {
+          return _this.flushMicroTaskQueue();
+        });
+      } else {
+        this.requestFlushMicroTaskQueue = makeRequestFlushFromTimer(function () {
+          return _this.flushMicroTaskQueue();
+        });
+      }
+
+      this.requestFlushTaskQueue = makeRequestFlushFromTimer(function () {
+        return _this.flushTaskQueue();
       });
     }
 
-    RouterViewLocator.prototype.findNearest = function findNearest() {
-      return this.promise;
+    TaskQueue.prototype.queueMicroTask = function queueMicroTask(task) {
+      if (this.microTaskQueue.length < 1) {
+        this.requestFlushMicroTaskQueue();
+      }
+
+      if (this.longStacks) {
+        task.stack = this.prepareQueueStack(microStackSeparator);
+      }
+      this.microTaskQueue.push(task);
     };
 
-    RouterViewLocator.prototype._notify = function _notify(routerView) {
-      this.resolve(routerView);
+    TaskQueue.prototype.queueTask = function queueTask(task) {
+      if (this.taskQueue.length < 1) {
+        this.requestFlushTaskQueue();
+      }
+
+      if (this.longStacks) {
+        task.stack = this.prepareQueueStack(stackSeparator);
+      }
+      this.taskQueue.push(task);
     };
 
-    return RouterViewLocator;
+    TaskQueue.prototype.flushTaskQueue = function flushTaskQueue() {
+      var queue = this.taskQueue;
+      var index = 0;
+      var task = void 0;
+
+      this.taskQueue = [];
+
+      try {
+        this.flushing = true;
+        while (index < queue.length) {
+          task = queue[index];
+          if (this.longStacks) {
+            this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+          }
+          task.call();
+          index++;
+        }
+      } catch (error) {
+        onError(error, task, this.longStacks);
+      } finally {
+        this.flushing = false;
+      }
+    };
+
+    TaskQueue.prototype.flushMicroTaskQueue = function flushMicroTaskQueue() {
+      var queue = this.microTaskQueue;
+      var capacity = this.microTaskQueueCapacity;
+      var index = 0;
+      var task = void 0;
+
+      try {
+        this.flushing = true;
+        while (index < queue.length) {
+          task = queue[index];
+          if (this.longStacks) {
+            this.stack = typeof task.stack === 'string' ? task.stack : undefined;
+          }
+          task.call();
+          index++;
+
+          if (index > capacity) {
+            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+              queue[scan] = queue[scan + index];
+            }
+
+            queue.length -= index;
+            index = 0;
+          }
+        }
+      } catch (error) {
+        onError(error, task, this.longStacks);
+      } finally {
+        this.flushing = false;
+      }
+
+      queue.length = 0;
+    };
+
+    TaskQueue.prototype.prepareQueueStack = function prepareQueueStack(separator) {
+      var stack = separator + filterQueueStack(captureStack());
+      if (typeof this.stack === 'string') {
+        stack = filterFlushStack(stack) + this.stack;
+      }
+      return stack;
+    };
+
+    return TaskQueue;
   }();
+
+  function captureStack() {
+    var error = new Error();
+
+    if (error.stack) {
+      return error.stack;
+    }
+
+    try {
+      throw error;
+    } catch (e) {
+      return e.stack;
+    }
+  }
+
+  function filterQueueStack(stack) {
+    return stack.replace(/^[\s\S]*?\bqueue(Micro)?Task\b[^\n]*\n/, '');
+  }
+
+  function filterFlushStack(stack) {
+    var index = stack.lastIndexOf('flushMicroTaskQueue');
+    if (index < 0) {
+      index = stack.lastIndexOf('flushTaskQueue');
+      if (index < 0) {
+        return stack;
+      }
+    }
+    index = stack.lastIndexOf('\n', index);
+    return index < 0 ? stack : stack.substr(0, index);
+  }
 });
-define('aurelia-templating-router/route-href',['exports', 'aurelia-templating', 'aurelia-dependency-injection', 'aurelia-router', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaTemplating, _aureliaDependencyInjection, _aureliaRouter, _aureliaPal, _aureliaLogging) {
+define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _aureliaLogging, _aureliaRouteRecognizer, _aureliaDependencyInjection, _aureliaHistory, _aureliaEventAggregator) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.RouteHref = undefined;
+  exports.AppRouter = exports.PipelineProvider = exports.LoadRouteStep = exports.RouteLoader = exports.ActivateNextStep = exports.DeactivatePreviousStep = exports.CanActivateNextStep = exports.CanDeactivatePreviousStep = exports.Router = exports.BuildNavigationPlanStep = exports.activationStrategy = exports.RouterConfiguration = exports.RedirectToRoute = exports.Redirect = exports.NavModel = exports.NavigationInstruction = exports.CommitChangesStep = exports.Pipeline = exports.pipelineStatus = undefined;
+  exports._normalizeAbsolutePath = _normalizeAbsolutePath;
+  exports._createRootedPath = _createRootedPath;
+  exports._resolveUrl = _resolveUrl;
+  exports.isNavigationCommand = isNavigationCommand;
+  exports._buildNavigationPlan = _buildNavigationPlan;
 
   var LogManager = _interopRequireWildcard(_aureliaLogging);
 
@@ -26173,61 +21576,1854 @@ define('aurelia-templating-router/route-href',['exports', 'aurelia-templating', 
     }
   }
 
-  
-
-  var _dec, _dec2, _dec3, _dec4, _dec5, _class;
-
-  var logger = LogManager.getLogger('route-href');
-
-  var RouteHref = exports.RouteHref = (_dec = (0, _aureliaTemplating.customAttribute)('route-href'), _dec2 = (0, _aureliaTemplating.bindable)({ name: 'route', changeHandler: 'processChange' }), _dec3 = (0, _aureliaTemplating.bindable)({ name: 'params', changeHandler: 'processChange' }), _dec4 = (0, _aureliaTemplating.bindable)({ name: 'attribute', defaultValue: 'href' }), _dec5 = (0, _aureliaDependencyInjection.inject)(_aureliaRouter.Router, _aureliaPal.DOM.Element), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = _dec5(_class = function () {
-    function RouteHref(router, element) {
-      
-
-      this.router = router;
-      this.element = element;
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
     }
 
-    RouteHref.prototype.bind = function bind() {
-      this.isActive = true;
-      this.processChange();
-    };
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
 
-    RouteHref.prototype.unbind = function unbind() {
-      this.isActive = false;
-    };
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
 
-    RouteHref.prototype.attributeChanged = function attributeChanged(value, previous) {
-      if (previous) {
-        this.element.removeAttribute(previous);
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
+    }
+
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
+
+  
+
+  function _normalizeAbsolutePath(path, hasPushState) {
+    var absolute = arguments.length <= 2 || arguments[2] === undefined ? false : arguments[2];
+
+    if (!hasPushState && path[0] !== '#') {
+      path = '#' + path;
+    }
+
+    if (hasPushState && absolute) {
+      path = path.substring(1, path.length);
+    }
+
+    return path;
+  }
+
+  function _createRootedPath(fragment, baseUrl, hasPushState, absolute) {
+    if (isAbsoluteUrl.test(fragment)) {
+      return fragment;
+    }
+
+    var path = '';
+
+    if (baseUrl.length && baseUrl[0] !== '/') {
+      path += '/';
+    }
+
+    path += baseUrl;
+
+    if ((!path.length || path[path.length - 1] !== '/') && fragment[0] !== '/') {
+      path += '/';
+    }
+
+    if (path.length && path[path.length - 1] === '/' && fragment[0] === '/') {
+      path = path.substring(0, path.length - 1);
+    }
+
+    return _normalizeAbsolutePath(path + fragment, hasPushState, absolute);
+  }
+
+  function _resolveUrl(fragment, baseUrl, hasPushState) {
+    if (isRootedPath.test(fragment)) {
+      return _normalizeAbsolutePath(fragment, hasPushState);
+    }
+
+    return _createRootedPath(fragment, baseUrl, hasPushState);
+  }
+
+  var isRootedPath = /^#?\//;
+  var isAbsoluteUrl = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+
+  var pipelineStatus = exports.pipelineStatus = {
+    completed: 'completed',
+    canceled: 'canceled',
+    rejected: 'rejected',
+    running: 'running'
+  };
+
+  var Pipeline = exports.Pipeline = function () {
+    function Pipeline() {
+      
+
+      this.steps = [];
+    }
+
+    Pipeline.prototype.addStep = function addStep(step) {
+      var run = void 0;
+
+      if (typeof step === 'function') {
+        run = step;
+      } else if (typeof step.getSteps === 'function') {
+        var steps = step.getSteps();
+        for (var i = 0, l = steps.length; i < l; i++) {
+          this.addStep(steps[i]);
+        }
+
+        return this;
+      } else {
+        run = step.run.bind(step);
       }
 
-      this.processChange();
+      this.steps.push(run);
+
+      return this;
     };
 
-    RouteHref.prototype.processChange = function processChange() {
-      var _this = this;
+    Pipeline.prototype.run = function run(instruction) {
+      var index = -1;
+      var steps = this.steps;
 
-      return this.router.ensureConfigured().then(function () {
-        if (!_this.isActive) {
-          return null;
-        }
+      function next() {
+        index++;
 
-        var href = _this.router.generate(_this.route, _this.params);
+        if (index < steps.length) {
+          var currentStep = steps[index];
 
-        if (_this.element.au.controller) {
-          _this.element.au.controller.viewModel[_this.attribute] = href;
+          try {
+            return currentStep(instruction, next);
+          } catch (e) {
+            return next.reject(e);
+          }
         } else {
-          _this.element.setAttribute(_this.attribute, href);
+          return next.complete();
         }
+      }
 
-        return null;
-      }).catch(function (reason) {
-        logger.error(reason);
+      next.complete = createCompletionHandler(next, pipelineStatus.completed);
+      next.cancel = createCompletionHandler(next, pipelineStatus.canceled);
+      next.reject = createCompletionHandler(next, pipelineStatus.rejected);
+
+      return next();
+    };
+
+    return Pipeline;
+  }();
+
+  function createCompletionHandler(next, status) {
+    return function (output) {
+      return Promise.resolve({ status: status, output: output, completed: status === pipelineStatus.completed });
+    };
+  }
+
+  var CommitChangesStep = exports.CommitChangesStep = function () {
+    function CommitChangesStep() {
+      
+    }
+
+    CommitChangesStep.prototype.run = function run(navigationInstruction, next) {
+      return navigationInstruction._commitChanges(true).then(function () {
+        navigationInstruction._updateTitle();
+        return next();
       });
     };
 
-    return RouteHref;
-  }()) || _class) || _class) || _class) || _class) || _class);
+    return CommitChangesStep;
+  }();
+
+  var NavigationInstruction = exports.NavigationInstruction = function () {
+    function NavigationInstruction(init) {
+      
+
+      this.plan = null;
+      this.options = {};
+
+      Object.assign(this, init);
+
+      this.params = this.params || {};
+      this.viewPortInstructions = {};
+
+      var ancestorParams = [];
+      var current = this;
+      do {
+        var currentParams = Object.assign({}, current.params);
+        if (current.config && current.config.hasChildRouter) {
+          delete currentParams[current.getWildCardName()];
+        }
+
+        ancestorParams.unshift(currentParams);
+        current = current.parentInstruction;
+      } while (current);
+
+      var allParams = Object.assign.apply(Object, [{}, this.queryParams].concat(ancestorParams));
+      this.lifecycleArgs = [allParams, this.config, this];
+    }
+
+    NavigationInstruction.prototype.getAllInstructions = function getAllInstructions() {
+      var instructions = [this];
+      for (var key in this.viewPortInstructions) {
+        var childInstruction = this.viewPortInstructions[key].childNavigationInstruction;
+        if (childInstruction) {
+          instructions.push.apply(instructions, childInstruction.getAllInstructions());
+        }
+      }
+
+      return instructions;
+    };
+
+    NavigationInstruction.prototype.getAllPreviousInstructions = function getAllPreviousInstructions() {
+      return this.getAllInstructions().map(function (c) {
+        return c.previousInstruction;
+      }).filter(function (c) {
+        return c;
+      });
+    };
+
+    NavigationInstruction.prototype.addViewPortInstruction = function addViewPortInstruction(viewPortName, strategy, moduleId, component) {
+      var viewportInstruction = this.viewPortInstructions[viewPortName] = {
+        name: viewPortName,
+        strategy: strategy,
+        moduleId: moduleId,
+        component: component,
+        childRouter: component.childRouter,
+        lifecycleArgs: this.lifecycleArgs.slice()
+      };
+
+      return viewportInstruction;
+    };
+
+    NavigationInstruction.prototype.getWildCardName = function getWildCardName() {
+      var wildcardIndex = this.config.route.lastIndexOf('*');
+      return this.config.route.substr(wildcardIndex + 1);
+    };
+
+    NavigationInstruction.prototype.getWildcardPath = function getWildcardPath() {
+      var wildcardName = this.getWildCardName();
+      var path = this.params[wildcardName] || '';
+
+      if (this.queryString) {
+        path += '?' + this.queryString;
+      }
+
+      return path;
+    };
+
+    NavigationInstruction.prototype.getBaseUrl = function getBaseUrl() {
+      var _this = this;
+
+      var fragment = this.fragment;
+
+      if (fragment === '') {
+        var nonEmptyRoute = this.router.routes.find(function (route) {
+          return route.name === _this.config.name && route.route !== '';
+        });
+        if (nonEmptyRoute) {
+          fragment = nonEmptyRoute.route;
+        }
+      }
+
+      if (!this.params) {
+        return fragment;
+      }
+
+      var wildcardName = this.getWildCardName();
+      var path = this.params[wildcardName] || '';
+
+      if (!path) {
+        return fragment;
+      }
+
+      path = encodeURI(path);
+      return fragment.substr(0, fragment.lastIndexOf(path));
+    };
+
+    NavigationInstruction.prototype._commitChanges = function _commitChanges(waitToSwap) {
+      var _this2 = this;
+
+      var router = this.router;
+      router.currentInstruction = this;
+
+      if (this.previousInstruction) {
+        this.previousInstruction.config.navModel.isActive = false;
+      }
+
+      this.config.navModel.isActive = true;
+
+      router._refreshBaseUrl();
+      router.refreshNavigation();
+
+      var loads = [];
+      var delaySwaps = [];
+
+      var _loop = function _loop(viewPortName) {
+        var viewPortInstruction = _this2.viewPortInstructions[viewPortName];
+        var viewPort = router.viewPorts[viewPortName];
+
+        if (!viewPort) {
+          throw new Error('There was no router-view found in the view for ' + viewPortInstruction.moduleId + '.');
+        }
+
+        if (viewPortInstruction.strategy === activationStrategy.replace) {
+          if (waitToSwap) {
+            delaySwaps.push({ viewPort: viewPort, viewPortInstruction: viewPortInstruction });
+          }
+
+          loads.push(viewPort.process(viewPortInstruction, waitToSwap).then(function (x) {
+            if (viewPortInstruction.childNavigationInstruction) {
+              return viewPortInstruction.childNavigationInstruction._commitChanges();
+            }
+
+            return undefined;
+          }));
+        } else {
+          if (viewPortInstruction.childNavigationInstruction) {
+            loads.push(viewPortInstruction.childNavigationInstruction._commitChanges(waitToSwap));
+          }
+        }
+      };
+
+      for (var viewPortName in this.viewPortInstructions) {
+        _loop(viewPortName);
+      }
+
+      return Promise.all(loads).then(function () {
+        delaySwaps.forEach(function (x) {
+          return x.viewPort.swap(x.viewPortInstruction);
+        });
+        return null;
+      }).then(function () {
+        return prune(_this2);
+      });
+    };
+
+    NavigationInstruction.prototype._updateTitle = function _updateTitle() {
+      var title = this._buildTitle();
+      if (title) {
+        this.router.history.setTitle(title);
+      }
+    };
+
+    NavigationInstruction.prototype._buildTitle = function _buildTitle() {
+      var separator = arguments.length <= 0 || arguments[0] === undefined ? ' | ' : arguments[0];
+
+      var title = '';
+      var childTitles = [];
+
+      if (this.config.navModel.title) {
+        title = this.router.transformTitle(this.config.navModel.title);
+      }
+
+      for (var viewPortName in this.viewPortInstructions) {
+        var _viewPortInstruction = this.viewPortInstructions[viewPortName];
+
+        if (_viewPortInstruction.childNavigationInstruction) {
+          var childTitle = _viewPortInstruction.childNavigationInstruction._buildTitle(separator);
+          if (childTitle) {
+            childTitles.push(childTitle);
+          }
+        }
+      }
+
+      if (childTitles.length) {
+        title = childTitles.join(separator) + (title ? separator : '') + title;
+      }
+
+      if (this.router.title) {
+        title += (title ? separator : '') + this.router.transformTitle(this.router.title);
+      }
+
+      return title;
+    };
+
+    return NavigationInstruction;
+  }();
+
+  function prune(instruction) {
+    instruction.previousInstruction = null;
+    instruction.plan = null;
+  }
+
+  var NavModel = exports.NavModel = function () {
+    function NavModel(router, relativeHref) {
+      
+
+      this.isActive = false;
+      this.title = null;
+      this.href = null;
+      this.relativeHref = null;
+      this.settings = {};
+      this.config = null;
+
+      this.router = router;
+      this.relativeHref = relativeHref;
+    }
+
+    NavModel.prototype.setTitle = function setTitle(title) {
+      this.title = title;
+
+      if (this.isActive) {
+        this.router.updateTitle();
+      }
+    };
+
+    return NavModel;
+  }();
+
+  function isNavigationCommand(obj) {
+    return obj && typeof obj.navigate === 'function';
+  }
+
+  var Redirect = exports.Redirect = function () {
+    function Redirect(url) {
+      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+      
+
+      this.url = url;
+      this.options = Object.assign({ trigger: true, replace: true }, options);
+      this.shouldContinueProcessing = false;
+    }
+
+    Redirect.prototype.setRouter = function setRouter(router) {
+      this.router = router;
+    };
+
+    Redirect.prototype.navigate = function navigate(appRouter) {
+      var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
+      navigatingRouter.navigate(this.url, this.options);
+    };
+
+    return Redirect;
+  }();
+
+  var RedirectToRoute = exports.RedirectToRoute = function () {
+    function RedirectToRoute(route) {
+      var params = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      
+
+      this.route = route;
+      this.params = params;
+      this.options = Object.assign({ trigger: true, replace: true }, options);
+      this.shouldContinueProcessing = false;
+    }
+
+    RedirectToRoute.prototype.setRouter = function setRouter(router) {
+      this.router = router;
+    };
+
+    RedirectToRoute.prototype.navigate = function navigate(appRouter) {
+      var navigatingRouter = this.options.useAppRouter ? appRouter : this.router || appRouter;
+      navigatingRouter.navigateToRoute(this.route, this.params, this.options);
+    };
+
+    return RedirectToRoute;
+  }();
+
+  var RouterConfiguration = exports.RouterConfiguration = function () {
+    function RouterConfiguration() {
+      
+
+      this.instructions = [];
+      this.options = {};
+      this.pipelineSteps = [];
+    }
+
+    RouterConfiguration.prototype.addPipelineStep = function addPipelineStep(name, step) {
+      this.pipelineSteps.push({ name: name, step: step });
+      return this;
+    };
+
+    RouterConfiguration.prototype.addAuthorizeStep = function addAuthorizeStep(step) {
+      return this.addPipelineStep('authorize', step);
+    };
+
+    RouterConfiguration.prototype.addPreActivateStep = function addPreActivateStep(step) {
+      return this.addPipelineStep('preActivate', step);
+    };
+
+    RouterConfiguration.prototype.addPreRenderStep = function addPreRenderStep(step) {
+      return this.addPipelineStep('preRender', step);
+    };
+
+    RouterConfiguration.prototype.addPostRenderStep = function addPostRenderStep(step) {
+      return this.addPipelineStep('postRender', step);
+    };
+
+    RouterConfiguration.prototype.fallbackRoute = function fallbackRoute(fragment) {
+      this._fallbackRoute = fragment;
+      return this;
+    };
+
+    RouterConfiguration.prototype.map = function map(route) {
+      if (Array.isArray(route)) {
+        route.forEach(this.map.bind(this));
+        return this;
+      }
+
+      return this.mapRoute(route);
+    };
+
+    RouterConfiguration.prototype.mapRoute = function mapRoute(config) {
+      this.instructions.push(function (router) {
+        var routeConfigs = [];
+
+        if (Array.isArray(config.route)) {
+          for (var i = 0, ii = config.route.length; i < ii; ++i) {
+            var current = Object.assign({}, config);
+            current.route = config.route[i];
+            routeConfigs.push(current);
+          }
+        } else {
+          routeConfigs.push(Object.assign({}, config));
+        }
+
+        var navModel = void 0;
+        for (var _i = 0, _ii = routeConfigs.length; _i < _ii; ++_i) {
+          var _routeConfig = routeConfigs[_i];
+          _routeConfig.settings = _routeConfig.settings || {};
+          if (!navModel) {
+            navModel = router.createNavModel(_routeConfig);
+          }
+
+          router.addRoute(_routeConfig, navModel);
+        }
+      });
+
+      return this;
+    };
+
+    RouterConfiguration.prototype.mapUnknownRoutes = function mapUnknownRoutes(config) {
+      this.unknownRouteConfig = config;
+      return this;
+    };
+
+    RouterConfiguration.prototype.exportToRouter = function exportToRouter(router) {
+      var instructions = this.instructions;
+      for (var i = 0, ii = instructions.length; i < ii; ++i) {
+        instructions[i](router);
+      }
+
+      if (this.title) {
+        router.title = this.title;
+      }
+
+      if (this.unknownRouteConfig) {
+        router.handleUnknownRoutes(this.unknownRouteConfig);
+      }
+
+      if (this._fallbackRoute) {
+        router.fallbackRoute = this._fallbackRoute;
+      }
+
+      router.options = this.options;
+
+      var pipelineSteps = this.pipelineSteps;
+      if (pipelineSteps.length) {
+        if (!router.isRoot) {
+          throw new Error('Pipeline steps can only be added to the root router');
+        }
+
+        var pipelineProvider = router.pipelineProvider;
+        for (var _i2 = 0, _ii2 = pipelineSteps.length; _i2 < _ii2; ++_i2) {
+          var _pipelineSteps$_i = pipelineSteps[_i2];
+          var _name = _pipelineSteps$_i.name;
+          var step = _pipelineSteps$_i.step;
+
+          pipelineProvider.addStep(_name, step);
+        }
+      }
+    };
+
+    return RouterConfiguration;
+  }();
+
+  var activationStrategy = exports.activationStrategy = {
+    noChange: 'no-change',
+    invokeLifecycle: 'invoke-lifecycle',
+    replace: 'replace'
+  };
+
+  var BuildNavigationPlanStep = exports.BuildNavigationPlanStep = function () {
+    function BuildNavigationPlanStep() {
+      
+    }
+
+    BuildNavigationPlanStep.prototype.run = function run(navigationInstruction, next) {
+      return _buildNavigationPlan(navigationInstruction).then(function (plan) {
+        navigationInstruction.plan = plan;
+        return next();
+      }).catch(next.cancel);
+    };
+
+    return BuildNavigationPlanStep;
+  }();
+
+  function _buildNavigationPlan(instruction, forceLifecycleMinimum) {
+    var prev = instruction.previousInstruction;
+    var config = instruction.config;
+    var plan = {};
+
+    if ('redirect' in config) {
+      var redirectLocation = _resolveUrl(config.redirect, getInstructionBaseUrl(instruction));
+      if (instruction.queryString) {
+        redirectLocation += '?' + instruction.queryString;
+      }
+
+      return Promise.reject(new Redirect(redirectLocation));
+    }
+
+    if (prev) {
+      var newParams = hasDifferentParameterValues(prev, instruction);
+      var pending = [];
+
+      var _loop2 = function _loop2(viewPortName) {
+        var prevViewPortInstruction = prev.viewPortInstructions[viewPortName];
+        var nextViewPortConfig = config.viewPorts[viewPortName];
+
+        if (!nextViewPortConfig) throw new Error('Invalid Route Config: Configuration for viewPort "' + viewPortName + '" was not found for route: "' + instruction.config.route + '."');
+
+        var viewPortPlan = plan[viewPortName] = {
+          name: viewPortName,
+          config: nextViewPortConfig,
+          prevComponent: prevViewPortInstruction.component,
+          prevModuleId: prevViewPortInstruction.moduleId
+        };
+
+        if (prevViewPortInstruction.moduleId !== nextViewPortConfig.moduleId) {
+          viewPortPlan.strategy = activationStrategy.replace;
+        } else if ('determineActivationStrategy' in prevViewPortInstruction.component.viewModel) {
+          var _prevViewPortInstruct;
+
+          viewPortPlan.strategy = (_prevViewPortInstruct = prevViewPortInstruction.component.viewModel).determineActivationStrategy.apply(_prevViewPortInstruct, instruction.lifecycleArgs);
+        } else if (config.activationStrategy) {
+          viewPortPlan.strategy = config.activationStrategy;
+        } else if (newParams || forceLifecycleMinimum) {
+          viewPortPlan.strategy = activationStrategy.invokeLifecycle;
+        } else {
+          viewPortPlan.strategy = activationStrategy.noChange;
+        }
+
+        if (viewPortPlan.strategy !== activationStrategy.replace && prevViewPortInstruction.childRouter) {
+          var path = instruction.getWildcardPath();
+          var task = prevViewPortInstruction.childRouter._createNavigationInstruction(path, instruction).then(function (childInstruction) {
+            viewPortPlan.childNavigationInstruction = childInstruction;
+
+            return _buildNavigationPlan(childInstruction, viewPortPlan.strategy === activationStrategy.invokeLifecycle).then(function (childPlan) {
+              childInstruction.plan = childPlan;
+            });
+          });
+
+          pending.push(task);
+        }
+      };
+
+      for (var viewPortName in prev.viewPortInstructions) {
+        _loop2(viewPortName);
+      }
+
+      return Promise.all(pending).then(function () {
+        return plan;
+      });
+    }
+
+    for (var _viewPortName in config.viewPorts) {
+      plan[_viewPortName] = {
+        name: _viewPortName,
+        strategy: activationStrategy.replace,
+        config: instruction.config.viewPorts[_viewPortName]
+      };
+    }
+
+    return Promise.resolve(plan);
+  }
+
+  function hasDifferentParameterValues(prev, next) {
+    var prevParams = prev.params;
+    var nextParams = next.params;
+    var nextWildCardName = next.config.hasChildRouter ? next.getWildCardName() : null;
+
+    for (var key in nextParams) {
+      if (key === nextWildCardName) {
+        continue;
+      }
+
+      if (prevParams[key] !== nextParams[key]) {
+        return true;
+      }
+    }
+
+    for (var _key in prevParams) {
+      if (_key === nextWildCardName) {
+        continue;
+      }
+
+      if (prevParams[_key] !== nextParams[_key]) {
+        return true;
+      }
+    }
+
+    if (!next.options.compareQueryParams) {
+      return false;
+    }
+
+    var prevQueryParams = prev.queryParams;
+    var nextQueryParams = next.queryParams;
+    for (var _key2 in nextQueryParams) {
+      if (prevQueryParams[_key2] !== nextQueryParams[_key2]) {
+        return true;
+      }
+    }
+
+    for (var _key3 in prevQueryParams) {
+      if (prevQueryParams[_key3] !== nextQueryParams[_key3]) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function getInstructionBaseUrl(instruction) {
+    var instructionBaseUrlParts = [];
+    instruction = instruction.parentInstruction;
+
+    while (instruction) {
+      instructionBaseUrlParts.unshift(instruction.getBaseUrl());
+      instruction = instruction.parentInstruction;
+    }
+
+    instructionBaseUrlParts.unshift('/');
+    return instructionBaseUrlParts.join('');
+  }
+
+  var Router = exports.Router = function () {
+    function Router(container, history) {
+      var _this3 = this;
+
+      
+
+      this.parent = null;
+      this.options = {};
+
+      this.transformTitle = function (title) {
+        if (_this3.parent) {
+          return _this3.parent.transformTitle(title);
+        }
+        return title;
+      };
+
+      this.container = container;
+      this.history = history;
+      this.reset();
+    }
+
+    Router.prototype.reset = function reset() {
+      var _this4 = this;
+
+      this.viewPorts = {};
+      this.routes = [];
+      this.baseUrl = '';
+      this.isConfigured = false;
+      this.isNavigating = false;
+      this.isExplicitNavigation = false;
+      this.isExplicitNavigationBack = false;
+      this.navigation = [];
+      this.currentInstruction = null;
+      this._fallbackOrder = 100;
+      this._recognizer = new _aureliaRouteRecognizer.RouteRecognizer();
+      this._childRecognizer = new _aureliaRouteRecognizer.RouteRecognizer();
+      this._configuredPromise = new Promise(function (resolve) {
+        _this4._resolveConfiguredPromise = resolve;
+      });
+    };
+
+    Router.prototype.registerViewPort = function registerViewPort(viewPort, name) {
+      name = name || 'default';
+      this.viewPorts[name] = viewPort;
+    };
+
+    Router.prototype.ensureConfigured = function ensureConfigured() {
+      return this._configuredPromise;
+    };
+
+    Router.prototype.configure = function configure(callbackOrConfig) {
+      var _this5 = this;
+
+      this.isConfigured = true;
+
+      var result = callbackOrConfig;
+      var config = void 0;
+      if (typeof callbackOrConfig === 'function') {
+        config = new RouterConfiguration();
+        result = callbackOrConfig(config);
+      }
+
+      return Promise.resolve(result).then(function (c) {
+        if (c && c.exportToRouter) {
+          config = c;
+        }
+
+        config.exportToRouter(_this5);
+        _this5.isConfigured = true;
+        _this5._resolveConfiguredPromise();
+      });
+    };
+
+    Router.prototype.navigate = function navigate(fragment, options) {
+      if (!this.isConfigured && this.parent) {
+        return this.parent.navigate(fragment, options);
+      }
+
+      this.isExplicitNavigation = true;
+      return this.history.navigate(_resolveUrl(fragment, this.baseUrl, this.history._hasPushState), options);
+    };
+
+    Router.prototype.navigateToRoute = function navigateToRoute(route, params, options) {
+      var path = this.generate(route, params);
+      return this.navigate(path, options);
+    };
+
+    Router.prototype.navigateBack = function navigateBack() {
+      this.isExplicitNavigationBack = true;
+      this.history.navigateBack();
+    };
+
+    Router.prototype.createChild = function createChild(container) {
+      var childRouter = new Router(container || this.container.createChild(), this.history);
+      childRouter.parent = this;
+      return childRouter;
+    };
+
+    Router.prototype.generate = function generate(name, params) {
+      var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+
+      var hasRoute = this._recognizer.hasRoute(name);
+      if ((!this.isConfigured || !hasRoute) && this.parent) {
+        return this.parent.generate(name, params);
+      }
+
+      if (!hasRoute) {
+        throw new Error('A route with name \'' + name + '\' could not be found. Check that `name: \'' + name + '\'` was specified in the route\'s config.');
+      }
+
+      var path = this._recognizer.generate(name, params);
+      var rootedPath = _createRootedPath(path, this.baseUrl, this.history._hasPushState, options.absolute);
+      return options.absolute ? '' + this.history.getAbsoluteRoot() + rootedPath : rootedPath;
+    };
+
+    Router.prototype.createNavModel = function createNavModel(config) {
+      var navModel = new NavModel(this, 'href' in config ? config.href : config.route);
+      navModel.title = config.title;
+      navModel.order = config.nav;
+      navModel.href = config.href;
+      navModel.settings = config.settings;
+      navModel.config = config;
+
+      return navModel;
+    };
+
+    Router.prototype.addRoute = function addRoute(config, navModel) {
+      validateRouteConfig(config, this.routes);
+
+      if (!('viewPorts' in config) && !config.navigationStrategy) {
+        config.viewPorts = {
+          'default': {
+            moduleId: config.moduleId,
+            view: config.view
+          }
+        };
+      }
+
+      if (!navModel) {
+        navModel = this.createNavModel(config);
+      }
+
+      this.routes.push(config);
+
+      var path = config.route;
+      if (path.charAt(0) === '/') {
+        path = path.substr(1);
+      }
+      var caseSensitive = config.caseSensitive === true;
+      var state = this._recognizer.add({ path: path, handler: config, caseSensitive: caseSensitive });
+
+      if (path) {
+        var _settings = config.settings;
+        delete config.settings;
+        var withChild = JSON.parse(JSON.stringify(config));
+        config.settings = _settings;
+        withChild.route = path + '/*childRoute';
+        withChild.hasChildRouter = true;
+        this._childRecognizer.add({
+          path: withChild.route,
+          handler: withChild,
+          caseSensitive: caseSensitive
+        });
+
+        withChild.navModel = navModel;
+        withChild.settings = config.settings;
+        withChild.navigationStrategy = config.navigationStrategy;
+      }
+
+      config.navModel = navModel;
+
+      if ((navModel.order || navModel.order === 0) && this.navigation.indexOf(navModel) === -1) {
+        if (!navModel.href && navModel.href !== '' && (state.types.dynamics || state.types.stars)) {
+          throw new Error('Invalid route config for "' + config.route + '" : dynamic routes must specify an "href:" to be included in the navigation model.');
+        }
+
+        if (typeof navModel.order !== 'number') {
+          navModel.order = ++this._fallbackOrder;
+        }
+
+        this.navigation.push(navModel);
+        this.navigation = this.navigation.sort(function (a, b) {
+          return a.order - b.order;
+        });
+      }
+    };
+
+    Router.prototype.hasRoute = function hasRoute(name) {
+      return !!(this._recognizer.hasRoute(name) || this.parent && this.parent.hasRoute(name));
+    };
+
+    Router.prototype.hasOwnRoute = function hasOwnRoute(name) {
+      return this._recognizer.hasRoute(name);
+    };
+
+    Router.prototype.handleUnknownRoutes = function handleUnknownRoutes(config) {
+      var _this6 = this;
+
+      if (!config) {
+        throw new Error('Invalid unknown route handler');
+      }
+
+      this.catchAllHandler = function (instruction) {
+        return _this6._createRouteConfig(config, instruction).then(function (c) {
+          instruction.config = c;
+          return instruction;
+        });
+      };
+    };
+
+    Router.prototype.updateTitle = function updateTitle() {
+      if (this.parent) {
+        return this.parent.updateTitle();
+      }
+
+      if (this.currentInstruction) {
+        this.currentInstruction._updateTitle();
+      }
+      return undefined;
+    };
+
+    Router.prototype.refreshNavigation = function refreshNavigation() {
+      var nav = this.navigation;
+
+      for (var i = 0, length = nav.length; i < length; i++) {
+        var current = nav[i];
+        if (!current.config.href) {
+          current.href = _createRootedPath(current.relativeHref, this.baseUrl, this.history._hasPushState);
+        } else {
+          current.href = _normalizeAbsolutePath(current.config.href, this.history._hasPushState);
+        }
+      }
+    };
+
+    Router.prototype._refreshBaseUrl = function _refreshBaseUrl() {
+      if (this.parent) {
+        var baseUrl = this.parent.currentInstruction.getBaseUrl();
+        this.baseUrl = this.parent.baseUrl + baseUrl;
+      }
+    };
+
+    Router.prototype._createNavigationInstruction = function _createNavigationInstruction() {
+      var url = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+      var parentInstruction = arguments.length <= 1 || arguments[1] === undefined ? null : arguments[1];
+
+      var fragment = url;
+      var queryString = '';
+
+      var queryIndex = url.indexOf('?');
+      if (queryIndex !== -1) {
+        fragment = url.substr(0, queryIndex);
+        queryString = url.substr(queryIndex + 1);
+      }
+
+      var results = this._recognizer.recognize(url);
+      if (!results || !results.length) {
+        results = this._childRecognizer.recognize(url);
+      }
+
+      var instructionInit = {
+        fragment: fragment,
+        queryString: queryString,
+        config: null,
+        parentInstruction: parentInstruction,
+        previousInstruction: this.currentInstruction,
+        router: this,
+        options: {
+          compareQueryParams: this.options.compareQueryParams
+        }
+      };
+
+      if (results && results.length) {
+        var first = results[0];
+        var _instruction = new NavigationInstruction(Object.assign({}, instructionInit, {
+          params: first.params,
+          queryParams: first.queryParams || results.queryParams,
+          config: first.config || first.handler
+        }));
+
+        if (typeof first.handler === 'function') {
+          return evaluateNavigationStrategy(_instruction, first.handler, first);
+        } else if (first.handler && typeof first.handler.navigationStrategy === 'function') {
+          return evaluateNavigationStrategy(_instruction, first.handler.navigationStrategy, first.handler);
+        }
+
+        return Promise.resolve(_instruction);
+      } else if (this.catchAllHandler) {
+        var _instruction2 = new NavigationInstruction(Object.assign({}, instructionInit, {
+          params: { path: fragment },
+          queryParams: results && results.queryParams,
+          config: null }));
+
+        return evaluateNavigationStrategy(_instruction2, this.catchAllHandler);
+      }
+
+      return Promise.reject(new Error('Route not found: ' + url));
+    };
+
+    Router.prototype._createRouteConfig = function _createRouteConfig(config, instruction) {
+      var _this7 = this;
+
+      return Promise.resolve(config).then(function (c) {
+        if (typeof c === 'string') {
+          return { moduleId: c };
+        } else if (typeof c === 'function') {
+          return c(instruction);
+        }
+
+        return c;
+      }).then(function (c) {
+        return typeof c === 'string' ? { moduleId: c } : c;
+      }).then(function (c) {
+        c.route = instruction.params.path;
+        validateRouteConfig(c, _this7.routes);
+
+        if (!c.navModel) {
+          c.navModel = _this7.createNavModel(c);
+        }
+
+        return c;
+      });
+    };
+
+    _createClass(Router, [{
+      key: 'isRoot',
+      get: function get() {
+        return !this.parent;
+      }
+    }]);
+
+    return Router;
+  }();
+
+  function validateRouteConfig(config, routes) {
+    if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) !== 'object') {
+      throw new Error('Invalid Route Config');
+    }
+
+    if (typeof config.route !== 'string') {
+      var _name2 = config.name || '(no name)';
+      throw new Error('Invalid Route Config for "' + _name2 + '": You must specify a "route:" pattern.');
+    }
+
+    if (!('redirect' in config || config.moduleId || config.navigationStrategy || config.viewPorts)) {
+      throw new Error('Invalid Route Config for "' + config.route + '": You must specify a "moduleId:", "redirect:", "navigationStrategy:", or "viewPorts:".');
+    }
+  }
+
+  function evaluateNavigationStrategy(instruction, evaluator, context) {
+    return Promise.resolve(evaluator.call(context, instruction)).then(function () {
+      if (!('viewPorts' in instruction.config)) {
+        instruction.config.viewPorts = {
+          'default': {
+            moduleId: instruction.config.moduleId
+          }
+        };
+      }
+
+      return instruction;
+    });
+  }
+
+  var CanDeactivatePreviousStep = exports.CanDeactivatePreviousStep = function () {
+    function CanDeactivatePreviousStep() {
+      
+    }
+
+    CanDeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
+      return processDeactivatable(navigationInstruction.plan, 'canDeactivate', next);
+    };
+
+    return CanDeactivatePreviousStep;
+  }();
+
+  var CanActivateNextStep = exports.CanActivateNextStep = function () {
+    function CanActivateNextStep() {
+      
+    }
+
+    CanActivateNextStep.prototype.run = function run(navigationInstruction, next) {
+      return processActivatable(navigationInstruction, 'canActivate', next);
+    };
+
+    return CanActivateNextStep;
+  }();
+
+  var DeactivatePreviousStep = exports.DeactivatePreviousStep = function () {
+    function DeactivatePreviousStep() {
+      
+    }
+
+    DeactivatePreviousStep.prototype.run = function run(navigationInstruction, next) {
+      return processDeactivatable(navigationInstruction.plan, 'deactivate', next, true);
+    };
+
+    return DeactivatePreviousStep;
+  }();
+
+  var ActivateNextStep = exports.ActivateNextStep = function () {
+    function ActivateNextStep() {
+      
+    }
+
+    ActivateNextStep.prototype.run = function run(navigationInstruction, next) {
+      return processActivatable(navigationInstruction, 'activate', next, true);
+    };
+
+    return ActivateNextStep;
+  }();
+
+  function processDeactivatable(plan, callbackName, next, ignoreResult) {
+    var infos = findDeactivatable(plan, callbackName);
+    var i = infos.length;
+
+    function inspect(val) {
+      if (ignoreResult || shouldContinue(val)) {
+        return iterate();
+      }
+
+      return next.cancel(val);
+    }
+
+    function iterate() {
+      if (i--) {
+        try {
+          var viewModel = infos[i];
+          var _result = viewModel[callbackName]();
+          return processPotential(_result, inspect, next.cancel);
+        } catch (error) {
+          return next.cancel(error);
+        }
+      }
+
+      return next();
+    }
+
+    return iterate();
+  }
+
+  function findDeactivatable(plan, callbackName) {
+    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+
+    for (var viewPortName in plan) {
+      var _viewPortPlan = plan[viewPortName];
+      var prevComponent = _viewPortPlan.prevComponent;
+
+      if ((_viewPortPlan.strategy === activationStrategy.invokeLifecycle || _viewPortPlan.strategy === activationStrategy.replace) && prevComponent) {
+        var viewModel = prevComponent.viewModel;
+
+        if (callbackName in viewModel) {
+          list.push(viewModel);
+        }
+      }
+
+      if (_viewPortPlan.childNavigationInstruction) {
+        findDeactivatable(_viewPortPlan.childNavigationInstruction.plan, callbackName, list);
+      } else if (prevComponent) {
+        addPreviousDeactivatable(prevComponent, callbackName, list);
+      }
+    }
+
+    return list;
+  }
+
+  function addPreviousDeactivatable(component, callbackName, list) {
+    var childRouter = component.childRouter;
+
+    if (childRouter && childRouter.currentInstruction) {
+      var viewPortInstructions = childRouter.currentInstruction.viewPortInstructions;
+
+      for (var viewPortName in viewPortInstructions) {
+        var _viewPortInstruction2 = viewPortInstructions[viewPortName];
+        var prevComponent = _viewPortInstruction2.component;
+        var prevViewModel = prevComponent.viewModel;
+
+        if (callbackName in prevViewModel) {
+          list.push(prevViewModel);
+        }
+
+        addPreviousDeactivatable(prevComponent, callbackName, list);
+      }
+    }
+  }
+
+  function processActivatable(navigationInstruction, callbackName, next, ignoreResult) {
+    var infos = findActivatable(navigationInstruction, callbackName);
+    var length = infos.length;
+    var i = -1;
+
+    function inspect(val, router) {
+      if (ignoreResult || shouldContinue(val, router)) {
+        return iterate();
+      }
+
+      return next.cancel(val);
+    }
+
+    function iterate() {
+      i++;
+
+      if (i < length) {
+        try {
+          var _ret3 = function () {
+            var _current$viewModel;
+
+            var current = infos[i];
+            var result = (_current$viewModel = current.viewModel)[callbackName].apply(_current$viewModel, current.lifecycleArgs);
+            return {
+              v: processPotential(result, function (val) {
+                return inspect(val, current.router);
+              }, next.cancel)
+            };
+          }();
+
+          if ((typeof _ret3 === 'undefined' ? 'undefined' : _typeof(_ret3)) === "object") return _ret3.v;
+        } catch (error) {
+          return next.cancel(error);
+        }
+      }
+
+      return next();
+    }
+
+    return iterate();
+  }
+
+  function findActivatable(navigationInstruction, callbackName) {
+    var list = arguments.length <= 2 || arguments[2] === undefined ? [] : arguments[2];
+    var router = arguments[3];
+
+    var plan = navigationInstruction.plan;
+
+    Object.keys(plan).filter(function (viewPortName) {
+      var viewPortPlan = plan[viewPortName];
+      var viewPortInstruction = navigationInstruction.viewPortInstructions[viewPortName];
+      var viewModel = viewPortInstruction.component.viewModel;
+
+      if ((viewPortPlan.strategy === activationStrategy.invokeLifecycle || viewPortPlan.strategy === activationStrategy.replace) && callbackName in viewModel) {
+        list.push({
+          viewModel: viewModel,
+          lifecycleArgs: viewPortInstruction.lifecycleArgs,
+          router: router
+        });
+      }
+
+      if (viewPortPlan.childNavigationInstruction) {
+        findActivatable(viewPortPlan.childNavigationInstruction, callbackName, list, viewPortInstruction.component.childRouter || router);
+      }
+    });
+
+    return list;
+  }
+
+  function shouldContinue(output, router) {
+    if (output instanceof Error) {
+      return false;
+    }
+
+    if (isNavigationCommand(output)) {
+      if (typeof output.setRouter === 'function') {
+        output.setRouter(router);
+      }
+
+      return !!output.shouldContinueProcessing;
+    }
+
+    if (output === undefined) {
+      return true;
+    }
+
+    return output;
+  }
+
+  var SafeSubscription = function () {
+    function SafeSubscription(subscriptionFunc) {
+      
+
+      this._subscribed = true;
+      this._subscription = subscriptionFunc(this);
+
+      if (!this._subscribed) this.unsubscribe();
+    }
+
+    SafeSubscription.prototype.unsubscribe = function unsubscribe() {
+      if (this._subscribed && this._subscription) this._subscription.unsubscribe();
+
+      this._subscribed = false;
+    };
+
+    _createClass(SafeSubscription, [{
+      key: 'subscribed',
+      get: function get() {
+        return this._subscribed;
+      }
+    }]);
+
+    return SafeSubscription;
+  }();
+
+  function processPotential(obj, resolve, reject) {
+    if (obj && typeof obj.then === 'function') {
+      return Promise.resolve(obj).then(resolve).catch(reject);
+    }
+
+    if (obj && typeof obj.subscribe === 'function') {
+      var _ret4 = function () {
+        var obs = obj;
+        return {
+          v: new SafeSubscription(function (sub) {
+            return obs.subscribe({
+              next: function next() {
+                if (sub.subscribed) {
+                  sub.unsubscribe();
+                  resolve(obj);
+                }
+              },
+              error: function error(_error) {
+                if (sub.subscribed) {
+                  sub.unsubscribe();
+                  reject(_error);
+                }
+              },
+              complete: function complete() {
+                if (sub.subscribed) {
+                  sub.unsubscribe();
+                  resolve(obj);
+                }
+              }
+            });
+          })
+        };
+      }();
+
+      if ((typeof _ret4 === 'undefined' ? 'undefined' : _typeof(_ret4)) === "object") return _ret4.v;
+    }
+
+    try {
+      return resolve(obj);
+    } catch (error) {
+      return reject(error);
+    }
+  }
+
+  var RouteLoader = exports.RouteLoader = function () {
+    function RouteLoader() {
+      
+    }
+
+    RouteLoader.prototype.loadRoute = function loadRoute(router, config, navigationInstruction) {
+      throw Error('Route loaders must implement "loadRoute(router, config, navigationInstruction)".');
+    };
+
+    return RouteLoader;
+  }();
+
+  var LoadRouteStep = exports.LoadRouteStep = function () {
+    LoadRouteStep.inject = function inject() {
+      return [RouteLoader];
+    };
+
+    function LoadRouteStep(routeLoader) {
+      
+
+      this.routeLoader = routeLoader;
+    }
+
+    LoadRouteStep.prototype.run = function run(navigationInstruction, next) {
+      return loadNewRoute(this.routeLoader, navigationInstruction).then(next).catch(next.cancel);
+    };
+
+    return LoadRouteStep;
+  }();
+
+  function loadNewRoute(routeLoader, navigationInstruction) {
+    var toLoad = determineWhatToLoad(navigationInstruction);
+    var loadPromises = toLoad.map(function (current) {
+      return loadRoute(routeLoader, current.navigationInstruction, current.viewPortPlan);
+    });
+
+    return Promise.all(loadPromises);
+  }
+
+  function determineWhatToLoad(navigationInstruction) {
+    var toLoad = arguments.length <= 1 || arguments[1] === undefined ? [] : arguments[1];
+
+    var plan = navigationInstruction.plan;
+
+    for (var viewPortName in plan) {
+      var _viewPortPlan2 = plan[viewPortName];
+
+      if (_viewPortPlan2.strategy === activationStrategy.replace) {
+        toLoad.push({ viewPortPlan: _viewPortPlan2, navigationInstruction: navigationInstruction });
+
+        if (_viewPortPlan2.childNavigationInstruction) {
+          determineWhatToLoad(_viewPortPlan2.childNavigationInstruction, toLoad);
+        }
+      } else {
+        var _viewPortInstruction3 = navigationInstruction.addViewPortInstruction(viewPortName, _viewPortPlan2.strategy, _viewPortPlan2.prevModuleId, _viewPortPlan2.prevComponent);
+
+        if (_viewPortPlan2.childNavigationInstruction) {
+          _viewPortInstruction3.childNavigationInstruction = _viewPortPlan2.childNavigationInstruction;
+          determineWhatToLoad(_viewPortPlan2.childNavigationInstruction, toLoad);
+        }
+      }
+    }
+
+    return toLoad;
+  }
+
+  function loadRoute(routeLoader, navigationInstruction, viewPortPlan) {
+    var moduleId = viewPortPlan.config.moduleId;
+
+    return loadComponent(routeLoader, navigationInstruction, viewPortPlan.config).then(function (component) {
+      var viewPortInstruction = navigationInstruction.addViewPortInstruction(viewPortPlan.name, viewPortPlan.strategy, moduleId, component);
+
+      var childRouter = component.childRouter;
+      if (childRouter) {
+        var path = navigationInstruction.getWildcardPath();
+
+        return childRouter._createNavigationInstruction(path, navigationInstruction).then(function (childInstruction) {
+          viewPortPlan.childNavigationInstruction = childInstruction;
+
+          return _buildNavigationPlan(childInstruction).then(function (childPlan) {
+            childInstruction.plan = childPlan;
+            viewPortInstruction.childNavigationInstruction = childInstruction;
+
+            return loadNewRoute(routeLoader, childInstruction);
+          });
+        });
+      }
+
+      return undefined;
+    });
+  }
+
+  function loadComponent(routeLoader, navigationInstruction, config) {
+    var router = navigationInstruction.router;
+    var lifecycleArgs = navigationInstruction.lifecycleArgs;
+
+    return routeLoader.loadRoute(router, config, navigationInstruction).then(function (component) {
+      var viewModel = component.viewModel;
+      var childContainer = component.childContainer;
+
+      component.router = router;
+      component.config = config;
+
+      if ('configureRouter' in viewModel) {
+        var _ret5 = function () {
+          var childRouter = childContainer.getChildRouter();
+          component.childRouter = childRouter;
+
+          return {
+            v: childRouter.configure(function (c) {
+              return viewModel.configureRouter.apply(viewModel, [c, childRouter].concat(lifecycleArgs));
+            }).then(function () {
+              return component;
+            })
+          };
+        }();
+
+        if ((typeof _ret5 === 'undefined' ? 'undefined' : _typeof(_ret5)) === "object") return _ret5.v;
+      }
+
+      return component;
+    });
+  }
+
+  var PipelineSlot = function () {
+    function PipelineSlot(container, name, alias) {
+      
+
+      this.steps = [];
+
+      this.container = container;
+      this.slotName = name;
+      this.slotAlias = alias;
+    }
+
+    PipelineSlot.prototype.getSteps = function getSteps() {
+      var _this8 = this;
+
+      return this.steps.map(function (x) {
+        return _this8.container.get(x);
+      });
+    };
+
+    return PipelineSlot;
+  }();
+
+  var PipelineProvider = exports.PipelineProvider = function () {
+    PipelineProvider.inject = function inject() {
+      return [_aureliaDependencyInjection.Container];
+    };
+
+    function PipelineProvider(container) {
+      
+
+      this.container = container;
+      this.steps = [BuildNavigationPlanStep, CanDeactivatePreviousStep, LoadRouteStep, this._createPipelineSlot('authorize'), CanActivateNextStep, this._createPipelineSlot('preActivate', 'modelbind'), DeactivatePreviousStep, ActivateNextStep, this._createPipelineSlot('preRender', 'precommit'), CommitChangesStep, this._createPipelineSlot('postRender', 'postcomplete')];
+    }
+
+    PipelineProvider.prototype.createPipeline = function createPipeline() {
+      var _this9 = this;
+
+      var pipeline = new Pipeline();
+      this.steps.forEach(function (step) {
+        return pipeline.addStep(_this9.container.get(step));
+      });
+      return pipeline;
+    };
+
+    PipelineProvider.prototype._findStep = function _findStep(name) {
+      return this.steps.find(function (x) {
+        return x.slotName === name || x.slotAlias === name;
+      });
+    };
+
+    PipelineProvider.prototype.addStep = function addStep(name, step) {
+      var found = this._findStep(name);
+      if (found) {
+        if (!found.steps.includes(step)) {
+          found.steps.push(step);
+        }
+      } else {
+        throw new Error('Invalid pipeline slot name: ' + name + '.');
+      }
+    };
+
+    PipelineProvider.prototype.removeStep = function removeStep(name, step) {
+      var slot = this._findStep(name);
+      if (slot) {
+        slot.steps.splice(slot.steps.indexOf(step), 1);
+      }
+    };
+
+    PipelineProvider.prototype._clearSteps = function _clearSteps() {
+      var name = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+      var slot = this._findStep(name);
+      if (slot) {
+        slot.steps = [];
+      }
+    };
+
+    PipelineProvider.prototype.reset = function reset() {
+      this._clearSteps('authorize');
+      this._clearSteps('preActivate');
+      this._clearSteps('preRender');
+      this._clearSteps('postRender');
+    };
+
+    PipelineProvider.prototype._createPipelineSlot = function _createPipelineSlot(name, alias) {
+      return new PipelineSlot(this.container, name, alias);
+    };
+
+    return PipelineProvider;
+  }();
+
+  var logger = LogManager.getLogger('app-router');
+
+  var AppRouter = exports.AppRouter = function (_Router) {
+    _inherits(AppRouter, _Router);
+
+    AppRouter.inject = function inject() {
+      return [_aureliaDependencyInjection.Container, _aureliaHistory.History, PipelineProvider, _aureliaEventAggregator.EventAggregator];
+    };
+
+    function AppRouter(container, history, pipelineProvider, events) {
+      
+
+      var _this10 = _possibleConstructorReturn(this, _Router.call(this, container, history));
+
+      _this10.pipelineProvider = pipelineProvider;
+      _this10.events = events;
+      return _this10;
+    }
+
+    AppRouter.prototype.reset = function reset() {
+      _Router.prototype.reset.call(this);
+      this.maxInstructionCount = 10;
+      if (!this._queue) {
+        this._queue = [];
+      } else {
+        this._queue.length = 0;
+      }
+    };
+
+    AppRouter.prototype.loadUrl = function loadUrl(url) {
+      var _this11 = this;
+
+      return this._createNavigationInstruction(url).then(function (instruction) {
+        return _this11._queueInstruction(instruction);
+      }).catch(function (error) {
+        logger.error(error);
+        restorePreviousLocation(_this11);
+      });
+    };
+
+    AppRouter.prototype.registerViewPort = function registerViewPort(viewPort, name) {
+      var _this12 = this;
+
+      _Router.prototype.registerViewPort.call(this, viewPort, name);
+
+      if (!this.isActive) {
+        var _ret6 = function () {
+          var viewModel = _this12._findViewModel(viewPort);
+          if ('configureRouter' in viewModel) {
+            if (!_this12.isConfigured) {
+              var _ret7 = function () {
+                var resolveConfiguredPromise = _this12._resolveConfiguredPromise;
+                _this12._resolveConfiguredPromise = function () {};
+                return {
+                  v: {
+                    v: _this12.configure(function (config) {
+                      return viewModel.configureRouter(config, _this12);
+                    }).then(function () {
+                      _this12.activate();
+                      resolveConfiguredPromise();
+                    })
+                  }
+                };
+              }();
+
+              if ((typeof _ret7 === 'undefined' ? 'undefined' : _typeof(_ret7)) === "object") return _ret7.v;
+            }
+          } else {
+            _this12.activate();
+          }
+        }();
+
+        if ((typeof _ret6 === 'undefined' ? 'undefined' : _typeof(_ret6)) === "object") return _ret6.v;
+      } else {
+        this._dequeueInstruction();
+      }
+
+      return Promise.resolve();
+    };
+
+    AppRouter.prototype.activate = function activate(options) {
+      if (this.isActive) {
+        return;
+      }
+
+      this.isActive = true;
+      this.options = Object.assign({ routeHandler: this.loadUrl.bind(this) }, this.options, options);
+      this.history.activate(this.options);
+      this._dequeueInstruction();
+    };
+
+    AppRouter.prototype.deactivate = function deactivate() {
+      this.isActive = false;
+      this.history.deactivate();
+    };
+
+    AppRouter.prototype._queueInstruction = function _queueInstruction(instruction) {
+      var _this13 = this;
+
+      return new Promise(function (resolve) {
+        instruction.resolve = resolve;
+        _this13._queue.unshift(instruction);
+        _this13._dequeueInstruction();
+      });
+    };
+
+    AppRouter.prototype._dequeueInstruction = function _dequeueInstruction() {
+      var _this14 = this;
+
+      var instructionCount = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+
+      return Promise.resolve().then(function () {
+        if (_this14.isNavigating && !instructionCount) {
+          return undefined;
+        }
+
+        var instruction = _this14._queue.shift();
+        _this14._queue.length = 0;
+
+        if (!instruction) {
+          return undefined;
+        }
+
+        _this14.isNavigating = true;
+        instruction.previousInstruction = _this14.currentInstruction;
+
+        if (!instructionCount) {
+          _this14.events.publish('router:navigation:processing', { instruction: instruction });
+        } else if (instructionCount === _this14.maxInstructionCount - 1) {
+          logger.error(instructionCount + 1 + ' navigation instructions have been attempted without success. Restoring last known good location.');
+          restorePreviousLocation(_this14);
+          return _this14._dequeueInstruction(instructionCount + 1);
+        } else if (instructionCount > _this14.maxInstructionCount) {
+          throw new Error('Maximum navigation attempts exceeded. Giving up.');
+        }
+
+        var pipeline = _this14.pipelineProvider.createPipeline();
+
+        return pipeline.run(instruction).then(function (result) {
+          return processResult(instruction, result, instructionCount, _this14);
+        }).catch(function (error) {
+          return { output: error instanceof Error ? error : new Error(error) };
+        }).then(function (result) {
+          return resolveInstruction(instruction, result, !!instructionCount, _this14);
+        });
+      });
+    };
+
+    AppRouter.prototype._findViewModel = function _findViewModel(viewPort) {
+      if (this.container.viewModel) {
+        return this.container.viewModel;
+      }
+
+      if (viewPort.container) {
+        var container = viewPort.container;
+
+        while (container) {
+          if (container.viewModel) {
+            this.container.viewModel = container.viewModel;
+            return container.viewModel;
+          }
+
+          container = container.parent;
+        }
+      }
+
+      return undefined;
+    };
+
+    return AppRouter;
+  }(Router);
+
+  function processResult(instruction, result, instructionCount, router) {
+    if (!(result && 'completed' in result && 'output' in result)) {
+      result = result || {};
+      result.output = new Error('Expected router pipeline to return a navigation result, but got [' + JSON.stringify(result) + '] instead.');
+    }
+
+    var finalResult = null;
+    if (isNavigationCommand(result.output)) {
+      result.output.navigate(router);
+    } else {
+      finalResult = result;
+
+      if (!result.completed) {
+        if (result.output instanceof Error) {
+          logger.error(result.output);
+        }
+
+        restorePreviousLocation(router);
+      }
+    }
+
+    return router._dequeueInstruction(instructionCount + 1).then(function (innerResult) {
+      return finalResult || innerResult || result;
+    });
+  }
+
+  function resolveInstruction(instruction, result, isInnerInstruction, router) {
+    instruction.resolve(result);
+
+    var eventArgs = { instruction: instruction, result: result };
+    if (!isInnerInstruction) {
+      router.isNavigating = false;
+      router.isExplicitNavigation = false;
+      router.isExplicitNavigationBack = false;
+
+      var eventName = void 0;
+
+      if (result.output instanceof Error) {
+        eventName = 'error';
+      } else if (!result.completed) {
+        eventName = 'canceled';
+      } else {
+        var _queryString = instruction.queryString ? '?' + instruction.queryString : '';
+        router.history.previousLocation = instruction.fragment + _queryString;
+        eventName = 'success';
+      }
+
+      router.events.publish('router:navigation:' + eventName, eventArgs);
+      router.events.publish('router:navigation:complete', eventArgs);
+    } else {
+      router.events.publish('router:navigation:child:complete', eventArgs);
+    }
+
+    return result;
+  }
+
+  function restorePreviousLocation(router) {
+    var previousLocation = router.history.previousLocation;
+    if (previousLocation) {
+      router.navigate(router.history.previousLocation, { trigger: false, replace: true });
+    } else if (router.fallbackRoute) {
+      router.navigate(router.fallbackRoute, { trigger: true, replace: true });
+    } else {
+      logger.error('Router navigation failed, and no previous location or fallbackRoute could be restored.');
+    }
+  }
 });
 define('aurelia-templating-binding',['exports', 'aurelia-logging', 'aurelia-binding', 'aurelia-templating'], function (exports, _aureliaLogging, _aureliaBinding, _aureliaTemplating) {
   'use strict';
@@ -26918,7 +24114,6 @@ define('aurelia-templating-binding',['exports', 'aurelia-logging', 'aurelia-bind
     config.container.registerAlias(_aureliaTemplating.BindingLanguage, TemplatingBindingLanguage);
   }
 });
-define('text',{});
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -37173,6 +34368,7 @@ if ( !noGlobal ) {
 return jQuery;
 } );
 
+define('text',{});
 define('aurelia-templating-resources/aurelia-templating-resources',['exports', 'aurelia-pal', './compose', './if', './with', './repeat', './show', './hide', './sanitize-html', './replaceable', './focus', 'aurelia-templating', './css-resource', './html-sanitizer', './attr-binding-behavior', './binding-mode-behaviors', './throttle-binding-behavior', './debounce-binding-behavior', './self-binding-behavior', './signal-binding-behavior', './binding-signaler', './update-trigger-binding-behavior', './abstract-repeater', './repeat-strategy-locator', './html-resource-plugin', './null-repeat-strategy', './array-repeat-strategy', './map-repeat-strategy', './set-repeat-strategy', './number-repeat-strategy', './repeat-utilities', './analyze-view-factory', './aurelia-hide-style'], function (exports, _aureliaPal, _compose, _if, _with, _repeat, _show, _hide, _sanitizeHtml, _replaceable, _focus, _aureliaTemplating, _cssResource, _htmlSanitizer, _attrBindingBehavior, _bindingModeBehaviors, _throttleBindingBehavior, _debounceBindingBehavior, _selfBindingBehavior, _signalBindingBehavior, _bindingSignaler, _updateTriggerBindingBehavior, _abstractRepeater, _repeatStrategyLocator, _htmlResourcePlugin, _nullRepeatStrategy, _arrayRepeatStrategy, _mapRepeatStrategy, _setRepeatStrategy, _numberRepeatStrategy, _repeatUtilities, _analyzeViewFactory, _aureliaHideStyle) {
   'use strict';
 
@@ -37190,15 +34386,12 @@ define('aurelia-templating-resources/aurelia-templating-resources',['exports', '
     (0, _htmlResourcePlugin.configure)(config);
 
     var viewEngine = config.container.get(_aureliaTemplating.ViewEngine);
-    var styleResourcePlugin = {
-      fetch: function fetch(address) {
+    viewEngine.addResourcePlugin('.css', {
+      'fetch': function fetch(address) {
         var _ref;
 
         return _ref = {}, _ref[address] = (0, _cssResource._createCSSResource)(address), _ref;
       }
-    };
-    ['.css', '.less', '.sass', '.scss', '.styl'].forEach(function (ext) {
-      return viewEngine.addResourcePlugin(ext, styleResourcePlugin);
     });
   }
 
@@ -37239,6 +34432,2368 @@ define('aurelia-templating-resources/aurelia-templating-resources',['exports', '
   exports.viewsRequireLifecycle = _analyzeViewFactory.viewsRequireLifecycle;
 });;define('aurelia-templating-resources', ['aurelia-templating-resources/aurelia-templating-resources'], function (main) { return main; });
 
+define('aurelia-templating-resources/compose',['exports', 'aurelia-dependency-injection', 'aurelia-task-queue', 'aurelia-templating', 'aurelia-pal'], function (exports, _aureliaDependencyInjection, _aureliaTaskQueue, _aureliaTemplating, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Compose = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+
+  var Compose = exports.Compose = (_dec = (0, _aureliaTemplating.customElement)('compose'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.CompositionEngine, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaTaskQueue.TaskQueue), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
+    function Compose(element, container, compositionEngine, viewSlot, viewResources, taskQueue) {
+      
+
+      _initDefineProp(this, 'model', _descriptor, this);
+
+      _initDefineProp(this, 'view', _descriptor2, this);
+
+      _initDefineProp(this, 'viewModel', _descriptor3, this);
+
+      _initDefineProp(this, 'swapOrder', _descriptor4, this);
+
+      this.element = element;
+      this.container = container;
+      this.compositionEngine = compositionEngine;
+      this.viewSlot = viewSlot;
+      this.viewResources = viewResources;
+      this.taskQueue = taskQueue;
+      this.currentController = null;
+      this.currentViewModel = null;
+    }
+
+    Compose.prototype.created = function created(owningView) {
+      this.owningView = owningView;
+    };
+
+    Compose.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.bindingContext = bindingContext;
+      this.overrideContext = overrideContext;
+      processInstruction(this, createInstruction(this, {
+        view: this.view,
+        viewModel: this.viewModel,
+        model: this.model
+      }));
+    };
+
+    Compose.prototype.unbind = function unbind(bindingContext, overrideContext) {
+      this.bindingContext = null;
+      this.overrideContext = null;
+      var returnToCache = true;
+      var skipAnimation = true;
+      this.viewSlot.removeAll(returnToCache, skipAnimation);
+    };
+
+    Compose.prototype.modelChanged = function modelChanged(newValue, oldValue) {
+      var _this = this;
+
+      if (this.currentInstruction) {
+        this.currentInstruction.model = newValue;
+        return;
+      }
+
+      this.taskQueue.queueMicroTask(function () {
+        if (_this.currentInstruction) {
+          _this.currentInstruction.model = newValue;
+          return;
+        }
+
+        var vm = _this.currentViewModel;
+
+        if (vm && typeof vm.activate === 'function') {
+          vm.activate(newValue);
+        }
+      });
+    };
+
+    Compose.prototype.viewChanged = function viewChanged(newValue, oldValue) {
+      var _this2 = this;
+
+      var instruction = createInstruction(this, {
+        view: newValue,
+        viewModel: this.currentViewModel || this.viewModel,
+        model: this.model
+      });
+
+      if (this.currentInstruction) {
+        this.currentInstruction = instruction;
+        return;
+      }
+
+      this.currentInstruction = instruction;
+      this.taskQueue.queueMicroTask(function () {
+        return processInstruction(_this2, _this2.currentInstruction);
+      });
+    };
+
+    Compose.prototype.viewModelChanged = function viewModelChanged(newValue, oldValue) {
+      var _this3 = this;
+
+      var instruction = createInstruction(this, {
+        viewModel: newValue,
+        view: this.view,
+        model: this.model
+      });
+
+      if (this.currentInstruction) {
+        this.currentInstruction = instruction;
+        return;
+      }
+
+      this.currentInstruction = instruction;
+      this.taskQueue.queueMicroTask(function () {
+        return processInstruction(_this3, _this3.currentInstruction);
+      });
+    };
+
+    return Compose;
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'model', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'view', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'viewModel', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class) || _class) || _class);
+
+
+  function createInstruction(composer, instruction) {
+    return Object.assign(instruction, {
+      bindingContext: composer.bindingContext,
+      overrideContext: composer.overrideContext,
+      owningView: composer.owningView,
+      container: composer.container,
+      viewSlot: composer.viewSlot,
+      viewResources: composer.viewResources,
+      currentController: composer.currentController,
+      host: composer.element,
+      swapOrder: composer.swapOrder
+    });
+  }
+
+  function processInstruction(composer, instruction) {
+    composer.currentInstruction = null;
+    composer.compositionEngine.compose(instruction).then(function (controller) {
+      composer.currentController = controller;
+      composer.currentViewModel = controller ? controller.viewModel : null;
+    });
+  }
+});
+define('aurelia-templating-resources/if',['exports', 'aurelia-templating', 'aurelia-dependency-injection'], function (exports, _aureliaTemplating, _aureliaDependencyInjection) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.If = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var If = exports.If = (_dec = (0, _aureliaTemplating.customAttribute)('if'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
+    function If(viewFactory, viewSlot) {
+      
+
+      this.viewFactory = viewFactory;
+      this.viewSlot = viewSlot;
+      this.showing = false;
+      this.view = null;
+      this.bindingContext = null;
+      this.overrideContext = null;
+    }
+
+    If.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.bindingContext = bindingContext;
+      this.overrideContext = overrideContext;
+      this.valueChanged(this.value);
+    };
+
+    If.prototype.valueChanged = function valueChanged(newValue) {
+      var _this = this;
+
+      if (this.__queuedChanges) {
+        this.__queuedChanges.push(newValue);
+        return;
+      }
+
+      var maybePromise = this._runValueChanged(newValue);
+      if (maybePromise instanceof Promise) {
+        (function () {
+          var queuedChanges = _this.__queuedChanges = [];
+
+          var runQueuedChanges = function runQueuedChanges() {
+            if (!queuedChanges.length) {
+              _this.__queuedChanges = undefined;
+              return;
+            }
+
+            var nextPromise = _this._runValueChanged(queuedChanges.shift()) || Promise.resolve();
+            nextPromise.then(runQueuedChanges);
+          };
+
+          maybePromise.then(runQueuedChanges);
+        })();
+      }
+    };
+
+    If.prototype._runValueChanged = function _runValueChanged(newValue) {
+      var _this2 = this;
+
+      if (!newValue) {
+        var viewOrPromise = void 0;
+        if (this.view !== null && this.showing) {
+          viewOrPromise = this.viewSlot.remove(this.view);
+          if (viewOrPromise instanceof Promise) {
+            viewOrPromise.then(function () {
+              return _this2.view.unbind();
+            });
+          } else {
+            this.view.unbind();
+          }
+        }
+
+        this.showing = false;
+        return viewOrPromise;
+      }
+
+      if (this.view === null) {
+        this.view = this.viewFactory.create();
+      }
+
+      if (!this.view.isBound) {
+        this.view.bind(this.bindingContext, this.overrideContext);
+      }
+
+      if (!this.showing) {
+        this.showing = true;
+        return this.viewSlot.add(this.view);
+      }
+
+      return undefined;
+    };
+
+    If.prototype.unbind = function unbind() {
+      if (this.view === null) {
+        return;
+      }
+
+      this.view.unbind();
+
+      if (!this.viewFactory.isCaching) {
+        return;
+      }
+
+      if (this.showing) {
+        this.showing = false;
+        this.viewSlot.remove(this.view, true, true);
+      }
+      this.view.returnToCache();
+      this.view = null;
+    };
+
+    return If;
+  }()) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/with',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-binding'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.With = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var With = exports.With = (_dec = (0, _aureliaTemplating.customAttribute)('with'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
+    function With(viewFactory, viewSlot) {
+      
+
+      this.viewFactory = viewFactory;
+      this.viewSlot = viewSlot;
+      this.parentOverrideContext = null;
+      this.view = null;
+    }
+
+    With.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.parentOverrideContext = overrideContext;
+      this.valueChanged(this.value);
+    };
+
+    With.prototype.valueChanged = function valueChanged(newValue) {
+      var overrideContext = (0, _aureliaBinding.createOverrideContext)(newValue, this.parentOverrideContext);
+      if (!this.view) {
+        this.view = this.viewFactory.create();
+        this.view.bind(newValue, overrideContext);
+        this.viewSlot.add(this.view);
+      } else {
+        this.view.bind(newValue, overrideContext);
+      }
+    };
+
+    With.prototype.unbind = function unbind() {
+      this.parentOverrideContext = null;
+
+      if (this.view) {
+        this.view.unbind();
+      }
+    };
+
+    return With;
+  }()) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/repeat',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-templating', './repeat-strategy-locator', './repeat-utilities', './analyze-view-factory', './abstract-repeater'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaTemplating, _repeatStrategyLocator, _repeatUtilities, _analyzeViewFactory, _abstractRepeater) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Repeat = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+
+  var Repeat = exports.Repeat = (_dec = (0, _aureliaTemplating.customAttribute)('repeat'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.TargetInstruction, _aureliaTemplating.ViewSlot, _aureliaTemplating.ViewResources, _aureliaBinding.ObserverLocator, _repeatStrategyLocator.RepeatStrategyLocator), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = (_class2 = function (_AbstractRepeater) {
+    _inherits(Repeat, _AbstractRepeater);
+
+    function Repeat(viewFactory, instruction, viewSlot, viewResources, observerLocator, strategyLocator) {
+      
+
+      var _this = _possibleConstructorReturn(this, _AbstractRepeater.call(this, {
+        local: 'item',
+        viewsRequireLifecycle: (0, _analyzeViewFactory.viewsRequireLifecycle)(viewFactory)
+      }));
+
+      _initDefineProp(_this, 'items', _descriptor, _this);
+
+      _initDefineProp(_this, 'local', _descriptor2, _this);
+
+      _initDefineProp(_this, 'key', _descriptor3, _this);
+
+      _initDefineProp(_this, 'value', _descriptor4, _this);
+
+      _this.viewFactory = viewFactory;
+      _this.instruction = instruction;
+      _this.viewSlot = viewSlot;
+      _this.lookupFunctions = viewResources.lookupFunctions;
+      _this.observerLocator = observerLocator;
+      _this.key = 'key';
+      _this.value = 'value';
+      _this.strategyLocator = strategyLocator;
+      _this.ignoreMutation = false;
+      _this.sourceExpression = (0, _repeatUtilities.getItemsSourceExpression)(_this.instruction, 'repeat.for');
+      _this.isOneTime = (0, _repeatUtilities.isOneTime)(_this.sourceExpression);
+      _this.viewsRequireLifecycle = (0, _analyzeViewFactory.viewsRequireLifecycle)(viewFactory);
+      return _this;
+    }
+
+    Repeat.prototype.call = function call(context, changes) {
+      this[context](this.items, changes);
+    };
+
+    Repeat.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.scope = { bindingContext: bindingContext, overrideContext: overrideContext };
+      this.matcherBinding = this._captureAndRemoveMatcherBinding();
+      this.itemsChanged();
+    };
+
+    Repeat.prototype.unbind = function unbind() {
+      this.scope = null;
+      this.items = null;
+      this.matcherBinding = null;
+      this.viewSlot.removeAll(true);
+      this._unsubscribeCollection();
+    };
+
+    Repeat.prototype._unsubscribeCollection = function _unsubscribeCollection() {
+      if (this.collectionObserver) {
+        this.collectionObserver.unsubscribe(this.callContext, this);
+        this.collectionObserver = null;
+        this.callContext = null;
+      }
+    };
+
+    Repeat.prototype.itemsChanged = function itemsChanged() {
+      this._unsubscribeCollection();
+
+      if (!this.scope) {
+        return;
+      }
+
+      var items = this.items;
+      this.strategy = this.strategyLocator.getStrategy(items);
+      if (!this.strategy) {
+        throw new Error('Value for \'' + this.sourceExpression + '\' is non-repeatable');
+      }
+
+      if (!this.isOneTime && !this._observeInnerCollection()) {
+        this._observeCollection();
+      }
+      this.strategy.instanceChanged(this, items);
+    };
+
+    Repeat.prototype._getInnerCollection = function _getInnerCollection() {
+      var expression = (0, _repeatUtilities.unwrapExpression)(this.sourceExpression);
+      if (!expression) {
+        return null;
+      }
+      return expression.evaluate(this.scope, null);
+    };
+
+    Repeat.prototype.handleCollectionMutated = function handleCollectionMutated(collection, changes) {
+      if (!this.collectionObserver) {
+        return;
+      }
+      this.strategy.instanceMutated(this, collection, changes);
+    };
+
+    Repeat.prototype.handleInnerCollectionMutated = function handleInnerCollectionMutated(collection, changes) {
+      var _this2 = this;
+
+      if (!this.collectionObserver) {
+        return;
+      }
+
+      if (this.ignoreMutation) {
+        return;
+      }
+      this.ignoreMutation = true;
+      var newItems = this.sourceExpression.evaluate(this.scope, this.lookupFunctions);
+      this.observerLocator.taskQueue.queueMicroTask(function () {
+        return _this2.ignoreMutation = false;
+      });
+
+      if (newItems === this.items) {
+        this.itemsChanged();
+      } else {
+        this.items = newItems;
+      }
+    };
+
+    Repeat.prototype._observeInnerCollection = function _observeInnerCollection() {
+      var items = this._getInnerCollection();
+      var strategy = this.strategyLocator.getStrategy(items);
+      if (!strategy) {
+        return false;
+      }
+      this.collectionObserver = strategy.getCollectionObserver(this.observerLocator, items);
+      if (!this.collectionObserver) {
+        return false;
+      }
+      this.callContext = 'handleInnerCollectionMutated';
+      this.collectionObserver.subscribe(this.callContext, this);
+      return true;
+    };
+
+    Repeat.prototype._observeCollection = function _observeCollection() {
+      var items = this.items;
+      this.collectionObserver = this.strategy.getCollectionObserver(this.observerLocator, items);
+      if (this.collectionObserver) {
+        this.callContext = 'handleCollectionMutated';
+        this.collectionObserver.subscribe(this.callContext, this);
+      }
+    };
+
+    Repeat.prototype._captureAndRemoveMatcherBinding = function _captureAndRemoveMatcherBinding() {
+      if (this.viewFactory.viewFactory) {
+        var instructions = this.viewFactory.viewFactory.instructions;
+        var instructionIds = Object.keys(instructions);
+        for (var i = 0; i < instructionIds.length; i++) {
+          var expressions = instructions[instructionIds[i]].expressions;
+          if (expressions) {
+            for (var ii = 0; i < expressions.length; i++) {
+              if (expressions[ii].targetProperty === 'matcher') {
+                var matcherBinding = expressions[ii];
+                expressions.splice(ii, 1);
+                return matcherBinding;
+              }
+            }
+          }
+        }
+      }
+
+      return undefined;
+    };
+
+    Repeat.prototype.viewCount = function viewCount() {
+      return this.viewSlot.children.length;
+    };
+
+    Repeat.prototype.views = function views() {
+      return this.viewSlot.children;
+    };
+
+    Repeat.prototype.view = function view(index) {
+      return this.viewSlot.children[index];
+    };
+
+    Repeat.prototype.matcher = function matcher() {
+      return this.matcherBinding ? this.matcherBinding.sourceExpression.evaluate(this.scope, this.matcherBinding.lookupFunctions) : null;
+    };
+
+    Repeat.prototype.addView = function addView(bindingContext, overrideContext) {
+      var view = this.viewFactory.create();
+      view.bind(bindingContext, overrideContext);
+      this.viewSlot.add(view);
+    };
+
+    Repeat.prototype.insertView = function insertView(index, bindingContext, overrideContext) {
+      var view = this.viewFactory.create();
+      view.bind(bindingContext, overrideContext);
+      this.viewSlot.insert(index, view);
+    };
+
+    Repeat.prototype.moveView = function moveView(sourceIndex, targetIndex) {
+      this.viewSlot.move(sourceIndex, targetIndex);
+    };
+
+    Repeat.prototype.removeAllViews = function removeAllViews(returnToCache, skipAnimation) {
+      return this.viewSlot.removeAll(returnToCache, skipAnimation);
+    };
+
+    Repeat.prototype.removeViews = function removeViews(viewsToRemove, returnToCache, skipAnimation) {
+      return this.viewSlot.removeMany(viewsToRemove, returnToCache, skipAnimation);
+    };
+
+    Repeat.prototype.removeView = function removeView(index, returnToCache, skipAnimation) {
+      return this.viewSlot.removeAt(index, returnToCache, skipAnimation);
+    };
+
+    Repeat.prototype.updateBindings = function updateBindings(view) {
+      var j = view.bindings.length;
+      while (j--) {
+        (0, _repeatUtilities.updateOneTimeBinding)(view.bindings[j]);
+      }
+      j = view.controllers.length;
+      while (j--) {
+        var k = view.controllers[j].boundProperties.length;
+        while (k--) {
+          var binding = view.controllers[j].boundProperties[k].binding;
+          (0, _repeatUtilities.updateOneTimeBinding)(binding);
+        }
+      }
+    };
+
+    return Repeat;
+  }(_abstractRepeater.AbstractRepeater), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'items', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'local', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'key', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'value', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/repeat-strategy-locator',['exports', './null-repeat-strategy', './array-repeat-strategy', './map-repeat-strategy', './set-repeat-strategy', './number-repeat-strategy'], function (exports, _nullRepeatStrategy, _arrayRepeatStrategy, _mapRepeatStrategy, _setRepeatStrategy, _numberRepeatStrategy) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RepeatStrategyLocator = undefined;
+
+  
+
+  var RepeatStrategyLocator = exports.RepeatStrategyLocator = function () {
+    function RepeatStrategyLocator() {
+      
+
+      this.matchers = [];
+      this.strategies = [];
+
+      this.addStrategy(function (items) {
+        return items === null || items === undefined;
+      }, new _nullRepeatStrategy.NullRepeatStrategy());
+      this.addStrategy(function (items) {
+        return items instanceof Array;
+      }, new _arrayRepeatStrategy.ArrayRepeatStrategy());
+      this.addStrategy(function (items) {
+        return items instanceof Map;
+      }, new _mapRepeatStrategy.MapRepeatStrategy());
+      this.addStrategy(function (items) {
+        return items instanceof Set;
+      }, new _setRepeatStrategy.SetRepeatStrategy());
+      this.addStrategy(function (items) {
+        return typeof items === 'number';
+      }, new _numberRepeatStrategy.NumberRepeatStrategy());
+    }
+
+    RepeatStrategyLocator.prototype.addStrategy = function addStrategy(matcher, strategy) {
+      this.matchers.push(matcher);
+      this.strategies.push(strategy);
+    };
+
+    RepeatStrategyLocator.prototype.getStrategy = function getStrategy(items) {
+      var matchers = this.matchers;
+
+      for (var i = 0, ii = matchers.length; i < ii; ++i) {
+        if (matchers[i](items)) {
+          return this.strategies[i];
+        }
+      }
+
+      return null;
+    };
+
+    return RepeatStrategyLocator;
+  }();
+});
+define('aurelia-templating-resources/null-repeat-strategy',["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var NullRepeatStrategy = exports.NullRepeatStrategy = function () {
+    function NullRepeatStrategy() {
+      
+    }
+
+    NullRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      repeat.removeAllViews(true);
+    };
+
+    NullRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {};
+
+    return NullRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/array-repeat-strategy',['exports', './repeat-utilities', 'aurelia-binding'], function (exports, _repeatUtilities, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ArrayRepeatStrategy = undefined;
+
+  
+
+  var ArrayRepeatStrategy = exports.ArrayRepeatStrategy = function () {
+    function ArrayRepeatStrategy() {
+      
+    }
+
+    ArrayRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
+      return observerLocator.getArrayObserver(items);
+    };
+
+    ArrayRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      var _this = this;
+
+      var itemsLength = items.length;
+
+      if (!items || itemsLength === 0) {
+        repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+        return;
+      }
+
+      var children = repeat.views();
+      var viewsLength = children.length;
+
+      if (viewsLength === 0) {
+        this._standardProcessInstanceChanged(repeat, items);
+        return;
+      }
+
+      if (repeat.viewsRequireLifecycle) {
+        (function () {
+          var childrenSnapshot = children.slice(0);
+          var itemNameInBindingContext = repeat.local;
+          var matcher = repeat.matcher();
+
+          var itemsPreviouslyInViews = [];
+          var viewsToRemove = [];
+
+          for (var index = 0; index < viewsLength; index++) {
+            var view = childrenSnapshot[index];
+            var oldItem = view.bindingContext[itemNameInBindingContext];
+
+            if ((0, _repeatUtilities.indexOf)(items, oldItem, matcher) === -1) {
+              viewsToRemove.push(view);
+            } else {
+              itemsPreviouslyInViews.push(oldItem);
+            }
+          }
+
+          var updateViews = void 0;
+          var removePromise = void 0;
+
+          if (itemsPreviouslyInViews.length > 0) {
+            removePromise = repeat.removeViews(viewsToRemove, true, !repeat.viewsRequireLifecycle);
+            updateViews = function updateViews() {
+              for (var _index = 0; _index < itemsLength; _index++) {
+                var item = items[_index];
+                var indexOfView = (0, _repeatUtilities.indexOf)(itemsPreviouslyInViews, item, matcher, _index);
+                var _view = void 0;
+
+                if (indexOfView === -1) {
+                  var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_index], _index, itemsLength);
+                  repeat.insertView(_index, overrideContext.bindingContext, overrideContext);
+
+                  itemsPreviouslyInViews.splice(_index, 0, undefined);
+                } else if (indexOfView === _index) {
+                  _view = children[indexOfView];
+                  itemsPreviouslyInViews[indexOfView] = undefined;
+                } else {
+                  _view = children[indexOfView];
+                  repeat.moveView(indexOfView, _index);
+                  itemsPreviouslyInViews.splice(indexOfView, 1);
+                  itemsPreviouslyInViews.splice(_index, 0, undefined);
+                }
+
+                if (_view) {
+                  (0, _repeatUtilities.updateOverrideContext)(_view.overrideContext, _index, itemsLength);
+                }
+              }
+
+              _this._inPlaceProcessItems(repeat, items);
+            };
+          } else {
+            removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+            updateViews = function updateViews() {
+              return _this._standardProcessInstanceChanged(repeat, items);
+            };
+          }
+
+          if (removePromise instanceof Promise) {
+            removePromise.then(updateViews);
+          } else {
+            updateViews();
+          }
+        })();
+      } else {
+        this._inPlaceProcessItems(repeat, items);
+      }
+    };
+
+    ArrayRepeatStrategy.prototype._standardProcessInstanceChanged = function _standardProcessInstanceChanged(repeat, items) {
+      for (var i = 0, ii = items.length; i < ii; i++) {
+        var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[i], i, ii);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+      }
+    };
+
+    ArrayRepeatStrategy.prototype._inPlaceProcessItems = function _inPlaceProcessItems(repeat, items) {
+      var itemsLength = items.length;
+      var viewsLength = repeat.viewCount();
+
+      while (viewsLength > itemsLength) {
+        viewsLength--;
+        repeat.removeView(viewsLength, true, !repeat.viewsRequireLifecycle);
+      }
+
+      var local = repeat.local;
+
+      for (var i = 0; i < viewsLength; i++) {
+        var view = repeat.view(i);
+        var last = i === itemsLength - 1;
+        var middle = i !== 0 && !last;
+
+        if (view.bindingContext[local] === items[i] && view.overrideContext.$middle === middle && view.overrideContext.$last === last) {
+          continue;
+        }
+
+        view.bindingContext[local] = items[i];
+        view.overrideContext.$middle = middle;
+        view.overrideContext.$last = last;
+        repeat.updateBindings(view);
+      }
+
+      for (var _i = viewsLength; _i < itemsLength; _i++) {
+        var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, items[_i], _i, itemsLength);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+      }
+    };
+
+    ArrayRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, array, splices) {
+      var _this2 = this;
+
+      if (repeat.__queuedSplices) {
+        for (var i = 0, ii = splices.length; i < ii; ++i) {
+          var _splices$i = splices[i],
+              index = _splices$i.index,
+              removed = _splices$i.removed,
+              addedCount = _splices$i.addedCount;
+
+          (0, _aureliaBinding.mergeSplice)(repeat.__queuedSplices, index, removed, addedCount);
+        }
+
+        repeat.__array = array.slice(0);
+        return;
+      }
+
+      var maybePromise = this._runSplices(repeat, array.slice(0), splices);
+      if (maybePromise instanceof Promise) {
+        (function () {
+          var queuedSplices = repeat.__queuedSplices = [];
+
+          var runQueuedSplices = function runQueuedSplices() {
+            if (!queuedSplices.length) {
+              repeat.__queuedSplices = undefined;
+              repeat.__array = undefined;
+              return;
+            }
+
+            var nextPromise = _this2._runSplices(repeat, repeat.__array, queuedSplices) || Promise.resolve();
+            queuedSplices = repeat.__queuedSplices = [];
+            nextPromise.then(runQueuedSplices);
+          };
+
+          maybePromise.then(runQueuedSplices);
+        })();
+      }
+    };
+
+    ArrayRepeatStrategy.prototype._runSplices = function _runSplices(repeat, array, splices) {
+      var _this3 = this;
+
+      var removeDelta = 0;
+      var rmPromises = [];
+
+      for (var i = 0, ii = splices.length; i < ii; ++i) {
+        var splice = splices[i];
+        var removed = splice.removed;
+
+        for (var j = 0, jj = removed.length; j < jj; ++j) {
+          var viewOrPromise = repeat.removeView(splice.index + removeDelta + rmPromises.length, true);
+          if (viewOrPromise instanceof Promise) {
+            rmPromises.push(viewOrPromise);
+          }
+        }
+        removeDelta -= splice.addedCount;
+      }
+
+      if (rmPromises.length > 0) {
+        return Promise.all(rmPromises).then(function () {
+          var spliceIndexLow = _this3._handleAddedSplices(repeat, array, splices);
+          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), spliceIndexLow);
+        });
+      }
+
+      var spliceIndexLow = this._handleAddedSplices(repeat, array, splices);
+      (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), spliceIndexLow);
+
+      return undefined;
+    };
+
+    ArrayRepeatStrategy.prototype._handleAddedSplices = function _handleAddedSplices(repeat, array, splices) {
+      var spliceIndex = void 0;
+      var spliceIndexLow = void 0;
+      var arrayLength = array.length;
+      for (var i = 0, ii = splices.length; i < ii; ++i) {
+        var splice = splices[i];
+        var addIndex = spliceIndex = splice.index;
+        var end = splice.index + splice.addedCount;
+
+        if (typeof spliceIndexLow === 'undefined' || spliceIndexLow === null || spliceIndexLow > splice.index) {
+          spliceIndexLow = spliceIndex;
+        }
+
+        for (; addIndex < end; ++addIndex) {
+          var overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, array[addIndex], addIndex, arrayLength);
+          repeat.insertView(addIndex, overrideContext.bindingContext, overrideContext);
+        }
+      }
+
+      return spliceIndexLow;
+    };
+
+    return ArrayRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/repeat-utilities',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.updateOverrideContexts = updateOverrideContexts;
+  exports.createFullOverrideContext = createFullOverrideContext;
+  exports.updateOverrideContext = updateOverrideContext;
+  exports.getItemsSourceExpression = getItemsSourceExpression;
+  exports.unwrapExpression = unwrapExpression;
+  exports.isOneTime = isOneTime;
+  exports.updateOneTimeBinding = updateOneTimeBinding;
+  exports.indexOf = indexOf;
+
+
+  var oneTime = _aureliaBinding.bindingMode.oneTime;
+
+  function updateOverrideContexts(views, startIndex) {
+    var length = views.length;
+
+    if (startIndex > 0) {
+      startIndex = startIndex - 1;
+    }
+
+    for (; startIndex < length; ++startIndex) {
+      updateOverrideContext(views[startIndex].overrideContext, startIndex, length);
+    }
+  }
+
+  function createFullOverrideContext(repeat, data, index, length, key) {
+    var bindingContext = {};
+    var overrideContext = (0, _aureliaBinding.createOverrideContext)(bindingContext, repeat.scope.overrideContext);
+
+    if (typeof key !== 'undefined') {
+      bindingContext[repeat.key] = key;
+      bindingContext[repeat.value] = data;
+    } else {
+      bindingContext[repeat.local] = data;
+    }
+    updateOverrideContext(overrideContext, index, length);
+    return overrideContext;
+  }
+
+  function updateOverrideContext(overrideContext, index, length) {
+    var first = index === 0;
+    var last = index === length - 1;
+    var even = index % 2 === 0;
+
+    overrideContext.$index = index;
+    overrideContext.$first = first;
+    overrideContext.$last = last;
+    overrideContext.$middle = !(first || last);
+    overrideContext.$odd = !even;
+    overrideContext.$even = even;
+  }
+
+  function getItemsSourceExpression(instruction, attrName) {
+    return instruction.behaviorInstructions.filter(function (bi) {
+      return bi.originalAttrName === attrName;
+    })[0].attributes.items.sourceExpression;
+  }
+
+  function unwrapExpression(expression) {
+    var unwrapped = false;
+    while (expression instanceof _aureliaBinding.BindingBehavior) {
+      expression = expression.expression;
+    }
+    while (expression instanceof _aureliaBinding.ValueConverter) {
+      expression = expression.expression;
+      unwrapped = true;
+    }
+    return unwrapped ? expression : null;
+  }
+
+  function isOneTime(expression) {
+    while (expression instanceof _aureliaBinding.BindingBehavior) {
+      if (expression.name === 'oneTime') {
+        return true;
+      }
+      expression = expression.expression;
+    }
+    return false;
+  }
+
+  function updateOneTimeBinding(binding) {
+    if (binding.call && binding.mode === oneTime) {
+      binding.call(_aureliaBinding.sourceContext);
+    } else if (binding.updateOneTimeBindings) {
+      binding.updateOneTimeBindings();
+    }
+  }
+
+  function indexOf(array, item, matcher, startIndex) {
+    if (!matcher) {
+      return array.indexOf(item);
+    }
+    var length = array.length;
+    for (var index = startIndex || 0; index < length; index++) {
+      if (matcher(array[index], item)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+});
+define('aurelia-templating-resources/map-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.MapRepeatStrategy = undefined;
+
+  
+
+  var MapRepeatStrategy = exports.MapRepeatStrategy = function () {
+    function MapRepeatStrategy() {
+      
+    }
+
+    MapRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
+      return observerLocator.getMapObserver(items);
+    };
+
+    MapRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      var _this = this;
+
+      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+      if (removePromise instanceof Promise) {
+        removePromise.then(function () {
+          return _this._standardProcessItems(repeat, items);
+        });
+        return;
+      }
+      this._standardProcessItems(repeat, items);
+    };
+
+    MapRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, items) {
+      var index = 0;
+      var overrideContext = void 0;
+
+      items.forEach(function (value, key) {
+        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, index, items.size, key);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+        ++index;
+      });
+    };
+
+    MapRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, map, records) {
+      var key = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var overrideContext = void 0;
+      var removeIndex = void 0;
+      var record = void 0;
+      var rmPromises = [];
+      var viewOrPromise = void 0;
+
+      for (i = 0, ii = records.length; i < ii; ++i) {
+        record = records[i];
+        key = record.key;
+        switch (record.type) {
+          case 'update':
+            removeIndex = this._getViewIndexByKey(repeat, key);
+            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
+            if (viewOrPromise instanceof Promise) {
+              rmPromises.push(viewOrPromise);
+            }
+            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), removeIndex, map.size, key);
+            repeat.insertView(removeIndex, overrideContext.bindingContext, overrideContext);
+            break;
+          case 'add':
+            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, map.get(key), map.size - 1, map.size, key);
+            repeat.insertView(map.size - 1, overrideContext.bindingContext, overrideContext);
+            break;
+          case 'delete':
+            if (record.oldValue === undefined) {
+              return;
+            }
+            removeIndex = this._getViewIndexByKey(repeat, key);
+            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
+            if (viewOrPromise instanceof Promise) {
+              rmPromises.push(viewOrPromise);
+            }
+            break;
+          case 'clear':
+            repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+            break;
+          default:
+            continue;
+        }
+      }
+
+      if (rmPromises.length > 0) {
+        Promise.all(rmPromises).then(function () {
+          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+        });
+      } else {
+        (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+      }
+    };
+
+    MapRepeatStrategy.prototype._getViewIndexByKey = function _getViewIndexByKey(repeat, key) {
+      var i = void 0;
+      var ii = void 0;
+      var child = void 0;
+
+      for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
+        child = repeat.view(i);
+        if (child.bindingContext[repeat.key] === key) {
+          return i;
+        }
+      }
+
+      return undefined;
+    };
+
+    return MapRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/set-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.SetRepeatStrategy = undefined;
+
+  
+
+  var SetRepeatStrategy = exports.SetRepeatStrategy = function () {
+    function SetRepeatStrategy() {
+      
+    }
+
+    SetRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver(observerLocator, items) {
+      return observerLocator.getSetObserver(items);
+    };
+
+    SetRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, items) {
+      var _this = this;
+
+      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+      if (removePromise instanceof Promise) {
+        removePromise.then(function () {
+          return _this._standardProcessItems(repeat, items);
+        });
+        return;
+      }
+      this._standardProcessItems(repeat, items);
+    };
+
+    SetRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, items) {
+      var index = 0;
+      var overrideContext = void 0;
+
+      items.forEach(function (value) {
+        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, index, items.size);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+        ++index;
+      });
+    };
+
+    SetRepeatStrategy.prototype.instanceMutated = function instanceMutated(repeat, set, records) {
+      var value = void 0;
+      var i = void 0;
+      var ii = void 0;
+      var overrideContext = void 0;
+      var removeIndex = void 0;
+      var record = void 0;
+      var rmPromises = [];
+      var viewOrPromise = void 0;
+
+      for (i = 0, ii = records.length; i < ii; ++i) {
+        record = records[i];
+        value = record.value;
+        switch (record.type) {
+          case 'add':
+            overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, value, set.size - 1, set.size);
+            repeat.insertView(set.size - 1, overrideContext.bindingContext, overrideContext);
+            break;
+          case 'delete':
+            removeIndex = this._getViewIndexByValue(repeat, value);
+            viewOrPromise = repeat.removeView(removeIndex, true, !repeat.viewsRequireLifecycle);
+            if (viewOrPromise instanceof Promise) {
+              rmPromises.push(viewOrPromise);
+            }
+            break;
+          case 'clear':
+            repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+            break;
+          default:
+            continue;
+        }
+      }
+
+      if (rmPromises.length > 0) {
+        Promise.all(rmPromises).then(function () {
+          (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+        });
+      } else {
+        (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+      }
+    };
+
+    SetRepeatStrategy.prototype._getViewIndexByValue = function _getViewIndexByValue(repeat, value) {
+      var i = void 0;
+      var ii = void 0;
+      var child = void 0;
+
+      for (i = 0, ii = repeat.viewCount(); i < ii; ++i) {
+        child = repeat.view(i);
+        if (child.bindingContext[repeat.local] === value) {
+          return i;
+        }
+      }
+
+      return undefined;
+    };
+
+    return SetRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/number-repeat-strategy',['exports', './repeat-utilities'], function (exports, _repeatUtilities) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.NumberRepeatStrategy = undefined;
+
+  
+
+  var NumberRepeatStrategy = exports.NumberRepeatStrategy = function () {
+    function NumberRepeatStrategy() {
+      
+    }
+
+    NumberRepeatStrategy.prototype.getCollectionObserver = function getCollectionObserver() {
+      return null;
+    };
+
+    NumberRepeatStrategy.prototype.instanceChanged = function instanceChanged(repeat, value) {
+      var _this = this;
+
+      var removePromise = repeat.removeAllViews(true, !repeat.viewsRequireLifecycle);
+      if (removePromise instanceof Promise) {
+        removePromise.then(function () {
+          return _this._standardProcessItems(repeat, value);
+        });
+        return;
+      }
+      this._standardProcessItems(repeat, value);
+    };
+
+    NumberRepeatStrategy.prototype._standardProcessItems = function _standardProcessItems(repeat, value) {
+      var childrenLength = repeat.viewCount();
+      var i = void 0;
+      var ii = void 0;
+      var overrideContext = void 0;
+      var viewsToRemove = void 0;
+
+      value = Math.floor(value);
+      viewsToRemove = childrenLength - value;
+
+      if (viewsToRemove > 0) {
+        if (viewsToRemove > childrenLength) {
+          viewsToRemove = childrenLength;
+        }
+
+        for (i = 0, ii = viewsToRemove; i < ii; ++i) {
+          repeat.removeView(childrenLength - (i + 1), true, !repeat.viewsRequireLifecycle);
+        }
+
+        return;
+      }
+
+      for (i = childrenLength, ii = value; i < ii; ++i) {
+        overrideContext = (0, _repeatUtilities.createFullOverrideContext)(repeat, i, i, ii);
+        repeat.addView(overrideContext.bindingContext, overrideContext);
+      }
+
+      (0, _repeatUtilities.updateOverrideContexts)(repeat.views(), 0);
+    };
+
+    return NumberRepeatStrategy;
+  }();
+});
+define('aurelia-templating-resources/analyze-view-factory',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.viewsRequireLifecycle = viewsRequireLifecycle;
+  var lifecycleOptionalBehaviors = exports.lifecycleOptionalBehaviors = ['focus', 'if', 'repeat', 'show', 'with'];
+
+  function behaviorRequiresLifecycle(instruction) {
+    var t = instruction.type;
+    var name = t.elementName !== null ? t.elementName : t.attributeName;
+    return lifecycleOptionalBehaviors.indexOf(name) === -1 && (t.handlesAttached || t.handlesBind || t.handlesCreated || t.handlesDetached || t.handlesUnbind) || t.viewFactory && viewsRequireLifecycle(t.viewFactory) || instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
+  }
+
+  function targetRequiresLifecycle(instruction) {
+    var behaviors = instruction.behaviorInstructions;
+    if (behaviors) {
+      var i = behaviors.length;
+      while (i--) {
+        if (behaviorRequiresLifecycle(behaviors[i])) {
+          return true;
+        }
+      }
+    }
+
+    return instruction.viewFactory && viewsRequireLifecycle(instruction.viewFactory);
+  }
+
+  function viewsRequireLifecycle(viewFactory) {
+    if ('_viewsRequireLifecycle' in viewFactory) {
+      return viewFactory._viewsRequireLifecycle;
+    }
+
+    viewFactory._viewsRequireLifecycle = false;
+
+    if (viewFactory.viewFactory) {
+      viewFactory._viewsRequireLifecycle = viewsRequireLifecycle(viewFactory.viewFactory);
+      return viewFactory._viewsRequireLifecycle;
+    }
+
+    if (viewFactory.template.querySelector('.au-animate')) {
+      viewFactory._viewsRequireLifecycle = true;
+      return true;
+    }
+
+    for (var id in viewFactory.instructions) {
+      if (targetRequiresLifecycle(viewFactory.instructions[id])) {
+        viewFactory._viewsRequireLifecycle = true;
+        return true;
+      }
+    }
+
+    viewFactory._viewsRequireLifecycle = false;
+    return false;
+  }
+});
+define('aurelia-templating-resources/abstract-repeater',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var AbstractRepeater = exports.AbstractRepeater = function () {
+    function AbstractRepeater(options) {
+      
+
+      Object.assign(this, {
+        local: 'items',
+        viewsRequireLifecycle: true
+      }, options);
+    }
+
+    AbstractRepeater.prototype.viewCount = function viewCount() {
+      throw new Error('subclass must implement `viewCount`');
+    };
+
+    AbstractRepeater.prototype.views = function views() {
+      throw new Error('subclass must implement `views`');
+    };
+
+    AbstractRepeater.prototype.view = function view(index) {
+      throw new Error('subclass must implement `view`');
+    };
+
+    AbstractRepeater.prototype.matcher = function matcher() {
+      throw new Error('subclass must implement `matcher`');
+    };
+
+    AbstractRepeater.prototype.addView = function addView(bindingContext, overrideContext) {
+      throw new Error('subclass must implement `addView`');
+    };
+
+    AbstractRepeater.prototype.insertView = function insertView(index, bindingContext, overrideContext) {
+      throw new Error('subclass must implement `insertView`');
+    };
+
+    AbstractRepeater.prototype.moveView = function moveView(sourceIndex, targetIndex) {
+      throw new Error('subclass must implement `moveView`');
+    };
+
+    AbstractRepeater.prototype.removeAllViews = function removeAllViews(returnToCache, skipAnimation) {
+      throw new Error('subclass must implement `removeAllViews`');
+    };
+
+    AbstractRepeater.prototype.removeViews = function removeViews(viewsToRemove, returnToCache, skipAnimation) {
+      throw new Error('subclass must implement `removeView`');
+    };
+
+    AbstractRepeater.prototype.removeView = function removeView(index, returnToCache, skipAnimation) {
+      throw new Error('subclass must implement `removeView`');
+    };
+
+    AbstractRepeater.prototype.updateBindings = function updateBindings(view) {
+      throw new Error('subclass must implement `updateBindings`');
+    };
+
+    return AbstractRepeater;
+  }();
+});
+define('aurelia-templating-resources/show',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-pal', './aurelia-hide-style'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaPal, _aureliaHideStyle) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Show = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Show = exports.Show = (_dec = (0, _aureliaTemplating.customAttribute)('show'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
+    function Show(element, animator, domBoundary) {
+      
+
+      this.element = element;
+      this.animator = animator;
+      this.domBoundary = domBoundary;
+    }
+
+    Show.prototype.created = function created() {
+      (0, _aureliaHideStyle.injectAureliaHideStyleAtBoundary)(this.domBoundary);
+    };
+
+    Show.prototype.valueChanged = function valueChanged(newValue) {
+      if (newValue) {
+        this.animator.removeClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      } else {
+        this.animator.addClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      }
+    };
+
+    Show.prototype.bind = function bind(bindingContext) {
+      this.valueChanged(this.value);
+    };
+
+    return Show;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/aurelia-hide-style',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.aureliaHideClassName = undefined;
+  exports.injectAureliaHideStyleAtHead = injectAureliaHideStyleAtHead;
+  exports.injectAureliaHideStyleAtBoundary = injectAureliaHideStyleAtBoundary;
+  var aureliaHideClassName = exports.aureliaHideClassName = 'aurelia-hide';
+
+  var aureliaHideClass = '.' + aureliaHideClassName + ' { display:none !important; }';
+
+  function injectAureliaHideStyleAtHead() {
+    _aureliaPal.DOM.injectStyles(aureliaHideClass);
+  }
+
+  function injectAureliaHideStyleAtBoundary(domBoundary) {
+    if (_aureliaPal.FEATURE.shadowDOM && domBoundary && !domBoundary.hasAureliaHideStyle) {
+      domBoundary.hasAureliaHideStyle = true;
+      _aureliaPal.DOM.injectStyles(aureliaHideClass, domBoundary);
+    }
+  }
+});
+define('aurelia-templating-resources/hide',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-pal', './aurelia-hide-style'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaPal, _aureliaHideStyle) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Hide = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Hide = exports.Hide = (_dec = (0, _aureliaTemplating.customAttribute)('hide'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTemplating.Animator, _aureliaDependencyInjection.Optional.of(_aureliaPal.DOM.boundary, true)), _dec(_class = _dec2(_class = function () {
+    function Hide(element, animator, domBoundary) {
+      
+
+      this.element = element;
+      this.animator = animator;
+      this.domBoundary = domBoundary;
+    }
+
+    Hide.prototype.created = function created() {
+      (0, _aureliaHideStyle.injectAureliaHideStyleAtBoundary)(this.domBoundary);
+    };
+
+    Hide.prototype.valueChanged = function valueChanged(newValue) {
+      if (newValue) {
+        this.animator.addClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      } else {
+        this.animator.removeClass(this.element, _aureliaHideStyle.aureliaHideClassName);
+      }
+    };
+
+    Hide.prototype.bind = function bind(bindingContext) {
+      this.valueChanged(this.value);
+    };
+
+    return Hide;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/sanitize-html',['exports', 'aurelia-binding', 'aurelia-dependency-injection', './html-sanitizer'], function (exports, _aureliaBinding, _aureliaDependencyInjection, _htmlSanitizer) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.SanitizeHTMLValueConverter = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var SanitizeHTMLValueConverter = exports.SanitizeHTMLValueConverter = (_dec = (0, _aureliaBinding.valueConverter)('sanitizeHTML'), _dec2 = (0, _aureliaDependencyInjection.inject)(_htmlSanitizer.HTMLSanitizer), _dec(_class = _dec2(_class = function () {
+    function SanitizeHTMLValueConverter(sanitizer) {
+      
+
+      this.sanitizer = sanitizer;
+    }
+
+    SanitizeHTMLValueConverter.prototype.toView = function toView(untrustedMarkup) {
+      if (untrustedMarkup === null || untrustedMarkup === undefined) {
+        return null;
+      }
+
+      return this.sanitizer.sanitize(untrustedMarkup);
+    };
+
+    return SanitizeHTMLValueConverter;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/html-sanitizer',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  var SCRIPT_REGEX = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+
+  var HTMLSanitizer = exports.HTMLSanitizer = function () {
+    function HTMLSanitizer() {
+      
+    }
+
+    HTMLSanitizer.prototype.sanitize = function sanitize(input) {
+      return input.replace(SCRIPT_REGEX, '');
+    };
+
+    return HTMLSanitizer;
+  }();
+});
+define('aurelia-templating-resources/replaceable',['exports', 'aurelia-dependency-injection', 'aurelia-templating'], function (exports, _aureliaDependencyInjection, _aureliaTemplating) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Replaceable = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Replaceable = exports.Replaceable = (_dec = (0, _aureliaTemplating.customAttribute)('replaceable'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.BoundViewFactory, _aureliaTemplating.ViewSlot), _dec(_class = (0, _aureliaTemplating.templateController)(_class = _dec2(_class = function () {
+    function Replaceable(viewFactory, viewSlot) {
+      
+
+      this.viewFactory = viewFactory;
+      this.viewSlot = viewSlot;
+      this.view = null;
+    }
+
+    Replaceable.prototype.bind = function bind(bindingContext, overrideContext) {
+      if (this.view === null) {
+        this.view = this.viewFactory.create();
+        this.viewSlot.add(this.view);
+      }
+
+      this.view.bind(bindingContext, overrideContext);
+    };
+
+    Replaceable.prototype.unbind = function unbind() {
+      this.view.unbind();
+    };
+
+    return Replaceable;
+  }()) || _class) || _class) || _class);
+});
+define('aurelia-templating-resources/focus',['exports', 'aurelia-templating', 'aurelia-binding', 'aurelia-dependency-injection', 'aurelia-task-queue', 'aurelia-pal'], function (exports, _aureliaTemplating, _aureliaBinding, _aureliaDependencyInjection, _aureliaTaskQueue, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Focus = undefined;
+
+  
+
+  var _dec, _dec2, _class;
+
+  var Focus = exports.Focus = (_dec = (0, _aureliaTemplating.customAttribute)('focus', _aureliaBinding.bindingMode.twoWay), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaTaskQueue.TaskQueue), _dec(_class = _dec2(_class = function () {
+    function Focus(element, taskQueue) {
+      var _this = this;
+
+      
+
+      this.element = element;
+      this.taskQueue = taskQueue;
+      this.isAttached = false;
+      this.needsApply = false;
+
+      this.focusListener = function (e) {
+        _this.value = true;
+      };
+      this.blurListener = function (e) {
+        if (_aureliaPal.DOM.activeElement !== _this.element) {
+          _this.value = false;
+        }
+      };
+    }
+
+    Focus.prototype.valueChanged = function valueChanged(newValue) {
+      if (this.isAttached) {
+        this._apply();
+      } else {
+        this.needsApply = true;
+      }
+    };
+
+    Focus.prototype._apply = function _apply() {
+      var _this2 = this;
+
+      if (this.value) {
+        this.taskQueue.queueMicroTask(function () {
+          if (_this2.value) {
+            _this2.element.focus();
+          }
+        });
+      } else {
+        this.element.blur();
+      }
+    };
+
+    Focus.prototype.attached = function attached() {
+      this.isAttached = true;
+      if (this.needsApply) {
+        this.needsApply = false;
+        this._apply();
+      }
+      this.element.addEventListener('focus', this.focusListener);
+      this.element.addEventListener('blur', this.blurListener);
+    };
+
+    Focus.prototype.detached = function detached() {
+      this.isAttached = false;
+      this.element.removeEventListener('focus', this.focusListener);
+      this.element.removeEventListener('blur', this.blurListener);
+    };
+
+    return Focus;
+  }()) || _class) || _class);
+});
+define('aurelia-templating-resources/css-resource',['exports', 'aurelia-templating', 'aurelia-loader', 'aurelia-dependency-injection', 'aurelia-path', 'aurelia-pal'], function (exports, _aureliaTemplating, _aureliaLoader, _aureliaDependencyInjection, _aureliaPath, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports._createCSSResource = _createCSSResource;
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  
+
+  var cssUrlMatcher = /url\((?!['"]data)([^)]+)\)/gi;
+
+  function fixupCSSUrls(address, css) {
+    if (typeof css !== 'string') {
+      throw new Error('Failed loading required CSS file: ' + address);
+    }
+    return css.replace(cssUrlMatcher, function (match, p1) {
+      var quote = p1.charAt(0);
+      if (quote === '\'' || quote === '"') {
+        p1 = p1.substr(1, p1.length - 2);
+      }
+      return 'url(\'' + (0, _aureliaPath.relativeToFile)(p1, address) + '\')';
+    });
+  }
+
+  var CSSResource = function () {
+    function CSSResource(address) {
+      
+
+      this.address = address;
+      this._scoped = null;
+      this._global = false;
+      this._alreadyGloballyInjected = false;
+    }
+
+    CSSResource.prototype.initialize = function initialize(container, target) {
+      this._scoped = new target(this);
+    };
+
+    CSSResource.prototype.register = function register(registry, name) {
+      if (name === 'scoped') {
+        registry.registerViewEngineHooks(this._scoped);
+      } else {
+        this._global = true;
+      }
+    };
+
+    CSSResource.prototype.load = function load(container) {
+      var _this = this;
+
+      return container.get(_aureliaLoader.Loader).loadText(this.address).catch(function (err) {
+        return null;
+      }).then(function (text) {
+        text = fixupCSSUrls(_this.address, text);
+        _this._scoped.css = text;
+        if (_this._global) {
+          _this._alreadyGloballyInjected = true;
+          _aureliaPal.DOM.injectStyles(text);
+        }
+      });
+    };
+
+    return CSSResource;
+  }();
+
+  var CSSViewEngineHooks = function () {
+    function CSSViewEngineHooks(owner) {
+      
+
+      this.owner = owner;
+      this.css = null;
+    }
+
+    CSSViewEngineHooks.prototype.beforeCompile = function beforeCompile(content, resources, instruction) {
+      if (instruction.targetShadowDOM) {
+        _aureliaPal.DOM.injectStyles(this.css, content, true);
+      } else if (_aureliaPal.FEATURE.scopedCSS) {
+        var styleNode = _aureliaPal.DOM.injectStyles(this.css, content, true);
+        styleNode.setAttribute('scoped', 'scoped');
+      } else if (!this.owner._alreadyGloballyInjected) {
+        _aureliaPal.DOM.injectStyles(this.css);
+        this.owner._alreadyGloballyInjected = true;
+      }
+    };
+
+    return CSSViewEngineHooks;
+  }();
+
+  function _createCSSResource(address) {
+    var _dec, _class;
+
+    var ViewCSS = (_dec = (0, _aureliaTemplating.resource)(new CSSResource(address)), _dec(_class = function (_CSSViewEngineHooks) {
+      _inherits(ViewCSS, _CSSViewEngineHooks);
+
+      function ViewCSS() {
+        
+
+        return _possibleConstructorReturn(this, _CSSViewEngineHooks.apply(this, arguments));
+      }
+
+      return ViewCSS;
+    }(CSSViewEngineHooks)) || _class);
+
+    return ViewCSS;
+  }
+});
+define('aurelia-templating-resources/attr-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AttrBindingBehavior = undefined;
+
+  
+
+  var AttrBindingBehavior = exports.AttrBindingBehavior = function () {
+    function AttrBindingBehavior() {
+      
+    }
+
+    AttrBindingBehavior.prototype.bind = function bind(binding, source) {
+      binding.targetObserver = new _aureliaBinding.DataAttributeObserver(binding.target, binding.targetProperty);
+    };
+
+    AttrBindingBehavior.prototype.unbind = function unbind(binding, source) {};
+
+    return AttrBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/binding-mode-behaviors',['exports', 'aurelia-binding', 'aurelia-metadata'], function (exports, _aureliaBinding, _aureliaMetadata) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TwoWayBindingBehavior = exports.OneWayBindingBehavior = exports.OneTimeBindingBehavior = undefined;
+
+  
+
+  var _dec, _class, _dec2, _class2, _dec3, _class3;
+
+  var modeBindingBehavior = {
+    bind: function bind(binding, source, lookupFunctions) {
+      binding.originalMode = binding.mode;
+      binding.mode = this.mode;
+    },
+    unbind: function unbind(binding, source) {
+      binding.mode = binding.originalMode;
+      binding.originalMode = null;
+    }
+  };
+
+  var OneTimeBindingBehavior = exports.OneTimeBindingBehavior = (_dec = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec(_class = function OneTimeBindingBehavior() {
+    
+
+    this.mode = _aureliaBinding.bindingMode.oneTime;
+  }) || _class);
+  var OneWayBindingBehavior = exports.OneWayBindingBehavior = (_dec2 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec2(_class2 = function OneWayBindingBehavior() {
+    
+
+    this.mode = _aureliaBinding.bindingMode.oneWay;
+  }) || _class2);
+  var TwoWayBindingBehavior = exports.TwoWayBindingBehavior = (_dec3 = (0, _aureliaMetadata.mixin)(modeBindingBehavior), _dec3(_class3 = function TwoWayBindingBehavior() {
+    
+
+    this.mode = _aureliaBinding.bindingMode.twoWay;
+  }) || _class3);
+});
+define('aurelia-templating-resources/throttle-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.ThrottleBindingBehavior = undefined;
+
+  
+
+  function throttle(newValue) {
+    var _this = this;
+
+    var state = this.throttleState;
+    var elapsed = +new Date() - state.last;
+    if (elapsed >= state.delay) {
+      clearTimeout(state.timeoutId);
+      state.timeoutId = null;
+      state.last = +new Date();
+      this.throttledMethod(newValue);
+      return;
+    }
+    state.newValue = newValue;
+    if (state.timeoutId === null) {
+      state.timeoutId = setTimeout(function () {
+        state.timeoutId = null;
+        state.last = +new Date();
+        _this.throttledMethod(state.newValue);
+      }, state.delay - elapsed);
+    }
+  }
+
+  var ThrottleBindingBehavior = exports.ThrottleBindingBehavior = function () {
+    function ThrottleBindingBehavior() {
+      
+    }
+
+    ThrottleBindingBehavior.prototype.bind = function bind(binding, source) {
+      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+
+      var methodToThrottle = 'updateTarget';
+      if (binding.callSource) {
+        methodToThrottle = 'callSource';
+      } else if (binding.updateSource && binding.mode === _aureliaBinding.bindingMode.twoWay) {
+        methodToThrottle = 'updateSource';
+      }
+
+      binding.throttledMethod = binding[methodToThrottle];
+      binding.throttledMethod.originalName = methodToThrottle;
+
+      binding[methodToThrottle] = throttle;
+
+      binding.throttleState = {
+        delay: delay,
+        last: 0,
+        timeoutId: null
+      };
+    };
+
+    ThrottleBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      var methodToRestore = binding.throttledMethod.originalName;
+      binding[methodToRestore] = binding.throttledMethod;
+      binding.throttledMethod = null;
+      clearTimeout(binding.throttleState.timeoutId);
+      binding.throttleState = null;
+    };
+
+    return ThrottleBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/debounce-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.DebounceBindingBehavior = undefined;
+
+  
+
+  function debounce(newValue) {
+    var _this = this;
+
+    var state = this.debounceState;
+    if (state.immediate) {
+      state.immediate = false;
+      this.debouncedMethod(newValue);
+      return;
+    }
+    clearTimeout(state.timeoutId);
+    state.timeoutId = setTimeout(function () {
+      return _this.debouncedMethod(newValue);
+    }, state.delay);
+  }
+
+  var DebounceBindingBehavior = exports.DebounceBindingBehavior = function () {
+    function DebounceBindingBehavior() {
+      
+    }
+
+    DebounceBindingBehavior.prototype.bind = function bind(binding, source) {
+      var delay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 200;
+
+      var methodToDebounce = 'updateTarget';
+      if (binding.callSource) {
+        methodToDebounce = 'callSource';
+      } else if (binding.updateSource && binding.mode === _aureliaBinding.bindingMode.twoWay) {
+        methodToDebounce = 'updateSource';
+      }
+
+      binding.debouncedMethod = binding[methodToDebounce];
+      binding.debouncedMethod.originalName = methodToDebounce;
+
+      binding[methodToDebounce] = debounce;
+
+      binding.debounceState = {
+        delay: delay,
+        timeoutId: null,
+        immediate: methodToDebounce === 'updateTarget' };
+    };
+
+    DebounceBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      var methodToRestore = binding.debouncedMethod.originalName;
+      binding[methodToRestore] = binding.debouncedMethod;
+      binding.debouncedMethod = null;
+      clearTimeout(binding.debounceState.timeoutId);
+      binding.debounceState = null;
+    };
+
+    return DebounceBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/self-binding-behavior',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  
+
+  function findOriginalEventTarget(event) {
+    return event.path && event.path[0] || event.deepPath && event.deepPath[0] || event.target;
+  }
+
+  function handleSelfEvent(event) {
+    var target = findOriginalEventTarget(event);
+    if (this.target !== target) return;
+    this.selfEventCallSource(event);
+  }
+
+  var SelfBindingBehavior = exports.SelfBindingBehavior = function () {
+    function SelfBindingBehavior() {
+      
+    }
+
+    SelfBindingBehavior.prototype.bind = function bind(binding, source) {
+      if (!binding.callSource || !binding.targetEvent) throw new Error('Self binding behavior only supports event.');
+      binding.selfEventCallSource = binding.callSource;
+      binding.callSource = handleSelfEvent;
+    };
+
+    SelfBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      binding.callSource = binding.selfEventCallSource;
+      binding.selfEventCallSource = null;
+    };
+
+    return SelfBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/signal-binding-behavior',['exports', './binding-signaler'], function (exports, _bindingSignaler) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.SignalBindingBehavior = undefined;
+
+  
+
+  var SignalBindingBehavior = exports.SignalBindingBehavior = function () {
+    SignalBindingBehavior.inject = function inject() {
+      return [_bindingSignaler.BindingSignaler];
+    };
+
+    function SignalBindingBehavior(bindingSignaler) {
+      
+
+      this.signals = bindingSignaler.signals;
+    }
+
+    SignalBindingBehavior.prototype.bind = function bind(binding, source) {
+      if (!binding.updateTarget) {
+        throw new Error('Only property bindings and string interpolation bindings can be signaled.  Trigger, delegate and call bindings cannot be signaled.');
+      }
+      if (arguments.length === 3) {
+        var name = arguments[2];
+        var bindings = this.signals[name] || (this.signals[name] = []);
+        bindings.push(binding);
+        binding.signalName = name;
+      } else if (arguments.length > 3) {
+        var names = Array.prototype.slice.call(arguments, 2);
+        var i = names.length;
+        while (i--) {
+          var _name = names[i];
+          var _bindings = this.signals[_name] || (this.signals[_name] = []);
+          _bindings.push(binding);
+        }
+        binding.signalName = names;
+      } else {
+        throw new Error('Signal name is required.');
+      }
+    };
+
+    SignalBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      var name = binding.signalName;
+      binding.signalName = null;
+      if (Array.isArray(name)) {
+        var names = name;
+        var i = names.length;
+        while (i--) {
+          var n = names[i];
+          var bindings = this.signals[n];
+          bindings.splice(bindings.indexOf(binding), 1);
+        }
+      } else {
+        var _bindings2 = this.signals[name];
+        _bindings2.splice(_bindings2.indexOf(binding), 1);
+      }
+    };
+
+    return SignalBindingBehavior;
+  }();
+});
+define('aurelia-templating-resources/binding-signaler',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.BindingSignaler = undefined;
+
+  
+
+  var BindingSignaler = exports.BindingSignaler = function () {
+    function BindingSignaler() {
+      
+
+      this.signals = {};
+    }
+
+    BindingSignaler.prototype.signal = function signal(name) {
+      var bindings = this.signals[name];
+      if (!bindings) {
+        return;
+      }
+      var i = bindings.length;
+      while (i--) {
+        bindings[i].call(_aureliaBinding.sourceContext);
+      }
+    };
+
+    return BindingSignaler;
+  }();
+});
+define('aurelia-templating-resources/update-trigger-binding-behavior',['exports', 'aurelia-binding'], function (exports, _aureliaBinding) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.UpdateTriggerBindingBehavior = undefined;
+
+  
+
+  var _class, _temp;
+
+  var eventNamesRequired = 'The updateTrigger binding behavior requires at least one event name argument: eg <input value.bind="firstName & updateTrigger:\'blur\'">';
+  var notApplicableMessage = 'The updateTrigger binding behavior can only be applied to two-way bindings on input/select elements.';
+
+  var UpdateTriggerBindingBehavior = exports.UpdateTriggerBindingBehavior = (_temp = _class = function () {
+    function UpdateTriggerBindingBehavior(eventManager) {
+      
+
+      this.eventManager = eventManager;
+    }
+
+    UpdateTriggerBindingBehavior.prototype.bind = function bind(binding, source) {
+      for (var _len = arguments.length, events = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+        events[_key - 2] = arguments[_key];
+      }
+
+      if (events.length === 0) {
+        throw new Error(eventNamesRequired);
+      }
+      if (binding.mode !== _aureliaBinding.bindingMode.twoWay) {
+        throw new Error(notApplicableMessage);
+      }
+
+      var targetObserver = binding.observerLocator.getObserver(binding.target, binding.targetProperty);
+      if (!targetObserver.handler) {
+        throw new Error(notApplicableMessage);
+      }
+      binding.targetObserver = targetObserver;
+
+      targetObserver.originalHandler = binding.targetObserver.handler;
+
+      var handler = this.eventManager.createElementHandler(events);
+      targetObserver.handler = handler;
+    };
+
+    UpdateTriggerBindingBehavior.prototype.unbind = function unbind(binding, source) {
+      binding.targetObserver.handler = binding.targetObserver.originalHandler;
+      binding.targetObserver.originalHandler = null;
+    };
+
+    return UpdateTriggerBindingBehavior;
+  }(), _class.inject = [_aureliaBinding.EventManager], _temp);
+});
+define('aurelia-templating-resources/html-resource-plugin',['exports', 'aurelia-templating', './dynamic-element'], function (exports, _aureliaTemplating, _dynamicElement) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.getElementName = getElementName;
+  exports.configure = configure;
+  function getElementName(address) {
+    return (/([^\/^\?]+)\.html/i.exec(address)[1].toLowerCase()
+    );
+  }
+
+  function configure(config) {
+    var viewEngine = config.container.get(_aureliaTemplating.ViewEngine);
+    var loader = config.aurelia.loader;
+
+    viewEngine.addResourcePlugin('.html', {
+      'fetch': function fetch(address) {
+        return loader.loadTemplate(address).then(function (registryEntry) {
+          var _ref;
+
+          var bindable = registryEntry.template.getAttribute('bindable');
+          var elementName = getElementName(address);
+
+          if (bindable) {
+            bindable = bindable.split(',').map(function (x) {
+              return x.trim();
+            });
+            registryEntry.template.removeAttribute('bindable');
+          } else {
+            bindable = [];
+          }
+
+          return _ref = {}, _ref[elementName] = (0, _dynamicElement._createDynamicElement)(elementName, address, bindable), _ref;
+        });
+      }
+    });
+  }
+});
+define('aurelia-templating-resources/dynamic-element',['exports', 'aurelia-templating'], function (exports, _aureliaTemplating) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports._createDynamicElement = _createDynamicElement;
+
+  
+
+  function _createDynamicElement(name, viewUrl, bindableNames) {
+    var _dec, _dec2, _class;
+
+    var DynamicElement = (_dec = (0, _aureliaTemplating.customElement)(name), _dec2 = (0, _aureliaTemplating.useView)(viewUrl), _dec(_class = _dec2(_class = function () {
+      function DynamicElement() {
+        
+      }
+
+      DynamicElement.prototype.bind = function bind(bindingContext) {
+        this.$parent = bindingContext;
+      };
+
+      return DynamicElement;
+    }()) || _class) || _class);
+
+    for (var i = 0, ii = bindableNames.length; i < ii; ++i) {
+      (0, _aureliaTemplating.bindable)(bindableNames[i])(DynamicElement);
+    }
+    return DynamicElement;
+  }
+});
 define('aurelia-templating-router/aurelia-templating-router',['exports', 'aurelia-pal', 'aurelia-router', './route-loader', './router-view', './route-href'], function (exports, _aureliaPal, _aureliaRouter, _routeLoader, _routerView, _routeHref) {
   'use strict';
 
@@ -37260,6 +36815,420 @@ define('aurelia-templating-router/aurelia-templating-router',['exports', 'aureli
   exports.configure = configure;
 });;define('aurelia-templating-router', ['aurelia-templating-router/aurelia-templating-router'], function (main) { return main; });
 
+define('aurelia-templating-router/route-loader',['exports', 'aurelia-dependency-injection', 'aurelia-templating', 'aurelia-router', 'aurelia-path', 'aurelia-metadata', './router-view'], function (exports, _aureliaDependencyInjection, _aureliaTemplating, _aureliaRouter, _aureliaPath, _aureliaMetadata, _routerView) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.TemplatingRouteLoader = undefined;
+
+  
+
+  function _possibleConstructorReturn(self, call) {
+    if (!self) {
+      throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+    }
+
+    return call && (typeof call === "object" || typeof call === "function") ? call : self;
+  }
+
+  function _inherits(subClass, superClass) {
+    if (typeof superClass !== "function" && superClass !== null) {
+      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+    }
+
+    subClass.prototype = Object.create(superClass && superClass.prototype, {
+      constructor: {
+        value: subClass,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+  }
+
+  var _dec, _class;
+
+  var TemplatingRouteLoader = exports.TemplatingRouteLoader = (_dec = (0, _aureliaDependencyInjection.inject)(_aureliaTemplating.CompositionEngine), _dec(_class = function (_RouteLoader) {
+    _inherits(TemplatingRouteLoader, _RouteLoader);
+
+    function TemplatingRouteLoader(compositionEngine) {
+      
+
+      var _this = _possibleConstructorReturn(this, _RouteLoader.call(this));
+
+      _this.compositionEngine = compositionEngine;
+      return _this;
+    }
+
+    TemplatingRouteLoader.prototype.loadRoute = function loadRoute(router, config) {
+      var childContainer = router.container.createChild();
+
+      var viewModel = /\.html/.test(config.moduleId) ? createDynamicClass(config.moduleId) : (0, _aureliaPath.relativeToFile)(config.moduleId, _aureliaMetadata.Origin.get(router.container.viewModel.constructor).moduleId);
+
+      var instruction = {
+        viewModel: viewModel,
+        childContainer: childContainer,
+        view: config.view || config.viewStrategy,
+        router: router
+      };
+
+      childContainer.registerSingleton(_routerView.RouterViewLocator);
+
+      childContainer.getChildRouter = function () {
+        var childRouter = void 0;
+
+        childContainer.registerHandler(_aureliaRouter.Router, function (c) {
+          return childRouter || (childRouter = router.createChild(childContainer));
+        });
+
+        return childContainer.get(_aureliaRouter.Router);
+      };
+
+      return this.compositionEngine.ensureViewModel(instruction);
+    };
+
+    return TemplatingRouteLoader;
+  }(_aureliaRouter.RouteLoader)) || _class);
+
+
+  function createDynamicClass(moduleId) {
+    var _dec2, _dec3, _class2;
+
+    var name = /([^\/^\?]+)\.html/i.exec(moduleId)[1];
+
+    var DynamicClass = (_dec2 = (0, _aureliaTemplating.customElement)(name), _dec3 = (0, _aureliaTemplating.useView)(moduleId), _dec2(_class2 = _dec3(_class2 = function () {
+      function DynamicClass() {
+        
+      }
+
+      DynamicClass.prototype.bind = function bind(bindingContext) {
+        this.$parent = bindingContext;
+      };
+
+      return DynamicClass;
+    }()) || _class2) || _class2);
+
+
+    return DynamicClass;
+  }
+});
+define('aurelia-templating-router/router-view',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-templating', 'aurelia-router', 'aurelia-metadata', 'aurelia-pal'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaTemplating, _aureliaRouter, _aureliaMetadata, _aureliaPal) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RouterViewLocator = exports.RouterView = undefined;
+
+  function _initDefineProp(target, property, descriptor, context) {
+    if (!descriptor) return;
+    Object.defineProperty(target, property, {
+      enumerable: descriptor.enumerable,
+      configurable: descriptor.configurable,
+      writable: descriptor.writable,
+      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
+    });
+  }
+
+  
+
+  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+    var desc = {};
+    Object['ke' + 'ys'](descriptor).forEach(function (key) {
+      desc[key] = descriptor[key];
+    });
+    desc.enumerable = !!desc.enumerable;
+    desc.configurable = !!desc.configurable;
+
+    if ('value' in desc || desc.initializer) {
+      desc.writable = true;
+    }
+
+    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
+      return decorator(target, property, desc) || desc;
+    }, desc);
+
+    if (context && desc.initializer !== void 0) {
+      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+      desc.initializer = undefined;
+    }
+
+    if (desc.initializer === void 0) {
+      Object['define' + 'Property'](target, property, desc);
+      desc = null;
+    }
+
+    return desc;
+  }
+
+  function _initializerWarningHelper(descriptor, context) {
+    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
+  }
+
+  var _dec, _dec2, _class, _desc, _value, _class2, _descriptor, _descriptor2, _descriptor3, _descriptor4;
+
+  var RouterView = exports.RouterView = (_dec = (0, _aureliaTemplating.customElement)('router-view'), _dec2 = (0, _aureliaDependencyInjection.inject)(_aureliaPal.DOM.Element, _aureliaDependencyInjection.Container, _aureliaTemplating.ViewSlot, _aureliaRouter.Router, _aureliaTemplating.ViewLocator, _aureliaTemplating.CompositionTransaction, _aureliaTemplating.CompositionEngine), _dec(_class = (0, _aureliaTemplating.noView)(_class = _dec2(_class = (_class2 = function () {
+    function RouterView(element, container, viewSlot, router, viewLocator, compositionTransaction, compositionEngine) {
+      
+
+      _initDefineProp(this, 'swapOrder', _descriptor, this);
+
+      _initDefineProp(this, 'layoutView', _descriptor2, this);
+
+      _initDefineProp(this, 'layoutViewModel', _descriptor3, this);
+
+      _initDefineProp(this, 'layoutModel', _descriptor4, this);
+
+      this.element = element;
+      this.container = container;
+      this.viewSlot = viewSlot;
+      this.router = router;
+      this.viewLocator = viewLocator;
+      this.compositionTransaction = compositionTransaction;
+      this.compositionEngine = compositionEngine;
+      this.router.registerViewPort(this, this.element.getAttribute('name'));
+
+      if (!('initialComposition' in compositionTransaction)) {
+        compositionTransaction.initialComposition = true;
+        this.compositionTransactionNotifier = compositionTransaction.enlist();
+      }
+    }
+
+    RouterView.prototype.created = function created(owningView) {
+      this.owningView = owningView;
+    };
+
+    RouterView.prototype.bind = function bind(bindingContext, overrideContext) {
+      this.container.viewModel = bindingContext;
+      this.overrideContext = overrideContext;
+    };
+
+    RouterView.prototype.process = function process(viewPortInstruction, waitToSwap) {
+      var _this = this;
+
+      var component = viewPortInstruction.component;
+      var childContainer = component.childContainer;
+      var viewModel = component.viewModel;
+      var viewModelResource = component.viewModelResource;
+      var metadata = viewModelResource.metadata;
+      var config = component.router.currentInstruction.config;
+      var viewPort = config.viewPorts ? config.viewPorts[viewPortInstruction.name] : {};
+
+      childContainer.get(RouterViewLocator)._notify(this);
+
+      var layoutInstruction = {
+        viewModel: viewPort.layoutViewModel || config.layoutViewModel || this.layoutViewModel,
+        view: viewPort.layoutView || config.layoutView || this.layoutView,
+        model: viewPort.layoutModel || config.layoutModel || this.layoutModel,
+        router: viewPortInstruction.component.router,
+        childContainer: childContainer,
+        viewSlot: this.viewSlot
+      };
+
+      var viewStrategy = this.viewLocator.getViewStrategy(component.view || viewModel);
+      if (viewStrategy && component.view) {
+        viewStrategy.makeRelativeTo(_aureliaMetadata.Origin.get(component.router.container.viewModel.constructor).moduleId);
+      }
+
+      return metadata.load(childContainer, viewModelResource.value, null, viewStrategy, true).then(function (viewFactory) {
+        if (!_this.compositionTransactionNotifier) {
+          _this.compositionTransactionOwnershipToken = _this.compositionTransaction.tryCapture();
+        }
+
+        if (layoutInstruction.viewModel || layoutInstruction.view) {
+          viewPortInstruction.layoutInstruction = layoutInstruction;
+        }
+
+        viewPortInstruction.controller = metadata.create(childContainer, _aureliaTemplating.BehaviorInstruction.dynamic(_this.element, viewModel, viewFactory));
+
+        if (waitToSwap) {
+          return;
+        }
+
+        _this.swap(viewPortInstruction);
+      });
+    };
+
+    RouterView.prototype.swap = function swap(viewPortInstruction) {
+      var _this2 = this;
+
+      var layoutInstruction = viewPortInstruction.layoutInstruction;
+      var previousView = this.view;
+
+      var work = function work() {
+        var swapStrategy = _aureliaTemplating.SwapStrategies[_this2.swapOrder] || _aureliaTemplating.SwapStrategies.after;
+        var viewSlot = _this2.viewSlot;
+
+        swapStrategy(viewSlot, previousView, function () {
+          return Promise.resolve(viewSlot.add(_this2.view));
+        }).then(function () {
+          _this2._notify();
+        });
+      };
+
+      var ready = function ready(owningView) {
+        viewPortInstruction.controller.automate(_this2.overrideContext, owningView);
+        if (_this2.compositionTransactionOwnershipToken) {
+          return _this2.compositionTransactionOwnershipToken.waitForCompositionComplete().then(function () {
+            _this2.compositionTransactionOwnershipToken = null;
+            return work();
+          });
+        }
+
+        return work();
+      };
+
+      if (layoutInstruction) {
+        if (!layoutInstruction.viewModel) {
+          layoutInstruction.viewModel = {};
+        }
+
+        return this.compositionEngine.createController(layoutInstruction).then(function (controller) {
+          _aureliaTemplating.ShadowDOM.distributeView(viewPortInstruction.controller.view, controller.slots || controller.view.slots);
+          controller.automate((0, _aureliaBinding.createOverrideContext)(layoutInstruction.viewModel), _this2.owningView);
+          controller.view.children.push(viewPortInstruction.controller.view);
+          return controller.view || controller;
+        }).then(function (newView) {
+          _this2.view = newView;
+          return ready(newView);
+        });
+      }
+
+      this.view = viewPortInstruction.controller.view;
+
+      return ready(this.owningView);
+    };
+
+    RouterView.prototype._notify = function _notify() {
+      if (this.compositionTransactionNotifier) {
+        this.compositionTransactionNotifier.done();
+        this.compositionTransactionNotifier = null;
+      }
+    };
+
+    return RouterView;
+  }(), (_descriptor = _applyDecoratedDescriptor(_class2.prototype, 'swapOrder', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor2 = _applyDecoratedDescriptor(_class2.prototype, 'layoutView', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor3 = _applyDecoratedDescriptor(_class2.prototype, 'layoutViewModel', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  }), _descriptor4 = _applyDecoratedDescriptor(_class2.prototype, 'layoutModel', [_aureliaTemplating.bindable], {
+    enumerable: true,
+    initializer: null
+  })), _class2)) || _class) || _class) || _class);
+
+  var RouterViewLocator = exports.RouterViewLocator = function () {
+    function RouterViewLocator() {
+      var _this3 = this;
+
+      
+
+      this.promise = new Promise(function (resolve) {
+        return _this3.resolve = resolve;
+      });
+    }
+
+    RouterViewLocator.prototype.findNearest = function findNearest() {
+      return this.promise;
+    };
+
+    RouterViewLocator.prototype._notify = function _notify(routerView) {
+      this.resolve(routerView);
+    };
+
+    return RouterViewLocator;
+  }();
+});
+define('aurelia-templating-router/route-href',['exports', 'aurelia-templating', 'aurelia-dependency-injection', 'aurelia-router', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaTemplating, _aureliaDependencyInjection, _aureliaRouter, _aureliaPal, _aureliaLogging) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RouteHref = undefined;
+
+  var LogManager = _interopRequireWildcard(_aureliaLogging);
+
+  function _interopRequireWildcard(obj) {
+    if (obj && obj.__esModule) {
+      return obj;
+    } else {
+      var newObj = {};
+
+      if (obj != null) {
+        for (var key in obj) {
+          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+        }
+      }
+
+      newObj.default = obj;
+      return newObj;
+    }
+  }
+
+  
+
+  var _dec, _dec2, _dec3, _dec4, _dec5, _class;
+
+  var logger = LogManager.getLogger('route-href');
+
+  var RouteHref = exports.RouteHref = (_dec = (0, _aureliaTemplating.customAttribute)('route-href'), _dec2 = (0, _aureliaTemplating.bindable)({ name: 'route', changeHandler: 'processChange' }), _dec3 = (0, _aureliaTemplating.bindable)({ name: 'params', changeHandler: 'processChange' }), _dec4 = (0, _aureliaTemplating.bindable)({ name: 'attribute', defaultValue: 'href' }), _dec5 = (0, _aureliaDependencyInjection.inject)(_aureliaRouter.Router, _aureliaPal.DOM.Element), _dec(_class = _dec2(_class = _dec3(_class = _dec4(_class = _dec5(_class = function () {
+    function RouteHref(router, element) {
+      
+
+      this.router = router;
+      this.element = element;
+    }
+
+    RouteHref.prototype.bind = function bind() {
+      this.isActive = true;
+      this.processChange();
+    };
+
+    RouteHref.prototype.unbind = function unbind() {
+      this.isActive = false;
+    };
+
+    RouteHref.prototype.attributeChanged = function attributeChanged(value, previous) {
+      if (previous) {
+        this.element.removeAttribute(previous);
+      }
+
+      this.processChange();
+    };
+
+    RouteHref.prototype.processChange = function processChange() {
+      var _this = this;
+
+      return this.router.ensureConfigured().then(function () {
+        if (!_this.isActive) {
+          return null;
+        }
+
+        var href = _this.router.generate(_this.route, _this.params);
+
+        if (_this.element.au.controller) {
+          _this.element.au.controller.viewModel[_this.attribute] = href;
+        } else {
+          _this.element.setAttribute(_this.attribute, href);
+        }
+
+        return null;
+      }).catch(function (reason) {
+        logger.error(reason);
+      });
+    };
+
+    return RouteHref;
+  }()) || _class) || _class) || _class) || _class) || _class);
+});
 define('aurelia-testing/aurelia-testing',['exports', './compile-spy', './view-spy', './component-tester', './wait'], function (exports, _compileSpy, _viewSpy, _componentTester, _wait) {
   'use strict';
 
@@ -37628,4 +37597,4 @@ define("bootstrap4/js/bootstrap.min", ["jquery"], (function (global) {
 ;define('bootstrap4', ['bootstrap4/js/bootstrap.min'], function (main) { return main; });
 
 define('text!bootstrap4/css/bootstrap.css', ['module'], function(module) { module.exports = "/*!\n * Bootstrap v4.0.0-alpha.6 (https://getbootstrap.com)\n * Copyright 2011-2017 The Bootstrap Authors\n * Copyright 2011-2017 Twitter, Inc.\n * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)\n */\n/*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */\nhtml {\n  font-family: sans-serif;\n  line-height: 1.15;\n  -ms-text-size-adjust: 100%;\n  -webkit-text-size-adjust: 100%;\n}\n\nbody {\n  margin: 0;\n}\n\narticle,\naside,\nfooter,\nheader,\nnav,\nsection {\n  display: block;\n}\n\nh1 {\n  font-size: 2em;\n  margin: 0.67em 0;\n}\n\nfigcaption,\nfigure,\nmain {\n  display: block;\n}\n\nfigure {\n  margin: 1em 40px;\n}\n\nhr {\n  -webkit-box-sizing: content-box;\n          box-sizing: content-box;\n  height: 0;\n  overflow: visible;\n}\n\npre {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\n\na {\n  background-color: transparent;\n  -webkit-text-decoration-skip: objects;\n}\n\na:active,\na:hover {\n  outline-width: 0;\n}\n\nabbr[title] {\n  border-bottom: none;\n  text-decoration: underline;\n  text-decoration: underline dotted;\n}\n\nb,\nstrong {\n  font-weight: inherit;\n}\n\nb,\nstrong {\n  font-weight: bolder;\n}\n\ncode,\nkbd,\nsamp {\n  font-family: monospace, monospace;\n  font-size: 1em;\n}\n\ndfn {\n  font-style: italic;\n}\n\nmark {\n  background-color: #ff0;\n  color: #000;\n}\n\nsmall {\n  font-size: 80%;\n}\n\nsub,\nsup {\n  font-size: 75%;\n  line-height: 0;\n  position: relative;\n  vertical-align: baseline;\n}\n\nsub {\n  bottom: -0.25em;\n}\n\nsup {\n  top: -0.5em;\n}\n\naudio,\nvideo {\n  display: inline-block;\n}\n\naudio:not([controls]) {\n  display: none;\n  height: 0;\n}\n\nimg {\n  border-style: none;\n}\n\nsvg:not(:root) {\n  overflow: hidden;\n}\n\nbutton,\ninput,\noptgroup,\nselect,\ntextarea {\n  font-family: sans-serif;\n  font-size: 100%;\n  line-height: 1.15;\n  margin: 0;\n}\n\nbutton,\ninput {\n  overflow: visible;\n}\n\nbutton,\nselect {\n  text-transform: none;\n}\n\nbutton,\nhtml [type=\"button\"],\n[type=\"reset\"],\n[type=\"submit\"] {\n  -webkit-appearance: button;\n}\n\nbutton::-moz-focus-inner,\n[type=\"button\"]::-moz-focus-inner,\n[type=\"reset\"]::-moz-focus-inner,\n[type=\"submit\"]::-moz-focus-inner {\n  border-style: none;\n  padding: 0;\n}\n\nbutton:-moz-focusring,\n[type=\"button\"]:-moz-focusring,\n[type=\"reset\"]:-moz-focusring,\n[type=\"submit\"]:-moz-focusring {\n  outline: 1px dotted ButtonText;\n}\n\nfieldset {\n  border: 1px solid #c0c0c0;\n  margin: 0 2px;\n  padding: 0.35em 0.625em 0.75em;\n}\n\nlegend {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: inherit;\n  display: table;\n  max-width: 100%;\n  padding: 0;\n  white-space: normal;\n}\n\nprogress {\n  display: inline-block;\n  vertical-align: baseline;\n}\n\ntextarea {\n  overflow: auto;\n}\n\n[type=\"checkbox\"],\n[type=\"radio\"] {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  padding: 0;\n}\n\n[type=\"number\"]::-webkit-inner-spin-button,\n[type=\"number\"]::-webkit-outer-spin-button {\n  height: auto;\n}\n\n[type=\"search\"] {\n  -webkit-appearance: textfield;\n  outline-offset: -2px;\n}\n\n[type=\"search\"]::-webkit-search-cancel-button,\n[type=\"search\"]::-webkit-search-decoration {\n  -webkit-appearance: none;\n}\n\n::-webkit-file-upload-button {\n  -webkit-appearance: button;\n  font: inherit;\n}\n\ndetails,\nmenu {\n  display: block;\n}\n\nsummary {\n  display: list-item;\n}\n\ncanvas {\n  display: inline-block;\n}\n\ntemplate {\n  display: none;\n}\n\n[hidden] {\n  display: none;\n}\n\n@media print {\n  *,\n  *::before,\n  *::after,\n  p::first-letter,\n  div::first-letter,\n  blockquote::first-letter,\n  li::first-letter,\n  p::first-line,\n  div::first-line,\n  blockquote::first-line,\n  li::first-line {\n    text-shadow: none !important;\n    -webkit-box-shadow: none !important;\n            box-shadow: none !important;\n  }\n  a,\n  a:visited {\n    text-decoration: underline;\n  }\n  abbr[title]::after {\n    content: \" (\" attr(title) \")\";\n  }\n  pre {\n    white-space: pre-wrap !important;\n  }\n  pre,\n  blockquote {\n    border: 1px solid #999;\n    page-break-inside: avoid;\n  }\n  thead {\n    display: table-header-group;\n  }\n  tr,\n  img {\n    page-break-inside: avoid;\n  }\n  p,\n  h2,\n  h3 {\n    orphans: 3;\n    widows: 3;\n  }\n  h2,\n  h3 {\n    page-break-after: avoid;\n  }\n  .navbar {\n    display: none;\n  }\n  .badge {\n    border: 1px solid #000;\n  }\n  .table {\n    border-collapse: collapse !important;\n  }\n  .table td,\n  .table th {\n    background-color: #fff !important;\n  }\n  .table-bordered th,\n  .table-bordered td {\n    border: 1px solid #ddd !important;\n  }\n}\n\nhtml {\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n}\n\n*,\n*::before,\n*::after {\n  -webkit-box-sizing: inherit;\n          box-sizing: inherit;\n}\n\n@-ms-viewport {\n  width: device-width;\n}\n\nhtml {\n  -ms-overflow-style: scrollbar;\n  -webkit-tap-highlight-color: transparent;\n}\n\nbody {\n  font-family: -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-size: 1rem;\n  font-weight: normal;\n  line-height: 1.5;\n  color: #292b2c;\n  background-color: #fff;\n}\n\n[tabindex=\"-1\"]:focus {\n  outline: none !important;\n}\n\nh1, h2, h3, h4, h5, h6 {\n  margin-top: 0;\n  margin-bottom: .5rem;\n}\n\np {\n  margin-top: 0;\n  margin-bottom: 1rem;\n}\n\nabbr[title],\nabbr[data-original-title] {\n  cursor: help;\n}\n\naddress {\n  margin-bottom: 1rem;\n  font-style: normal;\n  line-height: inherit;\n}\n\nol,\nul,\ndl {\n  margin-top: 0;\n  margin-bottom: 1rem;\n}\n\nol ol,\nul ul,\nol ul,\nul ol {\n  margin-bottom: 0;\n}\n\ndt {\n  font-weight: bold;\n}\n\ndd {\n  margin-bottom: .5rem;\n  margin-left: 0;\n}\n\nblockquote {\n  margin: 0 0 1rem;\n}\n\na {\n  color: #0275d8;\n  text-decoration: none;\n}\n\na:focus, a:hover {\n  color: #014c8c;\n  text-decoration: underline;\n}\n\na:not([href]):not([tabindex]) {\n  color: inherit;\n  text-decoration: none;\n}\n\na:not([href]):not([tabindex]):focus, a:not([href]):not([tabindex]):hover {\n  color: inherit;\n  text-decoration: none;\n}\n\na:not([href]):not([tabindex]):focus {\n  outline: 0;\n}\n\npre {\n  margin-top: 0;\n  margin-bottom: 1rem;\n  overflow: auto;\n}\n\nfigure {\n  margin: 0 0 1rem;\n}\n\nimg {\n  vertical-align: middle;\n}\n\n[role=\"button\"] {\n  cursor: pointer;\n}\n\na,\narea,\nbutton,\n[role=\"button\"],\ninput,\nlabel,\nselect,\nsummary,\ntextarea {\n  -ms-touch-action: manipulation;\n      touch-action: manipulation;\n}\n\ntable {\n  border-collapse: collapse;\n  background-color: transparent;\n}\n\ncaption {\n  padding-top: 0.75rem;\n  padding-bottom: 0.75rem;\n  color: #636c72;\n  text-align: left;\n  caption-side: bottom;\n}\n\nth {\n  text-align: left;\n}\n\nlabel {\n  display: inline-block;\n  margin-bottom: .5rem;\n}\n\nbutton:focus {\n  outline: 1px dotted;\n  outline: 5px auto -webkit-focus-ring-color;\n}\n\ninput,\nbutton,\nselect,\ntextarea {\n  line-height: inherit;\n}\n\ninput[type=\"radio\"]:disabled,\ninput[type=\"checkbox\"]:disabled {\n  cursor: not-allowed;\n}\n\ninput[type=\"date\"],\ninput[type=\"time\"],\ninput[type=\"datetime-local\"],\ninput[type=\"month\"] {\n  -webkit-appearance: listbox;\n}\n\ntextarea {\n  resize: vertical;\n}\n\nfieldset {\n  min-width: 0;\n  padding: 0;\n  margin: 0;\n  border: 0;\n}\n\nlegend {\n  display: block;\n  width: 100%;\n  padding: 0;\n  margin-bottom: .5rem;\n  font-size: 1.5rem;\n  line-height: inherit;\n}\n\ninput[type=\"search\"] {\n  -webkit-appearance: none;\n}\n\noutput {\n  display: inline-block;\n}\n\n[hidden] {\n  display: none !important;\n}\n\nh1, h2, h3, h4, h5, h6,\n.h1, .h2, .h3, .h4, .h5, .h6 {\n  margin-bottom: 0.5rem;\n  font-family: inherit;\n  font-weight: 500;\n  line-height: 1.1;\n  color: inherit;\n}\n\nh1, .h1 {\n  font-size: 2.5rem;\n}\n\nh2, .h2 {\n  font-size: 2rem;\n}\n\nh3, .h3 {\n  font-size: 1.75rem;\n}\n\nh4, .h4 {\n  font-size: 1.5rem;\n}\n\nh5, .h5 {\n  font-size: 1.25rem;\n}\n\nh6, .h6 {\n  font-size: 1rem;\n}\n\n.lead {\n  font-size: 1.25rem;\n  font-weight: 300;\n}\n\n.display-1 {\n  font-size: 6rem;\n  font-weight: 300;\n  line-height: 1.1;\n}\n\n.display-2 {\n  font-size: 5.5rem;\n  font-weight: 300;\n  line-height: 1.1;\n}\n\n.display-3 {\n  font-size: 4.5rem;\n  font-weight: 300;\n  line-height: 1.1;\n}\n\n.display-4 {\n  font-size: 3.5rem;\n  font-weight: 300;\n  line-height: 1.1;\n}\n\nhr {\n  margin-top: 1rem;\n  margin-bottom: 1rem;\n  border: 0;\n  border-top: 1px solid rgba(0, 0, 0, 0.1);\n}\n\nsmall,\n.small {\n  font-size: 80%;\n  font-weight: normal;\n}\n\nmark,\n.mark {\n  padding: 0.2em;\n  background-color: #fcf8e3;\n}\n\n.list-unstyled {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-inline {\n  padding-left: 0;\n  list-style: none;\n}\n\n.list-inline-item {\n  display: inline-block;\n}\n\n.list-inline-item:not(:last-child) {\n  margin-right: 5px;\n}\n\n.initialism {\n  font-size: 90%;\n  text-transform: uppercase;\n}\n\n.blockquote {\n  padding: 0.5rem 1rem;\n  margin-bottom: 1rem;\n  font-size: 1.25rem;\n  border-left: 0.25rem solid #eceeef;\n}\n\n.blockquote-footer {\n  display: block;\n  font-size: 80%;\n  color: #636c72;\n}\n\n.blockquote-footer::before {\n  content: \"\\2014 \\00A0\";\n}\n\n.blockquote-reverse {\n  padding-right: 1rem;\n  padding-left: 0;\n  text-align: right;\n  border-right: 0.25rem solid #eceeef;\n  border-left: 0;\n}\n\n.blockquote-reverse .blockquote-footer::before {\n  content: \"\";\n}\n\n.blockquote-reverse .blockquote-footer::after {\n  content: \"\\00A0 \\2014\";\n}\n\n.img-fluid {\n  max-width: 100%;\n  height: auto;\n}\n\n.img-thumbnail {\n  padding: 0.25rem;\n  background-color: #fff;\n  border: 1px solid #ddd;\n  border-radius: 0.25rem;\n  -webkit-transition: all 0.2s ease-in-out;\n  -o-transition: all 0.2s ease-in-out;\n  transition: all 0.2s ease-in-out;\n  max-width: 100%;\n  height: auto;\n}\n\n.figure {\n  display: inline-block;\n}\n\n.figure-img {\n  margin-bottom: 0.5rem;\n  line-height: 1;\n}\n\n.figure-caption {\n  font-size: 90%;\n  color: #636c72;\n}\n\ncode,\nkbd,\npre,\nsamp {\n  font-family: Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;\n}\n\ncode {\n  padding: 0.2rem 0.4rem;\n  font-size: 90%;\n  color: #bd4147;\n  background-color: #f7f7f9;\n  border-radius: 0.25rem;\n}\n\na > code {\n  padding: 0;\n  color: inherit;\n  background-color: inherit;\n}\n\nkbd {\n  padding: 0.2rem 0.4rem;\n  font-size: 90%;\n  color: #fff;\n  background-color: #292b2c;\n  border-radius: 0.2rem;\n}\n\nkbd kbd {\n  padding: 0;\n  font-size: 100%;\n  font-weight: bold;\n}\n\npre {\n  display: block;\n  margin-top: 0;\n  margin-bottom: 1rem;\n  font-size: 90%;\n  color: #292b2c;\n}\n\npre code {\n  padding: 0;\n  font-size: inherit;\n  color: inherit;\n  background-color: transparent;\n  border-radius: 0;\n}\n\n.pre-scrollable {\n  max-height: 340px;\n  overflow-y: scroll;\n}\n\n.container {\n  position: relative;\n  margin-left: auto;\n  margin-right: auto;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n\n@media (min-width: 576px) {\n  .container {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .container {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .container {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .container {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 576px) {\n  .container {\n    width: 540px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 768px) {\n  .container {\n    width: 720px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 992px) {\n  .container {\n    width: 960px;\n    max-width: 100%;\n  }\n}\n\n@media (min-width: 1200px) {\n  .container {\n    width: 1140px;\n    max-width: 100%;\n  }\n}\n\n.container-fluid {\n  position: relative;\n  margin-left: auto;\n  margin-right: auto;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n\n@media (min-width: 576px) {\n  .container-fluid {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .container-fluid {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .container-fluid {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .container-fluid {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n.row {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-wrap: wrap;\n      -ms-flex-wrap: wrap;\n          flex-wrap: wrap;\n  margin-right: -15px;\n  margin-left: -15px;\n}\n\n@media (min-width: 576px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .row {\n    margin-right: -15px;\n    margin-left: -15px;\n  }\n}\n\n.no-gutters {\n  margin-right: 0;\n  margin-left: 0;\n}\n\n.no-gutters > .col,\n.no-gutters > [class*=\"col-\"] {\n  padding-right: 0;\n  padding-left: 0;\n}\n\n.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl {\n  position: relative;\n  width: 100%;\n  min-height: 1px;\n  padding-right: 15px;\n  padding-left: 15px;\n}\n\n@media (min-width: 576px) {\n  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 768px) {\n  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 992px) {\n  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n@media (min-width: 1200px) {\n  .col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl {\n    padding-right: 15px;\n    padding-left: 15px;\n  }\n}\n\n.col {\n  -webkit-flex-basis: 0;\n      -ms-flex-preferred-size: 0;\n          flex-basis: 0;\n  -webkit-box-flex: 1;\n  -webkit-flex-grow: 1;\n      -ms-flex-positive: 1;\n          flex-grow: 1;\n  max-width: 100%;\n}\n\n.col-auto {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 auto;\n      -ms-flex: 0 0 auto;\n          flex: 0 0 auto;\n  width: auto;\n}\n\n.col-1 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 8.333333%;\n      -ms-flex: 0 0 8.333333%;\n          flex: 0 0 8.333333%;\n  max-width: 8.333333%;\n}\n\n.col-2 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 16.666667%;\n      -ms-flex: 0 0 16.666667%;\n          flex: 0 0 16.666667%;\n  max-width: 16.666667%;\n}\n\n.col-3 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 25%;\n      -ms-flex: 0 0 25%;\n          flex: 0 0 25%;\n  max-width: 25%;\n}\n\n.col-4 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 33.333333%;\n      -ms-flex: 0 0 33.333333%;\n          flex: 0 0 33.333333%;\n  max-width: 33.333333%;\n}\n\n.col-5 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 41.666667%;\n      -ms-flex: 0 0 41.666667%;\n          flex: 0 0 41.666667%;\n  max-width: 41.666667%;\n}\n\n.col-6 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 50%;\n      -ms-flex: 0 0 50%;\n          flex: 0 0 50%;\n  max-width: 50%;\n}\n\n.col-7 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 58.333333%;\n      -ms-flex: 0 0 58.333333%;\n          flex: 0 0 58.333333%;\n  max-width: 58.333333%;\n}\n\n.col-8 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 66.666667%;\n      -ms-flex: 0 0 66.666667%;\n          flex: 0 0 66.666667%;\n  max-width: 66.666667%;\n}\n\n.col-9 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 75%;\n      -ms-flex: 0 0 75%;\n          flex: 0 0 75%;\n  max-width: 75%;\n}\n\n.col-10 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 83.333333%;\n      -ms-flex: 0 0 83.333333%;\n          flex: 0 0 83.333333%;\n  max-width: 83.333333%;\n}\n\n.col-11 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 91.666667%;\n      -ms-flex: 0 0 91.666667%;\n          flex: 0 0 91.666667%;\n  max-width: 91.666667%;\n}\n\n.col-12 {\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 0 100%;\n      -ms-flex: 0 0 100%;\n          flex: 0 0 100%;\n  max-width: 100%;\n}\n\n.pull-0 {\n  right: auto;\n}\n\n.pull-1 {\n  right: 8.333333%;\n}\n\n.pull-2 {\n  right: 16.666667%;\n}\n\n.pull-3 {\n  right: 25%;\n}\n\n.pull-4 {\n  right: 33.333333%;\n}\n\n.pull-5 {\n  right: 41.666667%;\n}\n\n.pull-6 {\n  right: 50%;\n}\n\n.pull-7 {\n  right: 58.333333%;\n}\n\n.pull-8 {\n  right: 66.666667%;\n}\n\n.pull-9 {\n  right: 75%;\n}\n\n.pull-10 {\n  right: 83.333333%;\n}\n\n.pull-11 {\n  right: 91.666667%;\n}\n\n.pull-12 {\n  right: 100%;\n}\n\n.push-0 {\n  left: auto;\n}\n\n.push-1 {\n  left: 8.333333%;\n}\n\n.push-2 {\n  left: 16.666667%;\n}\n\n.push-3 {\n  left: 25%;\n}\n\n.push-4 {\n  left: 33.333333%;\n}\n\n.push-5 {\n  left: 41.666667%;\n}\n\n.push-6 {\n  left: 50%;\n}\n\n.push-7 {\n  left: 58.333333%;\n}\n\n.push-8 {\n  left: 66.666667%;\n}\n\n.push-9 {\n  left: 75%;\n}\n\n.push-10 {\n  left: 83.333333%;\n}\n\n.push-11 {\n  left: 91.666667%;\n}\n\n.push-12 {\n  left: 100%;\n}\n\n.offset-1 {\n  margin-left: 8.333333%;\n}\n\n.offset-2 {\n  margin-left: 16.666667%;\n}\n\n.offset-3 {\n  margin-left: 25%;\n}\n\n.offset-4 {\n  margin-left: 33.333333%;\n}\n\n.offset-5 {\n  margin-left: 41.666667%;\n}\n\n.offset-6 {\n  margin-left: 50%;\n}\n\n.offset-7 {\n  margin-left: 58.333333%;\n}\n\n.offset-8 {\n  margin-left: 66.666667%;\n}\n\n.offset-9 {\n  margin-left: 75%;\n}\n\n.offset-10 {\n  margin-left: 83.333333%;\n}\n\n.offset-11 {\n  margin-left: 91.666667%;\n}\n\n@media (min-width: 576px) {\n  .col-sm {\n    -webkit-flex-basis: 0;\n        -ms-flex-preferred-size: 0;\n            flex-basis: 0;\n    -webkit-box-flex: 1;\n    -webkit-flex-grow: 1;\n        -ms-flex-positive: 1;\n            flex-grow: 1;\n    max-width: 100%;\n  }\n  .col-sm-auto {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 auto;\n        -ms-flex: 0 0 auto;\n            flex: 0 0 auto;\n    width: auto;\n  }\n  .col-sm-1 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 8.333333%;\n        -ms-flex: 0 0 8.333333%;\n            flex: 0 0 8.333333%;\n    max-width: 8.333333%;\n  }\n  .col-sm-2 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 16.666667%;\n        -ms-flex: 0 0 16.666667%;\n            flex: 0 0 16.666667%;\n    max-width: 16.666667%;\n  }\n  .col-sm-3 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 25%;\n        -ms-flex: 0 0 25%;\n            flex: 0 0 25%;\n    max-width: 25%;\n  }\n  .col-sm-4 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 33.333333%;\n        -ms-flex: 0 0 33.333333%;\n            flex: 0 0 33.333333%;\n    max-width: 33.333333%;\n  }\n  .col-sm-5 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 41.666667%;\n        -ms-flex: 0 0 41.666667%;\n            flex: 0 0 41.666667%;\n    max-width: 41.666667%;\n  }\n  .col-sm-6 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 50%;\n        -ms-flex: 0 0 50%;\n            flex: 0 0 50%;\n    max-width: 50%;\n  }\n  .col-sm-7 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 58.333333%;\n        -ms-flex: 0 0 58.333333%;\n            flex: 0 0 58.333333%;\n    max-width: 58.333333%;\n  }\n  .col-sm-8 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 66.666667%;\n        -ms-flex: 0 0 66.666667%;\n            flex: 0 0 66.666667%;\n    max-width: 66.666667%;\n  }\n  .col-sm-9 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 75%;\n        -ms-flex: 0 0 75%;\n            flex: 0 0 75%;\n    max-width: 75%;\n  }\n  .col-sm-10 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 83.333333%;\n        -ms-flex: 0 0 83.333333%;\n            flex: 0 0 83.333333%;\n    max-width: 83.333333%;\n  }\n  .col-sm-11 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 91.666667%;\n        -ms-flex: 0 0 91.666667%;\n            flex: 0 0 91.666667%;\n    max-width: 91.666667%;\n  }\n  .col-sm-12 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 100%;\n        -ms-flex: 0 0 100%;\n            flex: 0 0 100%;\n    max-width: 100%;\n  }\n  .pull-sm-0 {\n    right: auto;\n  }\n  .pull-sm-1 {\n    right: 8.333333%;\n  }\n  .pull-sm-2 {\n    right: 16.666667%;\n  }\n  .pull-sm-3 {\n    right: 25%;\n  }\n  .pull-sm-4 {\n    right: 33.333333%;\n  }\n  .pull-sm-5 {\n    right: 41.666667%;\n  }\n  .pull-sm-6 {\n    right: 50%;\n  }\n  .pull-sm-7 {\n    right: 58.333333%;\n  }\n  .pull-sm-8 {\n    right: 66.666667%;\n  }\n  .pull-sm-9 {\n    right: 75%;\n  }\n  .pull-sm-10 {\n    right: 83.333333%;\n  }\n  .pull-sm-11 {\n    right: 91.666667%;\n  }\n  .pull-sm-12 {\n    right: 100%;\n  }\n  .push-sm-0 {\n    left: auto;\n  }\n  .push-sm-1 {\n    left: 8.333333%;\n  }\n  .push-sm-2 {\n    left: 16.666667%;\n  }\n  .push-sm-3 {\n    left: 25%;\n  }\n  .push-sm-4 {\n    left: 33.333333%;\n  }\n  .push-sm-5 {\n    left: 41.666667%;\n  }\n  .push-sm-6 {\n    left: 50%;\n  }\n  .push-sm-7 {\n    left: 58.333333%;\n  }\n  .push-sm-8 {\n    left: 66.666667%;\n  }\n  .push-sm-9 {\n    left: 75%;\n  }\n  .push-sm-10 {\n    left: 83.333333%;\n  }\n  .push-sm-11 {\n    left: 91.666667%;\n  }\n  .push-sm-12 {\n    left: 100%;\n  }\n  .offset-sm-0 {\n    margin-left: 0%;\n  }\n  .offset-sm-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-sm-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-sm-3 {\n    margin-left: 25%;\n  }\n  .offset-sm-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-sm-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-sm-6 {\n    margin-left: 50%;\n  }\n  .offset-sm-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-sm-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-sm-9 {\n    margin-left: 75%;\n  }\n  .offset-sm-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-sm-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 768px) {\n  .col-md {\n    -webkit-flex-basis: 0;\n        -ms-flex-preferred-size: 0;\n            flex-basis: 0;\n    -webkit-box-flex: 1;\n    -webkit-flex-grow: 1;\n        -ms-flex-positive: 1;\n            flex-grow: 1;\n    max-width: 100%;\n  }\n  .col-md-auto {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 auto;\n        -ms-flex: 0 0 auto;\n            flex: 0 0 auto;\n    width: auto;\n  }\n  .col-md-1 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 8.333333%;\n        -ms-flex: 0 0 8.333333%;\n            flex: 0 0 8.333333%;\n    max-width: 8.333333%;\n  }\n  .col-md-2 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 16.666667%;\n        -ms-flex: 0 0 16.666667%;\n            flex: 0 0 16.666667%;\n    max-width: 16.666667%;\n  }\n  .col-md-3 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 25%;\n        -ms-flex: 0 0 25%;\n            flex: 0 0 25%;\n    max-width: 25%;\n  }\n  .col-md-4 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 33.333333%;\n        -ms-flex: 0 0 33.333333%;\n            flex: 0 0 33.333333%;\n    max-width: 33.333333%;\n  }\n  .col-md-5 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 41.666667%;\n        -ms-flex: 0 0 41.666667%;\n            flex: 0 0 41.666667%;\n    max-width: 41.666667%;\n  }\n  .col-md-6 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 50%;\n        -ms-flex: 0 0 50%;\n            flex: 0 0 50%;\n    max-width: 50%;\n  }\n  .col-md-7 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 58.333333%;\n        -ms-flex: 0 0 58.333333%;\n            flex: 0 0 58.333333%;\n    max-width: 58.333333%;\n  }\n  .col-md-8 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 66.666667%;\n        -ms-flex: 0 0 66.666667%;\n            flex: 0 0 66.666667%;\n    max-width: 66.666667%;\n  }\n  .col-md-9 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 75%;\n        -ms-flex: 0 0 75%;\n            flex: 0 0 75%;\n    max-width: 75%;\n  }\n  .col-md-10 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 83.333333%;\n        -ms-flex: 0 0 83.333333%;\n            flex: 0 0 83.333333%;\n    max-width: 83.333333%;\n  }\n  .col-md-11 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 91.666667%;\n        -ms-flex: 0 0 91.666667%;\n            flex: 0 0 91.666667%;\n    max-width: 91.666667%;\n  }\n  .col-md-12 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 100%;\n        -ms-flex: 0 0 100%;\n            flex: 0 0 100%;\n    max-width: 100%;\n  }\n  .pull-md-0 {\n    right: auto;\n  }\n  .pull-md-1 {\n    right: 8.333333%;\n  }\n  .pull-md-2 {\n    right: 16.666667%;\n  }\n  .pull-md-3 {\n    right: 25%;\n  }\n  .pull-md-4 {\n    right: 33.333333%;\n  }\n  .pull-md-5 {\n    right: 41.666667%;\n  }\n  .pull-md-6 {\n    right: 50%;\n  }\n  .pull-md-7 {\n    right: 58.333333%;\n  }\n  .pull-md-8 {\n    right: 66.666667%;\n  }\n  .pull-md-9 {\n    right: 75%;\n  }\n  .pull-md-10 {\n    right: 83.333333%;\n  }\n  .pull-md-11 {\n    right: 91.666667%;\n  }\n  .pull-md-12 {\n    right: 100%;\n  }\n  .push-md-0 {\n    left: auto;\n  }\n  .push-md-1 {\n    left: 8.333333%;\n  }\n  .push-md-2 {\n    left: 16.666667%;\n  }\n  .push-md-3 {\n    left: 25%;\n  }\n  .push-md-4 {\n    left: 33.333333%;\n  }\n  .push-md-5 {\n    left: 41.666667%;\n  }\n  .push-md-6 {\n    left: 50%;\n  }\n  .push-md-7 {\n    left: 58.333333%;\n  }\n  .push-md-8 {\n    left: 66.666667%;\n  }\n  .push-md-9 {\n    left: 75%;\n  }\n  .push-md-10 {\n    left: 83.333333%;\n  }\n  .push-md-11 {\n    left: 91.666667%;\n  }\n  .push-md-12 {\n    left: 100%;\n  }\n  .offset-md-0 {\n    margin-left: 0%;\n  }\n  .offset-md-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-md-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-md-3 {\n    margin-left: 25%;\n  }\n  .offset-md-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-md-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-md-6 {\n    margin-left: 50%;\n  }\n  .offset-md-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-md-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-md-9 {\n    margin-left: 75%;\n  }\n  .offset-md-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-md-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 992px) {\n  .col-lg {\n    -webkit-flex-basis: 0;\n        -ms-flex-preferred-size: 0;\n            flex-basis: 0;\n    -webkit-box-flex: 1;\n    -webkit-flex-grow: 1;\n        -ms-flex-positive: 1;\n            flex-grow: 1;\n    max-width: 100%;\n  }\n  .col-lg-auto {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 auto;\n        -ms-flex: 0 0 auto;\n            flex: 0 0 auto;\n    width: auto;\n  }\n  .col-lg-1 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 8.333333%;\n        -ms-flex: 0 0 8.333333%;\n            flex: 0 0 8.333333%;\n    max-width: 8.333333%;\n  }\n  .col-lg-2 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 16.666667%;\n        -ms-flex: 0 0 16.666667%;\n            flex: 0 0 16.666667%;\n    max-width: 16.666667%;\n  }\n  .col-lg-3 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 25%;\n        -ms-flex: 0 0 25%;\n            flex: 0 0 25%;\n    max-width: 25%;\n  }\n  .col-lg-4 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 33.333333%;\n        -ms-flex: 0 0 33.333333%;\n            flex: 0 0 33.333333%;\n    max-width: 33.333333%;\n  }\n  .col-lg-5 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 41.666667%;\n        -ms-flex: 0 0 41.666667%;\n            flex: 0 0 41.666667%;\n    max-width: 41.666667%;\n  }\n  .col-lg-6 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 50%;\n        -ms-flex: 0 0 50%;\n            flex: 0 0 50%;\n    max-width: 50%;\n  }\n  .col-lg-7 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 58.333333%;\n        -ms-flex: 0 0 58.333333%;\n            flex: 0 0 58.333333%;\n    max-width: 58.333333%;\n  }\n  .col-lg-8 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 66.666667%;\n        -ms-flex: 0 0 66.666667%;\n            flex: 0 0 66.666667%;\n    max-width: 66.666667%;\n  }\n  .col-lg-9 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 75%;\n        -ms-flex: 0 0 75%;\n            flex: 0 0 75%;\n    max-width: 75%;\n  }\n  .col-lg-10 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 83.333333%;\n        -ms-flex: 0 0 83.333333%;\n            flex: 0 0 83.333333%;\n    max-width: 83.333333%;\n  }\n  .col-lg-11 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 91.666667%;\n        -ms-flex: 0 0 91.666667%;\n            flex: 0 0 91.666667%;\n    max-width: 91.666667%;\n  }\n  .col-lg-12 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 100%;\n        -ms-flex: 0 0 100%;\n            flex: 0 0 100%;\n    max-width: 100%;\n  }\n  .pull-lg-0 {\n    right: auto;\n  }\n  .pull-lg-1 {\n    right: 8.333333%;\n  }\n  .pull-lg-2 {\n    right: 16.666667%;\n  }\n  .pull-lg-3 {\n    right: 25%;\n  }\n  .pull-lg-4 {\n    right: 33.333333%;\n  }\n  .pull-lg-5 {\n    right: 41.666667%;\n  }\n  .pull-lg-6 {\n    right: 50%;\n  }\n  .pull-lg-7 {\n    right: 58.333333%;\n  }\n  .pull-lg-8 {\n    right: 66.666667%;\n  }\n  .pull-lg-9 {\n    right: 75%;\n  }\n  .pull-lg-10 {\n    right: 83.333333%;\n  }\n  .pull-lg-11 {\n    right: 91.666667%;\n  }\n  .pull-lg-12 {\n    right: 100%;\n  }\n  .push-lg-0 {\n    left: auto;\n  }\n  .push-lg-1 {\n    left: 8.333333%;\n  }\n  .push-lg-2 {\n    left: 16.666667%;\n  }\n  .push-lg-3 {\n    left: 25%;\n  }\n  .push-lg-4 {\n    left: 33.333333%;\n  }\n  .push-lg-5 {\n    left: 41.666667%;\n  }\n  .push-lg-6 {\n    left: 50%;\n  }\n  .push-lg-7 {\n    left: 58.333333%;\n  }\n  .push-lg-8 {\n    left: 66.666667%;\n  }\n  .push-lg-9 {\n    left: 75%;\n  }\n  .push-lg-10 {\n    left: 83.333333%;\n  }\n  .push-lg-11 {\n    left: 91.666667%;\n  }\n  .push-lg-12 {\n    left: 100%;\n  }\n  .offset-lg-0 {\n    margin-left: 0%;\n  }\n  .offset-lg-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-lg-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-lg-3 {\n    margin-left: 25%;\n  }\n  .offset-lg-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-lg-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-lg-6 {\n    margin-left: 50%;\n  }\n  .offset-lg-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-lg-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-lg-9 {\n    margin-left: 75%;\n  }\n  .offset-lg-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-lg-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n@media (min-width: 1200px) {\n  .col-xl {\n    -webkit-flex-basis: 0;\n        -ms-flex-preferred-size: 0;\n            flex-basis: 0;\n    -webkit-box-flex: 1;\n    -webkit-flex-grow: 1;\n        -ms-flex-positive: 1;\n            flex-grow: 1;\n    max-width: 100%;\n  }\n  .col-xl-auto {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 auto;\n        -ms-flex: 0 0 auto;\n            flex: 0 0 auto;\n    width: auto;\n  }\n  .col-xl-1 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 8.333333%;\n        -ms-flex: 0 0 8.333333%;\n            flex: 0 0 8.333333%;\n    max-width: 8.333333%;\n  }\n  .col-xl-2 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 16.666667%;\n        -ms-flex: 0 0 16.666667%;\n            flex: 0 0 16.666667%;\n    max-width: 16.666667%;\n  }\n  .col-xl-3 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 25%;\n        -ms-flex: 0 0 25%;\n            flex: 0 0 25%;\n    max-width: 25%;\n  }\n  .col-xl-4 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 33.333333%;\n        -ms-flex: 0 0 33.333333%;\n            flex: 0 0 33.333333%;\n    max-width: 33.333333%;\n  }\n  .col-xl-5 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 41.666667%;\n        -ms-flex: 0 0 41.666667%;\n            flex: 0 0 41.666667%;\n    max-width: 41.666667%;\n  }\n  .col-xl-6 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 50%;\n        -ms-flex: 0 0 50%;\n            flex: 0 0 50%;\n    max-width: 50%;\n  }\n  .col-xl-7 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 58.333333%;\n        -ms-flex: 0 0 58.333333%;\n            flex: 0 0 58.333333%;\n    max-width: 58.333333%;\n  }\n  .col-xl-8 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 66.666667%;\n        -ms-flex: 0 0 66.666667%;\n            flex: 0 0 66.666667%;\n    max-width: 66.666667%;\n  }\n  .col-xl-9 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 75%;\n        -ms-flex: 0 0 75%;\n            flex: 0 0 75%;\n    max-width: 75%;\n  }\n  .col-xl-10 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 83.333333%;\n        -ms-flex: 0 0 83.333333%;\n            flex: 0 0 83.333333%;\n    max-width: 83.333333%;\n  }\n  .col-xl-11 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 91.666667%;\n        -ms-flex: 0 0 91.666667%;\n            flex: 0 0 91.666667%;\n    max-width: 91.666667%;\n  }\n  .col-xl-12 {\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 100%;\n        -ms-flex: 0 0 100%;\n            flex: 0 0 100%;\n    max-width: 100%;\n  }\n  .pull-xl-0 {\n    right: auto;\n  }\n  .pull-xl-1 {\n    right: 8.333333%;\n  }\n  .pull-xl-2 {\n    right: 16.666667%;\n  }\n  .pull-xl-3 {\n    right: 25%;\n  }\n  .pull-xl-4 {\n    right: 33.333333%;\n  }\n  .pull-xl-5 {\n    right: 41.666667%;\n  }\n  .pull-xl-6 {\n    right: 50%;\n  }\n  .pull-xl-7 {\n    right: 58.333333%;\n  }\n  .pull-xl-8 {\n    right: 66.666667%;\n  }\n  .pull-xl-9 {\n    right: 75%;\n  }\n  .pull-xl-10 {\n    right: 83.333333%;\n  }\n  .pull-xl-11 {\n    right: 91.666667%;\n  }\n  .pull-xl-12 {\n    right: 100%;\n  }\n  .push-xl-0 {\n    left: auto;\n  }\n  .push-xl-1 {\n    left: 8.333333%;\n  }\n  .push-xl-2 {\n    left: 16.666667%;\n  }\n  .push-xl-3 {\n    left: 25%;\n  }\n  .push-xl-4 {\n    left: 33.333333%;\n  }\n  .push-xl-5 {\n    left: 41.666667%;\n  }\n  .push-xl-6 {\n    left: 50%;\n  }\n  .push-xl-7 {\n    left: 58.333333%;\n  }\n  .push-xl-8 {\n    left: 66.666667%;\n  }\n  .push-xl-9 {\n    left: 75%;\n  }\n  .push-xl-10 {\n    left: 83.333333%;\n  }\n  .push-xl-11 {\n    left: 91.666667%;\n  }\n  .push-xl-12 {\n    left: 100%;\n  }\n  .offset-xl-0 {\n    margin-left: 0%;\n  }\n  .offset-xl-1 {\n    margin-left: 8.333333%;\n  }\n  .offset-xl-2 {\n    margin-left: 16.666667%;\n  }\n  .offset-xl-3 {\n    margin-left: 25%;\n  }\n  .offset-xl-4 {\n    margin-left: 33.333333%;\n  }\n  .offset-xl-5 {\n    margin-left: 41.666667%;\n  }\n  .offset-xl-6 {\n    margin-left: 50%;\n  }\n  .offset-xl-7 {\n    margin-left: 58.333333%;\n  }\n  .offset-xl-8 {\n    margin-left: 66.666667%;\n  }\n  .offset-xl-9 {\n    margin-left: 75%;\n  }\n  .offset-xl-10 {\n    margin-left: 83.333333%;\n  }\n  .offset-xl-11 {\n    margin-left: 91.666667%;\n  }\n}\n\n.table {\n  width: 100%;\n  max-width: 100%;\n  margin-bottom: 1rem;\n}\n\n.table th,\n.table td {\n  padding: 0.75rem;\n  vertical-align: top;\n  border-top: 1px solid #eceeef;\n}\n\n.table thead th {\n  vertical-align: bottom;\n  border-bottom: 2px solid #eceeef;\n}\n\n.table tbody + tbody {\n  border-top: 2px solid #eceeef;\n}\n\n.table .table {\n  background-color: #fff;\n}\n\n.table-sm th,\n.table-sm td {\n  padding: 0.3rem;\n}\n\n.table-bordered {\n  border: 1px solid #eceeef;\n}\n\n.table-bordered th,\n.table-bordered td {\n  border: 1px solid #eceeef;\n}\n\n.table-bordered thead th,\n.table-bordered thead td {\n  border-bottom-width: 2px;\n}\n\n.table-striped tbody tr:nth-of-type(odd) {\n  background-color: rgba(0, 0, 0, 0.05);\n}\n\n.table-hover tbody tr:hover {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-active,\n.table-active > th,\n.table-active > td {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-hover .table-active:hover {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-hover .table-active:hover > td,\n.table-hover .table-active:hover > th {\n  background-color: rgba(0, 0, 0, 0.075);\n}\n\n.table-success,\n.table-success > th,\n.table-success > td {\n  background-color: #dff0d8;\n}\n\n.table-hover .table-success:hover {\n  background-color: #d0e9c6;\n}\n\n.table-hover .table-success:hover > td,\n.table-hover .table-success:hover > th {\n  background-color: #d0e9c6;\n}\n\n.table-info,\n.table-info > th,\n.table-info > td {\n  background-color: #d9edf7;\n}\n\n.table-hover .table-info:hover {\n  background-color: #c4e3f3;\n}\n\n.table-hover .table-info:hover > td,\n.table-hover .table-info:hover > th {\n  background-color: #c4e3f3;\n}\n\n.table-warning,\n.table-warning > th,\n.table-warning > td {\n  background-color: #fcf8e3;\n}\n\n.table-hover .table-warning:hover {\n  background-color: #faf2cc;\n}\n\n.table-hover .table-warning:hover > td,\n.table-hover .table-warning:hover > th {\n  background-color: #faf2cc;\n}\n\n.table-danger,\n.table-danger > th,\n.table-danger > td {\n  background-color: #f2dede;\n}\n\n.table-hover .table-danger:hover {\n  background-color: #ebcccc;\n}\n\n.table-hover .table-danger:hover > td,\n.table-hover .table-danger:hover > th {\n  background-color: #ebcccc;\n}\n\n.thead-inverse th {\n  color: #fff;\n  background-color: #292b2c;\n}\n\n.thead-default th {\n  color: #464a4c;\n  background-color: #eceeef;\n}\n\n.table-inverse {\n  color: #fff;\n  background-color: #292b2c;\n}\n\n.table-inverse th,\n.table-inverse td,\n.table-inverse thead th {\n  border-color: #fff;\n}\n\n.table-inverse.table-bordered {\n  border: 0;\n}\n\n.table-responsive {\n  display: block;\n  width: 100%;\n  overflow-x: auto;\n  -ms-overflow-style: -ms-autohiding-scrollbar;\n}\n\n.table-responsive.table-bordered {\n  border: 0;\n}\n\n.form-control {\n  display: block;\n  width: 100%;\n  padding: 0.5rem 0.75rem;\n  font-size: 1rem;\n  line-height: 1.25;\n  color: #464a4c;\n  background-color: #fff;\n  background-image: none;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n  -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;\n  transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;\n  -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;\n  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;\n  transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;\n}\n\n.form-control::-ms-expand {\n  background-color: transparent;\n  border: 0;\n}\n\n.form-control:focus {\n  color: #464a4c;\n  background-color: #fff;\n  border-color: #5cb3fd;\n  outline: none;\n}\n\n.form-control::-webkit-input-placeholder {\n  color: #636c72;\n  opacity: 1;\n}\n\n.form-control::-moz-placeholder {\n  color: #636c72;\n  opacity: 1;\n}\n\n.form-control:-ms-input-placeholder {\n  color: #636c72;\n  opacity: 1;\n}\n\n.form-control::placeholder {\n  color: #636c72;\n  opacity: 1;\n}\n\n.form-control:disabled, .form-control[readonly] {\n  background-color: #eceeef;\n  opacity: 1;\n}\n\n.form-control:disabled {\n  cursor: not-allowed;\n}\n\nselect.form-control:not([size]):not([multiple]) {\n  height: calc(2.25rem + 2px);\n}\n\nselect.form-control:focus::-ms-value {\n  color: #464a4c;\n  background-color: #fff;\n}\n\n.form-control-file,\n.form-control-range {\n  display: block;\n}\n\n.col-form-label {\n  padding-top: calc(0.5rem - 1px * 2);\n  padding-bottom: calc(0.5rem - 1px * 2);\n  margin-bottom: 0;\n}\n\n.col-form-label-lg {\n  padding-top: calc(0.75rem - 1px * 2);\n  padding-bottom: calc(0.75rem - 1px * 2);\n  font-size: 1.25rem;\n}\n\n.col-form-label-sm {\n  padding-top: calc(0.25rem - 1px * 2);\n  padding-bottom: calc(0.25rem - 1px * 2);\n  font-size: 0.875rem;\n}\n\n.col-form-legend {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  margin-bottom: 0;\n  font-size: 1rem;\n}\n\n.form-control-static {\n  padding-top: 0.5rem;\n  padding-bottom: 0.5rem;\n  margin-bottom: 0;\n  line-height: 1.25;\n  border: solid transparent;\n  border-width: 1px 0;\n}\n\n.form-control-static.form-control-sm, .input-group-sm > .form-control-static.form-control,\n.input-group-sm > .form-control-static.input-group-addon,\n.input-group-sm > .input-group-btn > .form-control-static.btn, .form-control-static.form-control-lg, .input-group-lg > .form-control-static.form-control,\n.input-group-lg > .form-control-static.input-group-addon,\n.input-group-lg > .input-group-btn > .form-control-static.btn {\n  padding-right: 0;\n  padding-left: 0;\n}\n\n.form-control-sm, .input-group-sm > .form-control,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\nselect.form-control-sm:not([size]):not([multiple]), .input-group-sm > select.form-control:not([size]):not([multiple]),\n.input-group-sm > select.input-group-addon:not([size]):not([multiple]),\n.input-group-sm > .input-group-btn > select.btn:not([size]):not([multiple]) {\n  height: 1.8125rem;\n}\n\n.form-control-lg, .input-group-lg > .form-control,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\nselect.form-control-lg:not([size]):not([multiple]), .input-group-lg > select.form-control:not([size]):not([multiple]),\n.input-group-lg > select.input-group-addon:not([size]):not([multiple]),\n.input-group-lg > .input-group-btn > select.btn:not([size]):not([multiple]) {\n  height: 3.166667rem;\n}\n\n.form-group {\n  margin-bottom: 1rem;\n}\n\n.form-text {\n  display: block;\n  margin-top: 0.25rem;\n}\n\n.form-check {\n  position: relative;\n  display: block;\n  margin-bottom: 0.5rem;\n}\n\n.form-check.disabled .form-check-label {\n  color: #636c72;\n  cursor: not-allowed;\n}\n\n.form-check-label {\n  padding-left: 1.25rem;\n  margin-bottom: 0;\n  cursor: pointer;\n}\n\n.form-check-input {\n  position: absolute;\n  margin-top: 0.25rem;\n  margin-left: -1.25rem;\n}\n\n.form-check-input:only-child {\n  position: static;\n}\n\n.form-check-inline {\n  display: inline-block;\n}\n\n.form-check-inline .form-check-label {\n  vertical-align: middle;\n}\n\n.form-check-inline + .form-check-inline {\n  margin-left: 0.75rem;\n}\n\n.form-control-feedback {\n  margin-top: 0.25rem;\n}\n\n.form-control-success,\n.form-control-warning,\n.form-control-danger {\n  padding-right: 2.25rem;\n  background-repeat: no-repeat;\n  background-position: center right 0.5625rem;\n  -webkit-background-size: 1.125rem 1.125rem;\n          background-size: 1.125rem 1.125rem;\n}\n\n.has-success .form-control-feedback,\n.has-success .form-control-label,\n.has-success .col-form-label,\n.has-success .form-check-label,\n.has-success .custom-control {\n  color: #5cb85c;\n}\n\n.has-success .form-control {\n  border-color: #5cb85c;\n}\n\n.has-success .input-group-addon {\n  color: #5cb85c;\n  border-color: #5cb85c;\n  background-color: #eaf6ea;\n}\n\n.has-success .form-control-success {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%235cb85c' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3E%3C/svg%3E\");\n}\n\n.has-warning .form-control-feedback,\n.has-warning .form-control-label,\n.has-warning .col-form-label,\n.has-warning .form-check-label,\n.has-warning .custom-control {\n  color: #f0ad4e;\n}\n\n.has-warning .form-control {\n  border-color: #f0ad4e;\n}\n\n.has-warning .input-group-addon {\n  color: #f0ad4e;\n  border-color: #f0ad4e;\n  background-color: white;\n}\n\n.has-warning .form-control-warning {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23f0ad4e' d='M4.4 5.324h-.8v-2.46h.8zm0 1.42h-.8V5.89h.8zM3.76.63L.04 7.075c-.115.2.016.425.26.426h7.397c.242 0 .372-.226.258-.426C6.726 4.924 5.47 2.79 4.253.63c-.113-.174-.39-.174-.494 0z'/%3E%3C/svg%3E\");\n}\n\n.has-danger .form-control-feedback,\n.has-danger .form-control-label,\n.has-danger .col-form-label,\n.has-danger .form-check-label,\n.has-danger .custom-control {\n  color: #d9534f;\n}\n\n.has-danger .form-control {\n  border-color: #d9534f;\n}\n\n.has-danger .input-group-addon {\n  color: #d9534f;\n  border-color: #d9534f;\n  background-color: #fdf7f7;\n}\n\n.has-danger .form-control-danger {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23d9534f' viewBox='-2 -2 7 7'%3E%3Cpath stroke='%23d9534f' d='M0 0l3 3m0-3L0 3'/%3E%3Ccircle r='.5'/%3E%3Ccircle cx='3' r='.5'/%3E%3Ccircle cy='3' r='.5'/%3E%3Ccircle cx='3' cy='3' r='.5'/%3E%3C/svg%3E\");\n}\n\n.form-inline {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n\n.form-inline .form-check {\n  width: 100%;\n}\n\n@media (min-width: 576px) {\n  .form-inline label {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n    -webkit-box-pack: center;\n    -webkit-justify-content: center;\n        -ms-flex-pack: center;\n            justify-content: center;\n    margin-bottom: 0;\n  }\n  .form-inline .form-group {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-flex: 0;\n    -webkit-flex: 0 0 auto;\n        -ms-flex: 0 0 auto;\n            flex: 0 0 auto;\n    -webkit-flex-flow: row wrap;\n        -ms-flex-flow: row wrap;\n            flex-flow: row wrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n    margin-bottom: 0;\n  }\n  .form-inline .form-control {\n    display: inline-block;\n    width: auto;\n    vertical-align: middle;\n  }\n  .form-inline .form-control-static {\n    display: inline-block;\n  }\n  .form-inline .input-group {\n    width: auto;\n  }\n  .form-inline .form-control-label {\n    margin-bottom: 0;\n    vertical-align: middle;\n  }\n  .form-inline .form-check {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n    -webkit-box-pack: center;\n    -webkit-justify-content: center;\n        -ms-flex-pack: center;\n            justify-content: center;\n    width: auto;\n    margin-top: 0;\n    margin-bottom: 0;\n  }\n  .form-inline .form-check-label {\n    padding-left: 0;\n  }\n  .form-inline .form-check-input {\n    position: relative;\n    margin-top: 0;\n    margin-right: 0.25rem;\n    margin-left: 0;\n  }\n  .form-inline .custom-control {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n    -webkit-box-pack: center;\n    -webkit-justify-content: center;\n        -ms-flex-pack: center;\n            justify-content: center;\n    padding-left: 0;\n  }\n  .form-inline .custom-control-indicator {\n    position: static;\n    display: inline-block;\n    margin-right: 0.25rem;\n    vertical-align: text-bottom;\n  }\n  .form-inline .has-feedback .form-control-feedback {\n    top: 0;\n  }\n}\n\n.btn {\n  display: inline-block;\n  font-weight: normal;\n  line-height: 1.25;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: middle;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  border: 1px solid transparent;\n  padding: 0.5rem 1rem;\n  font-size: 1rem;\n  border-radius: 0.25rem;\n  -webkit-transition: all 0.2s ease-in-out;\n  -o-transition: all 0.2s ease-in-out;\n  transition: all 0.2s ease-in-out;\n}\n\n.btn:focus, .btn:hover {\n  text-decoration: none;\n}\n\n.btn:focus, .btn.focus {\n  outline: 0;\n  -webkit-box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);\n          box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.25);\n}\n\n.btn.disabled, .btn:disabled {\n  cursor: not-allowed;\n  opacity: .65;\n}\n\n.btn:active, .btn.active {\n  background-image: none;\n}\n\na.btn.disabled,\nfieldset[disabled] a.btn {\n  pointer-events: none;\n}\n\n.btn-primary {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-primary:hover {\n  color: #fff;\n  background-color: #025aa5;\n  border-color: #01549b;\n}\n\n.btn-primary:focus, .btn-primary.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);\n          box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);\n}\n\n.btn-primary.disabled, .btn-primary:disabled {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-primary:active, .btn-primary.active,\n.show > .btn-primary.dropdown-toggle {\n  color: #fff;\n  background-color: #025aa5;\n  background-image: none;\n  border-color: #01549b;\n}\n\n.btn-secondary {\n  color: #292b2c;\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-secondary:hover {\n  color: #292b2c;\n  background-color: #e6e6e6;\n  border-color: #adadad;\n}\n\n.btn-secondary:focus, .btn-secondary.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(204, 204, 204, 0.5);\n          box-shadow: 0 0 0 2px rgba(204, 204, 204, 0.5);\n}\n\n.btn-secondary.disabled, .btn-secondary:disabled {\n  background-color: #fff;\n  border-color: #ccc;\n}\n\n.btn-secondary:active, .btn-secondary.active,\n.show > .btn-secondary.dropdown-toggle {\n  color: #292b2c;\n  background-color: #e6e6e6;\n  background-image: none;\n  border-color: #adadad;\n}\n\n.btn-info {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-info:hover {\n  color: #fff;\n  background-color: #31b0d5;\n  border-color: #2aabd2;\n}\n\n.btn-info:focus, .btn-info.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(91, 192, 222, 0.5);\n          box-shadow: 0 0 0 2px rgba(91, 192, 222, 0.5);\n}\n\n.btn-info.disabled, .btn-info:disabled {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-info:active, .btn-info.active,\n.show > .btn-info.dropdown-toggle {\n  color: #fff;\n  background-color: #31b0d5;\n  background-image: none;\n  border-color: #2aabd2;\n}\n\n.btn-success {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-success:hover {\n  color: #fff;\n  background-color: #449d44;\n  border-color: #419641;\n}\n\n.btn-success:focus, .btn-success.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(92, 184, 92, 0.5);\n          box-shadow: 0 0 0 2px rgba(92, 184, 92, 0.5);\n}\n\n.btn-success.disabled, .btn-success:disabled {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-success:active, .btn-success.active,\n.show > .btn-success.dropdown-toggle {\n  color: #fff;\n  background-color: #449d44;\n  background-image: none;\n  border-color: #419641;\n}\n\n.btn-warning {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-warning:hover {\n  color: #fff;\n  background-color: #ec971f;\n  border-color: #eb9316;\n}\n\n.btn-warning:focus, .btn-warning.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(240, 173, 78, 0.5);\n          box-shadow: 0 0 0 2px rgba(240, 173, 78, 0.5);\n}\n\n.btn-warning.disabled, .btn-warning:disabled {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-warning:active, .btn-warning.active,\n.show > .btn-warning.dropdown-toggle {\n  color: #fff;\n  background-color: #ec971f;\n  background-image: none;\n  border-color: #eb9316;\n}\n\n.btn-danger {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-danger:hover {\n  color: #fff;\n  background-color: #c9302c;\n  border-color: #c12e2a;\n}\n\n.btn-danger:focus, .btn-danger.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.5);\n          box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.5);\n}\n\n.btn-danger.disabled, .btn-danger:disabled {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-danger:active, .btn-danger.active,\n.show > .btn-danger.dropdown-toggle {\n  color: #fff;\n  background-color: #c9302c;\n  background-image: none;\n  border-color: #c12e2a;\n}\n\n.btn-outline-primary {\n  color: #0275d8;\n  background-image: none;\n  background-color: transparent;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:hover {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-primary:focus, .btn-outline-primary.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);\n          box-shadow: 0 0 0 2px rgba(2, 117, 216, 0.5);\n}\n\n.btn-outline-primary.disabled, .btn-outline-primary:disabled {\n  color: #0275d8;\n  background-color: transparent;\n}\n\n.btn-outline-primary:active, .btn-outline-primary.active,\n.show > .btn-outline-primary.dropdown-toggle {\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.btn-outline-secondary {\n  color: #ccc;\n  background-image: none;\n  background-color: transparent;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:hover {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-secondary:focus, .btn-outline-secondary.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(204, 204, 204, 0.5);\n          box-shadow: 0 0 0 2px rgba(204, 204, 204, 0.5);\n}\n\n.btn-outline-secondary.disabled, .btn-outline-secondary:disabled {\n  color: #ccc;\n  background-color: transparent;\n}\n\n.btn-outline-secondary:active, .btn-outline-secondary.active,\n.show > .btn-outline-secondary.dropdown-toggle {\n  color: #fff;\n  background-color: #ccc;\n  border-color: #ccc;\n}\n\n.btn-outline-info {\n  color: #5bc0de;\n  background-image: none;\n  background-color: transparent;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:hover {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-info:focus, .btn-outline-info.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(91, 192, 222, 0.5);\n          box-shadow: 0 0 0 2px rgba(91, 192, 222, 0.5);\n}\n\n.btn-outline-info.disabled, .btn-outline-info:disabled {\n  color: #5bc0de;\n  background-color: transparent;\n}\n\n.btn-outline-info:active, .btn-outline-info.active,\n.show > .btn-outline-info.dropdown-toggle {\n  color: #fff;\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.btn-outline-success {\n  color: #5cb85c;\n  background-image: none;\n  background-color: transparent;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:hover {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-success:focus, .btn-outline-success.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(92, 184, 92, 0.5);\n          box-shadow: 0 0 0 2px rgba(92, 184, 92, 0.5);\n}\n\n.btn-outline-success.disabled, .btn-outline-success:disabled {\n  color: #5cb85c;\n  background-color: transparent;\n}\n\n.btn-outline-success:active, .btn-outline-success.active,\n.show > .btn-outline-success.dropdown-toggle {\n  color: #fff;\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.btn-outline-warning {\n  color: #f0ad4e;\n  background-image: none;\n  background-color: transparent;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:hover {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-warning:focus, .btn-outline-warning.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(240, 173, 78, 0.5);\n          box-shadow: 0 0 0 2px rgba(240, 173, 78, 0.5);\n}\n\n.btn-outline-warning.disabled, .btn-outline-warning:disabled {\n  color: #f0ad4e;\n  background-color: transparent;\n}\n\n.btn-outline-warning:active, .btn-outline-warning.active,\n.show > .btn-outline-warning.dropdown-toggle {\n  color: #fff;\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.btn-outline-danger {\n  color: #d9534f;\n  background-image: none;\n  background-color: transparent;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:hover {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-outline-danger:focus, .btn-outline-danger.focus {\n  -webkit-box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.5);\n          box-shadow: 0 0 0 2px rgba(217, 83, 79, 0.5);\n}\n\n.btn-outline-danger.disabled, .btn-outline-danger:disabled {\n  color: #d9534f;\n  background-color: transparent;\n}\n\n.btn-outline-danger:active, .btn-outline-danger.active,\n.show > .btn-outline-danger.dropdown-toggle {\n  color: #fff;\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.btn-link {\n  font-weight: normal;\n  color: #0275d8;\n  border-radius: 0;\n}\n\n.btn-link, .btn-link:active, .btn-link.active, .btn-link:disabled {\n  background-color: transparent;\n}\n\n.btn-link, .btn-link:focus, .btn-link:active {\n  border-color: transparent;\n}\n\n.btn-link:hover {\n  border-color: transparent;\n}\n\n.btn-link:focus, .btn-link:hover {\n  color: #014c8c;\n  text-decoration: underline;\n  background-color: transparent;\n}\n\n.btn-link:disabled {\n  color: #636c72;\n}\n\n.btn-link:disabled:focus, .btn-link:disabled:hover {\n  text-decoration: none;\n}\n\n.btn-lg, .btn-group-lg > .btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\n.btn-sm, .btn-group-sm > .btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\n.btn-block {\n  display: block;\n  width: 100%;\n}\n\n.btn-block + .btn-block {\n  margin-top: 0.5rem;\n}\n\ninput[type=\"submit\"].btn-block,\ninput[type=\"reset\"].btn-block,\ninput[type=\"button\"].btn-block {\n  width: 100%;\n}\n\n.fade {\n  opacity: 0;\n  -webkit-transition: opacity 0.15s linear;\n  -o-transition: opacity 0.15s linear;\n  transition: opacity 0.15s linear;\n}\n\n.fade.show {\n  opacity: 1;\n}\n\n.collapse {\n  display: none;\n}\n\n.collapse.show {\n  display: block;\n}\n\ntr.collapse.show {\n  display: table-row;\n}\n\ntbody.collapse.show {\n  display: table-row-group;\n}\n\n.collapsing {\n  position: relative;\n  height: 0;\n  overflow: hidden;\n  -webkit-transition: height 0.35s ease;\n  -o-transition: height 0.35s ease;\n  transition: height 0.35s ease;\n}\n\n.dropup,\n.dropdown {\n  position: relative;\n}\n\n.dropdown-toggle::after {\n  display: inline-block;\n  width: 0;\n  height: 0;\n  margin-left: 0.3em;\n  vertical-align: middle;\n  content: \"\";\n  border-top: 0.3em solid;\n  border-right: 0.3em solid transparent;\n  border-left: 0.3em solid transparent;\n}\n\n.dropdown-toggle:focus {\n  outline: 0;\n}\n\n.dropup .dropdown-toggle::after {\n  border-top: 0;\n  border-bottom: 0.3em solid;\n}\n\n.dropdown-menu {\n  position: absolute;\n  top: 100%;\n  left: 0;\n  z-index: 1000;\n  display: none;\n  float: left;\n  min-width: 10rem;\n  padding: 0.5rem 0;\n  margin: 0.125rem 0 0;\n  font-size: 1rem;\n  color: #292b2c;\n  text-align: left;\n  list-style: none;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.dropdown-divider {\n  height: 1px;\n  margin: 0.5rem 0;\n  overflow: hidden;\n  background-color: #eceeef;\n}\n\n.dropdown-item {\n  display: block;\n  width: 100%;\n  padding: 3px 1.5rem;\n  clear: both;\n  font-weight: normal;\n  color: #292b2c;\n  text-align: inherit;\n  white-space: nowrap;\n  background: none;\n  border: 0;\n}\n\n.dropdown-item:focus, .dropdown-item:hover {\n  color: #1d1e1f;\n  text-decoration: none;\n  background-color: #f7f7f9;\n}\n\n.dropdown-item.active, .dropdown-item:active {\n  color: #fff;\n  text-decoration: none;\n  background-color: #0275d8;\n}\n\n.dropdown-item.disabled, .dropdown-item:disabled {\n  color: #636c72;\n  cursor: not-allowed;\n  background-color: transparent;\n}\n\n.show > .dropdown-menu {\n  display: block;\n}\n\n.show > a {\n  outline: 0;\n}\n\n.dropdown-menu-right {\n  right: 0;\n  left: auto;\n}\n\n.dropdown-menu-left {\n  right: auto;\n  left: 0;\n}\n\n.dropdown-header {\n  display: block;\n  padding: 0.5rem 1.5rem;\n  margin-bottom: 0;\n  font-size: 0.875rem;\n  color: #636c72;\n  white-space: nowrap;\n}\n\n.dropdown-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 990;\n}\n\n.dropup .dropdown-menu {\n  top: auto;\n  bottom: 100%;\n  margin-bottom: 0.125rem;\n}\n\n.btn-group,\n.btn-group-vertical {\n  position: relative;\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  vertical-align: middle;\n}\n\n.btn-group > .btn,\n.btn-group-vertical > .btn {\n  position: relative;\n  -webkit-box-flex: 0;\n  -webkit-flex: 0 1 auto;\n      -ms-flex: 0 1 auto;\n          flex: 0 1 auto;\n}\n\n.btn-group > .btn:hover,\n.btn-group-vertical > .btn:hover {\n  z-index: 2;\n}\n\n.btn-group > .btn:focus, .btn-group > .btn:active, .btn-group > .btn.active,\n.btn-group-vertical > .btn:focus,\n.btn-group-vertical > .btn:active,\n.btn-group-vertical > .btn.active {\n  z-index: 2;\n}\n\n.btn-group .btn + .btn,\n.btn-group .btn + .btn-group,\n.btn-group .btn-group + .btn,\n.btn-group .btn-group + .btn-group,\n.btn-group-vertical .btn + .btn,\n.btn-group-vertical .btn + .btn-group,\n.btn-group-vertical .btn-group + .btn,\n.btn-group-vertical .btn-group + .btn-group {\n  margin-left: -1px;\n}\n\n.btn-toolbar {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: start;\n  -webkit-justify-content: flex-start;\n      -ms-flex-pack: start;\n          justify-content: flex-start;\n}\n\n.btn-toolbar .input-group {\n  width: auto;\n}\n\n.btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {\n  border-radius: 0;\n}\n\n.btn-group > .btn:first-child {\n  margin-left: 0;\n}\n\n.btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.btn-group > .btn:last-child:not(:first-child),\n.btn-group > .dropdown-toggle:not(:first-child) {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group > .btn-group {\n  float: left;\n}\n\n.btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n\n.btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.btn-group > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group .dropdown-toggle:active,\n.btn-group.open .dropdown-toggle {\n  outline: 0;\n}\n\n.btn + .dropdown-toggle-split {\n  padding-right: 0.75rem;\n  padding-left: 0.75rem;\n}\n\n.btn + .dropdown-toggle-split::after {\n  margin-left: 0;\n}\n\n.btn-sm + .dropdown-toggle-split, .btn-group-sm > .btn + .dropdown-toggle-split {\n  padding-right: 0.375rem;\n  padding-left: 0.375rem;\n}\n\n.btn-lg + .dropdown-toggle-split, .btn-group-lg > .btn + .dropdown-toggle-split {\n  padding-right: 1.125rem;\n  padding-left: 1.125rem;\n}\n\n.btn-group-vertical {\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n}\n\n.btn-group-vertical .btn,\n.btn-group-vertical .btn-group {\n  width: 100%;\n}\n\n.btn-group-vertical > .btn + .btn,\n.btn-group-vertical > .btn + .btn-group,\n.btn-group-vertical > .btn-group + .btn,\n.btn-group-vertical > .btn-group + .btn-group {\n  margin-top: -1px;\n  margin-left: 0;\n}\n\n.btn-group-vertical > .btn:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n\n.btn-group-vertical > .btn:first-child:not(:last-child) {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n\n.btn-group-vertical > .btn:last-child:not(:first-child) {\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {\n  border-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,\n.btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle {\n  border-bottom-right-radius: 0;\n  border-bottom-left-radius: 0;\n}\n\n.btn-group-vertical > .btn-group:last-child:not(:first-child) > .btn:first-child {\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n[data-toggle=\"buttons\"] > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn input[type=\"checkbox\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"radio\"],\n[data-toggle=\"buttons\"] > .btn-group > .btn input[type=\"checkbox\"] {\n  position: absolute;\n  clip: rect(0, 0, 0, 0);\n  pointer-events: none;\n}\n\n.input-group {\n  position: relative;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  width: 100%;\n}\n\n.input-group .form-control {\n  position: relative;\n  z-index: 2;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 auto;\n      -ms-flex: 1 1 auto;\n          flex: 1 1 auto;\n  width: 1%;\n  margin-bottom: 0;\n}\n\n.input-group .form-control:focus, .input-group .form-control:active, .input-group .form-control:hover {\n  z-index: 3;\n}\n\n.input-group-addon,\n.input-group-btn,\n.input-group .form-control {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n}\n\n.input-group-addon:not(:first-child):not(:last-child),\n.input-group-btn:not(:first-child):not(:last-child),\n.input-group .form-control:not(:first-child):not(:last-child) {\n  border-radius: 0;\n}\n\n.input-group-addon,\n.input-group-btn {\n  white-space: nowrap;\n  vertical-align: middle;\n}\n\n.input-group-addon {\n  padding: 0.5rem 0.75rem;\n  margin-bottom: 0;\n  font-size: 1rem;\n  font-weight: normal;\n  line-height: 1.25;\n  color: #464a4c;\n  text-align: center;\n  background-color: #eceeef;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.input-group-addon.form-control-sm,\n.input-group-sm > .input-group-addon,\n.input-group-sm > .input-group-btn > .input-group-addon.btn {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n  border-radius: 0.2rem;\n}\n\n.input-group-addon.form-control-lg,\n.input-group-lg > .input-group-addon,\n.input-group-lg > .input-group-btn > .input-group-addon.btn {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n  border-radius: 0.3rem;\n}\n\n.input-group-addon input[type=\"radio\"],\n.input-group-addon input[type=\"checkbox\"] {\n  margin-top: 0;\n}\n\n.input-group .form-control:not(:last-child),\n.input-group-addon:not(:last-child),\n.input-group-btn:not(:last-child) > .btn,\n.input-group-btn:not(:last-child) > .btn-group > .btn,\n.input-group-btn:not(:last-child) > .dropdown-toggle,\n.input-group-btn:not(:first-child) > .btn:not(:last-child):not(.dropdown-toggle),\n.input-group-btn:not(:first-child) > .btn-group:not(:last-child) > .btn {\n  border-bottom-right-radius: 0;\n  border-top-right-radius: 0;\n}\n\n.input-group-addon:not(:last-child) {\n  border-right: 0;\n}\n\n.input-group .form-control:not(:first-child),\n.input-group-addon:not(:first-child),\n.input-group-btn:not(:first-child) > .btn,\n.input-group-btn:not(:first-child) > .btn-group > .btn,\n.input-group-btn:not(:first-child) > .dropdown-toggle,\n.input-group-btn:not(:last-child) > .btn:not(:first-child),\n.input-group-btn:not(:last-child) > .btn-group:not(:first-child) > .btn {\n  border-bottom-left-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.form-control + .input-group-addon:not(:first-child) {\n  border-left: 0;\n}\n\n.input-group-btn {\n  position: relative;\n  font-size: 0;\n  white-space: nowrap;\n}\n\n.input-group-btn > .btn {\n  position: relative;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 0%;\n      -ms-flex: 1 1 0%;\n          flex: 1 1 0%;\n}\n\n.input-group-btn > .btn + .btn {\n  margin-left: -1px;\n}\n\n.input-group-btn > .btn:focus, .input-group-btn > .btn:active, .input-group-btn > .btn:hover {\n  z-index: 3;\n}\n\n.input-group-btn:not(:last-child) > .btn,\n.input-group-btn:not(:last-child) > .btn-group {\n  margin-right: -1px;\n}\n\n.input-group-btn:not(:first-child) > .btn,\n.input-group-btn:not(:first-child) > .btn-group {\n  z-index: 2;\n  margin-left: -1px;\n}\n\n.input-group-btn:not(:first-child) > .btn:focus, .input-group-btn:not(:first-child) > .btn:active, .input-group-btn:not(:first-child) > .btn:hover,\n.input-group-btn:not(:first-child) > .btn-group:focus,\n.input-group-btn:not(:first-child) > .btn-group:active,\n.input-group-btn:not(:first-child) > .btn-group:hover {\n  z-index: 3;\n}\n\n.custom-control {\n  position: relative;\n  display: -webkit-inline-box;\n  display: -webkit-inline-flex;\n  display: -ms-inline-flexbox;\n  display: inline-flex;\n  min-height: 1.5rem;\n  padding-left: 1.5rem;\n  margin-right: 1rem;\n  cursor: pointer;\n}\n\n.custom-control-input {\n  position: absolute;\n  z-index: -1;\n  opacity: 0;\n}\n\n.custom-control-input:checked ~ .custom-control-indicator {\n  color: #fff;\n  background-color: #0275d8;\n}\n\n.custom-control-input:focus ~ .custom-control-indicator {\n  -webkit-box-shadow: 0 0 0 1px #fff, 0 0 0 3px #0275d8;\n          box-shadow: 0 0 0 1px #fff, 0 0 0 3px #0275d8;\n}\n\n.custom-control-input:active ~ .custom-control-indicator {\n  color: #fff;\n  background-color: #8fcafe;\n}\n\n.custom-control-input:disabled ~ .custom-control-indicator {\n  cursor: not-allowed;\n  background-color: #eceeef;\n}\n\n.custom-control-input:disabled ~ .custom-control-description {\n  color: #636c72;\n  cursor: not-allowed;\n}\n\n.custom-control-indicator {\n  position: absolute;\n  top: 0.25rem;\n  left: 0;\n  display: block;\n  width: 1rem;\n  height: 1rem;\n  pointer-events: none;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-color: #ddd;\n  background-repeat: no-repeat;\n  background-position: center center;\n  -webkit-background-size: 50% 50%;\n          background-size: 50% 50%;\n}\n\n.custom-checkbox .custom-control-indicator {\n  border-radius: 0.25rem;\n}\n\n.custom-checkbox .custom-control-input:checked ~ .custom-control-indicator {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath fill='%23fff' d='M6.564.75l-3.59 3.612-1.538-1.55L0 4.26 2.974 7.25 8 2.193z'/%3E%3C/svg%3E\");\n}\n\n.custom-checkbox .custom-control-input:indeterminate ~ .custom-control-indicator {\n  background-color: #0275d8;\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 4'%3E%3Cpath stroke='%23fff' d='M0 2h4'/%3E%3C/svg%3E\");\n}\n\n.custom-radio .custom-control-indicator {\n  border-radius: 50%;\n}\n\n.custom-radio .custom-control-input:checked ~ .custom-control-indicator {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%23fff'/%3E%3C/svg%3E\");\n}\n\n.custom-controls-stacked {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n}\n\n.custom-controls-stacked .custom-control {\n  margin-bottom: 0.25rem;\n}\n\n.custom-controls-stacked .custom-control + .custom-control {\n  margin-left: 0;\n}\n\n.custom-select {\n  display: inline-block;\n  max-width: 100%;\n  height: calc(2.25rem + 2px);\n  padding: 0.375rem 1.75rem 0.375rem 0.75rem;\n  line-height: 1.25;\n  color: #464a4c;\n  vertical-align: middle;\n  background: #fff url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 5'%3E%3Cpath fill='%23333' d='M2 0L0 2h4zm0 5L0 3h4z'/%3E%3C/svg%3E\") no-repeat right 0.75rem center;\n  -webkit-background-size: 8px 10px;\n          background-size: 8px 10px;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n  -moz-appearance: none;\n  -webkit-appearance: none;\n}\n\n.custom-select:focus {\n  border-color: #5cb3fd;\n  outline: none;\n}\n\n.custom-select:focus::-ms-value {\n  color: #464a4c;\n  background-color: #fff;\n}\n\n.custom-select:disabled {\n  color: #636c72;\n  cursor: not-allowed;\n  background-color: #eceeef;\n}\n\n.custom-select::-ms-expand {\n  opacity: 0;\n}\n\n.custom-select-sm {\n  padding-top: 0.375rem;\n  padding-bottom: 0.375rem;\n  font-size: 75%;\n}\n\n.custom-file {\n  position: relative;\n  display: inline-block;\n  max-width: 100%;\n  height: 2.5rem;\n  margin-bottom: 0;\n  cursor: pointer;\n}\n\n.custom-file-input {\n  min-width: 14rem;\n  max-width: 100%;\n  height: 2.5rem;\n  margin: 0;\n  filter: alpha(opacity=0);\n  opacity: 0;\n}\n\n.custom-file-control {\n  position: absolute;\n  top: 0;\n  right: 0;\n  left: 0;\n  z-index: 5;\n  height: 2.5rem;\n  padding: 0.5rem 1rem;\n  line-height: 1.5;\n  color: #464a4c;\n  pointer-events: none;\n  -webkit-user-select: none;\n     -moz-user-select: none;\n      -ms-user-select: none;\n          user-select: none;\n  background-color: #fff;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0.25rem;\n}\n\n.custom-file-control:lang(en)::after {\n  content: \"Choose file...\";\n}\n\n.custom-file-control::before {\n  position: absolute;\n  top: -1px;\n  right: -1px;\n  bottom: -1px;\n  z-index: 6;\n  display: block;\n  height: 2.5rem;\n  padding: 0.5rem 1rem;\n  line-height: 1.5;\n  color: #464a4c;\n  background-color: #eceeef;\n  border: 1px solid rgba(0, 0, 0, 0.15);\n  border-radius: 0 0.25rem 0.25rem 0;\n}\n\n.custom-file-control:lang(en)::before {\n  content: \"Browse\";\n}\n\n.nav {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n\n.nav-link {\n  display: block;\n  padding: 0.5em 1em;\n}\n\n.nav-link:focus, .nav-link:hover {\n  text-decoration: none;\n}\n\n.nav-link.disabled {\n  color: #636c72;\n  cursor: not-allowed;\n}\n\n.nav-tabs {\n  border-bottom: 1px solid #ddd;\n}\n\n.nav-tabs .nav-item {\n  margin-bottom: -1px;\n}\n\n.nav-tabs .nav-link {\n  border: 1px solid transparent;\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {\n  border-color: #eceeef #eceeef #ddd;\n}\n\n.nav-tabs .nav-link.disabled {\n  color: #636c72;\n  background-color: transparent;\n  border-color: transparent;\n}\n\n.nav-tabs .nav-link.active,\n.nav-tabs .nav-item.show .nav-link {\n  color: #464a4c;\n  background-color: #fff;\n  border-color: #ddd #ddd #fff;\n}\n\n.nav-tabs .dropdown-menu {\n  margin-top: -1px;\n  border-top-right-radius: 0;\n  border-top-left-radius: 0;\n}\n\n.nav-pills .nav-link {\n  border-radius: 0.25rem;\n}\n\n.nav-pills .nav-link.active,\n.nav-pills .nav-item.show .nav-link {\n  color: #fff;\n  cursor: default;\n  background-color: #0275d8;\n}\n\n.nav-fill .nav-item {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 auto;\n      -ms-flex: 1 1 auto;\n          flex: 1 1 auto;\n  text-align: center;\n}\n\n.nav-justified .nav-item {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 100%;\n      -ms-flex: 1 1 100%;\n          flex: 1 1 100%;\n  text-align: center;\n}\n\n.tab-content > .tab-pane {\n  display: none;\n}\n\n.tab-content > .active {\n  display: block;\n}\n\n.navbar {\n  position: relative;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  padding: 0.5rem 1rem;\n}\n\n.navbar-brand {\n  display: inline-block;\n  padding-top: .25rem;\n  padding-bottom: .25rem;\n  margin-right: 1rem;\n  font-size: 1.25rem;\n  line-height: inherit;\n  white-space: nowrap;\n}\n\n.navbar-brand:focus, .navbar-brand:hover {\n  text-decoration: none;\n}\n\n.navbar-nav {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  padding-left: 0;\n  margin-bottom: 0;\n  list-style: none;\n}\n\n.navbar-nav .nav-link {\n  padding-right: 0;\n  padding-left: 0;\n}\n\n.navbar-text {\n  display: inline-block;\n  padding-top: .425rem;\n  padding-bottom: .425rem;\n}\n\n.navbar-toggler {\n  -webkit-align-self: flex-start;\n      -ms-flex-item-align: start;\n          align-self: flex-start;\n  padding: 0.25rem 0.75rem;\n  font-size: 1.25rem;\n  line-height: 1;\n  background: transparent;\n  border: 1px solid transparent;\n  border-radius: 0.25rem;\n}\n\n.navbar-toggler:focus, .navbar-toggler:hover {\n  text-decoration: none;\n}\n\n.navbar-toggler-icon {\n  display: inline-block;\n  width: 1.5em;\n  height: 1.5em;\n  vertical-align: middle;\n  content: \"\";\n  background: no-repeat center center;\n  -webkit-background-size: 100% 100%;\n          background-size: 100% 100%;\n}\n\n.navbar-toggler-left {\n  position: absolute;\n  left: 1rem;\n}\n\n.navbar-toggler-right {\n  position: absolute;\n  right: 1rem;\n}\n\n@media (max-width: 575px) {\n  .navbar-toggleable .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n  .navbar-toggleable > .container {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n\n@media (min-width: 576px) {\n  .navbar-toggleable {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable .navbar-nav {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n  }\n  .navbar-toggleable .navbar-nav .nav-link {\n    padding-right: .5rem;\n    padding-left: .5rem;\n  }\n  .navbar-toggleable > .container {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable .navbar-collapse {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n    width: 100%;\n  }\n  .navbar-toggleable .navbar-toggler {\n    display: none;\n  }\n}\n\n@media (max-width: 767px) {\n  .navbar-toggleable-sm .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n  .navbar-toggleable-sm > .container {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n\n@media (min-width: 768px) {\n  .navbar-toggleable-sm {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable-sm .navbar-nav {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n  }\n  .navbar-toggleable-sm .navbar-nav .nav-link {\n    padding-right: .5rem;\n    padding-left: .5rem;\n  }\n  .navbar-toggleable-sm > .container {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable-sm .navbar-collapse {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n    width: 100%;\n  }\n  .navbar-toggleable-sm .navbar-toggler {\n    display: none;\n  }\n}\n\n@media (max-width: 991px) {\n  .navbar-toggleable-md .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n  .navbar-toggleable-md > .container {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n\n@media (min-width: 992px) {\n  .navbar-toggleable-md {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable-md .navbar-nav {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n  }\n  .navbar-toggleable-md .navbar-nav .nav-link {\n    padding-right: .5rem;\n    padding-left: .5rem;\n  }\n  .navbar-toggleable-md > .container {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable-md .navbar-collapse {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n    width: 100%;\n  }\n  .navbar-toggleable-md .navbar-toggler {\n    display: none;\n  }\n}\n\n@media (max-width: 1199px) {\n  .navbar-toggleable-lg .navbar-nav .dropdown-menu {\n    position: static;\n    float: none;\n  }\n  .navbar-toggleable-lg > .container {\n    padding-right: 0;\n    padding-left: 0;\n  }\n}\n\n@media (min-width: 1200px) {\n  .navbar-toggleable-lg {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable-lg .navbar-nav {\n    -webkit-box-orient: horizontal;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: row;\n        -ms-flex-direction: row;\n            flex-direction: row;\n  }\n  .navbar-toggleable-lg .navbar-nav .nav-link {\n    padding-right: .5rem;\n    padding-left: .5rem;\n  }\n  .navbar-toggleable-lg > .container {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-flex-wrap: nowrap;\n        -ms-flex-wrap: nowrap;\n            flex-wrap: nowrap;\n    -webkit-box-align: center;\n    -webkit-align-items: center;\n        -ms-flex-align: center;\n            align-items: center;\n  }\n  .navbar-toggleable-lg .navbar-collapse {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n    width: 100%;\n  }\n  .navbar-toggleable-lg .navbar-toggler {\n    display: none;\n  }\n}\n\n.navbar-toggleable-xl {\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: row;\n      -ms-flex-direction: row;\n          flex-direction: row;\n  -webkit-flex-wrap: nowrap;\n      -ms-flex-wrap: nowrap;\n          flex-wrap: nowrap;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n\n.navbar-toggleable-xl .navbar-nav .dropdown-menu {\n  position: static;\n  float: none;\n}\n\n.navbar-toggleable-xl > .container {\n  padding-right: 0;\n  padding-left: 0;\n}\n\n.navbar-toggleable-xl .navbar-nav {\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: row;\n      -ms-flex-direction: row;\n          flex-direction: row;\n}\n\n.navbar-toggleable-xl .navbar-nav .nav-link {\n  padding-right: .5rem;\n  padding-left: .5rem;\n}\n\n.navbar-toggleable-xl > .container {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-wrap: nowrap;\n      -ms-flex-wrap: nowrap;\n          flex-wrap: nowrap;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n}\n\n.navbar-toggleable-xl .navbar-collapse {\n  display: -webkit-box !important;\n  display: -webkit-flex !important;\n  display: -ms-flexbox !important;\n  display: flex !important;\n  width: 100%;\n}\n\n.navbar-toggleable-xl .navbar-toggler {\n  display: none;\n}\n\n.navbar-light .navbar-brand,\n.navbar-light .navbar-toggler {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-brand:focus, .navbar-light .navbar-brand:hover,\n.navbar-light .navbar-toggler:focus,\n.navbar-light .navbar-toggler:hover {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-nav .nav-link {\n  color: rgba(0, 0, 0, 0.5);\n}\n\n.navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {\n  color: rgba(0, 0, 0, 0.7);\n}\n\n.navbar-light .navbar-nav .nav-link.disabled {\n  color: rgba(0, 0, 0, 0.3);\n}\n\n.navbar-light .navbar-nav .open > .nav-link,\n.navbar-light .navbar-nav .active > .nav-link,\n.navbar-light .navbar-nav .nav-link.open,\n.navbar-light .navbar-nav .nav-link.active {\n  color: rgba(0, 0, 0, 0.9);\n}\n\n.navbar-light .navbar-toggler {\n  border-color: rgba(0, 0, 0, 0.1);\n}\n\n.navbar-light .navbar-toggler-icon {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0, 0, 0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E\");\n}\n\n.navbar-light .navbar-text {\n  color: rgba(0, 0, 0, 0.5);\n}\n\n.navbar-inverse .navbar-brand,\n.navbar-inverse .navbar-toggler {\n  color: white;\n}\n\n.navbar-inverse .navbar-brand:focus, .navbar-inverse .navbar-brand:hover,\n.navbar-inverse .navbar-toggler:focus,\n.navbar-inverse .navbar-toggler:hover {\n  color: white;\n}\n\n.navbar-inverse .navbar-nav .nav-link {\n  color: rgba(255, 255, 255, 0.5);\n}\n\n.navbar-inverse .navbar-nav .nav-link:focus, .navbar-inverse .navbar-nav .nav-link:hover {\n  color: rgba(255, 255, 255, 0.75);\n}\n\n.navbar-inverse .navbar-nav .nav-link.disabled {\n  color: rgba(255, 255, 255, 0.25);\n}\n\n.navbar-inverse .navbar-nav .open > .nav-link,\n.navbar-inverse .navbar-nav .active > .nav-link,\n.navbar-inverse .navbar-nav .nav-link.open,\n.navbar-inverse .navbar-nav .nav-link.active {\n  color: white;\n}\n\n.navbar-inverse .navbar-toggler {\n  border-color: rgba(255, 255, 255, 0.1);\n}\n\n.navbar-inverse .navbar-toggler-icon {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E\");\n}\n\n.navbar-inverse .navbar-text {\n  color: rgba(255, 255, 255, 0.5);\n}\n\n.card {\n  position: relative;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  border: 1px solid rgba(0, 0, 0, 0.125);\n  border-radius: 0.25rem;\n}\n\n.card-block {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 auto;\n      -ms-flex: 1 1 auto;\n          flex: 1 1 auto;\n  padding: 1.25rem;\n}\n\n.card-title {\n  margin-bottom: 0.75rem;\n}\n\n.card-subtitle {\n  margin-top: -0.375rem;\n  margin-bottom: 0;\n}\n\n.card-text:last-child {\n  margin-bottom: 0;\n}\n\n.card-link:hover {\n  text-decoration: none;\n}\n\n.card-link + .card-link {\n  margin-left: 1.25rem;\n}\n\n.card > .list-group:first-child .list-group-item:first-child {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.card > .list-group:last-child .list-group-item:last-child {\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.card-header {\n  padding: 0.75rem 1.25rem;\n  margin-bottom: 0;\n  background-color: #f7f7f9;\n  border-bottom: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-header:first-child {\n  border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0;\n}\n\n.card-footer {\n  padding: 0.75rem 1.25rem;\n  background-color: #f7f7f9;\n  border-top: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.card-footer:last-child {\n  border-radius: 0 0 calc(0.25rem - 1px) calc(0.25rem - 1px);\n}\n\n.card-header-tabs {\n  margin-right: -0.625rem;\n  margin-bottom: -0.75rem;\n  margin-left: -0.625rem;\n  border-bottom: 0;\n}\n\n.card-header-pills {\n  margin-right: -0.625rem;\n  margin-left: -0.625rem;\n}\n\n.card-primary {\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.card-primary .card-header,\n.card-primary .card-footer {\n  background-color: transparent;\n}\n\n.card-success {\n  background-color: #5cb85c;\n  border-color: #5cb85c;\n}\n\n.card-success .card-header,\n.card-success .card-footer {\n  background-color: transparent;\n}\n\n.card-info {\n  background-color: #5bc0de;\n  border-color: #5bc0de;\n}\n\n.card-info .card-header,\n.card-info .card-footer {\n  background-color: transparent;\n}\n\n.card-warning {\n  background-color: #f0ad4e;\n  border-color: #f0ad4e;\n}\n\n.card-warning .card-header,\n.card-warning .card-footer {\n  background-color: transparent;\n}\n\n.card-danger {\n  background-color: #d9534f;\n  border-color: #d9534f;\n}\n\n.card-danger .card-header,\n.card-danger .card-footer {\n  background-color: transparent;\n}\n\n.card-outline-primary {\n  background-color: transparent;\n  border-color: #0275d8;\n}\n\n.card-outline-secondary {\n  background-color: transparent;\n  border-color: #ccc;\n}\n\n.card-outline-info {\n  background-color: transparent;\n  border-color: #5bc0de;\n}\n\n.card-outline-success {\n  background-color: transparent;\n  border-color: #5cb85c;\n}\n\n.card-outline-warning {\n  background-color: transparent;\n  border-color: #f0ad4e;\n}\n\n.card-outline-danger {\n  background-color: transparent;\n  border-color: #d9534f;\n}\n\n.card-inverse {\n  color: rgba(255, 255, 255, 0.65);\n}\n\n.card-inverse .card-header,\n.card-inverse .card-footer {\n  background-color: transparent;\n  border-color: rgba(255, 255, 255, 0.2);\n}\n\n.card-inverse .card-header,\n.card-inverse .card-footer,\n.card-inverse .card-title,\n.card-inverse .card-blockquote {\n  color: #fff;\n}\n\n.card-inverse .card-link,\n.card-inverse .card-text,\n.card-inverse .card-subtitle,\n.card-inverse .card-blockquote .blockquote-footer {\n  color: rgba(255, 255, 255, 0.65);\n}\n\n.card-inverse .card-link:focus, .card-inverse .card-link:hover {\n  color: #fff;\n}\n\n.card-blockquote {\n  padding: 0;\n  margin-bottom: 0;\n  border-left: 0;\n}\n\n.card-img {\n  border-radius: calc(0.25rem - 1px);\n}\n\n.card-img-overlay {\n  position: absolute;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  padding: 1.25rem;\n}\n\n.card-img-top {\n  border-top-right-radius: calc(0.25rem - 1px);\n  border-top-left-radius: calc(0.25rem - 1px);\n}\n\n.card-img-bottom {\n  border-bottom-right-radius: calc(0.25rem - 1px);\n  border-bottom-left-radius: calc(0.25rem - 1px);\n}\n\n@media (min-width: 576px) {\n  .card-deck {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-flex-flow: row wrap;\n        -ms-flex-flow: row wrap;\n            flex-flow: row wrap;\n  }\n  .card-deck .card {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-box-flex: 1;\n    -webkit-flex: 1 0 0%;\n        -ms-flex: 1 0 0%;\n            flex: 1 0 0%;\n    -webkit-box-orient: vertical;\n    -webkit-box-direction: normal;\n    -webkit-flex-direction: column;\n        -ms-flex-direction: column;\n            flex-direction: column;\n  }\n  .card-deck .card:not(:first-child) {\n    margin-left: 15px;\n  }\n  .card-deck .card:not(:last-child) {\n    margin-right: 15px;\n  }\n}\n\n@media (min-width: 576px) {\n  .card-group {\n    display: -webkit-box;\n    display: -webkit-flex;\n    display: -ms-flexbox;\n    display: flex;\n    -webkit-flex-flow: row wrap;\n        -ms-flex-flow: row wrap;\n            flex-flow: row wrap;\n  }\n  .card-group .card {\n    -webkit-box-flex: 1;\n    -webkit-flex: 1 0 0%;\n        -ms-flex: 1 0 0%;\n            flex: 1 0 0%;\n  }\n  .card-group .card + .card {\n    margin-left: 0;\n    border-left: 0;\n  }\n  .card-group .card:first-child {\n    border-bottom-right-radius: 0;\n    border-top-right-radius: 0;\n  }\n  .card-group .card:first-child .card-img-top {\n    border-top-right-radius: 0;\n  }\n  .card-group .card:first-child .card-img-bottom {\n    border-bottom-right-radius: 0;\n  }\n  .card-group .card:last-child {\n    border-bottom-left-radius: 0;\n    border-top-left-radius: 0;\n  }\n  .card-group .card:last-child .card-img-top {\n    border-top-left-radius: 0;\n  }\n  .card-group .card:last-child .card-img-bottom {\n    border-bottom-left-radius: 0;\n  }\n  .card-group .card:not(:first-child):not(:last-child) {\n    border-radius: 0;\n  }\n  .card-group .card:not(:first-child):not(:last-child) .card-img-top,\n  .card-group .card:not(:first-child):not(:last-child) .card-img-bottom {\n    border-radius: 0;\n  }\n}\n\n@media (min-width: 576px) {\n  .card-columns {\n    -webkit-column-count: 3;\n       -moz-column-count: 3;\n            column-count: 3;\n    -webkit-column-gap: 1.25rem;\n       -moz-column-gap: 1.25rem;\n            column-gap: 1.25rem;\n  }\n  .card-columns .card {\n    display: inline-block;\n    width: 100%;\n    margin-bottom: 0.75rem;\n  }\n}\n\n.breadcrumb {\n  padding: 0.75rem 1rem;\n  margin-bottom: 1rem;\n  list-style: none;\n  background-color: #eceeef;\n  border-radius: 0.25rem;\n}\n\n.breadcrumb::after {\n  display: block;\n  content: \"\";\n  clear: both;\n}\n\n.breadcrumb-item {\n  float: left;\n}\n\n.breadcrumb-item + .breadcrumb-item::before {\n  display: inline-block;\n  padding-right: 0.5rem;\n  padding-left: 0.5rem;\n  color: #636c72;\n  content: \"/\";\n}\n\n.breadcrumb-item + .breadcrumb-item:hover::before {\n  text-decoration: underline;\n}\n\n.breadcrumb-item + .breadcrumb-item:hover::before {\n  text-decoration: none;\n}\n\n.breadcrumb-item.active {\n  color: #636c72;\n}\n\n.pagination {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  padding-left: 0;\n  list-style: none;\n  border-radius: 0.25rem;\n}\n\n.page-item:first-child .page-link {\n  margin-left: 0;\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.page-item:last-child .page-link {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.page-item.active .page-link {\n  z-index: 2;\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.page-item.disabled .page-link {\n  color: #636c72;\n  pointer-events: none;\n  cursor: not-allowed;\n  background-color: #fff;\n  border-color: #ddd;\n}\n\n.page-link {\n  position: relative;\n  display: block;\n  padding: 0.5rem 0.75rem;\n  margin-left: -1px;\n  line-height: 1.25;\n  color: #0275d8;\n  background-color: #fff;\n  border: 1px solid #ddd;\n}\n\n.page-link:focus, .page-link:hover {\n  color: #014c8c;\n  text-decoration: none;\n  background-color: #eceeef;\n  border-color: #ddd;\n}\n\n.pagination-lg .page-link {\n  padding: 0.75rem 1.5rem;\n  font-size: 1.25rem;\n}\n\n.pagination-lg .page-item:first-child .page-link {\n  border-bottom-left-radius: 0.3rem;\n  border-top-left-radius: 0.3rem;\n}\n\n.pagination-lg .page-item:last-child .page-link {\n  border-bottom-right-radius: 0.3rem;\n  border-top-right-radius: 0.3rem;\n}\n\n.pagination-sm .page-link {\n  padding: 0.25rem 0.5rem;\n  font-size: 0.875rem;\n}\n\n.pagination-sm .page-item:first-child .page-link {\n  border-bottom-left-radius: 0.2rem;\n  border-top-left-radius: 0.2rem;\n}\n\n.pagination-sm .page-item:last-child .page-link {\n  border-bottom-right-radius: 0.2rem;\n  border-top-right-radius: 0.2rem;\n}\n\n.badge {\n  display: inline-block;\n  padding: 0.25em 0.4em;\n  font-size: 75%;\n  font-weight: bold;\n  line-height: 1;\n  color: #fff;\n  text-align: center;\n  white-space: nowrap;\n  vertical-align: baseline;\n  border-radius: 0.25rem;\n}\n\n.badge:empty {\n  display: none;\n}\n\n.btn .badge {\n  position: relative;\n  top: -1px;\n}\n\na.badge:focus, a.badge:hover {\n  color: #fff;\n  text-decoration: none;\n  cursor: pointer;\n}\n\n.badge-pill {\n  padding-right: 0.6em;\n  padding-left: 0.6em;\n  border-radius: 10rem;\n}\n\n.badge-default {\n  background-color: #636c72;\n}\n\n.badge-default[href]:focus, .badge-default[href]:hover {\n  background-color: #4b5257;\n}\n\n.badge-primary {\n  background-color: #0275d8;\n}\n\n.badge-primary[href]:focus, .badge-primary[href]:hover {\n  background-color: #025aa5;\n}\n\n.badge-success {\n  background-color: #5cb85c;\n}\n\n.badge-success[href]:focus, .badge-success[href]:hover {\n  background-color: #449d44;\n}\n\n.badge-info {\n  background-color: #5bc0de;\n}\n\n.badge-info[href]:focus, .badge-info[href]:hover {\n  background-color: #31b0d5;\n}\n\n.badge-warning {\n  background-color: #f0ad4e;\n}\n\n.badge-warning[href]:focus, .badge-warning[href]:hover {\n  background-color: #ec971f;\n}\n\n.badge-danger {\n  background-color: #d9534f;\n}\n\n.badge-danger[href]:focus, .badge-danger[href]:hover {\n  background-color: #c9302c;\n}\n\n.jumbotron {\n  padding: 2rem 1rem;\n  margin-bottom: 2rem;\n  background-color: #eceeef;\n  border-radius: 0.3rem;\n}\n\n@media (min-width: 576px) {\n  .jumbotron {\n    padding: 4rem 2rem;\n  }\n}\n\n.jumbotron-hr {\n  border-top-color: #d0d5d8;\n}\n\n.jumbotron-fluid {\n  padding-right: 0;\n  padding-left: 0;\n  border-radius: 0;\n}\n\n.alert {\n  padding: 0.75rem 1.25rem;\n  margin-bottom: 1rem;\n  border: 1px solid transparent;\n  border-radius: 0.25rem;\n}\n\n.alert-heading {\n  color: inherit;\n}\n\n.alert-link {\n  font-weight: bold;\n}\n\n.alert-dismissible .close {\n  position: relative;\n  top: -0.75rem;\n  right: -1.25rem;\n  padding: 0.75rem 1.25rem;\n  color: inherit;\n}\n\n.alert-success {\n  background-color: #dff0d8;\n  border-color: #d0e9c6;\n  color: #3c763d;\n}\n\n.alert-success hr {\n  border-top-color: #c1e2b3;\n}\n\n.alert-success .alert-link {\n  color: #2b542c;\n}\n\n.alert-info {\n  background-color: #d9edf7;\n  border-color: #bcdff1;\n  color: #31708f;\n}\n\n.alert-info hr {\n  border-top-color: #a6d5ec;\n}\n\n.alert-info .alert-link {\n  color: #245269;\n}\n\n.alert-warning {\n  background-color: #fcf8e3;\n  border-color: #faf2cc;\n  color: #8a6d3b;\n}\n\n.alert-warning hr {\n  border-top-color: #f7ecb5;\n}\n\n.alert-warning .alert-link {\n  color: #66512c;\n}\n\n.alert-danger {\n  background-color: #f2dede;\n  border-color: #ebcccc;\n  color: #a94442;\n}\n\n.alert-danger hr {\n  border-top-color: #e4b9b9;\n}\n\n.alert-danger .alert-link {\n  color: #843534;\n}\n\n@-webkit-keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n@-o-keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n@keyframes progress-bar-stripes {\n  from {\n    background-position: 1rem 0;\n  }\n  to {\n    background-position: 0 0;\n  }\n}\n\n.progress {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  overflow: hidden;\n  font-size: 0.75rem;\n  line-height: 1rem;\n  text-align: center;\n  background-color: #eceeef;\n  border-radius: 0.25rem;\n}\n\n.progress-bar {\n  height: 1rem;\n  color: #fff;\n  background-color: #0275d8;\n}\n\n.progress-bar-striped {\n  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-image: -o-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);\n  -webkit-background-size: 1rem 1rem;\n          background-size: 1rem 1rem;\n}\n\n.progress-bar-animated {\n  -webkit-animation: progress-bar-stripes 1s linear infinite;\n       -o-animation: progress-bar-stripes 1s linear infinite;\n          animation: progress-bar-stripes 1s linear infinite;\n}\n\n.media {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: start;\n  -webkit-align-items: flex-start;\n      -ms-flex-align: start;\n          align-items: flex-start;\n}\n\n.media-body {\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 0%;\n      -ms-flex: 1 1 0%;\n          flex: 1 1 0%;\n}\n\n.list-group {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  padding-left: 0;\n  margin-bottom: 0;\n}\n\n.list-group-item-action {\n  width: 100%;\n  color: #464a4c;\n  text-align: inherit;\n}\n\n.list-group-item-action .list-group-item-heading {\n  color: #292b2c;\n}\n\n.list-group-item-action:focus, .list-group-item-action:hover {\n  color: #464a4c;\n  text-decoration: none;\n  background-color: #f7f7f9;\n}\n\n.list-group-item-action:active {\n  color: #292b2c;\n  background-color: #eceeef;\n}\n\n.list-group-item {\n  position: relative;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-flex-flow: row wrap;\n      -ms-flex-flow: row wrap;\n          flex-flow: row wrap;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  padding: 0.75rem 1.25rem;\n  margin-bottom: -1px;\n  background-color: #fff;\n  border: 1px solid rgba(0, 0, 0, 0.125);\n}\n\n.list-group-item:first-child {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.list-group-item:last-child {\n  margin-bottom: 0;\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.list-group-item:focus, .list-group-item:hover {\n  text-decoration: none;\n}\n\n.list-group-item.disabled, .list-group-item:disabled {\n  color: #636c72;\n  cursor: not-allowed;\n  background-color: #fff;\n}\n\n.list-group-item.disabled .list-group-item-heading, .list-group-item:disabled .list-group-item-heading {\n  color: inherit;\n}\n\n.list-group-item.disabled .list-group-item-text, .list-group-item:disabled .list-group-item-text {\n  color: #636c72;\n}\n\n.list-group-item.active {\n  z-index: 2;\n  color: #fff;\n  background-color: #0275d8;\n  border-color: #0275d8;\n}\n\n.list-group-item.active .list-group-item-heading,\n.list-group-item.active .list-group-item-heading > small,\n.list-group-item.active .list-group-item-heading > .small {\n  color: inherit;\n}\n\n.list-group-item.active .list-group-item-text {\n  color: #daeeff;\n}\n\n.list-group-flush .list-group-item {\n  border-right: 0;\n  border-left: 0;\n  border-radius: 0;\n}\n\n.list-group-flush:first-child .list-group-item:first-child {\n  border-top: 0;\n}\n\n.list-group-flush:last-child .list-group-item:last-child {\n  border-bottom: 0;\n}\n\n.list-group-item-success {\n  color: #3c763d;\n  background-color: #dff0d8;\n}\n\na.list-group-item-success,\nbutton.list-group-item-success {\n  color: #3c763d;\n}\n\na.list-group-item-success .list-group-item-heading,\nbutton.list-group-item-success .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-success:focus, a.list-group-item-success:hover,\nbutton.list-group-item-success:focus,\nbutton.list-group-item-success:hover {\n  color: #3c763d;\n  background-color: #d0e9c6;\n}\n\na.list-group-item-success.active,\nbutton.list-group-item-success.active {\n  color: #fff;\n  background-color: #3c763d;\n  border-color: #3c763d;\n}\n\n.list-group-item-info {\n  color: #31708f;\n  background-color: #d9edf7;\n}\n\na.list-group-item-info,\nbutton.list-group-item-info {\n  color: #31708f;\n}\n\na.list-group-item-info .list-group-item-heading,\nbutton.list-group-item-info .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-info:focus, a.list-group-item-info:hover,\nbutton.list-group-item-info:focus,\nbutton.list-group-item-info:hover {\n  color: #31708f;\n  background-color: #c4e3f3;\n}\n\na.list-group-item-info.active,\nbutton.list-group-item-info.active {\n  color: #fff;\n  background-color: #31708f;\n  border-color: #31708f;\n}\n\n.list-group-item-warning {\n  color: #8a6d3b;\n  background-color: #fcf8e3;\n}\n\na.list-group-item-warning,\nbutton.list-group-item-warning {\n  color: #8a6d3b;\n}\n\na.list-group-item-warning .list-group-item-heading,\nbutton.list-group-item-warning .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-warning:focus, a.list-group-item-warning:hover,\nbutton.list-group-item-warning:focus,\nbutton.list-group-item-warning:hover {\n  color: #8a6d3b;\n  background-color: #faf2cc;\n}\n\na.list-group-item-warning.active,\nbutton.list-group-item-warning.active {\n  color: #fff;\n  background-color: #8a6d3b;\n  border-color: #8a6d3b;\n}\n\n.list-group-item-danger {\n  color: #a94442;\n  background-color: #f2dede;\n}\n\na.list-group-item-danger,\nbutton.list-group-item-danger {\n  color: #a94442;\n}\n\na.list-group-item-danger .list-group-item-heading,\nbutton.list-group-item-danger .list-group-item-heading {\n  color: inherit;\n}\n\na.list-group-item-danger:focus, a.list-group-item-danger:hover,\nbutton.list-group-item-danger:focus,\nbutton.list-group-item-danger:hover {\n  color: #a94442;\n  background-color: #ebcccc;\n}\n\na.list-group-item-danger.active,\nbutton.list-group-item-danger.active {\n  color: #fff;\n  background-color: #a94442;\n  border-color: #a94442;\n}\n\n.embed-responsive {\n  position: relative;\n  display: block;\n  width: 100%;\n  padding: 0;\n  overflow: hidden;\n}\n\n.embed-responsive::before {\n  display: block;\n  content: \"\";\n}\n\n.embed-responsive .embed-responsive-item,\n.embed-responsive iframe,\n.embed-responsive embed,\n.embed-responsive object,\n.embed-responsive video {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  left: 0;\n  width: 100%;\n  height: 100%;\n  border: 0;\n}\n\n.embed-responsive-21by9::before {\n  padding-top: 42.857143%;\n}\n\n.embed-responsive-16by9::before {\n  padding-top: 56.25%;\n}\n\n.embed-responsive-4by3::before {\n  padding-top: 75%;\n}\n\n.embed-responsive-1by1::before {\n  padding-top: 100%;\n}\n\n.close {\n  float: right;\n  font-size: 1.5rem;\n  font-weight: bold;\n  line-height: 1;\n  color: #000;\n  text-shadow: 0 1px 0 #fff;\n  opacity: .5;\n}\n\n.close:focus, .close:hover {\n  color: #000;\n  text-decoration: none;\n  cursor: pointer;\n  opacity: .75;\n}\n\nbutton.close {\n  padding: 0;\n  cursor: pointer;\n  background: transparent;\n  border: 0;\n  -webkit-appearance: none;\n}\n\n.modal-open {\n  overflow: hidden;\n}\n\n.modal {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1050;\n  display: none;\n  overflow: hidden;\n  outline: 0;\n}\n\n.modal.fade .modal-dialog {\n  -webkit-transition: -webkit-transform 0.3s ease-out;\n  transition: -webkit-transform 0.3s ease-out;\n  -o-transition: -o-transform 0.3s ease-out;\n  transition: transform 0.3s ease-out;\n  transition: transform 0.3s ease-out, -webkit-transform 0.3s ease-out, -o-transform 0.3s ease-out;\n  -webkit-transform: translate(0, -25%);\n       -o-transform: translate(0, -25%);\n          transform: translate(0, -25%);\n}\n\n.modal.show .modal-dialog {\n  -webkit-transform: translate(0, 0);\n       -o-transform: translate(0, 0);\n          transform: translate(0, 0);\n}\n\n.modal-open .modal {\n  overflow-x: hidden;\n  overflow-y: auto;\n}\n\n.modal-dialog {\n  position: relative;\n  width: auto;\n  margin: 10px;\n}\n\n.modal-content {\n  position: relative;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: vertical;\n  -webkit-box-direction: normal;\n  -webkit-flex-direction: column;\n      -ms-flex-direction: column;\n          flex-direction: column;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  border-radius: 0.3rem;\n  outline: 0;\n}\n\n.modal-backdrop {\n  position: fixed;\n  top: 0;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1040;\n  background-color: #000;\n}\n\n.modal-backdrop.fade {\n  opacity: 0;\n}\n\n.modal-backdrop.show {\n  opacity: 0.5;\n}\n\n.modal-header {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -webkit-box-pack: justify;\n  -webkit-justify-content: space-between;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n  padding: 15px;\n  border-bottom: 1px solid #eceeef;\n}\n\n.modal-title {\n  margin-bottom: 0;\n  line-height: 1.5;\n}\n\n.modal-body {\n  position: relative;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 1 auto;\n      -ms-flex: 1 1 auto;\n          flex: 1 1 auto;\n  padding: 15px;\n}\n\n.modal-footer {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -webkit-box-pack: end;\n  -webkit-justify-content: flex-end;\n      -ms-flex-pack: end;\n          justify-content: flex-end;\n  padding: 15px;\n  border-top: 1px solid #eceeef;\n}\n\n.modal-footer > :not(:first-child) {\n  margin-left: .25rem;\n}\n\n.modal-footer > :not(:last-child) {\n  margin-right: .25rem;\n}\n\n.modal-scrollbar-measure {\n  position: absolute;\n  top: -9999px;\n  width: 50px;\n  height: 50px;\n  overflow: scroll;\n}\n\n@media (min-width: 576px) {\n  .modal-dialog {\n    max-width: 500px;\n    margin: 30px auto;\n  }\n  .modal-sm {\n    max-width: 300px;\n  }\n}\n\n@media (min-width: 992px) {\n  .modal-lg {\n    max-width: 800px;\n  }\n}\n\n.tooltip {\n  position: absolute;\n  z-index: 1070;\n  display: block;\n  font-family: -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  letter-spacing: normal;\n  line-break: auto;\n  line-height: 1.5;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  white-space: normal;\n  word-break: normal;\n  word-spacing: normal;\n  font-size: 0.875rem;\n  word-wrap: break-word;\n  opacity: 0;\n}\n\n.tooltip.show {\n  opacity: 0.9;\n}\n\n.tooltip.tooltip-top, .tooltip.bs-tether-element-attached-bottom {\n  padding: 5px 0;\n  margin-top: -3px;\n}\n\n.tooltip.tooltip-top .tooltip-inner::before, .tooltip.bs-tether-element-attached-bottom .tooltip-inner::before {\n  bottom: 0;\n  left: 50%;\n  margin-left: -5px;\n  content: \"\";\n  border-width: 5px 5px 0;\n  border-top-color: #000;\n}\n\n.tooltip.tooltip-right, .tooltip.bs-tether-element-attached-left {\n  padding: 0 5px;\n  margin-left: 3px;\n}\n\n.tooltip.tooltip-right .tooltip-inner::before, .tooltip.bs-tether-element-attached-left .tooltip-inner::before {\n  top: 50%;\n  left: 0;\n  margin-top: -5px;\n  content: \"\";\n  border-width: 5px 5px 5px 0;\n  border-right-color: #000;\n}\n\n.tooltip.tooltip-bottom, .tooltip.bs-tether-element-attached-top {\n  padding: 5px 0;\n  margin-top: 3px;\n}\n\n.tooltip.tooltip-bottom .tooltip-inner::before, .tooltip.bs-tether-element-attached-top .tooltip-inner::before {\n  top: 0;\n  left: 50%;\n  margin-left: -5px;\n  content: \"\";\n  border-width: 0 5px 5px;\n  border-bottom-color: #000;\n}\n\n.tooltip.tooltip-left, .tooltip.bs-tether-element-attached-right {\n  padding: 0 5px;\n  margin-left: -3px;\n}\n\n.tooltip.tooltip-left .tooltip-inner::before, .tooltip.bs-tether-element-attached-right .tooltip-inner::before {\n  top: 50%;\n  right: 0;\n  margin-top: -5px;\n  content: \"\";\n  border-width: 5px 0 5px 5px;\n  border-left-color: #000;\n}\n\n.tooltip-inner {\n  max-width: 200px;\n  padding: 3px 8px;\n  color: #fff;\n  text-align: center;\n  background-color: #000;\n  border-radius: 0.25rem;\n}\n\n.tooltip-inner::before {\n  position: absolute;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n\n.popover {\n  position: absolute;\n  top: 0;\n  left: 0;\n  z-index: 1060;\n  display: block;\n  max-width: 276px;\n  padding: 1px;\n  font-family: -apple-system, system-ui, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n  font-style: normal;\n  font-weight: normal;\n  letter-spacing: normal;\n  line-break: auto;\n  line-height: 1.5;\n  text-align: left;\n  text-align: start;\n  text-decoration: none;\n  text-shadow: none;\n  text-transform: none;\n  white-space: normal;\n  word-break: normal;\n  word-spacing: normal;\n  font-size: 0.875rem;\n  word-wrap: break-word;\n  background-color: #fff;\n  -webkit-background-clip: padding-box;\n          background-clip: padding-box;\n  border: 1px solid rgba(0, 0, 0, 0.2);\n  border-radius: 0.3rem;\n}\n\n.popover.popover-top, .popover.bs-tether-element-attached-bottom {\n  margin-top: -10px;\n}\n\n.popover.popover-top::before, .popover.popover-top::after, .popover.bs-tether-element-attached-bottom::before, .popover.bs-tether-element-attached-bottom::after {\n  left: 50%;\n  border-bottom-width: 0;\n}\n\n.popover.popover-top::before, .popover.bs-tether-element-attached-bottom::before {\n  bottom: -11px;\n  margin-left: -11px;\n  border-top-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-top::after, .popover.bs-tether-element-attached-bottom::after {\n  bottom: -10px;\n  margin-left: -10px;\n  border-top-color: #fff;\n}\n\n.popover.popover-right, .popover.bs-tether-element-attached-left {\n  margin-left: 10px;\n}\n\n.popover.popover-right::before, .popover.popover-right::after, .popover.bs-tether-element-attached-left::before, .popover.bs-tether-element-attached-left::after {\n  top: 50%;\n  border-left-width: 0;\n}\n\n.popover.popover-right::before, .popover.bs-tether-element-attached-left::before {\n  left: -11px;\n  margin-top: -11px;\n  border-right-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-right::after, .popover.bs-tether-element-attached-left::after {\n  left: -10px;\n  margin-top: -10px;\n  border-right-color: #fff;\n}\n\n.popover.popover-bottom, .popover.bs-tether-element-attached-top {\n  margin-top: 10px;\n}\n\n.popover.popover-bottom::before, .popover.popover-bottom::after, .popover.bs-tether-element-attached-top::before, .popover.bs-tether-element-attached-top::after {\n  left: 50%;\n  border-top-width: 0;\n}\n\n.popover.popover-bottom::before, .popover.bs-tether-element-attached-top::before {\n  top: -11px;\n  margin-left: -11px;\n  border-bottom-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-bottom::after, .popover.bs-tether-element-attached-top::after {\n  top: -10px;\n  margin-left: -10px;\n  border-bottom-color: #f7f7f7;\n}\n\n.popover.popover-bottom .popover-title::before, .popover.bs-tether-element-attached-top .popover-title::before {\n  position: absolute;\n  top: 0;\n  left: 50%;\n  display: block;\n  width: 20px;\n  margin-left: -10px;\n  content: \"\";\n  border-bottom: 1px solid #f7f7f7;\n}\n\n.popover.popover-left, .popover.bs-tether-element-attached-right {\n  margin-left: -10px;\n}\n\n.popover.popover-left::before, .popover.popover-left::after, .popover.bs-tether-element-attached-right::before, .popover.bs-tether-element-attached-right::after {\n  top: 50%;\n  border-right-width: 0;\n}\n\n.popover.popover-left::before, .popover.bs-tether-element-attached-right::before {\n  right: -11px;\n  margin-top: -11px;\n  border-left-color: rgba(0, 0, 0, 0.25);\n}\n\n.popover.popover-left::after, .popover.bs-tether-element-attached-right::after {\n  right: -10px;\n  margin-top: -10px;\n  border-left-color: #fff;\n}\n\n.popover-title {\n  padding: 8px 14px;\n  margin-bottom: 0;\n  font-size: 1rem;\n  background-color: #f7f7f7;\n  border-bottom: 1px solid #ebebeb;\n  border-top-right-radius: calc(0.3rem - 1px);\n  border-top-left-radius: calc(0.3rem - 1px);\n}\n\n.popover-title:empty {\n  display: none;\n}\n\n.popover-content {\n  padding: 9px 14px;\n}\n\n.popover::before,\n.popover::after {\n  position: absolute;\n  display: block;\n  width: 0;\n  height: 0;\n  border-color: transparent;\n  border-style: solid;\n}\n\n.popover::before {\n  content: \"\";\n  border-width: 11px;\n}\n\n.popover::after {\n  content: \"\";\n  border-width: 10px;\n}\n\n.carousel {\n  position: relative;\n}\n\n.carousel-inner {\n  position: relative;\n  width: 100%;\n  overflow: hidden;\n}\n\n.carousel-item {\n  position: relative;\n  display: none;\n  width: 100%;\n}\n\n@media (-webkit-transform-3d) {\n  .carousel-item {\n    -webkit-transition: -webkit-transform 0.6s ease-in-out;\n    transition: -webkit-transform 0.6s ease-in-out;\n    -o-transition: -o-transform 0.6s ease-in-out;\n    transition: transform 0.6s ease-in-out;\n    transition: transform 0.6s ease-in-out, -webkit-transform 0.6s ease-in-out, -o-transform 0.6s ease-in-out;\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n}\n\n@supports ((-webkit-transform: translate3d(0, 0, 0)) or (transform: translate3d(0, 0, 0))) {\n  .carousel-item {\n    -webkit-transition: -webkit-transform 0.6s ease-in-out;\n    transition: -webkit-transform 0.6s ease-in-out;\n    -o-transition: -o-transform 0.6s ease-in-out;\n    transition: transform 0.6s ease-in-out;\n    transition: transform 0.6s ease-in-out, -webkit-transform 0.6s ease-in-out, -o-transform 0.6s ease-in-out;\n    -webkit-backface-visibility: hidden;\n            backface-visibility: hidden;\n    -webkit-perspective: 1000px;\n            perspective: 1000px;\n  }\n}\n\n.carousel-item.active,\n.carousel-item-next,\n.carousel-item-prev {\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n}\n\n.carousel-item-next,\n.carousel-item-prev {\n  position: absolute;\n  top: 0;\n}\n\n@media (-webkit-transform-3d) {\n  .carousel-item-next.carousel-item-left,\n  .carousel-item-prev.carousel-item-right {\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n  .carousel-item-next,\n  .active.carousel-item-right {\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-item-prev,\n  .active.carousel-item-left {\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n}\n\n@supports ((-webkit-transform: translate3d(0, 0, 0)) or (transform: translate3d(0, 0, 0))) {\n  .carousel-item-next.carousel-item-left,\n  .carousel-item-prev.carousel-item-right {\n    -webkit-transform: translate3d(0, 0, 0);\n            transform: translate3d(0, 0, 0);\n  }\n  .carousel-item-next,\n  .active.carousel-item-right {\n    -webkit-transform: translate3d(100%, 0, 0);\n            transform: translate3d(100%, 0, 0);\n  }\n  .carousel-item-prev,\n  .active.carousel-item-left {\n    -webkit-transform: translate3d(-100%, 0, 0);\n            transform: translate3d(-100%, 0, 0);\n  }\n}\n\n.carousel-control-prev,\n.carousel-control-next {\n  position: absolute;\n  top: 0;\n  bottom: 0;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-align: center;\n  -webkit-align-items: center;\n      -ms-flex-align: center;\n          align-items: center;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  width: 15%;\n  color: #fff;\n  text-align: center;\n  opacity: 0.5;\n}\n\n.carousel-control-prev:focus, .carousel-control-prev:hover,\n.carousel-control-next:focus,\n.carousel-control-next:hover {\n  color: #fff;\n  text-decoration: none;\n  outline: 0;\n  opacity: .9;\n}\n\n.carousel-control-prev {\n  left: 0;\n}\n\n.carousel-control-next {\n  right: 0;\n}\n\n.carousel-control-prev-icon,\n.carousel-control-next-icon {\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  background: transparent no-repeat center center;\n  -webkit-background-size: 100% 100%;\n          background-size: 100% 100%;\n}\n\n.carousel-control-prev-icon {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M4 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E\");\n}\n\n.carousel-control-next-icon {\n  background-image: url(\"data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E\");\n}\n\n.carousel-indicators {\n  position: absolute;\n  right: 0;\n  bottom: 10px;\n  left: 0;\n  z-index: 15;\n  display: -webkit-box;\n  display: -webkit-flex;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-pack: center;\n  -webkit-justify-content: center;\n      -ms-flex-pack: center;\n          justify-content: center;\n  padding-left: 0;\n  margin-right: 15%;\n  margin-left: 15%;\n  list-style: none;\n}\n\n.carousel-indicators li {\n  position: relative;\n  -webkit-box-flex: 1;\n  -webkit-flex: 1 0 auto;\n      -ms-flex: 1 0 auto;\n          flex: 1 0 auto;\n  max-width: 30px;\n  height: 3px;\n  margin-right: 3px;\n  margin-left: 3px;\n  text-indent: -999px;\n  cursor: pointer;\n  background-color: rgba(255, 255, 255, 0.5);\n}\n\n.carousel-indicators li::before {\n  position: absolute;\n  top: -10px;\n  left: 0;\n  display: inline-block;\n  width: 100%;\n  height: 10px;\n  content: \"\";\n}\n\n.carousel-indicators li::after {\n  position: absolute;\n  bottom: -10px;\n  left: 0;\n  display: inline-block;\n  width: 100%;\n  height: 10px;\n  content: \"\";\n}\n\n.carousel-indicators .active {\n  background-color: #fff;\n}\n\n.carousel-caption {\n  position: absolute;\n  right: 15%;\n  bottom: 20px;\n  left: 15%;\n  z-index: 10;\n  padding-top: 20px;\n  padding-bottom: 20px;\n  color: #fff;\n  text-align: center;\n}\n\n.align-baseline {\n  vertical-align: baseline !important;\n}\n\n.align-top {\n  vertical-align: top !important;\n}\n\n.align-middle {\n  vertical-align: middle !important;\n}\n\n.align-bottom {\n  vertical-align: bottom !important;\n}\n\n.align-text-bottom {\n  vertical-align: text-bottom !important;\n}\n\n.align-text-top {\n  vertical-align: text-top !important;\n}\n\n.bg-faded {\n  background-color: #f7f7f7;\n}\n\n.bg-primary {\n  background-color: #0275d8 !important;\n}\n\na.bg-primary:focus, a.bg-primary:hover {\n  background-color: #025aa5 !important;\n}\n\n.bg-success {\n  background-color: #5cb85c !important;\n}\n\na.bg-success:focus, a.bg-success:hover {\n  background-color: #449d44 !important;\n}\n\n.bg-info {\n  background-color: #5bc0de !important;\n}\n\na.bg-info:focus, a.bg-info:hover {\n  background-color: #31b0d5 !important;\n}\n\n.bg-warning {\n  background-color: #f0ad4e !important;\n}\n\na.bg-warning:focus, a.bg-warning:hover {\n  background-color: #ec971f !important;\n}\n\n.bg-danger {\n  background-color: #d9534f !important;\n}\n\na.bg-danger:focus, a.bg-danger:hover {\n  background-color: #c9302c !important;\n}\n\n.bg-inverse {\n  background-color: #292b2c !important;\n}\n\na.bg-inverse:focus, a.bg-inverse:hover {\n  background-color: #101112 !important;\n}\n\n.border-0 {\n  border: 0 !important;\n}\n\n.border-top-0 {\n  border-top: 0 !important;\n}\n\n.border-right-0 {\n  border-right: 0 !important;\n}\n\n.border-bottom-0 {\n  border-bottom: 0 !important;\n}\n\n.border-left-0 {\n  border-left: 0 !important;\n}\n\n.rounded {\n  border-radius: 0.25rem;\n}\n\n.rounded-top {\n  border-top-right-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.rounded-right {\n  border-bottom-right-radius: 0.25rem;\n  border-top-right-radius: 0.25rem;\n}\n\n.rounded-bottom {\n  border-bottom-right-radius: 0.25rem;\n  border-bottom-left-radius: 0.25rem;\n}\n\n.rounded-left {\n  border-bottom-left-radius: 0.25rem;\n  border-top-left-radius: 0.25rem;\n}\n\n.rounded-circle {\n  border-radius: 50%;\n}\n\n.rounded-0 {\n  border-radius: 0;\n}\n\n.clearfix::after {\n  display: block;\n  content: \"\";\n  clear: both;\n}\n\n.d-none {\n  display: none !important;\n}\n\n.d-inline {\n  display: inline !important;\n}\n\n.d-inline-block {\n  display: inline-block !important;\n}\n\n.d-block {\n  display: block !important;\n}\n\n.d-table {\n  display: table !important;\n}\n\n.d-table-cell {\n  display: table-cell !important;\n}\n\n.d-flex {\n  display: -webkit-box !important;\n  display: -webkit-flex !important;\n  display: -ms-flexbox !important;\n  display: flex !important;\n}\n\n.d-inline-flex {\n  display: -webkit-inline-box !important;\n  display: -webkit-inline-flex !important;\n  display: -ms-inline-flexbox !important;\n  display: inline-flex !important;\n}\n\n@media (min-width: 576px) {\n  .d-sm-none {\n    display: none !important;\n  }\n  .d-sm-inline {\n    display: inline !important;\n  }\n  .d-sm-inline-block {\n    display: inline-block !important;\n  }\n  .d-sm-block {\n    display: block !important;\n  }\n  .d-sm-table {\n    display: table !important;\n  }\n  .d-sm-table-cell {\n    display: table-cell !important;\n  }\n  .d-sm-flex {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n  }\n  .d-sm-inline-flex {\n    display: -webkit-inline-box !important;\n    display: -webkit-inline-flex !important;\n    display: -ms-inline-flexbox !important;\n    display: inline-flex !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .d-md-none {\n    display: none !important;\n  }\n  .d-md-inline {\n    display: inline !important;\n  }\n  .d-md-inline-block {\n    display: inline-block !important;\n  }\n  .d-md-block {\n    display: block !important;\n  }\n  .d-md-table {\n    display: table !important;\n  }\n  .d-md-table-cell {\n    display: table-cell !important;\n  }\n  .d-md-flex {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n  }\n  .d-md-inline-flex {\n    display: -webkit-inline-box !important;\n    display: -webkit-inline-flex !important;\n    display: -ms-inline-flexbox !important;\n    display: inline-flex !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .d-lg-none {\n    display: none !important;\n  }\n  .d-lg-inline {\n    display: inline !important;\n  }\n  .d-lg-inline-block {\n    display: inline-block !important;\n  }\n  .d-lg-block {\n    display: block !important;\n  }\n  .d-lg-table {\n    display: table !important;\n  }\n  .d-lg-table-cell {\n    display: table-cell !important;\n  }\n  .d-lg-flex {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n  }\n  .d-lg-inline-flex {\n    display: -webkit-inline-box !important;\n    display: -webkit-inline-flex !important;\n    display: -ms-inline-flexbox !important;\n    display: inline-flex !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .d-xl-none {\n    display: none !important;\n  }\n  .d-xl-inline {\n    display: inline !important;\n  }\n  .d-xl-inline-block {\n    display: inline-block !important;\n  }\n  .d-xl-block {\n    display: block !important;\n  }\n  .d-xl-table {\n    display: table !important;\n  }\n  .d-xl-table-cell {\n    display: table-cell !important;\n  }\n  .d-xl-flex {\n    display: -webkit-box !important;\n    display: -webkit-flex !important;\n    display: -ms-flexbox !important;\n    display: flex !important;\n  }\n  .d-xl-inline-flex {\n    display: -webkit-inline-box !important;\n    display: -webkit-inline-flex !important;\n    display: -ms-inline-flexbox !important;\n    display: inline-flex !important;\n  }\n}\n\n.flex-first {\n  -webkit-box-ordinal-group: 0;\n  -webkit-order: -1;\n      -ms-flex-order: -1;\n          order: -1;\n}\n\n.flex-last {\n  -webkit-box-ordinal-group: 2;\n  -webkit-order: 1;\n      -ms-flex-order: 1;\n          order: 1;\n}\n\n.flex-unordered {\n  -webkit-box-ordinal-group: 1;\n  -webkit-order: 0;\n      -ms-flex-order: 0;\n          order: 0;\n}\n\n.flex-row {\n  -webkit-box-orient: horizontal !important;\n  -webkit-box-direction: normal !important;\n  -webkit-flex-direction: row !important;\n      -ms-flex-direction: row !important;\n          flex-direction: row !important;\n}\n\n.flex-column {\n  -webkit-box-orient: vertical !important;\n  -webkit-box-direction: normal !important;\n  -webkit-flex-direction: column !important;\n      -ms-flex-direction: column !important;\n          flex-direction: column !important;\n}\n\n.flex-row-reverse {\n  -webkit-box-orient: horizontal !important;\n  -webkit-box-direction: reverse !important;\n  -webkit-flex-direction: row-reverse !important;\n      -ms-flex-direction: row-reverse !important;\n          flex-direction: row-reverse !important;\n}\n\n.flex-column-reverse {\n  -webkit-box-orient: vertical !important;\n  -webkit-box-direction: reverse !important;\n  -webkit-flex-direction: column-reverse !important;\n      -ms-flex-direction: column-reverse !important;\n          flex-direction: column-reverse !important;\n}\n\n.flex-wrap {\n  -webkit-flex-wrap: wrap !important;\n      -ms-flex-wrap: wrap !important;\n          flex-wrap: wrap !important;\n}\n\n.flex-nowrap {\n  -webkit-flex-wrap: nowrap !important;\n      -ms-flex-wrap: nowrap !important;\n          flex-wrap: nowrap !important;\n}\n\n.flex-wrap-reverse {\n  -webkit-flex-wrap: wrap-reverse !important;\n      -ms-flex-wrap: wrap-reverse !important;\n          flex-wrap: wrap-reverse !important;\n}\n\n.justify-content-start {\n  -webkit-box-pack: start !important;\n  -webkit-justify-content: flex-start !important;\n      -ms-flex-pack: start !important;\n          justify-content: flex-start !important;\n}\n\n.justify-content-end {\n  -webkit-box-pack: end !important;\n  -webkit-justify-content: flex-end !important;\n      -ms-flex-pack: end !important;\n          justify-content: flex-end !important;\n}\n\n.justify-content-center {\n  -webkit-box-pack: center !important;\n  -webkit-justify-content: center !important;\n      -ms-flex-pack: center !important;\n          justify-content: center !important;\n}\n\n.justify-content-between {\n  -webkit-box-pack: justify !important;\n  -webkit-justify-content: space-between !important;\n      -ms-flex-pack: justify !important;\n          justify-content: space-between !important;\n}\n\n.justify-content-around {\n  -webkit-justify-content: space-around !important;\n      -ms-flex-pack: distribute !important;\n          justify-content: space-around !important;\n}\n\n.align-items-start {\n  -webkit-box-align: start !important;\n  -webkit-align-items: flex-start !important;\n      -ms-flex-align: start !important;\n          align-items: flex-start !important;\n}\n\n.align-items-end {\n  -webkit-box-align: end !important;\n  -webkit-align-items: flex-end !important;\n      -ms-flex-align: end !important;\n          align-items: flex-end !important;\n}\n\n.align-items-center {\n  -webkit-box-align: center !important;\n  -webkit-align-items: center !important;\n      -ms-flex-align: center !important;\n          align-items: center !important;\n}\n\n.align-items-baseline {\n  -webkit-box-align: baseline !important;\n  -webkit-align-items: baseline !important;\n      -ms-flex-align: baseline !important;\n          align-items: baseline !important;\n}\n\n.align-items-stretch {\n  -webkit-box-align: stretch !important;\n  -webkit-align-items: stretch !important;\n      -ms-flex-align: stretch !important;\n          align-items: stretch !important;\n}\n\n.align-content-start {\n  -webkit-align-content: flex-start !important;\n      -ms-flex-line-pack: start !important;\n          align-content: flex-start !important;\n}\n\n.align-content-end {\n  -webkit-align-content: flex-end !important;\n      -ms-flex-line-pack: end !important;\n          align-content: flex-end !important;\n}\n\n.align-content-center {\n  -webkit-align-content: center !important;\n      -ms-flex-line-pack: center !important;\n          align-content: center !important;\n}\n\n.align-content-between {\n  -webkit-align-content: space-between !important;\n      -ms-flex-line-pack: justify !important;\n          align-content: space-between !important;\n}\n\n.align-content-around {\n  -webkit-align-content: space-around !important;\n      -ms-flex-line-pack: distribute !important;\n          align-content: space-around !important;\n}\n\n.align-content-stretch {\n  -webkit-align-content: stretch !important;\n      -ms-flex-line-pack: stretch !important;\n          align-content: stretch !important;\n}\n\n.align-self-auto {\n  -webkit-align-self: auto !important;\n      -ms-flex-item-align: auto !important;\n              -ms-grid-row-align: auto !important;\n          align-self: auto !important;\n}\n\n.align-self-start {\n  -webkit-align-self: flex-start !important;\n      -ms-flex-item-align: start !important;\n          align-self: flex-start !important;\n}\n\n.align-self-end {\n  -webkit-align-self: flex-end !important;\n      -ms-flex-item-align: end !important;\n          align-self: flex-end !important;\n}\n\n.align-self-center {\n  -webkit-align-self: center !important;\n      -ms-flex-item-align: center !important;\n              -ms-grid-row-align: center !important;\n          align-self: center !important;\n}\n\n.align-self-baseline {\n  -webkit-align-self: baseline !important;\n      -ms-flex-item-align: baseline !important;\n          align-self: baseline !important;\n}\n\n.align-self-stretch {\n  -webkit-align-self: stretch !important;\n      -ms-flex-item-align: stretch !important;\n              -ms-grid-row-align: stretch !important;\n          align-self: stretch !important;\n}\n\n@media (min-width: 576px) {\n  .flex-sm-first {\n    -webkit-box-ordinal-group: 0;\n    -webkit-order: -1;\n        -ms-flex-order: -1;\n            order: -1;\n  }\n  .flex-sm-last {\n    -webkit-box-ordinal-group: 2;\n    -webkit-order: 1;\n        -ms-flex-order: 1;\n            order: 1;\n  }\n  .flex-sm-unordered {\n    -webkit-box-ordinal-group: 1;\n    -webkit-order: 0;\n        -ms-flex-order: 0;\n            order: 0;\n  }\n  .flex-sm-row {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: row !important;\n        -ms-flex-direction: row !important;\n            flex-direction: row !important;\n  }\n  .flex-sm-column {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: column !important;\n        -ms-flex-direction: column !important;\n            flex-direction: column !important;\n  }\n  .flex-sm-row-reverse {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: row-reverse !important;\n        -ms-flex-direction: row-reverse !important;\n            flex-direction: row-reverse !important;\n  }\n  .flex-sm-column-reverse {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: column-reverse !important;\n        -ms-flex-direction: column-reverse !important;\n            flex-direction: column-reverse !important;\n  }\n  .flex-sm-wrap {\n    -webkit-flex-wrap: wrap !important;\n        -ms-flex-wrap: wrap !important;\n            flex-wrap: wrap !important;\n  }\n  .flex-sm-nowrap {\n    -webkit-flex-wrap: nowrap !important;\n        -ms-flex-wrap: nowrap !important;\n            flex-wrap: nowrap !important;\n  }\n  .flex-sm-wrap-reverse {\n    -webkit-flex-wrap: wrap-reverse !important;\n        -ms-flex-wrap: wrap-reverse !important;\n            flex-wrap: wrap-reverse !important;\n  }\n  .justify-content-sm-start {\n    -webkit-box-pack: start !important;\n    -webkit-justify-content: flex-start !important;\n        -ms-flex-pack: start !important;\n            justify-content: flex-start !important;\n  }\n  .justify-content-sm-end {\n    -webkit-box-pack: end !important;\n    -webkit-justify-content: flex-end !important;\n        -ms-flex-pack: end !important;\n            justify-content: flex-end !important;\n  }\n  .justify-content-sm-center {\n    -webkit-box-pack: center !important;\n    -webkit-justify-content: center !important;\n        -ms-flex-pack: center !important;\n            justify-content: center !important;\n  }\n  .justify-content-sm-between {\n    -webkit-box-pack: justify !important;\n    -webkit-justify-content: space-between !important;\n        -ms-flex-pack: justify !important;\n            justify-content: space-between !important;\n  }\n  .justify-content-sm-around {\n    -webkit-justify-content: space-around !important;\n        -ms-flex-pack: distribute !important;\n            justify-content: space-around !important;\n  }\n  .align-items-sm-start {\n    -webkit-box-align: start !important;\n    -webkit-align-items: flex-start !important;\n        -ms-flex-align: start !important;\n            align-items: flex-start !important;\n  }\n  .align-items-sm-end {\n    -webkit-box-align: end !important;\n    -webkit-align-items: flex-end !important;\n        -ms-flex-align: end !important;\n            align-items: flex-end !important;\n  }\n  .align-items-sm-center {\n    -webkit-box-align: center !important;\n    -webkit-align-items: center !important;\n        -ms-flex-align: center !important;\n            align-items: center !important;\n  }\n  .align-items-sm-baseline {\n    -webkit-box-align: baseline !important;\n    -webkit-align-items: baseline !important;\n        -ms-flex-align: baseline !important;\n            align-items: baseline !important;\n  }\n  .align-items-sm-stretch {\n    -webkit-box-align: stretch !important;\n    -webkit-align-items: stretch !important;\n        -ms-flex-align: stretch !important;\n            align-items: stretch !important;\n  }\n  .align-content-sm-start {\n    -webkit-align-content: flex-start !important;\n        -ms-flex-line-pack: start !important;\n            align-content: flex-start !important;\n  }\n  .align-content-sm-end {\n    -webkit-align-content: flex-end !important;\n        -ms-flex-line-pack: end !important;\n            align-content: flex-end !important;\n  }\n  .align-content-sm-center {\n    -webkit-align-content: center !important;\n        -ms-flex-line-pack: center !important;\n            align-content: center !important;\n  }\n  .align-content-sm-between {\n    -webkit-align-content: space-between !important;\n        -ms-flex-line-pack: justify !important;\n            align-content: space-between !important;\n  }\n  .align-content-sm-around {\n    -webkit-align-content: space-around !important;\n        -ms-flex-line-pack: distribute !important;\n            align-content: space-around !important;\n  }\n  .align-content-sm-stretch {\n    -webkit-align-content: stretch !important;\n        -ms-flex-line-pack: stretch !important;\n            align-content: stretch !important;\n  }\n  .align-self-sm-auto {\n    -webkit-align-self: auto !important;\n        -ms-flex-item-align: auto !important;\n                -ms-grid-row-align: auto !important;\n            align-self: auto !important;\n  }\n  .align-self-sm-start {\n    -webkit-align-self: flex-start !important;\n        -ms-flex-item-align: start !important;\n            align-self: flex-start !important;\n  }\n  .align-self-sm-end {\n    -webkit-align-self: flex-end !important;\n        -ms-flex-item-align: end !important;\n            align-self: flex-end !important;\n  }\n  .align-self-sm-center {\n    -webkit-align-self: center !important;\n        -ms-flex-item-align: center !important;\n                -ms-grid-row-align: center !important;\n            align-self: center !important;\n  }\n  .align-self-sm-baseline {\n    -webkit-align-self: baseline !important;\n        -ms-flex-item-align: baseline !important;\n            align-self: baseline !important;\n  }\n  .align-self-sm-stretch {\n    -webkit-align-self: stretch !important;\n        -ms-flex-item-align: stretch !important;\n                -ms-grid-row-align: stretch !important;\n            align-self: stretch !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .flex-md-first {\n    -webkit-box-ordinal-group: 0;\n    -webkit-order: -1;\n        -ms-flex-order: -1;\n            order: -1;\n  }\n  .flex-md-last {\n    -webkit-box-ordinal-group: 2;\n    -webkit-order: 1;\n        -ms-flex-order: 1;\n            order: 1;\n  }\n  .flex-md-unordered {\n    -webkit-box-ordinal-group: 1;\n    -webkit-order: 0;\n        -ms-flex-order: 0;\n            order: 0;\n  }\n  .flex-md-row {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: row !important;\n        -ms-flex-direction: row !important;\n            flex-direction: row !important;\n  }\n  .flex-md-column {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: column !important;\n        -ms-flex-direction: column !important;\n            flex-direction: column !important;\n  }\n  .flex-md-row-reverse {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: row-reverse !important;\n        -ms-flex-direction: row-reverse !important;\n            flex-direction: row-reverse !important;\n  }\n  .flex-md-column-reverse {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: column-reverse !important;\n        -ms-flex-direction: column-reverse !important;\n            flex-direction: column-reverse !important;\n  }\n  .flex-md-wrap {\n    -webkit-flex-wrap: wrap !important;\n        -ms-flex-wrap: wrap !important;\n            flex-wrap: wrap !important;\n  }\n  .flex-md-nowrap {\n    -webkit-flex-wrap: nowrap !important;\n        -ms-flex-wrap: nowrap !important;\n            flex-wrap: nowrap !important;\n  }\n  .flex-md-wrap-reverse {\n    -webkit-flex-wrap: wrap-reverse !important;\n        -ms-flex-wrap: wrap-reverse !important;\n            flex-wrap: wrap-reverse !important;\n  }\n  .justify-content-md-start {\n    -webkit-box-pack: start !important;\n    -webkit-justify-content: flex-start !important;\n        -ms-flex-pack: start !important;\n            justify-content: flex-start !important;\n  }\n  .justify-content-md-end {\n    -webkit-box-pack: end !important;\n    -webkit-justify-content: flex-end !important;\n        -ms-flex-pack: end !important;\n            justify-content: flex-end !important;\n  }\n  .justify-content-md-center {\n    -webkit-box-pack: center !important;\n    -webkit-justify-content: center !important;\n        -ms-flex-pack: center !important;\n            justify-content: center !important;\n  }\n  .justify-content-md-between {\n    -webkit-box-pack: justify !important;\n    -webkit-justify-content: space-between !important;\n        -ms-flex-pack: justify !important;\n            justify-content: space-between !important;\n  }\n  .justify-content-md-around {\n    -webkit-justify-content: space-around !important;\n        -ms-flex-pack: distribute !important;\n            justify-content: space-around !important;\n  }\n  .align-items-md-start {\n    -webkit-box-align: start !important;\n    -webkit-align-items: flex-start !important;\n        -ms-flex-align: start !important;\n            align-items: flex-start !important;\n  }\n  .align-items-md-end {\n    -webkit-box-align: end !important;\n    -webkit-align-items: flex-end !important;\n        -ms-flex-align: end !important;\n            align-items: flex-end !important;\n  }\n  .align-items-md-center {\n    -webkit-box-align: center !important;\n    -webkit-align-items: center !important;\n        -ms-flex-align: center !important;\n            align-items: center !important;\n  }\n  .align-items-md-baseline {\n    -webkit-box-align: baseline !important;\n    -webkit-align-items: baseline !important;\n        -ms-flex-align: baseline !important;\n            align-items: baseline !important;\n  }\n  .align-items-md-stretch {\n    -webkit-box-align: stretch !important;\n    -webkit-align-items: stretch !important;\n        -ms-flex-align: stretch !important;\n            align-items: stretch !important;\n  }\n  .align-content-md-start {\n    -webkit-align-content: flex-start !important;\n        -ms-flex-line-pack: start !important;\n            align-content: flex-start !important;\n  }\n  .align-content-md-end {\n    -webkit-align-content: flex-end !important;\n        -ms-flex-line-pack: end !important;\n            align-content: flex-end !important;\n  }\n  .align-content-md-center {\n    -webkit-align-content: center !important;\n        -ms-flex-line-pack: center !important;\n            align-content: center !important;\n  }\n  .align-content-md-between {\n    -webkit-align-content: space-between !important;\n        -ms-flex-line-pack: justify !important;\n            align-content: space-between !important;\n  }\n  .align-content-md-around {\n    -webkit-align-content: space-around !important;\n        -ms-flex-line-pack: distribute !important;\n            align-content: space-around !important;\n  }\n  .align-content-md-stretch {\n    -webkit-align-content: stretch !important;\n        -ms-flex-line-pack: stretch !important;\n            align-content: stretch !important;\n  }\n  .align-self-md-auto {\n    -webkit-align-self: auto !important;\n        -ms-flex-item-align: auto !important;\n                -ms-grid-row-align: auto !important;\n            align-self: auto !important;\n  }\n  .align-self-md-start {\n    -webkit-align-self: flex-start !important;\n        -ms-flex-item-align: start !important;\n            align-self: flex-start !important;\n  }\n  .align-self-md-end {\n    -webkit-align-self: flex-end !important;\n        -ms-flex-item-align: end !important;\n            align-self: flex-end !important;\n  }\n  .align-self-md-center {\n    -webkit-align-self: center !important;\n        -ms-flex-item-align: center !important;\n                -ms-grid-row-align: center !important;\n            align-self: center !important;\n  }\n  .align-self-md-baseline {\n    -webkit-align-self: baseline !important;\n        -ms-flex-item-align: baseline !important;\n            align-self: baseline !important;\n  }\n  .align-self-md-stretch {\n    -webkit-align-self: stretch !important;\n        -ms-flex-item-align: stretch !important;\n                -ms-grid-row-align: stretch !important;\n            align-self: stretch !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .flex-lg-first {\n    -webkit-box-ordinal-group: 0;\n    -webkit-order: -1;\n        -ms-flex-order: -1;\n            order: -1;\n  }\n  .flex-lg-last {\n    -webkit-box-ordinal-group: 2;\n    -webkit-order: 1;\n        -ms-flex-order: 1;\n            order: 1;\n  }\n  .flex-lg-unordered {\n    -webkit-box-ordinal-group: 1;\n    -webkit-order: 0;\n        -ms-flex-order: 0;\n            order: 0;\n  }\n  .flex-lg-row {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: row !important;\n        -ms-flex-direction: row !important;\n            flex-direction: row !important;\n  }\n  .flex-lg-column {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: column !important;\n        -ms-flex-direction: column !important;\n            flex-direction: column !important;\n  }\n  .flex-lg-row-reverse {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: row-reverse !important;\n        -ms-flex-direction: row-reverse !important;\n            flex-direction: row-reverse !important;\n  }\n  .flex-lg-column-reverse {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: column-reverse !important;\n        -ms-flex-direction: column-reverse !important;\n            flex-direction: column-reverse !important;\n  }\n  .flex-lg-wrap {\n    -webkit-flex-wrap: wrap !important;\n        -ms-flex-wrap: wrap !important;\n            flex-wrap: wrap !important;\n  }\n  .flex-lg-nowrap {\n    -webkit-flex-wrap: nowrap !important;\n        -ms-flex-wrap: nowrap !important;\n            flex-wrap: nowrap !important;\n  }\n  .flex-lg-wrap-reverse {\n    -webkit-flex-wrap: wrap-reverse !important;\n        -ms-flex-wrap: wrap-reverse !important;\n            flex-wrap: wrap-reverse !important;\n  }\n  .justify-content-lg-start {\n    -webkit-box-pack: start !important;\n    -webkit-justify-content: flex-start !important;\n        -ms-flex-pack: start !important;\n            justify-content: flex-start !important;\n  }\n  .justify-content-lg-end {\n    -webkit-box-pack: end !important;\n    -webkit-justify-content: flex-end !important;\n        -ms-flex-pack: end !important;\n            justify-content: flex-end !important;\n  }\n  .justify-content-lg-center {\n    -webkit-box-pack: center !important;\n    -webkit-justify-content: center !important;\n        -ms-flex-pack: center !important;\n            justify-content: center !important;\n  }\n  .justify-content-lg-between {\n    -webkit-box-pack: justify !important;\n    -webkit-justify-content: space-between !important;\n        -ms-flex-pack: justify !important;\n            justify-content: space-between !important;\n  }\n  .justify-content-lg-around {\n    -webkit-justify-content: space-around !important;\n        -ms-flex-pack: distribute !important;\n            justify-content: space-around !important;\n  }\n  .align-items-lg-start {\n    -webkit-box-align: start !important;\n    -webkit-align-items: flex-start !important;\n        -ms-flex-align: start !important;\n            align-items: flex-start !important;\n  }\n  .align-items-lg-end {\n    -webkit-box-align: end !important;\n    -webkit-align-items: flex-end !important;\n        -ms-flex-align: end !important;\n            align-items: flex-end !important;\n  }\n  .align-items-lg-center {\n    -webkit-box-align: center !important;\n    -webkit-align-items: center !important;\n        -ms-flex-align: center !important;\n            align-items: center !important;\n  }\n  .align-items-lg-baseline {\n    -webkit-box-align: baseline !important;\n    -webkit-align-items: baseline !important;\n        -ms-flex-align: baseline !important;\n            align-items: baseline !important;\n  }\n  .align-items-lg-stretch {\n    -webkit-box-align: stretch !important;\n    -webkit-align-items: stretch !important;\n        -ms-flex-align: stretch !important;\n            align-items: stretch !important;\n  }\n  .align-content-lg-start {\n    -webkit-align-content: flex-start !important;\n        -ms-flex-line-pack: start !important;\n            align-content: flex-start !important;\n  }\n  .align-content-lg-end {\n    -webkit-align-content: flex-end !important;\n        -ms-flex-line-pack: end !important;\n            align-content: flex-end !important;\n  }\n  .align-content-lg-center {\n    -webkit-align-content: center !important;\n        -ms-flex-line-pack: center !important;\n            align-content: center !important;\n  }\n  .align-content-lg-between {\n    -webkit-align-content: space-between !important;\n        -ms-flex-line-pack: justify !important;\n            align-content: space-between !important;\n  }\n  .align-content-lg-around {\n    -webkit-align-content: space-around !important;\n        -ms-flex-line-pack: distribute !important;\n            align-content: space-around !important;\n  }\n  .align-content-lg-stretch {\n    -webkit-align-content: stretch !important;\n        -ms-flex-line-pack: stretch !important;\n            align-content: stretch !important;\n  }\n  .align-self-lg-auto {\n    -webkit-align-self: auto !important;\n        -ms-flex-item-align: auto !important;\n                -ms-grid-row-align: auto !important;\n            align-self: auto !important;\n  }\n  .align-self-lg-start {\n    -webkit-align-self: flex-start !important;\n        -ms-flex-item-align: start !important;\n            align-self: flex-start !important;\n  }\n  .align-self-lg-end {\n    -webkit-align-self: flex-end !important;\n        -ms-flex-item-align: end !important;\n            align-self: flex-end !important;\n  }\n  .align-self-lg-center {\n    -webkit-align-self: center !important;\n        -ms-flex-item-align: center !important;\n                -ms-grid-row-align: center !important;\n            align-self: center !important;\n  }\n  .align-self-lg-baseline {\n    -webkit-align-self: baseline !important;\n        -ms-flex-item-align: baseline !important;\n            align-self: baseline !important;\n  }\n  .align-self-lg-stretch {\n    -webkit-align-self: stretch !important;\n        -ms-flex-item-align: stretch !important;\n                -ms-grid-row-align: stretch !important;\n            align-self: stretch !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .flex-xl-first {\n    -webkit-box-ordinal-group: 0;\n    -webkit-order: -1;\n        -ms-flex-order: -1;\n            order: -1;\n  }\n  .flex-xl-last {\n    -webkit-box-ordinal-group: 2;\n    -webkit-order: 1;\n        -ms-flex-order: 1;\n            order: 1;\n  }\n  .flex-xl-unordered {\n    -webkit-box-ordinal-group: 1;\n    -webkit-order: 0;\n        -ms-flex-order: 0;\n            order: 0;\n  }\n  .flex-xl-row {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: row !important;\n        -ms-flex-direction: row !important;\n            flex-direction: row !important;\n  }\n  .flex-xl-column {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: normal !important;\n    -webkit-flex-direction: column !important;\n        -ms-flex-direction: column !important;\n            flex-direction: column !important;\n  }\n  .flex-xl-row-reverse {\n    -webkit-box-orient: horizontal !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: row-reverse !important;\n        -ms-flex-direction: row-reverse !important;\n            flex-direction: row-reverse !important;\n  }\n  .flex-xl-column-reverse {\n    -webkit-box-orient: vertical !important;\n    -webkit-box-direction: reverse !important;\n    -webkit-flex-direction: column-reverse !important;\n        -ms-flex-direction: column-reverse !important;\n            flex-direction: column-reverse !important;\n  }\n  .flex-xl-wrap {\n    -webkit-flex-wrap: wrap !important;\n        -ms-flex-wrap: wrap !important;\n            flex-wrap: wrap !important;\n  }\n  .flex-xl-nowrap {\n    -webkit-flex-wrap: nowrap !important;\n        -ms-flex-wrap: nowrap !important;\n            flex-wrap: nowrap !important;\n  }\n  .flex-xl-wrap-reverse {\n    -webkit-flex-wrap: wrap-reverse !important;\n        -ms-flex-wrap: wrap-reverse !important;\n            flex-wrap: wrap-reverse !important;\n  }\n  .justify-content-xl-start {\n    -webkit-box-pack: start !important;\n    -webkit-justify-content: flex-start !important;\n        -ms-flex-pack: start !important;\n            justify-content: flex-start !important;\n  }\n  .justify-content-xl-end {\n    -webkit-box-pack: end !important;\n    -webkit-justify-content: flex-end !important;\n        -ms-flex-pack: end !important;\n            justify-content: flex-end !important;\n  }\n  .justify-content-xl-center {\n    -webkit-box-pack: center !important;\n    -webkit-justify-content: center !important;\n        -ms-flex-pack: center !important;\n            justify-content: center !important;\n  }\n  .justify-content-xl-between {\n    -webkit-box-pack: justify !important;\n    -webkit-justify-content: space-between !important;\n        -ms-flex-pack: justify !important;\n            justify-content: space-between !important;\n  }\n  .justify-content-xl-around {\n    -webkit-justify-content: space-around !important;\n        -ms-flex-pack: distribute !important;\n            justify-content: space-around !important;\n  }\n  .align-items-xl-start {\n    -webkit-box-align: start !important;\n    -webkit-align-items: flex-start !important;\n        -ms-flex-align: start !important;\n            align-items: flex-start !important;\n  }\n  .align-items-xl-end {\n    -webkit-box-align: end !important;\n    -webkit-align-items: flex-end !important;\n        -ms-flex-align: end !important;\n            align-items: flex-end !important;\n  }\n  .align-items-xl-center {\n    -webkit-box-align: center !important;\n    -webkit-align-items: center !important;\n        -ms-flex-align: center !important;\n            align-items: center !important;\n  }\n  .align-items-xl-baseline {\n    -webkit-box-align: baseline !important;\n    -webkit-align-items: baseline !important;\n        -ms-flex-align: baseline !important;\n            align-items: baseline !important;\n  }\n  .align-items-xl-stretch {\n    -webkit-box-align: stretch !important;\n    -webkit-align-items: stretch !important;\n        -ms-flex-align: stretch !important;\n            align-items: stretch !important;\n  }\n  .align-content-xl-start {\n    -webkit-align-content: flex-start !important;\n        -ms-flex-line-pack: start !important;\n            align-content: flex-start !important;\n  }\n  .align-content-xl-end {\n    -webkit-align-content: flex-end !important;\n        -ms-flex-line-pack: end !important;\n            align-content: flex-end !important;\n  }\n  .align-content-xl-center {\n    -webkit-align-content: center !important;\n        -ms-flex-line-pack: center !important;\n            align-content: center !important;\n  }\n  .align-content-xl-between {\n    -webkit-align-content: space-between !important;\n        -ms-flex-line-pack: justify !important;\n            align-content: space-between !important;\n  }\n  .align-content-xl-around {\n    -webkit-align-content: space-around !important;\n        -ms-flex-line-pack: distribute !important;\n            align-content: space-around !important;\n  }\n  .align-content-xl-stretch {\n    -webkit-align-content: stretch !important;\n        -ms-flex-line-pack: stretch !important;\n            align-content: stretch !important;\n  }\n  .align-self-xl-auto {\n    -webkit-align-self: auto !important;\n        -ms-flex-item-align: auto !important;\n                -ms-grid-row-align: auto !important;\n            align-self: auto !important;\n  }\n  .align-self-xl-start {\n    -webkit-align-self: flex-start !important;\n        -ms-flex-item-align: start !important;\n            align-self: flex-start !important;\n  }\n  .align-self-xl-end {\n    -webkit-align-self: flex-end !important;\n        -ms-flex-item-align: end !important;\n            align-self: flex-end !important;\n  }\n  .align-self-xl-center {\n    -webkit-align-self: center !important;\n        -ms-flex-item-align: center !important;\n                -ms-grid-row-align: center !important;\n            align-self: center !important;\n  }\n  .align-self-xl-baseline {\n    -webkit-align-self: baseline !important;\n        -ms-flex-item-align: baseline !important;\n            align-self: baseline !important;\n  }\n  .align-self-xl-stretch {\n    -webkit-align-self: stretch !important;\n        -ms-flex-item-align: stretch !important;\n                -ms-grid-row-align: stretch !important;\n            align-self: stretch !important;\n  }\n}\n\n.float-left {\n  float: left !important;\n}\n\n.float-right {\n  float: right !important;\n}\n\n.float-none {\n  float: none !important;\n}\n\n@media (min-width: 576px) {\n  .float-sm-left {\n    float: left !important;\n  }\n  .float-sm-right {\n    float: right !important;\n  }\n  .float-sm-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .float-md-left {\n    float: left !important;\n  }\n  .float-md-right {\n    float: right !important;\n  }\n  .float-md-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .float-lg-left {\n    float: left !important;\n  }\n  .float-lg-right {\n    float: right !important;\n  }\n  .float-lg-none {\n    float: none !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .float-xl-left {\n    float: left !important;\n  }\n  .float-xl-right {\n    float: right !important;\n  }\n  .float-xl-none {\n    float: none !important;\n  }\n}\n\n.fixed-top {\n  position: fixed;\n  top: 0;\n  right: 0;\n  left: 0;\n  z-index: 1030;\n}\n\n.fixed-bottom {\n  position: fixed;\n  right: 0;\n  bottom: 0;\n  left: 0;\n  z-index: 1030;\n}\n\n.sticky-top {\n  position: -webkit-sticky;\n  position: sticky;\n  top: 0;\n  z-index: 1030;\n}\n\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n\n.sr-only-focusable:active, .sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n\n.w-25 {\n  width: 25% !important;\n}\n\n.w-50 {\n  width: 50% !important;\n}\n\n.w-75 {\n  width: 75% !important;\n}\n\n.w-100 {\n  width: 100% !important;\n}\n\n.h-25 {\n  height: 25% !important;\n}\n\n.h-50 {\n  height: 50% !important;\n}\n\n.h-75 {\n  height: 75% !important;\n}\n\n.h-100 {\n  height: 100% !important;\n}\n\n.mw-100 {\n  max-width: 100% !important;\n}\n\n.mh-100 {\n  max-height: 100% !important;\n}\n\n.m-0 {\n  margin: 0 0 !important;\n}\n\n.mt-0 {\n  margin-top: 0 !important;\n}\n\n.mr-0 {\n  margin-right: 0 !important;\n}\n\n.mb-0 {\n  margin-bottom: 0 !important;\n}\n\n.ml-0 {\n  margin-left: 0 !important;\n}\n\n.mx-0 {\n  margin-right: 0 !important;\n  margin-left: 0 !important;\n}\n\n.my-0 {\n  margin-top: 0 !important;\n  margin-bottom: 0 !important;\n}\n\n.m-1 {\n  margin: 0.25rem 0.25rem !important;\n}\n\n.mt-1 {\n  margin-top: 0.25rem !important;\n}\n\n.mr-1 {\n  margin-right: 0.25rem !important;\n}\n\n.mb-1 {\n  margin-bottom: 0.25rem !important;\n}\n\n.ml-1 {\n  margin-left: 0.25rem !important;\n}\n\n.mx-1 {\n  margin-right: 0.25rem !important;\n  margin-left: 0.25rem !important;\n}\n\n.my-1 {\n  margin-top: 0.25rem !important;\n  margin-bottom: 0.25rem !important;\n}\n\n.m-2 {\n  margin: 0.5rem 0.5rem !important;\n}\n\n.mt-2 {\n  margin-top: 0.5rem !important;\n}\n\n.mr-2 {\n  margin-right: 0.5rem !important;\n}\n\n.mb-2 {\n  margin-bottom: 0.5rem !important;\n}\n\n.ml-2 {\n  margin-left: 0.5rem !important;\n}\n\n.mx-2 {\n  margin-right: 0.5rem !important;\n  margin-left: 0.5rem !important;\n}\n\n.my-2 {\n  margin-top: 0.5rem !important;\n  margin-bottom: 0.5rem !important;\n}\n\n.m-3 {\n  margin: 1rem 1rem !important;\n}\n\n.mt-3 {\n  margin-top: 1rem !important;\n}\n\n.mr-3 {\n  margin-right: 1rem !important;\n}\n\n.mb-3 {\n  margin-bottom: 1rem !important;\n}\n\n.ml-3 {\n  margin-left: 1rem !important;\n}\n\n.mx-3 {\n  margin-right: 1rem !important;\n  margin-left: 1rem !important;\n}\n\n.my-3 {\n  margin-top: 1rem !important;\n  margin-bottom: 1rem !important;\n}\n\n.m-4 {\n  margin: 1.5rem 1.5rem !important;\n}\n\n.mt-4 {\n  margin-top: 1.5rem !important;\n}\n\n.mr-4 {\n  margin-right: 1.5rem !important;\n}\n\n.mb-4 {\n  margin-bottom: 1.5rem !important;\n}\n\n.ml-4 {\n  margin-left: 1.5rem !important;\n}\n\n.mx-4 {\n  margin-right: 1.5rem !important;\n  margin-left: 1.5rem !important;\n}\n\n.my-4 {\n  margin-top: 1.5rem !important;\n  margin-bottom: 1.5rem !important;\n}\n\n.m-5 {\n  margin: 3rem 3rem !important;\n}\n\n.mt-5 {\n  margin-top: 3rem !important;\n}\n\n.mr-5 {\n  margin-right: 3rem !important;\n}\n\n.mb-5 {\n  margin-bottom: 3rem !important;\n}\n\n.ml-5 {\n  margin-left: 3rem !important;\n}\n\n.mx-5 {\n  margin-right: 3rem !important;\n  margin-left: 3rem !important;\n}\n\n.my-5 {\n  margin-top: 3rem !important;\n  margin-bottom: 3rem !important;\n}\n\n.p-0 {\n  padding: 0 0 !important;\n}\n\n.pt-0 {\n  padding-top: 0 !important;\n}\n\n.pr-0 {\n  padding-right: 0 !important;\n}\n\n.pb-0 {\n  padding-bottom: 0 !important;\n}\n\n.pl-0 {\n  padding-left: 0 !important;\n}\n\n.px-0 {\n  padding-right: 0 !important;\n  padding-left: 0 !important;\n}\n\n.py-0 {\n  padding-top: 0 !important;\n  padding-bottom: 0 !important;\n}\n\n.p-1 {\n  padding: 0.25rem 0.25rem !important;\n}\n\n.pt-1 {\n  padding-top: 0.25rem !important;\n}\n\n.pr-1 {\n  padding-right: 0.25rem !important;\n}\n\n.pb-1 {\n  padding-bottom: 0.25rem !important;\n}\n\n.pl-1 {\n  padding-left: 0.25rem !important;\n}\n\n.px-1 {\n  padding-right: 0.25rem !important;\n  padding-left: 0.25rem !important;\n}\n\n.py-1 {\n  padding-top: 0.25rem !important;\n  padding-bottom: 0.25rem !important;\n}\n\n.p-2 {\n  padding: 0.5rem 0.5rem !important;\n}\n\n.pt-2 {\n  padding-top: 0.5rem !important;\n}\n\n.pr-2 {\n  padding-right: 0.5rem !important;\n}\n\n.pb-2 {\n  padding-bottom: 0.5rem !important;\n}\n\n.pl-2 {\n  padding-left: 0.5rem !important;\n}\n\n.px-2 {\n  padding-right: 0.5rem !important;\n  padding-left: 0.5rem !important;\n}\n\n.py-2 {\n  padding-top: 0.5rem !important;\n  padding-bottom: 0.5rem !important;\n}\n\n.p-3 {\n  padding: 1rem 1rem !important;\n}\n\n.pt-3 {\n  padding-top: 1rem !important;\n}\n\n.pr-3 {\n  padding-right: 1rem !important;\n}\n\n.pb-3 {\n  padding-bottom: 1rem !important;\n}\n\n.pl-3 {\n  padding-left: 1rem !important;\n}\n\n.px-3 {\n  padding-right: 1rem !important;\n  padding-left: 1rem !important;\n}\n\n.py-3 {\n  padding-top: 1rem !important;\n  padding-bottom: 1rem !important;\n}\n\n.p-4 {\n  padding: 1.5rem 1.5rem !important;\n}\n\n.pt-4 {\n  padding-top: 1.5rem !important;\n}\n\n.pr-4 {\n  padding-right: 1.5rem !important;\n}\n\n.pb-4 {\n  padding-bottom: 1.5rem !important;\n}\n\n.pl-4 {\n  padding-left: 1.5rem !important;\n}\n\n.px-4 {\n  padding-right: 1.5rem !important;\n  padding-left: 1.5rem !important;\n}\n\n.py-4 {\n  padding-top: 1.5rem !important;\n  padding-bottom: 1.5rem !important;\n}\n\n.p-5 {\n  padding: 3rem 3rem !important;\n}\n\n.pt-5 {\n  padding-top: 3rem !important;\n}\n\n.pr-5 {\n  padding-right: 3rem !important;\n}\n\n.pb-5 {\n  padding-bottom: 3rem !important;\n}\n\n.pl-5 {\n  padding-left: 3rem !important;\n}\n\n.px-5 {\n  padding-right: 3rem !important;\n  padding-left: 3rem !important;\n}\n\n.py-5 {\n  padding-top: 3rem !important;\n  padding-bottom: 3rem !important;\n}\n\n.m-auto {\n  margin: auto !important;\n}\n\n.mt-auto {\n  margin-top: auto !important;\n}\n\n.mr-auto {\n  margin-right: auto !important;\n}\n\n.mb-auto {\n  margin-bottom: auto !important;\n}\n\n.ml-auto {\n  margin-left: auto !important;\n}\n\n.mx-auto {\n  margin-right: auto !important;\n  margin-left: auto !important;\n}\n\n.my-auto {\n  margin-top: auto !important;\n  margin-bottom: auto !important;\n}\n\n@media (min-width: 576px) {\n  .m-sm-0 {\n    margin: 0 0 !important;\n  }\n  .mt-sm-0 {\n    margin-top: 0 !important;\n  }\n  .mr-sm-0 {\n    margin-right: 0 !important;\n  }\n  .mb-sm-0 {\n    margin-bottom: 0 !important;\n  }\n  .ml-sm-0 {\n    margin-left: 0 !important;\n  }\n  .mx-sm-0 {\n    margin-right: 0 !important;\n    margin-left: 0 !important;\n  }\n  .my-sm-0 {\n    margin-top: 0 !important;\n    margin-bottom: 0 !important;\n  }\n  .m-sm-1 {\n    margin: 0.25rem 0.25rem !important;\n  }\n  .mt-sm-1 {\n    margin-top: 0.25rem !important;\n  }\n  .mr-sm-1 {\n    margin-right: 0.25rem !important;\n  }\n  .mb-sm-1 {\n    margin-bottom: 0.25rem !important;\n  }\n  .ml-sm-1 {\n    margin-left: 0.25rem !important;\n  }\n  .mx-sm-1 {\n    margin-right: 0.25rem !important;\n    margin-left: 0.25rem !important;\n  }\n  .my-sm-1 {\n    margin-top: 0.25rem !important;\n    margin-bottom: 0.25rem !important;\n  }\n  .m-sm-2 {\n    margin: 0.5rem 0.5rem !important;\n  }\n  .mt-sm-2 {\n    margin-top: 0.5rem !important;\n  }\n  .mr-sm-2 {\n    margin-right: 0.5rem !important;\n  }\n  .mb-sm-2 {\n    margin-bottom: 0.5rem !important;\n  }\n  .ml-sm-2 {\n    margin-left: 0.5rem !important;\n  }\n  .mx-sm-2 {\n    margin-right: 0.5rem !important;\n    margin-left: 0.5rem !important;\n  }\n  .my-sm-2 {\n    margin-top: 0.5rem !important;\n    margin-bottom: 0.5rem !important;\n  }\n  .m-sm-3 {\n    margin: 1rem 1rem !important;\n  }\n  .mt-sm-3 {\n    margin-top: 1rem !important;\n  }\n  .mr-sm-3 {\n    margin-right: 1rem !important;\n  }\n  .mb-sm-3 {\n    margin-bottom: 1rem !important;\n  }\n  .ml-sm-3 {\n    margin-left: 1rem !important;\n  }\n  .mx-sm-3 {\n    margin-right: 1rem !important;\n    margin-left: 1rem !important;\n  }\n  .my-sm-3 {\n    margin-top: 1rem !important;\n    margin-bottom: 1rem !important;\n  }\n  .m-sm-4 {\n    margin: 1.5rem 1.5rem !important;\n  }\n  .mt-sm-4 {\n    margin-top: 1.5rem !important;\n  }\n  .mr-sm-4 {\n    margin-right: 1.5rem !important;\n  }\n  .mb-sm-4 {\n    margin-bottom: 1.5rem !important;\n  }\n  .ml-sm-4 {\n    margin-left: 1.5rem !important;\n  }\n  .mx-sm-4 {\n    margin-right: 1.5rem !important;\n    margin-left: 1.5rem !important;\n  }\n  .my-sm-4 {\n    margin-top: 1.5rem !important;\n    margin-bottom: 1.5rem !important;\n  }\n  .m-sm-5 {\n    margin: 3rem 3rem !important;\n  }\n  .mt-sm-5 {\n    margin-top: 3rem !important;\n  }\n  .mr-sm-5 {\n    margin-right: 3rem !important;\n  }\n  .mb-sm-5 {\n    margin-bottom: 3rem !important;\n  }\n  .ml-sm-5 {\n    margin-left: 3rem !important;\n  }\n  .mx-sm-5 {\n    margin-right: 3rem !important;\n    margin-left: 3rem !important;\n  }\n  .my-sm-5 {\n    margin-top: 3rem !important;\n    margin-bottom: 3rem !important;\n  }\n  .p-sm-0 {\n    padding: 0 0 !important;\n  }\n  .pt-sm-0 {\n    padding-top: 0 !important;\n  }\n  .pr-sm-0 {\n    padding-right: 0 !important;\n  }\n  .pb-sm-0 {\n    padding-bottom: 0 !important;\n  }\n  .pl-sm-0 {\n    padding-left: 0 !important;\n  }\n  .px-sm-0 {\n    padding-right: 0 !important;\n    padding-left: 0 !important;\n  }\n  .py-sm-0 {\n    padding-top: 0 !important;\n    padding-bottom: 0 !important;\n  }\n  .p-sm-1 {\n    padding: 0.25rem 0.25rem !important;\n  }\n  .pt-sm-1 {\n    padding-top: 0.25rem !important;\n  }\n  .pr-sm-1 {\n    padding-right: 0.25rem !important;\n  }\n  .pb-sm-1 {\n    padding-bottom: 0.25rem !important;\n  }\n  .pl-sm-1 {\n    padding-left: 0.25rem !important;\n  }\n  .px-sm-1 {\n    padding-right: 0.25rem !important;\n    padding-left: 0.25rem !important;\n  }\n  .py-sm-1 {\n    padding-top: 0.25rem !important;\n    padding-bottom: 0.25rem !important;\n  }\n  .p-sm-2 {\n    padding: 0.5rem 0.5rem !important;\n  }\n  .pt-sm-2 {\n    padding-top: 0.5rem !important;\n  }\n  .pr-sm-2 {\n    padding-right: 0.5rem !important;\n  }\n  .pb-sm-2 {\n    padding-bottom: 0.5rem !important;\n  }\n  .pl-sm-2 {\n    padding-left: 0.5rem !important;\n  }\n  .px-sm-2 {\n    padding-right: 0.5rem !important;\n    padding-left: 0.5rem !important;\n  }\n  .py-sm-2 {\n    padding-top: 0.5rem !important;\n    padding-bottom: 0.5rem !important;\n  }\n  .p-sm-3 {\n    padding: 1rem 1rem !important;\n  }\n  .pt-sm-3 {\n    padding-top: 1rem !important;\n  }\n  .pr-sm-3 {\n    padding-right: 1rem !important;\n  }\n  .pb-sm-3 {\n    padding-bottom: 1rem !important;\n  }\n  .pl-sm-3 {\n    padding-left: 1rem !important;\n  }\n  .px-sm-3 {\n    padding-right: 1rem !important;\n    padding-left: 1rem !important;\n  }\n  .py-sm-3 {\n    padding-top: 1rem !important;\n    padding-bottom: 1rem !important;\n  }\n  .p-sm-4 {\n    padding: 1.5rem 1.5rem !important;\n  }\n  .pt-sm-4 {\n    padding-top: 1.5rem !important;\n  }\n  .pr-sm-4 {\n    padding-right: 1.5rem !important;\n  }\n  .pb-sm-4 {\n    padding-bottom: 1.5rem !important;\n  }\n  .pl-sm-4 {\n    padding-left: 1.5rem !important;\n  }\n  .px-sm-4 {\n    padding-right: 1.5rem !important;\n    padding-left: 1.5rem !important;\n  }\n  .py-sm-4 {\n    padding-top: 1.5rem !important;\n    padding-bottom: 1.5rem !important;\n  }\n  .p-sm-5 {\n    padding: 3rem 3rem !important;\n  }\n  .pt-sm-5 {\n    padding-top: 3rem !important;\n  }\n  .pr-sm-5 {\n    padding-right: 3rem !important;\n  }\n  .pb-sm-5 {\n    padding-bottom: 3rem !important;\n  }\n  .pl-sm-5 {\n    padding-left: 3rem !important;\n  }\n  .px-sm-5 {\n    padding-right: 3rem !important;\n    padding-left: 3rem !important;\n  }\n  .py-sm-5 {\n    padding-top: 3rem !important;\n    padding-bottom: 3rem !important;\n  }\n  .m-sm-auto {\n    margin: auto !important;\n  }\n  .mt-sm-auto {\n    margin-top: auto !important;\n  }\n  .mr-sm-auto {\n    margin-right: auto !important;\n  }\n  .mb-sm-auto {\n    margin-bottom: auto !important;\n  }\n  .ml-sm-auto {\n    margin-left: auto !important;\n  }\n  .mx-sm-auto {\n    margin-right: auto !important;\n    margin-left: auto !important;\n  }\n  .my-sm-auto {\n    margin-top: auto !important;\n    margin-bottom: auto !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .m-md-0 {\n    margin: 0 0 !important;\n  }\n  .mt-md-0 {\n    margin-top: 0 !important;\n  }\n  .mr-md-0 {\n    margin-right: 0 !important;\n  }\n  .mb-md-0 {\n    margin-bottom: 0 !important;\n  }\n  .ml-md-0 {\n    margin-left: 0 !important;\n  }\n  .mx-md-0 {\n    margin-right: 0 !important;\n    margin-left: 0 !important;\n  }\n  .my-md-0 {\n    margin-top: 0 !important;\n    margin-bottom: 0 !important;\n  }\n  .m-md-1 {\n    margin: 0.25rem 0.25rem !important;\n  }\n  .mt-md-1 {\n    margin-top: 0.25rem !important;\n  }\n  .mr-md-1 {\n    margin-right: 0.25rem !important;\n  }\n  .mb-md-1 {\n    margin-bottom: 0.25rem !important;\n  }\n  .ml-md-1 {\n    margin-left: 0.25rem !important;\n  }\n  .mx-md-1 {\n    margin-right: 0.25rem !important;\n    margin-left: 0.25rem !important;\n  }\n  .my-md-1 {\n    margin-top: 0.25rem !important;\n    margin-bottom: 0.25rem !important;\n  }\n  .m-md-2 {\n    margin: 0.5rem 0.5rem !important;\n  }\n  .mt-md-2 {\n    margin-top: 0.5rem !important;\n  }\n  .mr-md-2 {\n    margin-right: 0.5rem !important;\n  }\n  .mb-md-2 {\n    margin-bottom: 0.5rem !important;\n  }\n  .ml-md-2 {\n    margin-left: 0.5rem !important;\n  }\n  .mx-md-2 {\n    margin-right: 0.5rem !important;\n    margin-left: 0.5rem !important;\n  }\n  .my-md-2 {\n    margin-top: 0.5rem !important;\n    margin-bottom: 0.5rem !important;\n  }\n  .m-md-3 {\n    margin: 1rem 1rem !important;\n  }\n  .mt-md-3 {\n    margin-top: 1rem !important;\n  }\n  .mr-md-3 {\n    margin-right: 1rem !important;\n  }\n  .mb-md-3 {\n    margin-bottom: 1rem !important;\n  }\n  .ml-md-3 {\n    margin-left: 1rem !important;\n  }\n  .mx-md-3 {\n    margin-right: 1rem !important;\n    margin-left: 1rem !important;\n  }\n  .my-md-3 {\n    margin-top: 1rem !important;\n    margin-bottom: 1rem !important;\n  }\n  .m-md-4 {\n    margin: 1.5rem 1.5rem !important;\n  }\n  .mt-md-4 {\n    margin-top: 1.5rem !important;\n  }\n  .mr-md-4 {\n    margin-right: 1.5rem !important;\n  }\n  .mb-md-4 {\n    margin-bottom: 1.5rem !important;\n  }\n  .ml-md-4 {\n    margin-left: 1.5rem !important;\n  }\n  .mx-md-4 {\n    margin-right: 1.5rem !important;\n    margin-left: 1.5rem !important;\n  }\n  .my-md-4 {\n    margin-top: 1.5rem !important;\n    margin-bottom: 1.5rem !important;\n  }\n  .m-md-5 {\n    margin: 3rem 3rem !important;\n  }\n  .mt-md-5 {\n    margin-top: 3rem !important;\n  }\n  .mr-md-5 {\n    margin-right: 3rem !important;\n  }\n  .mb-md-5 {\n    margin-bottom: 3rem !important;\n  }\n  .ml-md-5 {\n    margin-left: 3rem !important;\n  }\n  .mx-md-5 {\n    margin-right: 3rem !important;\n    margin-left: 3rem !important;\n  }\n  .my-md-5 {\n    margin-top: 3rem !important;\n    margin-bottom: 3rem !important;\n  }\n  .p-md-0 {\n    padding: 0 0 !important;\n  }\n  .pt-md-0 {\n    padding-top: 0 !important;\n  }\n  .pr-md-0 {\n    padding-right: 0 !important;\n  }\n  .pb-md-0 {\n    padding-bottom: 0 !important;\n  }\n  .pl-md-0 {\n    padding-left: 0 !important;\n  }\n  .px-md-0 {\n    padding-right: 0 !important;\n    padding-left: 0 !important;\n  }\n  .py-md-0 {\n    padding-top: 0 !important;\n    padding-bottom: 0 !important;\n  }\n  .p-md-1 {\n    padding: 0.25rem 0.25rem !important;\n  }\n  .pt-md-1 {\n    padding-top: 0.25rem !important;\n  }\n  .pr-md-1 {\n    padding-right: 0.25rem !important;\n  }\n  .pb-md-1 {\n    padding-bottom: 0.25rem !important;\n  }\n  .pl-md-1 {\n    padding-left: 0.25rem !important;\n  }\n  .px-md-1 {\n    padding-right: 0.25rem !important;\n    padding-left: 0.25rem !important;\n  }\n  .py-md-1 {\n    padding-top: 0.25rem !important;\n    padding-bottom: 0.25rem !important;\n  }\n  .p-md-2 {\n    padding: 0.5rem 0.5rem !important;\n  }\n  .pt-md-2 {\n    padding-top: 0.5rem !important;\n  }\n  .pr-md-2 {\n    padding-right: 0.5rem !important;\n  }\n  .pb-md-2 {\n    padding-bottom: 0.5rem !important;\n  }\n  .pl-md-2 {\n    padding-left: 0.5rem !important;\n  }\n  .px-md-2 {\n    padding-right: 0.5rem !important;\n    padding-left: 0.5rem !important;\n  }\n  .py-md-2 {\n    padding-top: 0.5rem !important;\n    padding-bottom: 0.5rem !important;\n  }\n  .p-md-3 {\n    padding: 1rem 1rem !important;\n  }\n  .pt-md-3 {\n    padding-top: 1rem !important;\n  }\n  .pr-md-3 {\n    padding-right: 1rem !important;\n  }\n  .pb-md-3 {\n    padding-bottom: 1rem !important;\n  }\n  .pl-md-3 {\n    padding-left: 1rem !important;\n  }\n  .px-md-3 {\n    padding-right: 1rem !important;\n    padding-left: 1rem !important;\n  }\n  .py-md-3 {\n    padding-top: 1rem !important;\n    padding-bottom: 1rem !important;\n  }\n  .p-md-4 {\n    padding: 1.5rem 1.5rem !important;\n  }\n  .pt-md-4 {\n    padding-top: 1.5rem !important;\n  }\n  .pr-md-4 {\n    padding-right: 1.5rem !important;\n  }\n  .pb-md-4 {\n    padding-bottom: 1.5rem !important;\n  }\n  .pl-md-4 {\n    padding-left: 1.5rem !important;\n  }\n  .px-md-4 {\n    padding-right: 1.5rem !important;\n    padding-left: 1.5rem !important;\n  }\n  .py-md-4 {\n    padding-top: 1.5rem !important;\n    padding-bottom: 1.5rem !important;\n  }\n  .p-md-5 {\n    padding: 3rem 3rem !important;\n  }\n  .pt-md-5 {\n    padding-top: 3rem !important;\n  }\n  .pr-md-5 {\n    padding-right: 3rem !important;\n  }\n  .pb-md-5 {\n    padding-bottom: 3rem !important;\n  }\n  .pl-md-5 {\n    padding-left: 3rem !important;\n  }\n  .px-md-5 {\n    padding-right: 3rem !important;\n    padding-left: 3rem !important;\n  }\n  .py-md-5 {\n    padding-top: 3rem !important;\n    padding-bottom: 3rem !important;\n  }\n  .m-md-auto {\n    margin: auto !important;\n  }\n  .mt-md-auto {\n    margin-top: auto !important;\n  }\n  .mr-md-auto {\n    margin-right: auto !important;\n  }\n  .mb-md-auto {\n    margin-bottom: auto !important;\n  }\n  .ml-md-auto {\n    margin-left: auto !important;\n  }\n  .mx-md-auto {\n    margin-right: auto !important;\n    margin-left: auto !important;\n  }\n  .my-md-auto {\n    margin-top: auto !important;\n    margin-bottom: auto !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .m-lg-0 {\n    margin: 0 0 !important;\n  }\n  .mt-lg-0 {\n    margin-top: 0 !important;\n  }\n  .mr-lg-0 {\n    margin-right: 0 !important;\n  }\n  .mb-lg-0 {\n    margin-bottom: 0 !important;\n  }\n  .ml-lg-0 {\n    margin-left: 0 !important;\n  }\n  .mx-lg-0 {\n    margin-right: 0 !important;\n    margin-left: 0 !important;\n  }\n  .my-lg-0 {\n    margin-top: 0 !important;\n    margin-bottom: 0 !important;\n  }\n  .m-lg-1 {\n    margin: 0.25rem 0.25rem !important;\n  }\n  .mt-lg-1 {\n    margin-top: 0.25rem !important;\n  }\n  .mr-lg-1 {\n    margin-right: 0.25rem !important;\n  }\n  .mb-lg-1 {\n    margin-bottom: 0.25rem !important;\n  }\n  .ml-lg-1 {\n    margin-left: 0.25rem !important;\n  }\n  .mx-lg-1 {\n    margin-right: 0.25rem !important;\n    margin-left: 0.25rem !important;\n  }\n  .my-lg-1 {\n    margin-top: 0.25rem !important;\n    margin-bottom: 0.25rem !important;\n  }\n  .m-lg-2 {\n    margin: 0.5rem 0.5rem !important;\n  }\n  .mt-lg-2 {\n    margin-top: 0.5rem !important;\n  }\n  .mr-lg-2 {\n    margin-right: 0.5rem !important;\n  }\n  .mb-lg-2 {\n    margin-bottom: 0.5rem !important;\n  }\n  .ml-lg-2 {\n    margin-left: 0.5rem !important;\n  }\n  .mx-lg-2 {\n    margin-right: 0.5rem !important;\n    margin-left: 0.5rem !important;\n  }\n  .my-lg-2 {\n    margin-top: 0.5rem !important;\n    margin-bottom: 0.5rem !important;\n  }\n  .m-lg-3 {\n    margin: 1rem 1rem !important;\n  }\n  .mt-lg-3 {\n    margin-top: 1rem !important;\n  }\n  .mr-lg-3 {\n    margin-right: 1rem !important;\n  }\n  .mb-lg-3 {\n    margin-bottom: 1rem !important;\n  }\n  .ml-lg-3 {\n    margin-left: 1rem !important;\n  }\n  .mx-lg-3 {\n    margin-right: 1rem !important;\n    margin-left: 1rem !important;\n  }\n  .my-lg-3 {\n    margin-top: 1rem !important;\n    margin-bottom: 1rem !important;\n  }\n  .m-lg-4 {\n    margin: 1.5rem 1.5rem !important;\n  }\n  .mt-lg-4 {\n    margin-top: 1.5rem !important;\n  }\n  .mr-lg-4 {\n    margin-right: 1.5rem !important;\n  }\n  .mb-lg-4 {\n    margin-bottom: 1.5rem !important;\n  }\n  .ml-lg-4 {\n    margin-left: 1.5rem !important;\n  }\n  .mx-lg-4 {\n    margin-right: 1.5rem !important;\n    margin-left: 1.5rem !important;\n  }\n  .my-lg-4 {\n    margin-top: 1.5rem !important;\n    margin-bottom: 1.5rem !important;\n  }\n  .m-lg-5 {\n    margin: 3rem 3rem !important;\n  }\n  .mt-lg-5 {\n    margin-top: 3rem !important;\n  }\n  .mr-lg-5 {\n    margin-right: 3rem !important;\n  }\n  .mb-lg-5 {\n    margin-bottom: 3rem !important;\n  }\n  .ml-lg-5 {\n    margin-left: 3rem !important;\n  }\n  .mx-lg-5 {\n    margin-right: 3rem !important;\n    margin-left: 3rem !important;\n  }\n  .my-lg-5 {\n    margin-top: 3rem !important;\n    margin-bottom: 3rem !important;\n  }\n  .p-lg-0 {\n    padding: 0 0 !important;\n  }\n  .pt-lg-0 {\n    padding-top: 0 !important;\n  }\n  .pr-lg-0 {\n    padding-right: 0 !important;\n  }\n  .pb-lg-0 {\n    padding-bottom: 0 !important;\n  }\n  .pl-lg-0 {\n    padding-left: 0 !important;\n  }\n  .px-lg-0 {\n    padding-right: 0 !important;\n    padding-left: 0 !important;\n  }\n  .py-lg-0 {\n    padding-top: 0 !important;\n    padding-bottom: 0 !important;\n  }\n  .p-lg-1 {\n    padding: 0.25rem 0.25rem !important;\n  }\n  .pt-lg-1 {\n    padding-top: 0.25rem !important;\n  }\n  .pr-lg-1 {\n    padding-right: 0.25rem !important;\n  }\n  .pb-lg-1 {\n    padding-bottom: 0.25rem !important;\n  }\n  .pl-lg-1 {\n    padding-left: 0.25rem !important;\n  }\n  .px-lg-1 {\n    padding-right: 0.25rem !important;\n    padding-left: 0.25rem !important;\n  }\n  .py-lg-1 {\n    padding-top: 0.25rem !important;\n    padding-bottom: 0.25rem !important;\n  }\n  .p-lg-2 {\n    padding: 0.5rem 0.5rem !important;\n  }\n  .pt-lg-2 {\n    padding-top: 0.5rem !important;\n  }\n  .pr-lg-2 {\n    padding-right: 0.5rem !important;\n  }\n  .pb-lg-2 {\n    padding-bottom: 0.5rem !important;\n  }\n  .pl-lg-2 {\n    padding-left: 0.5rem !important;\n  }\n  .px-lg-2 {\n    padding-right: 0.5rem !important;\n    padding-left: 0.5rem !important;\n  }\n  .py-lg-2 {\n    padding-top: 0.5rem !important;\n    padding-bottom: 0.5rem !important;\n  }\n  .p-lg-3 {\n    padding: 1rem 1rem !important;\n  }\n  .pt-lg-3 {\n    padding-top: 1rem !important;\n  }\n  .pr-lg-3 {\n    padding-right: 1rem !important;\n  }\n  .pb-lg-3 {\n    padding-bottom: 1rem !important;\n  }\n  .pl-lg-3 {\n    padding-left: 1rem !important;\n  }\n  .px-lg-3 {\n    padding-right: 1rem !important;\n    padding-left: 1rem !important;\n  }\n  .py-lg-3 {\n    padding-top: 1rem !important;\n    padding-bottom: 1rem !important;\n  }\n  .p-lg-4 {\n    padding: 1.5rem 1.5rem !important;\n  }\n  .pt-lg-4 {\n    padding-top: 1.5rem !important;\n  }\n  .pr-lg-4 {\n    padding-right: 1.5rem !important;\n  }\n  .pb-lg-4 {\n    padding-bottom: 1.5rem !important;\n  }\n  .pl-lg-4 {\n    padding-left: 1.5rem !important;\n  }\n  .px-lg-4 {\n    padding-right: 1.5rem !important;\n    padding-left: 1.5rem !important;\n  }\n  .py-lg-4 {\n    padding-top: 1.5rem !important;\n    padding-bottom: 1.5rem !important;\n  }\n  .p-lg-5 {\n    padding: 3rem 3rem !important;\n  }\n  .pt-lg-5 {\n    padding-top: 3rem !important;\n  }\n  .pr-lg-5 {\n    padding-right: 3rem !important;\n  }\n  .pb-lg-5 {\n    padding-bottom: 3rem !important;\n  }\n  .pl-lg-5 {\n    padding-left: 3rem !important;\n  }\n  .px-lg-5 {\n    padding-right: 3rem !important;\n    padding-left: 3rem !important;\n  }\n  .py-lg-5 {\n    padding-top: 3rem !important;\n    padding-bottom: 3rem !important;\n  }\n  .m-lg-auto {\n    margin: auto !important;\n  }\n  .mt-lg-auto {\n    margin-top: auto !important;\n  }\n  .mr-lg-auto {\n    margin-right: auto !important;\n  }\n  .mb-lg-auto {\n    margin-bottom: auto !important;\n  }\n  .ml-lg-auto {\n    margin-left: auto !important;\n  }\n  .mx-lg-auto {\n    margin-right: auto !important;\n    margin-left: auto !important;\n  }\n  .my-lg-auto {\n    margin-top: auto !important;\n    margin-bottom: auto !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .m-xl-0 {\n    margin: 0 0 !important;\n  }\n  .mt-xl-0 {\n    margin-top: 0 !important;\n  }\n  .mr-xl-0 {\n    margin-right: 0 !important;\n  }\n  .mb-xl-0 {\n    margin-bottom: 0 !important;\n  }\n  .ml-xl-0 {\n    margin-left: 0 !important;\n  }\n  .mx-xl-0 {\n    margin-right: 0 !important;\n    margin-left: 0 !important;\n  }\n  .my-xl-0 {\n    margin-top: 0 !important;\n    margin-bottom: 0 !important;\n  }\n  .m-xl-1 {\n    margin: 0.25rem 0.25rem !important;\n  }\n  .mt-xl-1 {\n    margin-top: 0.25rem !important;\n  }\n  .mr-xl-1 {\n    margin-right: 0.25rem !important;\n  }\n  .mb-xl-1 {\n    margin-bottom: 0.25rem !important;\n  }\n  .ml-xl-1 {\n    margin-left: 0.25rem !important;\n  }\n  .mx-xl-1 {\n    margin-right: 0.25rem !important;\n    margin-left: 0.25rem !important;\n  }\n  .my-xl-1 {\n    margin-top: 0.25rem !important;\n    margin-bottom: 0.25rem !important;\n  }\n  .m-xl-2 {\n    margin: 0.5rem 0.5rem !important;\n  }\n  .mt-xl-2 {\n    margin-top: 0.5rem !important;\n  }\n  .mr-xl-2 {\n    margin-right: 0.5rem !important;\n  }\n  .mb-xl-2 {\n    margin-bottom: 0.5rem !important;\n  }\n  .ml-xl-2 {\n    margin-left: 0.5rem !important;\n  }\n  .mx-xl-2 {\n    margin-right: 0.5rem !important;\n    margin-left: 0.5rem !important;\n  }\n  .my-xl-2 {\n    margin-top: 0.5rem !important;\n    margin-bottom: 0.5rem !important;\n  }\n  .m-xl-3 {\n    margin: 1rem 1rem !important;\n  }\n  .mt-xl-3 {\n    margin-top: 1rem !important;\n  }\n  .mr-xl-3 {\n    margin-right: 1rem !important;\n  }\n  .mb-xl-3 {\n    margin-bottom: 1rem !important;\n  }\n  .ml-xl-3 {\n    margin-left: 1rem !important;\n  }\n  .mx-xl-3 {\n    margin-right: 1rem !important;\n    margin-left: 1rem !important;\n  }\n  .my-xl-3 {\n    margin-top: 1rem !important;\n    margin-bottom: 1rem !important;\n  }\n  .m-xl-4 {\n    margin: 1.5rem 1.5rem !important;\n  }\n  .mt-xl-4 {\n    margin-top: 1.5rem !important;\n  }\n  .mr-xl-4 {\n    margin-right: 1.5rem !important;\n  }\n  .mb-xl-4 {\n    margin-bottom: 1.5rem !important;\n  }\n  .ml-xl-4 {\n    margin-left: 1.5rem !important;\n  }\n  .mx-xl-4 {\n    margin-right: 1.5rem !important;\n    margin-left: 1.5rem !important;\n  }\n  .my-xl-4 {\n    margin-top: 1.5rem !important;\n    margin-bottom: 1.5rem !important;\n  }\n  .m-xl-5 {\n    margin: 3rem 3rem !important;\n  }\n  .mt-xl-5 {\n    margin-top: 3rem !important;\n  }\n  .mr-xl-5 {\n    margin-right: 3rem !important;\n  }\n  .mb-xl-5 {\n    margin-bottom: 3rem !important;\n  }\n  .ml-xl-5 {\n    margin-left: 3rem !important;\n  }\n  .mx-xl-5 {\n    margin-right: 3rem !important;\n    margin-left: 3rem !important;\n  }\n  .my-xl-5 {\n    margin-top: 3rem !important;\n    margin-bottom: 3rem !important;\n  }\n  .p-xl-0 {\n    padding: 0 0 !important;\n  }\n  .pt-xl-0 {\n    padding-top: 0 !important;\n  }\n  .pr-xl-0 {\n    padding-right: 0 !important;\n  }\n  .pb-xl-0 {\n    padding-bottom: 0 !important;\n  }\n  .pl-xl-0 {\n    padding-left: 0 !important;\n  }\n  .px-xl-0 {\n    padding-right: 0 !important;\n    padding-left: 0 !important;\n  }\n  .py-xl-0 {\n    padding-top: 0 !important;\n    padding-bottom: 0 !important;\n  }\n  .p-xl-1 {\n    padding: 0.25rem 0.25rem !important;\n  }\n  .pt-xl-1 {\n    padding-top: 0.25rem !important;\n  }\n  .pr-xl-1 {\n    padding-right: 0.25rem !important;\n  }\n  .pb-xl-1 {\n    padding-bottom: 0.25rem !important;\n  }\n  .pl-xl-1 {\n    padding-left: 0.25rem !important;\n  }\n  .px-xl-1 {\n    padding-right: 0.25rem !important;\n    padding-left: 0.25rem !important;\n  }\n  .py-xl-1 {\n    padding-top: 0.25rem !important;\n    padding-bottom: 0.25rem !important;\n  }\n  .p-xl-2 {\n    padding: 0.5rem 0.5rem !important;\n  }\n  .pt-xl-2 {\n    padding-top: 0.5rem !important;\n  }\n  .pr-xl-2 {\n    padding-right: 0.5rem !important;\n  }\n  .pb-xl-2 {\n    padding-bottom: 0.5rem !important;\n  }\n  .pl-xl-2 {\n    padding-left: 0.5rem !important;\n  }\n  .px-xl-2 {\n    padding-right: 0.5rem !important;\n    padding-left: 0.5rem !important;\n  }\n  .py-xl-2 {\n    padding-top: 0.5rem !important;\n    padding-bottom: 0.5rem !important;\n  }\n  .p-xl-3 {\n    padding: 1rem 1rem !important;\n  }\n  .pt-xl-3 {\n    padding-top: 1rem !important;\n  }\n  .pr-xl-3 {\n    padding-right: 1rem !important;\n  }\n  .pb-xl-3 {\n    padding-bottom: 1rem !important;\n  }\n  .pl-xl-3 {\n    padding-left: 1rem !important;\n  }\n  .px-xl-3 {\n    padding-right: 1rem !important;\n    padding-left: 1rem !important;\n  }\n  .py-xl-3 {\n    padding-top: 1rem !important;\n    padding-bottom: 1rem !important;\n  }\n  .p-xl-4 {\n    padding: 1.5rem 1.5rem !important;\n  }\n  .pt-xl-4 {\n    padding-top: 1.5rem !important;\n  }\n  .pr-xl-4 {\n    padding-right: 1.5rem !important;\n  }\n  .pb-xl-4 {\n    padding-bottom: 1.5rem !important;\n  }\n  .pl-xl-4 {\n    padding-left: 1.5rem !important;\n  }\n  .px-xl-4 {\n    padding-right: 1.5rem !important;\n    padding-left: 1.5rem !important;\n  }\n  .py-xl-4 {\n    padding-top: 1.5rem !important;\n    padding-bottom: 1.5rem !important;\n  }\n  .p-xl-5 {\n    padding: 3rem 3rem !important;\n  }\n  .pt-xl-5 {\n    padding-top: 3rem !important;\n  }\n  .pr-xl-5 {\n    padding-right: 3rem !important;\n  }\n  .pb-xl-5 {\n    padding-bottom: 3rem !important;\n  }\n  .pl-xl-5 {\n    padding-left: 3rem !important;\n  }\n  .px-xl-5 {\n    padding-right: 3rem !important;\n    padding-left: 3rem !important;\n  }\n  .py-xl-5 {\n    padding-top: 3rem !important;\n    padding-bottom: 3rem !important;\n  }\n  .m-xl-auto {\n    margin: auto !important;\n  }\n  .mt-xl-auto {\n    margin-top: auto !important;\n  }\n  .mr-xl-auto {\n    margin-right: auto !important;\n  }\n  .mb-xl-auto {\n    margin-bottom: auto !important;\n  }\n  .ml-xl-auto {\n    margin-left: auto !important;\n  }\n  .mx-xl-auto {\n    margin-right: auto !important;\n    margin-left: auto !important;\n  }\n  .my-xl-auto {\n    margin-top: auto !important;\n    margin-bottom: auto !important;\n  }\n}\n\n.text-justify {\n  text-align: justify !important;\n}\n\n.text-nowrap {\n  white-space: nowrap !important;\n}\n\n.text-truncate {\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n\n.text-left {\n  text-align: left !important;\n}\n\n.text-right {\n  text-align: right !important;\n}\n\n.text-center {\n  text-align: center !important;\n}\n\n@media (min-width: 576px) {\n  .text-sm-left {\n    text-align: left !important;\n  }\n  .text-sm-right {\n    text-align: right !important;\n  }\n  .text-sm-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .text-md-left {\n    text-align: left !important;\n  }\n  .text-md-right {\n    text-align: right !important;\n  }\n  .text-md-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .text-lg-left {\n    text-align: left !important;\n  }\n  .text-lg-right {\n    text-align: right !important;\n  }\n  .text-lg-center {\n    text-align: center !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .text-xl-left {\n    text-align: left !important;\n  }\n  .text-xl-right {\n    text-align: right !important;\n  }\n  .text-xl-center {\n    text-align: center !important;\n  }\n}\n\n.text-lowercase {\n  text-transform: lowercase !important;\n}\n\n.text-uppercase {\n  text-transform: uppercase !important;\n}\n\n.text-capitalize {\n  text-transform: capitalize !important;\n}\n\n.font-weight-normal {\n  font-weight: normal;\n}\n\n.font-weight-bold {\n  font-weight: bold;\n}\n\n.font-italic {\n  font-style: italic;\n}\n\n.text-white {\n  color: #fff !important;\n}\n\n.text-muted {\n  color: #636c72 !important;\n}\n\na.text-muted:focus, a.text-muted:hover {\n  color: #4b5257 !important;\n}\n\n.text-primary {\n  color: #0275d8 !important;\n}\n\na.text-primary:focus, a.text-primary:hover {\n  color: #025aa5 !important;\n}\n\n.text-success {\n  color: #5cb85c !important;\n}\n\na.text-success:focus, a.text-success:hover {\n  color: #449d44 !important;\n}\n\n.text-info {\n  color: #5bc0de !important;\n}\n\na.text-info:focus, a.text-info:hover {\n  color: #31b0d5 !important;\n}\n\n.text-warning {\n  color: #f0ad4e !important;\n}\n\na.text-warning:focus, a.text-warning:hover {\n  color: #ec971f !important;\n}\n\n.text-danger {\n  color: #d9534f !important;\n}\n\na.text-danger:focus, a.text-danger:hover {\n  color: #c9302c !important;\n}\n\n.text-gray-dark {\n  color: #292b2c !important;\n}\n\na.text-gray-dark:focus, a.text-gray-dark:hover {\n  color: #101112 !important;\n}\n\n.text-hide {\n  font: 0/0 a;\n  color: transparent;\n  text-shadow: none;\n  background-color: transparent;\n  border: 0;\n}\n\n.invisible {\n  visibility: hidden !important;\n}\n\n.hidden-xs-up {\n  display: none !important;\n}\n\n@media (max-width: 575px) {\n  .hidden-xs-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 576px) {\n  .hidden-sm-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 767px) {\n  .hidden-sm-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 768px) {\n  .hidden-md-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 991px) {\n  .hidden-md-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 992px) {\n  .hidden-lg-up {\n    display: none !important;\n  }\n}\n\n@media (max-width: 1199px) {\n  .hidden-lg-down {\n    display: none !important;\n  }\n}\n\n@media (min-width: 1200px) {\n  .hidden-xl-up {\n    display: none !important;\n  }\n}\n\n.hidden-xl-down {\n  display: none !important;\n}\n\n.visible-print-block {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-block {\n    display: block !important;\n  }\n}\n\n.visible-print-inline {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-inline {\n    display: inline !important;\n  }\n}\n\n.visible-print-inline-block {\n  display: none !important;\n}\n\n@media print {\n  .visible-print-inline-block {\n    display: inline-block !important;\n  }\n}\n\n@media print {\n  .hidden-print {\n    display: none !important;\n  }\n}\n/*# sourceMappingURL=bootstrap.css.map */"; });
-function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-bootstrapper":"..\\node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-binding":"..\\node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-history":"..\\node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-loader":"..\\node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-dependency-injection":"..\\node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-logging":"..\\node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"..\\node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-loader-default":"..\\node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-history-browser":"..\\node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-pal":"..\\node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"..\\node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"..\\node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"..\\node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-task-queue":"..\\node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"..\\node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-framework":"..\\node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-router":"..\\node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-templating-binding":"..\\node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","text":"..\\node_modules\\text\\text","jquery":"..\\node_modules\\jquery\\dist\\jquery","aurelia-route-recognizer":"..\\node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-metadata":"..\\node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-event-aggregator":"..\\node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"bootstrap4","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"}],"stubModules":["text"],"shim":{"bootstrap4":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","messages","components/battle-stack","components/log-output","components/main-menu","components/modal-content","components/player-inventory","components/player-overview","components/player-templates","components/progress-bar","components/template-bag","components/template-manager","domain/AllItems","domain/AllRecipies","domain/Body","domain/Monster","domain/MonsterTemplate","domain/Player","factories/ItemFactory","factories/MonsterFactory","factories/PlayerFactory","helpers/Array","helpers/Attribute","helpers/Combat","helpers/Dice","helpers/Experience","helpers/GameLoop","helpers/LootDropper","resources/index","components/loot/loot-stack","domain/Enums/Rarity","domain/Items/Gold","domain/Items/Loot","domain/Items/Recipe","domain/Items/Weapon","domain/Recipies/DragonRecipe","domain/Recipies/KoboldRecipe","domain/Recipies/MonsterRecipe","domain/Recipies/WetPaperBagRecipe","domain/Stores/PlayerStore","domain/Stores/TemplateStore","styles/styles","components/loot/gold-loot","components/loot/recipe-loot","components/loot/weapon-loot"]}})}
+function _aureliaConfigureModuleLoader(){requirejs.config({"baseUrl":"src/","paths":{"aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","jquery":"../node_modules\\jquery\\dist\\jquery","text":"../node_modules\\text\\text","app-bundle":"../scripts/app-bundle"},"packages":[{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"},{"name":"bootstrap4","location":"../node_modules/bootstrap/dist","main":"js/bootstrap.min"}],"stubModules":["text"],"shim":{"bootstrap4":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["helpers/Attribute","helpers/Dice","helpers/Experience","domain/Body","domain/Enums/Rarity","domain/Recipies/MonsterRecipe","domain/Recipies/KoboldRecipe","domain/Recipies/WetPaperBagRecipe","domain/Recipies/DragonRecipe","domain/AllRecipies","domain/Monster","domain/MonsterTemplate","domain/Items/Loot","domain/Items/Gold","domain/Items/Weapon","domain/Items/Recipe","domain/AllItems","messages","helpers/GameLoop","app","helpers/Array","environment","main","domain/Player","factories/PlayerFactory","domain/Stores/PlayerStore","factories/MonsterFactory","helpers/Combat","components/battle-stack","components/log-output","domain/Stores/TemplateStore","components/main-menu","components/modal-content","components/player-inventory","components/player-overview","components/player-templates","components/progress-bar","components/template-bag","components/template-manager","factories/ItemFactory","helpers/LootDropper","resources/index","components/loot/loot-stack","styles/styles","components/loot/gold-loot","components/loot/recipe-loot","components/loot/weapon-loot"]}})}
