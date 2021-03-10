@@ -2,7 +2,7 @@ import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
 import Player from '../Domain/Player';
 import PlayerStore from '../domain/Stores/PlayerStore';
-import Monster from '../Domain/Monster';
+import Monster from '../domain/monster';
 import Body from '../Domain/Body';
 import Dice from "../helpers/Dice";
 import Attribute from "../helpers/Attribute";

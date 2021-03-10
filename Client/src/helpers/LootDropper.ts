@@ -1,6 +1,6 @@
 import { autoinject } from 'aurelia-framework';
 import Player from '../Domain/Player';
-import Monster from '../Domain/Monster';
+import Monster from '../domain/monster';
 import PlayerStore from '../domain/Stores/PlayerStore';
 import ItemFactory from '../factories/ItemFactory';
 import Dice from "../helpers/Dice";

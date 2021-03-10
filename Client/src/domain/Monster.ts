@@ -1,6 +1,6 @@
 import Body from "./Body";
 import { MonsterKilled } from '../messages';
-import * as Recipe from '../domain/AllRecipies';
+import * as Recipe from './AllRecipies';
 import Experience from '../helpers/Experience';
 
 export default class Monster extends Body {

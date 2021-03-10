@@ -1,6 +1,6 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
-import Monster from '../domain/Monster';
+import Monster from '../domain/monster';
 import PlayerStore from '../domain/Stores/PlayerStore';
 import * as Recipe from '../domain/AllRecipies';
 

@@ -3,7 +3,7 @@ import { EventAggregator } from 'aurelia-event-aggregator';
 import * as Item from '../domain/AllItems';
 import * as Recipes from '../domain/AllRecipies';
 import PlayerStore from '../domain/Stores/PlayerStore';
-import Monster from '../domain/Monster';
+import Monster from '../domain/monster';
 import Dice from "../helpers/Dice";
 
 @autoinject

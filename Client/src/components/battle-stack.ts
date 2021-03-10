@@ -1,6 +1,6 @@
 import { autoinject } from 'aurelia-framework';
 import { EventAggregator } from 'aurelia-event-aggregator';
-import Monster from '../domain/Monster';
+import Monster from '../domain/monster';
 import MonsterFactory from '../factories/MonsterFactory';
 import Combat from '../helpers/Combat';
 import { TemplateSpawned, Heartbeat, MonsterKilled } from '../messages';
